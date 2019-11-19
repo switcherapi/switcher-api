@@ -1,6 +1,6 @@
 const express = require('express')
 const ConfigGroup = require('../models/group-config')
-const ConfigStrategy = require('../models/config-strategy')
+const { ConfigStrategy } = require('../models/config-strategy')
 const validator = require('../middleware/validators')
 const { appAuth } = require('../middleware/auth')
 const router = new express.Router()

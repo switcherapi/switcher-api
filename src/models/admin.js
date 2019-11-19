@@ -3,9 +3,6 @@ const validator = require('validator')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const Domain = require('./domain')
-const GroupConfig = require('./group-config')
-const Config = require('./config')
-const ConfigStrategy = require('./config-strategy')
 
 const adminSchema = new mongoose.Schema({
     name: {
@@ -127,8 +124,15 @@ adminSchema.pre('save', async function (next) {
 })
 
 adminSchema.pre('remove', async function (next) {
+    var ObjectId = (require('mongoose').Types.ObjectId);
+
     const admin = this
-    await Domain.deleteMany({ owner: admin._id })
+    const domain = await Domain.find({ owner: new ObjectId(admin._id) })
+
+    if (domain) {
+        domain.forEach((d) => d.remove())
+    }
+
     next()
 })
 

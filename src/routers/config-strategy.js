@@ -1,6 +1,6 @@
 const express = require('express')
 const Config = require('../models/config')
-const ConfigStrategy = require('../models/config-strategy')
+const { ConfigStrategy } = require('../models/config-strategy')
 const { auth } = require('../middleware/auth')
 const router = new express.Router()
 

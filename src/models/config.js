@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const ConfigStrategy = require('./config-strategy')
+const { ConfigStrategy } = require('./config-strategy')
 
 const configSchema = new mongoose.Schema({
     key: {

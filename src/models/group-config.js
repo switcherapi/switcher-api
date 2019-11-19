@@ -1,6 +1,4 @@
 const mongoose = require('mongoose')
-const Admin = require('./admin')
-const Domain = require('./domain')
 const Config = require('./config')
 
 const groupConfigSchema = new mongoose.Schema({
@@ -48,8 +46,10 @@ groupConfigSchema.methods.toJSON = function () {
 }
 
 groupConfigSchema.pre('remove', async function (next) {
+    var ObjectId = (require('mongoose').Types.ObjectId);
+
     const group = this
-    const config = await Config.find({ group: group._id })
+    const config = await Config.find({ group: new ObjectId(group._id) })
 
     if (config) {
         config.forEach((c) => c.remove())

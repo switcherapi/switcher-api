@@ -1,8 +1,6 @@
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const GroupConfig = require('./group-config')
-const Config = require('./config')
-const ConfigStrategy = require('./config-strategy')
 
 const domainSchema = new mongoose.Schema({
     name: {
@@ -42,9 +40,11 @@ domainSchema.methods.generateAuthToken = async function () {
 }
 
 domainSchema.pre('remove', async function (next) {
-    const domain = this
-    const group = await GroupConfig.find({ domain: domain._id })
+    var ObjectId = (require('mongoose').Types.ObjectId);
 
+    const domain = this
+    const group = await GroupConfig.find({ domain: new ObjectId(domain._id) })
+    
     if (group) {
         group.forEach((g) => g.remove())
     }
