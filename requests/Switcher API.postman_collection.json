@@ -1,0 +1,1090 @@
+{
+	"info": {
+		"_postman_id": "4f795538-874c-4b94-b0b5-76fb711b05d0",
+		"name": "Switcher API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Admin - Signup",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bc8552fc-029b-432b-b090-dc2988741dca",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('authToken', pm.response.json().token)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Roger\",\n\t\"email\": \"mail@gmail.com\",\n\t\"password\": \"12312312312\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/admin/signup",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - Create",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bc8552fc-029b-432b-b090-dc2988741dca",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('authToken', pm.response.json().token)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"John\",\n\t\"email\": \"john@gmail.com\",\n\t\"password\": \"12312312312\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/admin/create",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - Update Me",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"password\": \"12312312312\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/admin/me",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - Update",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"active\": \"true\",\n\t\"master\": \"true\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/admin/5dd20630d02f4a21d4e5f2ba",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"5dd20630d02f4a21d4e5f2ba"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "00421dc9-53f8-493b-ac1b-9b71e2f59a64",
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    pm.environment.set('authToken', pm.response.json().token)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"mail@gmail.com\",\n\t\"password\": \"12312312312\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/admin/login",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - Logout",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/admin/logout",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - Logout ALL",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/admin/logoutAll",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"logoutAll"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - Logout Other Sessions",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/admin/logoutOtherSessions",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"logoutOtherSessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - Read",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d588267a-effd-4e44-a189-c4366083197f",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/admin/me",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - Delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/admin/me",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Domain - Create",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"currency-api\",\n\t\"description\": \"Currency API\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/domain/create",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"domain",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Domain - Token",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/domain/generateKey",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"domain",
+						"generateKey"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Domain - Update",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"currency-api\",\n\t\"description\": \"Currency API\",\n\t\"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGQyMDdjMDFmNDhlODQyOGNjMWYwM2MiLCJpYXQiOjE1NzQwNDYxNDd9.4V__O_GHxOves1OdZAlj2OdNswM1H0YsXiIaUhbbmis\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/domain/5dd207c01f48e8428cc1f03c",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"domain",
+						"5dd207c01f48e8428cc1f03c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Domain - Read",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/domain?sortBy=createdAt:desc",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"domain"
+					],
+					"query": [
+						{
+							"key": "sortBy",
+							"value": "createdAt:desc"
+						},
+						{
+							"key": "limit",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "2",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Domain - Read Single",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/domain/5dd05cfa98adc4285457e29a",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"domain",
+						"5dd05cfa98adc4285457e29a"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "2",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Domain - Delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/domain/5dd36ab857445636ccdeb520",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"domain",
+						"5dd36ab857445636ccdeb520"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Group - Create",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Rollout 2020\",\n\t\"description\": \"Changes that will be applied during the rollout\",\n\t\"domain\": \"5dd36adc57445636ccdeb522\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/groupconfig/create",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"groupconfig",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Group - Update",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Rollout 2020\",\n\t\"description\": \"Changes that will be applied during the rollout\",\n\t\"activated\": \"true\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/groupconfig/5dd231391f11a7307c164531",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"groupconfig",
+						"5dd231391f11a7307c164531"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Group - Read",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/groupconfig?sortBy=createdAt:asc&domain=5dd230991f11a7307c16452a",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"groupconfig"
+					],
+					"query": [
+						{
+							"key": "sortBy",
+							"value": "createdAt:asc"
+						},
+						{
+							"key": "activated",
+							"value": "true",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "domain",
+							"value": "5dd230991f11a7307c16452a"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Group - Read Single",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/groupconfig/5dd06217fd3f1e403806db30",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"groupconfig",
+						"5dd06217fd3f1e403806db30"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "5dd06217fd3f1e403806db30",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "2",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Group - Delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/groupconfig/5dd230a81f11a7307c16452b",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"groupconfig",
+						"5dd230a81f11a7307c16452b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Config - Create",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"key\": \"FF2FOR2021\",\n\t\"description\": \"Feature Flag\",\n\t\"group\": \"5dd36ae257445636ccdeb523\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/config/create",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"config",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Config - Update",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"key\": \"FF2FOR2021\",\n\t\"description\": \"Feature Flag\",\n\t\"activated\": \"true\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/config/5dd232241f11a7307c164535",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"config",
+						"5dd232241f11a7307c164535"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Config - Read",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/config?group=5dd231391f11a7307c164531",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"config"
+					],
+					"query": [
+						{
+							"key": "sortBy",
+							"value": "createdAt:asc",
+							"disabled": true
+						},
+						{
+							"key": "activated",
+							"value": "true",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "group",
+							"value": "5dd231391f11a7307c164531"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Config - Read Single",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/config/5dd088b463f32f24aca56156",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"config",
+						"5dd088b463f32f24aca56156"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "5dd06217fd3f1e403806db30",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "2",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Config - Delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/config/5dd230b31f11a7307c16452c",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"config",
+						"5dd230b31f11a7307c16452c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigStrategy - Create",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"Rollout users\",\n    \"strategy\": \"USER_VALIDATION\",\n    \"values\": [\n        {\n            \"value\": \"John\"\n        },\n        {\n            \"value\": \"Miller\"\n        },\n        {\n            \"value\": \"Roger\"\n        }\n    ],\n    \"operation\": \"EXIST\",\n    \"config\": \"5dd36aee57445636ccdeb524\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/configstrategy/create",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigStrategy - Update",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"description\": \"Strategy 2\",\n\t\"strategy\": \"1 == 1\",\n\t\"activated\": \"true\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/configstrategy/5dd2334c1f11a7307c164536",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"5dd2334c1f11a7307c164536"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigStrategy - Read",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/configstrategy?config=5dd0dc5b89b6342628955860",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy"
+					],
+					"query": [
+						{
+							"key": "sortBy",
+							"value": "createdAt:asc",
+							"disabled": true
+						},
+						{
+							"key": "activated",
+							"value": "true",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "config",
+							"value": "5dd0dc5b89b6342628955860"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigStrategy - Read Single",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/configstrategy/5dd0907fb504761b64fa5891",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"5dd0907fb504761b64fa5891"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "5dd06217fd3f1e403806db30",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "2",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigSrategy - Delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/configstrategy/5dd08fcdfd39402760aac664",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"5dd08fcdfd39402760aac664"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Client - Check",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGQyMzA5OTFmMTFhNzMwN2MxNjQ1MmEiLCJpYXQiOjE1NzQwNTYwODl9.vPIkIdtZqdJwZu7o7NWKVkwZ7QQmg-id69Sbfzo-P7s",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/check?key=FF2FOR2021&debug=true",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"check"
+					],
+					"query": [
+						{
+							"key": "sortBy",
+							"value": "createdAt:asc",
+							"disabled": true
+						},
+						{
+							"key": "activated",
+							"value": "true",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "key",
+							"value": "FF2FOR2021"
+						},
+						{
+							"key": "debug",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "0bfc6dbb-0184-4028-b804-070b98576b37",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "68b0c760-c49f-4b63-b539-407b10329bf0",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
