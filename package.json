@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./src/index.js",
-    "dev": "env-cmd nodemon ./src/index.js"
+    "dev": "env-cmd -e dev nodemon ./src/index.js",
+    "prod": "env-cmd -e prod nodemon ./src/index.js",
+    "test": "env-cmd -e test jest --runInBand"
   },
   "keywords": [
     "feature",
@@ -26,6 +28,8 @@
   },
   "devDependencies": {
     "env-cmd": "^10.0.1",
-    "nodemon": "^1.19.4"
+    "jest": "^24.9.0",
+    "nodemon": "^1.19.4",
+    "supertest": "^4.0.2"
   }
 }
