@@ -4,10 +4,14 @@ const { auth } = require('../middleware/auth')
 const { masterPermission } = require('../middleware/validators')
 const router = new express.Router()
 
-router.get('/domain/generateKey', auth, masterPermission('generate Domain token'), async (req, res) => {
+router.get('/domain/generateKey/:id', auth, masterPermission('generate Domain token'), async (req, res) => {
     try {
-        await req.admin.populate({ path: 'domain' }).execPopulate()
-        const domain = await Domain.findOne({ _id: req.admin.domain[0]._id })
+        const domain = await Domain.findOne({ _id: req.params.id })
+
+        if (!domain) {
+            return res.status(404).send()
+        }
+
         const token = await domain.generateAuthToken()
         
         res.status(201).send({ token })

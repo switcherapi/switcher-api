@@ -132,5 +132,11 @@ module.exports = {
     adminMasterAccountId,
     adminMasterAccount,
     adminAccountId,
-    adminAccount
+    adminAccount,
+    domainDocument,
+    domainId,
+    groupConfigId,
+    configId1,
+    configId2,
+    configStrategyId
 }
