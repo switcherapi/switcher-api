@@ -1,10 +1,10 @@
 const express = require('express')
 const Domain = require('../models/domain')
 const { auth } = require('../middleware/auth')
-const validator = require('../middleware/validators')
+const { masterPermission } = require('../middleware/validators')
 const router = new express.Router()
 
-router.get('/domain/generateKey', auth, validator.masterPermission, async (req, res) => {
+router.get('/domain/generateKey', auth, masterPermission('generate Domain token'), async (req, res) => {
     try {
         await req.admin.populate({ path: 'domain' }).execPopulate()
         const domain = await Domain.findOne({ _id: req.admin.domain[0]._id })
@@ -16,7 +16,7 @@ router.get('/domain/generateKey', auth, validator.masterPermission, async (req, 
     }
 })
 
-router.post('/domain/create', auth, validator.masterPermission, async (req, res) => {
+router.post('/domain/create', auth, masterPermission('create Domains'), async (req, res) => {
     try {
         const domain = new Domain({
             ...req.body,
@@ -73,7 +73,7 @@ router.get('/domain/:id', auth, async (req, res) => {
     }
 })
 
-router.delete('/domain/:id', auth, validator.masterPermission, async (req, res) => {
+router.delete('/domain/:id', auth, masterPermission('delete Domain'), async (req, res) => {
     try {
         const domain = await Domain.findOne({ _id: req.params.id })
 
@@ -89,7 +89,7 @@ router.delete('/domain/:id', auth, validator.masterPermission, async (req, res) 
     }
 })
 
-router.patch('/domain/:id', auth, validator.masterPermission, async (req, res) => {
+router.patch('/domain/:id', auth, masterPermission('update Domain'), async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['name', 'description', 'token']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))

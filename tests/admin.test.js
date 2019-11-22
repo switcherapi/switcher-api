@@ -8,7 +8,6 @@ const Config = require('../src/models/config')
 const { ConfigStrategy } = require('../src/models/config-strategy')
 const {
     setupDatabase,
-    setupFullProfile,
     adminMasterAccountId,
     adminMasterAccount,
     adminAccountId,
@@ -47,8 +46,15 @@ test('Should signup a new Master Admin', async () => {
     })
 })
 
-test('Should create a new Admin', async () => {
-    const response = await request(app).post('/admin/create').send({
+test('Should create a new Admin with Master credential', async () => {
+    const responseLogin = await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: adminMasterAccount.password
+    }).expect(200)
+
+    const response = await request(app).post('/admin/create')
+    .set('Authorization', `Bearer ${responseLogin.body.token}`)
+    .send({
         name: 'Admin',
         email: 'admin_test123@mail.com',
         password: '12312312312'
@@ -71,6 +77,21 @@ test('Should create a new Admin', async () => {
         },
         token: admin.tokens[0].token
     })
+})
+
+test('Should not create a new Admin without Master credential', async () => {
+    const responseLogin = await request(app).post('/admin/login').send({
+        email: adminAccount.email,
+        password: adminAccount.password
+    }).expect(200)
+
+    await request(app).post('/admin/create')
+    .set('Authorization', `Bearer ${responseLogin.body.token}`)
+    .send({
+        name: 'Admin',
+        email: 'admin_test123@mail.com',
+        password: '12312312312'
+    }).expect(400)
 })
 
 test('Should login Master Admin', async () => {
@@ -125,8 +146,9 @@ test('Should not get profile for unauthenticated admin', async () => {
         .expect(401)
 })
 
-test('Should update valid admin field', async () => {
-    const responseLogin = await request(app).post('/admin/login').send({
+test('Should update/me valid admin field', async () => {
+    // Validating Master credential
+    let responseLogin = await request(app).post('/admin/login').send({
         email: adminMasterAccount.email,
         password: adminMasterAccount.password
     }).expect(200)
@@ -138,14 +160,13 @@ test('Should update valid admin field', async () => {
             name: 'Updated Name'
         })
         .expect(200)
-    const admin = await Admin.findById(adminMasterAccountId)
+    let admin = await Admin.findById(adminMasterAccountId)
     expect(admin.name).toEqual('Updated Name')
-})
 
-test('Should update valid admin field', async () => {
-    const responseLogin = await request(app).post('/admin/login').send({
-        email: adminMasterAccount.email,
-        password: adminMasterAccount.password
+    // Validating regular Admin credential
+    responseLogin = await request(app).post('/admin/login').send({
+        email: adminAccount.email,
+        password: adminAccount.password
     }).expect(200)
 
     await request(app)
@@ -155,11 +176,11 @@ test('Should update valid admin field', async () => {
             name: 'Updated Name'
         })
         .expect(200)
-    const admin = await Admin.findById(adminMasterAccountId)
+    admin = await Admin.findById(adminAccountId)
     expect(admin.name).toEqual('Updated Name')
 })
 
-test('Should not update valid own admin by non-me patch URI', async () => {
+test('Should not update its own account by non-me patch URI', async () => {
     const responseLogin = await request(app).post('/admin/login').send({
         email: adminMasterAccount.email,
         password: adminMasterAccount.password
@@ -176,13 +197,30 @@ test('Should not update valid own admin by non-me patch URI', async () => {
     expect(response.body.message).toEqual('Unable to modify your own params')
 })
 
+test('Should not update others account without Master Credential by non-me patch URI', async () => {
+    const responseLogin = await request(app).post('/admin/login').send({
+        email: adminAccount.email,
+        password: adminAccount.password
+    }).expect(200)
+
+    const response = await request(app)
+        .patch('/admin/' + adminMasterAccountId)
+        .set('Authorization', `Bearer ${responseLogin.body.token}`)
+        .send({
+            name: 'Updated Name'
+        })
+        .expect(400)
+
+    expect(response.body.message).toEqual('Unable to update Admins without a Master Admin credential')
+})
+
 test('Should update valid admin by non-me patch URI', async () => {
     const responseLogin = await request(app).post('/admin/login').send({
         email: adminMasterAccount.email,
         password: adminMasterAccount.password
     }).expect(200)
 
-    const response = await request(app)
+    await request(app)
         .patch('/admin/' + adminAccountId)
         .set('Authorization', `Bearer ${responseLogin.body.token}`)
         .send({
@@ -200,7 +238,7 @@ test('Should logout valid admin', async () => {
         password: adminMasterAccount.password
     }).expect(200)
 
-    const response = await request(app)
+    await request(app)
         .post('/admin/logout')
         .set('Authorization', `Bearer ${responseLogin.body.token}`)
         .send()
@@ -228,7 +266,7 @@ test('Should logout other sessions for a valid admin', async () => {
     const adminBefore = await Admin.findById(adminMasterAccountId).select('tokens.token')
     expect(adminBefore.tokens.length).toEqual(3)
 
-    const response = await request(app)
+    await request(app)
         .post('/admin/logoutOtherSessions')
         .set('Authorization', `Bearer ${firstToken}`)
         .send()
@@ -255,7 +293,7 @@ test('Should logout all sessions for a valid admin', async () => {
     const adminBefore = await Admin.findById(adminMasterAccountId).select('tokens.token')
     expect(adminBefore.tokens.length).toEqual(3)
 
-    const response = await request(app)
+    await request(app)
         .post('/admin/logoutAll')
         .set('Authorization', `Bearer ${firstToken}`)
         .send()
@@ -265,7 +303,7 @@ test('Should logout all sessions for a valid admin', async () => {
     expect(adminAfter.tokens.length).toEqual(0)
 })
 
-test('Should delete account for admin', async () => {
+test('Should delete/me account for admin', async () => {
     const responseLogin = await request(app).post('/admin/login').send({
         email: adminMasterAccount.email,
         password: adminMasterAccount.password
@@ -276,6 +314,51 @@ test('Should delete account for admin', async () => {
         .set('Authorization', `Bearer ${responseLogin.body.token}`)
         .send()
         .expect(200)
+    
+    const admin = await Admin.findById(adminMasterAccountId)
+    expect(admin).toBeNull()
+
+    // DB validation - Verify deleted dependencies
+    const domain = await Domain.find({ owner: adminMasterAccountId })
+    expect(domain).toEqual([])
+
+    const group = await GroupConfig.find({ owner: adminMasterAccountId })
+    expect(group).toEqual([])
+
+    const config = await Config.find({ owner: adminMasterAccountId })
+    expect(config).toEqual([])
+
+    const configStrategy = await ConfigStrategy.find({ owner: adminMasterAccountId })
+    expect(configStrategy).toEqual([])
+})
+
+test('Should not delete/id account', async () => {
+    const responseLogin = await request(app).post('/admin/login').send({
+        email: adminAccount.email,
+        password: adminAccount.password
+    }).expect(200)
+
+    const response = await request(app)
+        .delete('/admin/' + adminMasterAccountId)
+        .set('Authorization', `Bearer ${responseLogin.body.token}`)
+        .send()
+        .expect(400)
+
+        expect(response.body.message).toEqual('Unable to delete Admins without a Master Admin credential')
+})
+
+test('Should delete/id account', async () => {
+    const responseLogin = await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: adminMasterAccount.password
+    }).expect(200)
+
+    const response = await request(app)
+        .delete('/admin/' + adminMasterAccountId)
+        .set('Authorization', `Bearer ${responseLogin.body.token}`)
+        .send()
+        .expect(200)
+
     const admin = await Admin.findById(adminMasterAccountId)
     expect(admin).toBeNull()
 

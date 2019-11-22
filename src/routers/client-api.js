@@ -1,13 +1,13 @@
 const express = require('express')
 const ConfigGroup = require('../models/group-config')
 const { ConfigStrategy } = require('../models/config-strategy')
-const validator = require('../middleware/validators')
+const { checkConfig } = require('../middleware/validators')
 const { appAuth } = require('../middleware/auth')
 const router = new express.Router()
 
 // GET /check?key=KEY
 // GET /check?key=KEY&debug=true
-router.get('/check', appAuth, validator.checkConfig, async (req, res) => {
+router.get('/check', appAuth, checkConfig, async (req, res) => {
 
     let debug = false
 

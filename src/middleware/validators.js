@@ -1,17 +1,18 @@
 const Config = require('../models/config')
 
-exports.masterPermission = (req, res, next) => {
+const masterPermission = function (action) {
+    return function (req, res, next) {
 
-    if (!req.admin.master) {
-        return res.status(400).send({
-            message: 'You do not have permission to create domains. Please, contact your administrator.'
-        })
+        if (!req.admin.master) {
+            return res.status(400).send({
+                message: `Unable to ${action} without a Master Admin credential`
+            })
+        }
+        next();
     }
-    
-    next();
 }
 
-exports.checkConfig = async (req, res, next) => {
+const checkConfig = async (req, res, next) => {
 
     const config = await Config.findOne({ key: req.query.key })
 
@@ -21,4 +22,9 @@ exports.checkConfig = async (req, res, next) => {
     
     req.config = config
     next();
+}
+
+module.exports = {
+    masterPermission,
+    checkConfig
 }

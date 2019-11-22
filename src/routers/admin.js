@@ -1,6 +1,7 @@
 const express = require('express')
 const Admin = require('../models/admin')
 const { auth } = require('../middleware/auth')
+const { masterPermission } = require('../middleware/validators')
 const router = new express.Router()
 
 router.post('/admin/signup', async (req, res) => {
@@ -16,7 +17,7 @@ router.post('/admin/signup', async (req, res) => {
     }
 })
 
-router.post('/admin/create', async (req, res) => {
+router.post('/admin/create', auth, masterPermission('create Admins'), async (req, res) => {
     const admin = new Admin(req.body)
 
     try {
@@ -83,7 +84,21 @@ router.delete('/admin/me', auth, async (req, res) => {
         await req.admin.remove()
         res.send(req.admin)
     } catch (e) {
-        console.log(e)
+        res.status(500).send()
+    }
+})
+
+router.delete('/admin/:id', auth, masterPermission('delete Admins'), async (req, res) => {
+    const admin = await Admin.findOne({ _id: req.params.id })
+
+    if (!admin) {
+        return res.status(404).send()
+    }
+
+    try {
+        await admin.remove()
+        res.send(admin)
+    } catch (e) {
         res.status(500).send()
     }
 })
@@ -106,7 +121,7 @@ router.patch('/admin/me', auth, async (req, res) => {
     }
 })
 
-router.patch('/admin/:id', auth, async (req, res) => {
+router.patch('/admin/:id', auth, masterPermission('update Admins'), async (req, res) => {
     const updates = Object.keys(req.body)
     const allowwedUpdates = ['name', 'email', 'password', 'active', 'master']
     const isValidOperation = updates.every((update) => allowwedUpdates.includes(update))
