@@ -9,6 +9,9 @@
     "prod": "env-cmd -e prod nodemon ./src/index.js",
     "test": "env-cmd -e test jest --runInBand"
   },
+  "jest": {
+    "testEnvironment": "node"
+  },
   "keywords": [
     "feature",
     "flag"

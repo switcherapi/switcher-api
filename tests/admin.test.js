@@ -1,0 +1,294 @@
+const mongoose = require('mongoose')
+const request = require('supertest')
+const app = require('../src/app')
+const Admin = require('../src/models/admin')
+const Domain = require('../src/models/domain')
+const GroupConfig = require('../src/models/group-config')
+const Config = require('../src/models/config')
+const { ConfigStrategy } = require('../src/models/config-strategy')
+const {
+    setupDatabase,
+    setupFullProfile,
+    adminMasterAccountId,
+    adminMasterAccount,
+    adminAccountId,
+    adminAccount
+} = require('./fixtures/db')
+
+beforeEach(setupDatabase)
+
+afterAll(async () => {
+    await mongoose.disconnect()
+})
+
+test('Should signup a new Master Admin', async () => {
+    const response = await request(app).post('/admin/signup').send({
+        name: 'Master Admin',
+        email: 'master_test123@mail.com',
+        password: '12312312312'
+    }).expect(201)
+
+    // DB validation - document created
+    const admin = await Admin.findById(response.body.admin._id)
+    expect(admin).not.toBeNull()
+
+    // DB validation - master flag
+    expect(admin.master).toBe(true)
+
+    // Response validation
+    expect(response.body).toMatchObject({
+        admin: {
+            name: 'Master Admin',
+            email: 'master_test123@mail.com',
+            master: true,
+            active: true
+        },
+        token: admin.tokens[0].token
+    })
+})
+
+test('Should create a new Admin', async () => {
+    const response = await request(app).post('/admin/create').send({
+        name: 'Admin',
+        email: 'admin_test123@mail.com',
+        password: '12312312312'
+    }).expect(201)
+
+    // DB validation - document created
+    const admin = await Admin.findById(response.body.admin._id)
+    expect(admin).not.toBeNull()
+
+    // DB validation - master flag
+    expect(admin.master).toBe(false)
+
+    // Response validation
+    expect(response.body).toMatchObject({
+        admin: {
+            name: 'Admin',
+            email: 'admin_test123@mail.com',
+            master: false,
+            active: true
+        },
+        token: admin.tokens[0].token
+    })
+})
+
+test('Should login Master Admin', async () => {
+    const response = await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: adminMasterAccount.password
+    }).expect(200)
+
+    const admin = await Admin.findById(adminMasterAccountId)
+    expect(response.body.token).toBe(admin.tokens[1].token)
+})
+
+test('Should login Admin', async () => {
+    const response = await request(app).post('/admin/login').send({
+        email: adminAccount.email,
+        password: adminAccount.password
+    }).expect(200)
+
+    const admin = await Admin.findById(adminAccountId)
+    expect(response.body.token).toBe(admin.tokens[1].token)
+})
+
+test('Should not login nonexistent admin', async () => {
+    await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: 'wrongpassword'
+    }).expect(400)
+})
+
+test('Should get profile for admin', async () => {
+    const responseLogin = await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: adminMasterAccount.password
+    }).expect(200)
+
+    const response = await request(app)
+        .get('/admin/me')
+        .set('Authorization', `Bearer ${responseLogin.body.token}`)
+        .send()
+        .expect(200)
+
+    // // Response validation
+    expect(response.body.name).toBe(adminMasterAccount.name)
+    expect(response.body.email).toBe(adminMasterAccount.email)
+    expect(response.body.master).toBe(adminMasterAccount.master)
+})
+
+test('Should not get profile for unauthenticated admin', async () => {
+    await request(app)
+        .get('/admin/me')
+        .send()
+        .expect(401)
+})
+
+test('Should update valid admin field', async () => {
+    const responseLogin = await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: adminMasterAccount.password
+    }).expect(200)
+
+    await request(app)
+        .patch('/admin/me')
+        .set('Authorization', `Bearer ${responseLogin.body.token}`)
+        .send({
+            name: 'Updated Name'
+        })
+        .expect(200)
+    const admin = await Admin.findById(adminMasterAccountId)
+    expect(admin.name).toEqual('Updated Name')
+})
+
+test('Should update valid admin field', async () => {
+    const responseLogin = await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: adminMasterAccount.password
+    }).expect(200)
+
+    await request(app)
+        .patch('/admin/me')
+        .set('Authorization', `Bearer ${responseLogin.body.token}`)
+        .send({
+            name: 'Updated Name'
+        })
+        .expect(200)
+    const admin = await Admin.findById(adminMasterAccountId)
+    expect(admin.name).toEqual('Updated Name')
+})
+
+test('Should not update valid own admin by non-me patch URI', async () => {
+    const responseLogin = await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: adminMasterAccount.password
+    }).expect(200)
+
+    const response = await request(app)
+        .patch('/admin/' + adminMasterAccountId)
+        .set('Authorization', `Bearer ${responseLogin.body.token}`)
+        .send({
+            name: 'Updated Name'
+        })
+        .expect(400)
+
+    expect(response.body.message).toEqual('Unable to modify your own params')
+})
+
+test('Should update valid admin by non-me patch URI', async () => {
+    const responseLogin = await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: adminMasterAccount.password
+    }).expect(200)
+
+    const response = await request(app)
+        .patch('/admin/' + adminAccountId)
+        .set('Authorization', `Bearer ${responseLogin.body.token}`)
+        .send({
+            name: 'Updated Name'
+        })
+        .expect(200)
+
+        const admin = await Admin.findById(adminAccountId)
+        expect(admin.name).toEqual('Updated Name')
+})
+
+test('Should logout valid admin', async () => {
+    const responseLogin = await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: adminMasterAccount.password
+    }).expect(200)
+
+    const response = await request(app)
+        .post('/admin/logout')
+        .set('Authorization', `Bearer ${responseLogin.body.token}`)
+        .send()
+        .expect(200)
+
+    const admin = await Admin.findById(adminMasterAccountId)
+    const expected = [ responseLogin.body.token ];
+    expect(admin.tokens).toEqual(expect.not.arrayContaining(expected))
+})
+
+test('Should logout other sessions for a valid admin', async () => {
+    const firstToken = adminMasterAccount.tokens[0].token
+
+    await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: adminMasterAccount.password
+    }).expect(200)
+
+    await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: adminMasterAccount.password
+    }).expect(200)
+
+    // DB validate - tokens per session generated logins
+    const adminBefore = await Admin.findById(adminMasterAccountId).select('tokens.token')
+    expect(adminBefore.tokens.length).toEqual(3)
+
+    const response = await request(app)
+        .post('/admin/logoutOtherSessions')
+        .set('Authorization', `Bearer ${firstToken}`)
+        .send()
+        .expect(200)
+
+    const adminAfter = await Admin.findById(adminMasterAccountId)
+    expect(adminAfter.tokens.length).toEqual(1)
+})
+
+test('Should logout all sessions for a valid admin', async () => {
+    const firstToken = adminMasterAccount.tokens[0].token
+
+    await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: adminMasterAccount.password
+    }).expect(200)
+
+    await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: adminMasterAccount.password
+    }).expect(200)
+
+    // DB validate - tokens per session generated logins
+    const adminBefore = await Admin.findById(adminMasterAccountId).select('tokens.token')
+    expect(adminBefore.tokens.length).toEqual(3)
+
+    const response = await request(app)
+        .post('/admin/logoutAll')
+        .set('Authorization', `Bearer ${firstToken}`)
+        .send()
+        .expect(200)
+
+    const adminAfter = await Admin.findById(adminMasterAccountId)
+    expect(adminAfter.tokens.length).toEqual(0)
+})
+
+test('Should delete account for admin', async () => {
+    const responseLogin = await request(app).post('/admin/login').send({
+        email: adminMasterAccount.email,
+        password: adminMasterAccount.password
+    }).expect(200)
+
+    await request(app)
+        .delete('/admin/me')
+        .set('Authorization', `Bearer ${responseLogin.body.token}`)
+        .send()
+        .expect(200)
+    const admin = await Admin.findById(adminMasterAccountId)
+    expect(admin).toBeNull()
+
+    // DB validation - Verify deleted dependencies
+    const domain = await Domain.find({ owner: adminMasterAccountId })
+    expect(domain).toEqual([])
+
+    const group = await GroupConfig.find({ owner: adminMasterAccountId })
+    expect(group).toEqual([])
+
+    const config = await Config.find({ owner: adminMasterAccountId })
+    expect(config).toEqual([])
+
+    const configStrategy = await ConfigStrategy.find({ owner: adminMasterAccountId })
+    expect(configStrategy).toEqual([])
+})
