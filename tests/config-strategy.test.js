@@ -27,7 +27,7 @@ afterAll(async () => {
 
 // test.only('Skip Config Strategy Test Suite')
 
-test('Should create a new Config Strategy', async () => {
+test('STRATEGY_SUITE - Should create a new Config Strategy', async () => {
     const response = await request(app)
         .post('/configstrategy/create')
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -51,7 +51,7 @@ test('Should create a new Config Strategy', async () => {
     expect(response.body.description).toBe('Description of my new Config Strategy')
 })
 
-test('Should not create a new Config Strategy', async () => {
+test('STRATEGY_SUITE - Should not create a new Config Strategy', async () => {
     const response = await request(app)
         .post('/configstrategy/create')
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -70,7 +70,7 @@ test('Should not create a new Config Strategy', async () => {
     expect(response.body.message).toBe('Config not found')
 })
 
-test('Should not create a new Config Strategy - Wrong operation and strategies', async () => {
+test('STRATEGY_SUITE - Should not create a new Config Strategy - Wrong operation and strategies', async () => {
     await request(app)
         .post('/configstrategy/create')
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -102,7 +102,7 @@ test('Should not create a new Config Strategy - Wrong operation and strategies',
         }).expect(400)
 })
 
-test('Should get Config Strategy information', async () => {
+test('STRATEGY_SUITE - Should get Config Strategy information', async () => {
     let response = await request(app)
         .get('/configstrategy?config=' + configId1)
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -144,7 +144,7 @@ test('Should get Config Strategy information', async () => {
     expect(response.body.length).toEqual(2)
 })
 
-test('Should get Config Strategy information by Id', async () => {
+test('STRATEGY_SUITE - Should get Config Strategy information by Id', async () => {
     let response = await request(app)
         .get('/configstrategy/' + configStrategyId)
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -178,14 +178,14 @@ test('Should get Config Strategy information by Id', async () => {
         .send().expect(200)
 })
 
-test('Should not found Config Strategy information by Id', async () => {
+test('STRATEGY_SUITE - Should not found Config Strategy information by Id', async () => {
     await request(app)
         .get('/configstrategy/' + 'NOTEXIST')
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
         .send().expect(404)
 })
 
-test('Should delete Config Strategy', async () => {
+test('STRATEGY_SUITE - Should delete Config Strategy', async () => {
     // DB validation Before deleting
     let domain = await Domain.findById(domainId)
     expect(domain).not.toBeNull()
@@ -227,7 +227,7 @@ test('Should delete Config Strategy', async () => {
     expect(configStrategy).toBeNull()
 })
 
-test('Should update Config Strategy info', async () => {
+test('STRATEGY_SUITE - Should update Config Strategy info', async () => {
 
     let configStrategy = await ConfigStrategy.findById(configStrategyId)
     expect(configStrategy).not.toBeNull()
@@ -246,7 +246,7 @@ test('Should update Config Strategy info', async () => {
     expect(configStrategy.activated).toEqual(false)
 })
 
-test('Should not update Config Strategy info', async () => {
+test('STRATEGY_SUITE - Should not update Config Strategy info', async () => {
     await request(app)
     .patch('/configstrategy/' + configStrategyId)
     .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)

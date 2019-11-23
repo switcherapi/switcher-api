@@ -28,7 +28,7 @@ afterAll(async () => {
 
 // test.only('Skip Domain Test Suite')
 
-test('Should create a new Config', async () => {
+test('CONFIG_SUITE - Should create a new Config', async () => {
     const response = await request(app)
         .post('/config/create')
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -46,7 +46,7 @@ test('Should create a new Config', async () => {
     expect(response.body.key).toBe('NEW_CONFIG')
 })
 
-test('Should not create a new Config - with wrong group config Id', async () => {
+test('CONFIG_SUITE - Should not create a new Config - with wrong group config Id', async () => {
     const response = await request(app)
         .post('/config/create')
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -59,7 +59,7 @@ test('Should not create a new Config - with wrong group config Id', async () => 
     expect(response.body.message).toBe('Group Config not found')
 })
 
-test('Should get Config information', async () => {
+test('CONFIG_SUITE - Should get Config information', async () => {
     let response = await request(app)
         .get('/config?group=' + groupConfigId)
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -94,7 +94,7 @@ test('Should get Config information', async () => {
     expect(response.body.length).toEqual(3)
 })
 
-test('Should get Config information by Id', async () => {
+test('CONFIG_SUITE - Should get Config information by Id', async () => {
     let response = await request(app)
         .get('/config/' + configId1)
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -121,14 +121,14 @@ test('Should get Config information by Id', async () => {
         .send().expect(200)
 })
 
-test('Should not found Config information by Id', async () => {
+test('CONFIG_SUITE - Should not found Config information by Id', async () => {
     await request(app)
         .get('/config/' + 'NOTEXIST')
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
         .send().expect(404)
 })
 
-test('Should delete Config', async () => {
+test('CONFIG_SUITE - Should delete Config', async () => {
     // DB validation Before deleting
     let domain = await Domain.findById(domainId)
     expect(domain).not.toBeNull()
@@ -170,7 +170,7 @@ test('Should delete Config', async () => {
     expect(configStrategy).toBeNull()
 })
 
-test('Should update Config info', async () => {
+test('CONFIG_SUITE - Should update Config info', async () => {
 
     let config = await Config.findById(configId1)
     expect(config).not.toBeNull()
@@ -189,7 +189,7 @@ test('Should update Config info', async () => {
     expect(config.activated).toEqual(false)
 })
 
-test('Should not update Config info', async () => {
+test('CONFIG_SUITE - Should not update Config info', async () => {
     await request(app)
     .patch('/config/' + configId1)
     .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)

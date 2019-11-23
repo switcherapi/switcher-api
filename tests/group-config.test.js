@@ -28,7 +28,7 @@ afterAll(async () => {
 
 // test.only('Skip Group Config Test Suite')
 
-test('Should create a new Group Config', async () => {
+test('GROUP_SUITE - Should create a new Group Config', async () => {
     const response = await request(app)
         .post('/groupconfig/create')
         .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
@@ -46,7 +46,7 @@ test('Should create a new Group Config', async () => {
     expect(response.body.name).toBe('New Group Config')
 })
 
-test('Should not create a new Group Config - with wrong domain Id', async () => {
+test('GROUP_SUITE - Should not create a new Group Config - with wrong domain Id', async () => {
     const response = await request(app)
         .post('/groupconfig/create')
         .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
@@ -59,7 +59,7 @@ test('Should not create a new Group Config - with wrong domain Id', async () => 
     expect(response.body.message).toBe('Domain not found')
 })
 
-test('Should get Group Config information', async () => {
+test('GROUP_SUITE - Should get Group Config information', async () => {
     let response = await request(app)
         .get('/groupconfig?domain=' + domainId)
         .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
@@ -94,7 +94,7 @@ test('Should get Group Config information', async () => {
     expect(response.body.length).toEqual(2)
 })
 
-test('Should get Group Config information by Id', async () => {
+test('GROUP_SUITE - Should get Group Config information by Id', async () => {
     let response = await request(app)
         .get('/groupconfig/' + groupConfigId)
         .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
@@ -121,14 +121,14 @@ test('Should get Group Config information by Id', async () => {
         .send().expect(200)
 })
 
-test('Should not found Group Config information by Id', async () => {
+test('GROUP_SUITE - Should not found Group Config information by Id', async () => {
     await request(app)
         .get('/groupconfig/' + 'NOTEXIST')
         .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
         .send().expect(404)
 })
 
-test('Should delete Group Config', async () => {
+test('GROUP_SUITE - Should delete Group Config', async () => {
     // DB validation Before deleting
     let domain = await Domain.findById(domainId)
     expect(domain).not.toBeNull()
@@ -170,7 +170,7 @@ test('Should delete Group Config', async () => {
     expect(configStrategy).toBeNull()
 })
 
-test('Should update Group Config info', async () => {
+test('GROUP_SUITE - Should update Group Config info', async () => {
 
     let group = await GroupConfig.findById(groupConfigId)
     expect(group).not.toBeNull()
@@ -191,7 +191,7 @@ test('Should update Group Config info', async () => {
     expect(group.activated).toEqual(false)
 })
 
-test('Should not update Group Config info', async () => {
+test('GROUP_SUITE - Should not update Group Config info', async () => {
     await request(app)
     .patch('/groupconfig/' + groupConfigId)
     .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)

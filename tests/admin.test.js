@@ -23,7 +23,7 @@ afterAll(async () => {
 
 // test.only('Skip Admin Test Suite')
 
-test('Should signup a new Master Admin', async () => {
+test('ADMIN_SUITE - Should signup a new Master Admin', async () => {
     const response = await request(app)
         .post('/admin/signup')
         .send({
@@ -51,7 +51,7 @@ test('Should signup a new Master Admin', async () => {
     })
 })
 
-test('Should create a new Admin with Master credential', async () => {
+test('ADMIN_SUITE - Should create a new Admin with Master credential', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -86,7 +86,7 @@ test('Should create a new Admin with Master credential', async () => {
     })
 })
 
-test('Should not create a new Admin without Master credential', async () => {
+test('ADMIN_SUITE - Should not create a new Admin without Master credential', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -103,7 +103,7 @@ test('Should not create a new Admin without Master credential', async () => {
         }).expect(400)
 })
 
-test('Should login Master Admin', async () => {
+test('ADMIN_SUITE - Should login Master Admin', async () => {
     const response = await request(app)
         .post('/admin/login')
         .send({
@@ -115,7 +115,7 @@ test('Should login Master Admin', async () => {
     expect(response.body.token).toBe(admin.tokens[1].token)
 })
 
-test('Should login Admin', async () => {
+test('ADMIN_SUITE - Should login Admin', async () => {
     const response = await request(app)
         .post('/admin/login')
         .send({
@@ -127,7 +127,7 @@ test('Should login Admin', async () => {
     expect(response.body.token).toBe(admin.tokens[1].token)
 })
 
-test('Should not login non-existent admin', async () => {
+test('ADMIN_SUITE - Should not login non-existent admin', async () => {
     await request(app)
         .post('/admin/login')
         .send({
@@ -136,7 +136,7 @@ test('Should not login non-existent admin', async () => {
         }).expect(400)
 })
 
-test('Should get profile for admin', async () => {
+test('ADMIN_SUITE - Should get profile for admin', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -156,14 +156,14 @@ test('Should get profile for admin', async () => {
     expect(response.body.master).toBe(adminMasterAccount.master)
 })
 
-test('Should not get profile for unauthenticated admin', async () => {
+test('ADMIN_SUITE - Should not get profile for unauthenticated admin', async () => {
     await request(app)
         .get('/admin/me')
         .send()
         .expect(401)
 })
 
-test('Should update/me valid admin field', async () => {
+test('ADMIN_SUITE - Should update/me valid admin field', async () => {
     // Validating Master credential
     let responseLogin = await request(app)
         .post('/admin/login')
@@ -201,7 +201,7 @@ test('Should update/me valid admin field', async () => {
     expect(admin.name).toEqual('Updated Name')
 })
 
-test('Should not update its own account by non-me patch URI', async () => {
+test('ADMIN_SUITE - Should not update its own account by non-me patch URI', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -220,7 +220,7 @@ test('Should not update its own account by non-me patch URI', async () => {
     expect(response.body.message).toEqual('Unable to modify your own params')
 })
 
-test('Should not update others account without Master Credential by non-me patch URI', async () => {
+test('ADMIN_SUITE - Should not update others account without Master Credential by non-me patch URI', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -239,7 +239,7 @@ test('Should not update others account without Master Credential by non-me patch
     expect(response.body.message).toEqual('Unable to update Admins without a Master Admin credential')
 })
 
-test('Should update valid admin by non-me patch URI', async () => {
+test('ADMIN_SUITE - Should update valid admin by non-me patch URI', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -259,7 +259,7 @@ test('Should update valid admin by non-me patch URI', async () => {
         expect(admin.name).toEqual('Updated Name')
 })
 
-test('Should logout valid admin', async () => {
+test('ADMIN_SUITE - Should logout valid admin', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -278,7 +278,7 @@ test('Should logout valid admin', async () => {
     expect(admin.tokens).toEqual(expect.not.arrayContaining(expected))
 })
 
-test('Should logout other sessions for a valid admin', async () => {
+test('ADMIN_SUITE - Should logout other sessions for a valid admin', async () => {
     const firstToken = adminMasterAccount.tokens[0].token
 
     await request(app)
@@ -309,7 +309,7 @@ test('Should logout other sessions for a valid admin', async () => {
     expect(adminAfter.tokens.length).toEqual(1)
 })
 
-test('Should logout all sessions for a valid admin', async () => {
+test('ADMIN_SUITE - Should logout all sessions for a valid admin', async () => {
     const firstToken = adminMasterAccount.tokens[0].token
 
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -342,7 +342,7 @@ test('Should logout all sessions for a valid admin', async () => {
     expect(adminAfter.tokens.length).toEqual(0)
 })
 
-test('Should delete/me account for admin', async () => {
+test('ADMIN_SUITE - Should delete/me account for admin', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -373,7 +373,7 @@ test('Should delete/me account for admin', async () => {
     expect(configStrategy).toEqual([])
 })
 
-test('Should not delete/id account', async () => {
+test('ADMIN_SUITE - Should not delete/id account', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -390,7 +390,7 @@ test('Should not delete/id account', async () => {
         expect(response.body.message).toEqual('Unable to delete Admins without a Master Admin credential')
 })
 
-test('Should delete/id account', async () => {
+test('ADMIN_SUITE - Should delete/id account', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({

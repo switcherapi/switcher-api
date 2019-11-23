@@ -28,7 +28,7 @@ afterAll(async () => {
 
 // test.only('Skip Domain Test Suite')
 
-test('Should create a new Domain', async () => {
+test('DOMAIN_SUITE - Should create a new Domain', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -52,7 +52,7 @@ test('Should create a new Domain', async () => {
     expect(response.body.name).toBe('New Domain')
 })
 
-test('Should not create a new Domain - with no Master credential', async () => {
+test('DOMAIN_SUITE - Should not create a new Domain - with no Master credential', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -71,7 +71,7 @@ test('Should not create a new Domain - with no Master credential', async () => {
     expect(response.body.message).toEqual('Unable to create Domains without a Master Admin credential')
 })
 
-test('Should generate Token for a Domain', async () => {
+test('DOMAIN_SUITE - Should generate Token for a Domain', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -92,7 +92,7 @@ test('Should generate Token for a Domain', async () => {
     expect(domain.token).not.toEqual(response.body.token)
 })
 
-test('Should not generate Token for a Domain', async () => {
+test('DOMAIN_SUITE - Should not generate Token for a Domain', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -106,7 +106,7 @@ test('Should not generate Token for a Domain', async () => {
         .send().expect(400)
 })
 
-test('Should get Domain information', async () => {
+test('DOMAIN_SUITE - Should get Domain information', async () => {
     let response = await request(app)
         .get('/domain')
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -140,7 +140,7 @@ test('Should get Domain information', async () => {
     expect(response.body.length).toEqual(2)
 })
 
-test('Should get Domain information by Id', async () => {
+test('DOMAIN_SUITE - Should get Domain information by Id', async () => {
     let response = await request(app)
         .get('/domain/' + domainId)
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -166,14 +166,14 @@ test('Should get Domain information by Id', async () => {
         .send().expect(200)
 })
 
-test('Should not found Domain information by Id', async () => {
+test('DOMAIN_SUITE - Should not found Domain information by Id', async () => {
     await request(app)
         .get('/domain/' + domainId + 'NOTEXIST')
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
         .send().expect(404)
 })
 
-test('Should delete Domain', async () => {
+test('DOMAIN_SUITE - Should delete Domain', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -222,7 +222,7 @@ test('Should delete Domain', async () => {
     expect(configStrategy).toBeNull()
 })
 
-test('Should not delete Domain', async () => {
+test('DOMAIN_SUITE - Should not delete Domain', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -236,7 +236,7 @@ test('Should not delete Domain', async () => {
         .send().expect(400)
 })
 
-test('Should update Domain info', async () => {
+test('DOMAIN_SUITE - Should update Domain info', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -267,7 +267,7 @@ test('Should update Domain info', async () => {
     expect(responseNewToken.body.token).toEqual(newToken.token)
 })
 
-test('Should not update Domain info without Master credential', async () => {
+test('DOMAIN_SUITE - Should not update Domain info without Master credential', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
