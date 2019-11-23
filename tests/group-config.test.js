@@ -17,7 +17,7 @@ const {
     configId1,
     configId2,
     configStrategyId
-} = require('./fixtures/db')
+} = require('./fixtures/db_api')
 
 beforeEach(setupDatabase)
 
@@ -25,8 +25,6 @@ afterAll(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     await mongoose.disconnect()
 })
-
-// test.only('Skip Group Config Test Suite')
 
 test('GROUP_SUITE - Should create a new Group Config', async () => {
     const response = await request(app)

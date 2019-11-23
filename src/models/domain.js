@@ -14,6 +14,11 @@ const domainSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    activated: {
+        type: Boolean,
+        required: true,
+        default: true
+    },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,

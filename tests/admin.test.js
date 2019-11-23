@@ -12,7 +12,7 @@ const {
     adminMasterAccount,
     adminAccountId,
     adminAccount
-} = require('./fixtures/db')
+} = require('./fixtures/db_api')
 
 beforeEach(setupDatabase)
 
@@ -20,8 +20,6 @@ afterAll(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     await mongoose.disconnect()
 })
-
-// test.only('Skip Admin Test Suite')
 
 test('ADMIN_SUITE - Should signup a new Master Admin', async () => {
     const response = await request(app)

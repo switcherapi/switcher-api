@@ -16,7 +16,7 @@ const {
     configId2,
     configStrategyId,
     configStrategyDocument
-} = require('./fixtures/db')
+} = require('./fixtures/db_api')
 
 beforeEach(setupDatabase)
 
@@ -24,8 +24,6 @@ afterAll(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     await mongoose.disconnect()
 })
-
-// test.only('Skip Config Strategy Test Suite')
 
 test('STRATEGY_SUITE - Should create a new Config Strategy', async () => {
     const response = await request(app)

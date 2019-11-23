@@ -122,13 +122,8 @@ const setupDatabase = async () => {
     await new ConfigStrategy(configStrategyDocument).save()
 }
 
-const setupFullProfile = async () => {
-
-}
-
 module.exports = {
     setupDatabase,
-    setupFullProfile,
     adminMasterAccountId,
     adminMasterAccount,
     adminAccountId,
