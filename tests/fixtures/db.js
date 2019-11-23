@@ -136,7 +136,10 @@ module.exports = {
     domainDocument,
     domainId,
     groupConfigId,
+    groupConfigDocument,
     configId1,
+    config1Document,
     configId2,
-    configStrategyId
+    configStrategyId,
+    configStrategyDocument
 }

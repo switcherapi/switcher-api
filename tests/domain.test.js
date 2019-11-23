@@ -40,8 +40,8 @@ test('Should create a new Domain', async () => {
         .post('/domain/create')
         .set('Authorization', `Bearer ${responseLogin.body.token}`)
         .send({
-            name: "New Domain",
-            description: "Description of my new Domain"
+            name: 'New Domain',
+            description: 'Description of my new Domain'
         }).expect(201)
 
     // DB validation - document created
@@ -64,8 +64,8 @@ test('Should not create a new Domain - with no Master credential', async () => {
         .post('/domain/create')
         .set('Authorization', `Bearer ${responseLogin.body.token}`)
         .send({
-            name: "New Domain",
-            description: "Description of my new Domain"
+            name: 'New Domain',
+            description: 'Description of my new Domain'
         }).expect(400)
 
     expect(response.body.message).toEqual('Unable to create Domains without a Master Admin credential')
@@ -124,8 +124,8 @@ test('Should get Domain information', async () => {
         .post('/domain/create')
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
         .send({
-            name: "New Domain 2",
-            description: "Description of my new Domain 2"
+            name: 'New Domain 2',
+            description: 'Description of my new Domain 2'
         }).expect(201)
 
     // DB validation - document created
@@ -156,8 +156,8 @@ test('Should get Domain information by Id', async () => {
         .post('/domain/create')
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
         .send({
-            name: "New Domain 2",
-            description: "Description of my new Domain 2"
+            name: 'New Domain 2',
+            description: 'Description of my new Domain 2'
         }).expect(201)
 
     response = await request(app)
@@ -167,7 +167,7 @@ test('Should get Domain information by Id', async () => {
 })
 
 test('Should not found Domain information by Id', async () => {
-    let response = await request(app)
+    await request(app)
         .get('/domain/' + domainId + 'NOTEXIST')
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
         .send().expect(404)
