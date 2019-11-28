@@ -1,6 +1,6 @@
 const express = require('express')
 const Config = require('../models/config')
-const { ConfigStrategy } = require('../models/config-strategy')
+const { ConfigStrategy, strategyRequirements } = require('../models/config-strategy')
 const { auth } = require('../middleware/auth')
 const router = new express.Router()
 
@@ -80,6 +80,16 @@ router.get('/configstrategy/:id', auth, async (req, res) => {
         res.send(configStrategy)
     } catch (e) {
         res.status(404).send()
+    }
+})
+
+// TODO: Need test
+router.get('/configstrategy/req/:strategy', auth, (req, res) => {
+    try {
+        const result = strategyRequirements(req.params.strategy, res)
+        res.send(result)
+    } catch (e) {
+        res.status(500).send()
     }
 })
 
