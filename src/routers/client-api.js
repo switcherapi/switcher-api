@@ -1,5 +1,5 @@
 const express = require('express')
-const ConfigGroup = require('../models/group-config')
+const GroupConfig = require('../models/group-config')
 const { ConfigStrategy } = require('../models/config-strategy')
 const { checkConfig } = require('../middleware/validators')
 const { appAuth } = require('../middleware/auth')
@@ -18,7 +18,7 @@ router.get('/check', appAuth, checkConfig, async (req, res) => {
     try {
         
         const configStrategy = await ConfigStrategy.find({ config: req.config._id }, 'activated strategy -_id')
-        const configGroup = await ConfigGroup.findOne({ _id: req.config.group._id })
+        const configGroup = await GroupConfig.findOne({ _id: req.config.group._id })
 
         const criteria = {
             key: req.config.key,

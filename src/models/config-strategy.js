@@ -1,9 +1,12 @@
 const mongoose = require('mongoose')
+const moment = require('moment')
+const IPCIDR = require('ip-cidr')
 
 const StrategiesType = Object.freeze({
     CIDR: 'CIDR_VALIDATION',
-    USER: 'USER_VALIDATION',
+    VALUE: 'VALUE_VALIDATION',
     TIME: 'TIME_VALIDATION',
+    DATE: 'DATE_VALIDATION',
     LOCATION: 'LOCATION_VALIDATION'
   });
 
@@ -21,11 +24,15 @@ const OperationPerStrategy = [
         operations: [OperationsType.EXIST]
     },
     {
-        strategy: StrategiesType.USER,
+        strategy: StrategiesType.VALUE,
         operations: [OperationsType.EXIST]
     },
     {
         strategy: StrategiesType.TIME,
+        operations: [OperationsType.BETWEEN, OperationsType.LOWER, OperationsType.GREATER]
+    },
+    {
+        strategy: StrategiesType.DATE,
         operations: [OperationsType.BETWEEN, OperationsType.LOWER, OperationsType.GREATER]
     },
     {
@@ -37,23 +44,28 @@ const OperationPerStrategy = [
 const OperationValuesValidation = [
     {
         operation: OperationsType.EQUAL,
-        min: 1
+        min: 1,
+        max: 1
     },
     {
         operation: OperationsType.EXIST,
-        min: 1
+        min: 1,
+        max: 100
     },
     {
         operation: OperationsType.GREATER,
-        min: 1
+        min: 1,
+        max: 1
     },
     {
         operation: OperationsType.LOWER,
-        min: 1
+        min: 1,
+        max: 1
     },
     {
         operation: OperationsType.BETWEEN,
-        min: 2
+        min: 2,
+        max: 2
     }
 ]
 
@@ -82,6 +94,73 @@ const strategyRequirements = (strategy, res) => {
     }
 }
 
+const processOperation = (strategy, operation, input, values) => {
+    switch(strategy) {
+        case StrategiesType.CIDR:
+            return processCIDR(operation, input, values)
+        case StrategiesType.VALUE:
+            return processVALUE(operation, input, values)
+        case StrategiesType.TIME:
+            return processTime(operation, input, values)
+        case StrategiesType.DATE:
+            return processDate(operation, input, values)
+        case StrategiesType.LOCATION:
+            return processLocation(operation, input, values)
+    }
+}
+
+const processCIDR = (operation, input, values) => {
+    const cidr = new IPCIDR(values);  
+    switch(operation) {
+        case OperationsType.EXIST:
+            return cidr.contains(input)
+    }
+}
+
+const processVALUE = (operation, input, values) => {
+    switch(operation) {
+        case OperationsType.EXIST:
+            const found = values.find((element) => element === input)
+            return found ? true : false
+        case OperationsType.EQUAL:
+            return input === values
+    }
+}
+
+const processTime = (operation, input, values) => {
+    const today = moment().format('YYYY-MM-DD')
+
+    switch(operation) {
+        case OperationsType.LOWER:
+            return moment(`${today}T${input}`).isSameOrBefore(`${today}T${values}`)
+        case OperationsType.GREATER:
+            return moment(`${today}T${input}`).isSameOrAfter(`${today}T${values}`)
+        case OperationsType.BETWEEN:
+            return moment(`${today}T${input}`).isBetween(`${today}T${values[0]}`, `${today}T${values[1]}`)
+    }
+}
+
+const processDate = (operation, input, values) => {
+    switch(operation) {
+        case OperationsType.LOWER:
+            return moment(input).isSameOrBefore(values)
+        case OperationsType.GREATER:
+            return moment(input).isSameOrAfter(values)
+        case OperationsType.BETWEEN:
+            return moment(input).isBetween(values[0], values[1])
+    }
+}
+
+const processLocation = (operation, input, values) => {
+    switch(operation) {
+        case OperationsType.EXIST:
+            const found = values.find((element) => element === input)
+            return found ? true : false
+        case OperationsType.EQUAL:
+            return input === values
+    }
+}
+
 const configStrategySchema = new mongoose.Schema({
     description: {
         type: String,
@@ -99,11 +178,9 @@ const configStrategySchema = new mongoose.Schema({
         required: true
     },
     values: [{
-        value: {
-            type: String,
-            require: true,
-            trim: true
-        }
+        type: String,
+        require: true,
+        trim: true
     }],
     operation: {
         type: String,
@@ -124,26 +201,29 @@ const configStrategySchema = new mongoose.Schema({
     timestamps: true
 })
 
-configStrategySchema.pre('save', async function (next) {
+configStrategySchema.pre('validate', async function (next) {
     const strategyConfig = this
 
     const strategy = strategyConfig.strategy
     const operation = strategyConfig.operation
-    const minValues = OperationValuesValidation.find(element => element.operation === operation).min
+    const { min, max } = OperationValuesValidation.find(element => element.operation === operation)
 
-    if (strategyConfig.values.length < minValues) {
-        return new Error({
-            message: `Unable to complete the operation. The number of values for the operation '${operation}', should contain at least ${minValues} items`
-        })
+    if (await existStrategy(strategyConfig)) {
+        const err = new Error(`Unable to complete the operation. Strategy '${strategy}' already exist for this configuration`)
+        next(err);
+    }
+
+    if (strategyConfig.values.length < min || strategyConfig.values.length > max) {
+        const err =  new Error(`Unable to complete the operation. The number of values for the operation '${operation}', are min: ${min} and max:${max} values`)
+        next(err);
     }
 
     const operations = OperationPerStrategy.find(element => element.strategy === strategy).operations
     const foundOperation = operations.filter((element) => element === operation)
 
     if (!foundOperation) {
-        return new Error({
-            message: `Unable to complete the operation. The strategy '${strategy}' needs ${operations} as operation`
-        })
+        const err =  new Error(`Unable to complete the operation. The strategy '${strategy}' needs ${operations} as operation`)
+        next(err);
     }
 
     next()
@@ -153,9 +233,18 @@ Object.assign(configStrategySchema.statics, { StrategiesType, OperationsType });
 
 const ConfigStrategy = mongoose.model('ConfigStrategy', configStrategySchema)
 
+const existStrategy = async (strategyConfig) => {
+    if (strategyConfig.__v === undefined) {
+        const foundStrategy = await ConfigStrategy.find({ config: strategyConfig.config, strategy: strategyConfig.strategy })
+        return foundStrategy.length > 0
+    }
+    return false
+}
+
 module.exports = {
     ConfigStrategy,
     StrategiesType,
     OperationsType,
-    strategyRequirements
+    strategyRequirements,
+    processOperation
 }

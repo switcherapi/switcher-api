@@ -5,22 +5,22 @@ const { auth } = require('../middleware/auth')
 const router = new express.Router()
 
 router.post('/configstrategy/create', auth, async (req, res) => {
-    const configStrategy = new ConfigStrategy({
-        ...req.body,
-        owner: req.admin._id
-    })
-
-    const config = await Config.findById(req.body.config).countDocuments()
-
-    if (config === 0) {
-        return res.status(404).send({ message: 'Config not found' })
-    }
-
     try {
+        const configStrategy = new ConfigStrategy({
+            ...req.body,
+            owner: req.admin._id
+        })
+
+        const config = await Config.findById(req.body.config).countDocuments()
+
+        if (config === 0) {
+            return res.status(404).send({ message: 'Config not found' })
+        }
+
         await configStrategy.save()
         res.status(201).send(configStrategy)
     } catch (e) {
-        res.status(400).send(e)
+        res.status(400).send({ message: e.message })
     }
 })
 
@@ -110,7 +110,7 @@ router.delete('/configstrategy/:id', auth, async (req, res) => {
 
 router.patch('/configstrategy/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['description', 'activated', 'strategy']
+    const allowedUpdates = ['description', 'activated', 'values']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
@@ -128,6 +128,7 @@ router.patch('/configstrategy/:id', auth, async (req, res) => {
         await configStrategy.save()
         res.send(configStrategy)
     } catch (e) {
+        console.log(e)
         res.status(400).send(e)
     }
 })

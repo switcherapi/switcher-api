@@ -78,9 +78,6 @@ const config2Document = {
 }
 
 const configStrategyId = new mongoose.Types.ObjectId()
-const configStrategyVal1Id = new mongoose.Types.ObjectId()
-const configStrategyVal2Id = new mongoose.Types.ObjectId()
-const configStrategyVal3Id = new mongoose.Types.ObjectId()
 const configStrategyDocument = {
     _id: configStrategyId,
     description: 'Test config strategy',
@@ -88,21 +85,8 @@ const configStrategyDocument = {
     config: configId1,
     activated: true,
     operation: 'EXIST',
-    strategy: 'USER_VALIDATION',
-    values: [
-        {
-            _id: configStrategyVal1Id,
-            value: 'USER_1'
-        },
-        {
-            _id: configStrategyVal2Id,
-            value: 'USER_2'
-        },
-        {
-            _id: configStrategyVal3Id,
-            value: 'USER_3'
-        }
-    ]
+    strategy: 'VALUE_VALIDATION',
+    values: ['USER_1', 'USER_2', 'USER_3']
 }
 
 const setupDatabase = async () => {

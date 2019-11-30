@@ -33,11 +33,7 @@ test('STRATEGY_SUITE - Should create a new Config Strategy', async () => {
             description: 'Description of my new Config Strategy',
             strategy: 'CIDR_VALIDATION',
             operation: 'EQUAL',
-            values: [
-                {
-                    value: '192.168.0.1/16'
-                }
-            ],
+            values: ['192.168.0.1/16'],
             config: configId2
         }).expect(201)
 
@@ -57,11 +53,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy', async () => {
             description: 'Description of my new Config Strategy',
             strategy: 'CIDR_VALIDATION',
             operation: 'EQUAL',
-            values: [
-                {
-                    value: '192.168.0.1/16'
-                }
-            ],
+            values: ['192.168.0.1/16'],
             config: new mongoose.Types.ObjectId()
         }).expect(404)
 
@@ -76,11 +68,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Wrong operation
             description: 'Description of my new Config Strategy',
             strategy: 'WRONG_STRATEGY',
             operation: 'EQUAL',
-            values: [
-                {
-                    value: '192.168.0.1/16'
-                }
-            ],
+            values: ['192.168.0.1/16'],
             config: configId2
         }).expect(400)
 
@@ -91,11 +79,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Wrong operation
             description: 'Description of my new Config Strategy',
             strategy: 'CIDR_VALIDATION',
             operation: 'WORNG_OPERATION',
-            values: [
-                {
-                    value: '192.168.0.1/16'
-                }
-            ],
+            values: ['192.168.0.1/16'],
             config: configId2
         }).expect(400)
 })
@@ -122,11 +106,7 @@ test('STRATEGY_SUITE - Should get Config Strategy information', async () => {
             description: 'Description of my new Config Strategy',
             strategy: 'CIDR_VALIDATION',
             operation: 'EQUAL',
-            values: [
-                {
-                    value: '192.168.0.1/16'
-                }
-            ],
+            values: ['192.168.0.1/16'],
             config: configId1
         }).expect(201)
 
@@ -162,11 +142,7 @@ test('STRATEGY_SUITE - Should get Config Strategy information by Id', async () =
             description: 'Description of my new Config Strategy',
             strategy: 'CIDR_VALIDATION',
             operation: 'EQUAL',
-            values: [
-                {
-                    value: '192.168.0.1/16'
-                }
-            ],
+            values: ['192.168.0.1/16'],
             config: configId1
         }).expect(201)
 
