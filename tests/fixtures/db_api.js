@@ -4,7 +4,7 @@ const Admin = require('../../src/models/admin')
 const Domain = require('../../src/models/domain')
 const GroupConfig = require('../../src/models/group-config')
 const Config = require('../../src/models/config')
-const { ConfigStrategy } = require('../../src/models/config-strategy')
+const { ConfigStrategy, StrategiesType, OperationsType } = require('../../src/models/config-strategy')
 
 const adminMasterAccountId = new mongoose.Types.ObjectId()
 const adminMasterAccount = {
@@ -84,8 +84,8 @@ const configStrategyDocument = {
     owner: adminMasterAccountId,
     config: configId1,
     activated: true,
-    operation: 'EXIST',
-    strategy: 'VALUE_VALIDATION',
+    operation: OperationsType.EXIST,
+    strategy: StrategiesType.VALUE,
     values: ['USER_1', 'USER_2', 'USER_3']
 }
 

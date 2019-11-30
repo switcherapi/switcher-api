@@ -3,7 +3,7 @@ const moment = require('moment')
 const IPCIDR = require('ip-cidr')
 
 const StrategiesType = Object.freeze({
-    CIDR: 'CIDR_VALIDATION',
+    NETWORK: 'NETWORK_VALIDATION',
     VALUE: 'VALUE_VALIDATION',
     TIME: 'TIME_VALIDATION',
     DATE: 'DATE_VALIDATION',
@@ -20,12 +20,12 @@ const StrategiesType = Object.freeze({
 
 const OperationPerStrategy = [
     {
-        strategy: StrategiesType.CIDR,
+        strategy: StrategiesType.NETWORK,
         operations: [OperationsType.EXIST]
     },
     {
         strategy: StrategiesType.VALUE,
-        operations: [OperationsType.EXIST]
+        operations: [OperationsType.EXIST, OperationsType.EQUAL]
     },
     {
         strategy: StrategiesType.TIME,
@@ -37,7 +37,7 @@ const OperationPerStrategy = [
     },
     {
         strategy: StrategiesType.LOCATION,
-        operations: [OperationsType.EXIST]
+        operations: [OperationsType.EXIST, OperationsType.EQUAL]
     }
 ]
 
@@ -96,8 +96,8 @@ const strategyRequirements = (strategy, res) => {
 
 const processOperation = (strategy, operation, input, values) => {
     switch(strategy) {
-        case StrategiesType.CIDR:
-            return processCIDR(operation, input, values)
+        case StrategiesType.NETWORK:
+            return processNETWORK(operation, input, values)
         case StrategiesType.VALUE:
             return processVALUE(operation, input, values)
         case StrategiesType.TIME:
@@ -109,12 +109,18 @@ const processOperation = (strategy, operation, input, values) => {
     }
 }
 
-const processCIDR = (operation, input, values) => {
-    const cidr = new IPCIDR(values);  
-    switch(operation) {
-        case OperationsType.EXIST:
-            return cidr.contains(input)
+const processNETWORK = (operation, input, values) => {
+    for (var i = 0; i < values.length; i++) {
+        const cidr = new IPCIDR(values[i]);  
+        switch(operation) {
+            case OperationsType.EXIST:
+                if (cidr.contains(input) || values[i] === input) {
+                    return true
+                }
+        }
     }
+
+    return false
 }
 
 const processVALUE = (operation, input, values) => {
@@ -123,7 +129,7 @@ const processVALUE = (operation, input, values) => {
             const found = values.find((element) => element === input)
             return found ? true : false
         case OperationsType.EQUAL:
-            return input === values
+            return input === values[0]
     }
 }
 
@@ -132,9 +138,9 @@ const processTime = (operation, input, values) => {
 
     switch(operation) {
         case OperationsType.LOWER:
-            return moment(`${today}T${input}`).isSameOrBefore(`${today}T${values}`)
+            return moment(`${today}T${input}`).isSameOrBefore(`${today}T${values[0]}`)
         case OperationsType.GREATER:
-            return moment(`${today}T${input}`).isSameOrAfter(`${today}T${values}`)
+            return moment(`${today}T${input}`).isSameOrAfter(`${today}T${values[0]}`)
         case OperationsType.BETWEEN:
             return moment(`${today}T${input}`).isBetween(`${today}T${values[0]}`, `${today}T${values[1]}`)
     }
@@ -143,9 +149,9 @@ const processTime = (operation, input, values) => {
 const processDate = (operation, input, values) => {
     switch(operation) {
         case OperationsType.LOWER:
-            return moment(input).isSameOrBefore(values)
+            return moment(input).isSameOrBefore(values[0])
         case OperationsType.GREATER:
-            return moment(input).isSameOrAfter(values)
+            return moment(input).isSameOrAfter(values[0])
         case OperationsType.BETWEEN:
             return moment(input).isBetween(values[0], values[1])
     }
@@ -157,7 +163,7 @@ const processLocation = (operation, input, values) => {
             const found = values.find((element) => element === input)
             return found ? true : false
         case OperationsType.EQUAL:
-            return input === values
+            return input === values[0]
     }
 }
 
@@ -205,21 +211,21 @@ configStrategySchema.pre('validate', async function (next) {
     const strategyConfig = this
 
     const strategy = strategyConfig.strategy
-    const operation = strategyConfig.operation
-    const { min, max } = OperationValuesValidation.find(element => element.operation === operation)
+    const operationStrategy = strategyConfig.operation
+    const { min, max } = OperationValuesValidation.filter(element => element.operation === operationStrategy)[0]
 
     if (await existStrategy(strategyConfig)) {
         const err = new Error(`Unable to complete the operation. Strategy '${strategy}' already exist for this configuration`)
         next(err);
     }
 
-    if (strategyConfig.values.length < min || strategyConfig.values.length > max) {
-        const err =  new Error(`Unable to complete the operation. The number of values for the operation '${operation}', are min: ${min} and max:${max} values`)
+    if (!strategyConfig.values || strategyConfig.values.length < min || strategyConfig.values.length > max) {
+        const err =  new Error(`Unable to complete the operation. The number of values for the operation '${operationStrategy}', are min: ${min} and max: ${max} values`)
         next(err);
     }
 
     const operations = OperationPerStrategy.find(element => element.strategy === strategy).operations
-    const foundOperation = operations.filter((element) => element === operation)
+    const foundOperation = operations.filter((element) => element === operationStrategy)
 
     if (!foundOperation) {
         const err =  new Error(`Unable to complete the operation. The strategy '${strategy}' needs ${operations} as operation`)

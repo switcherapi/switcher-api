@@ -5,7 +5,7 @@ const Admin = require('../src/models/admin')
 const Domain = require('../src/models/domain')
 const GroupConfig = require('../src/models/group-config')
 const Config = require('../src/models/config')
-const { ConfigStrategy } = require('../src/models/config-strategy')
+const { ConfigStrategy, StrategiesType, OperationsType, strategyRequirements } = require('../src/models/config-strategy')
 const {
     setupDatabase,
     adminMasterAccountId,
@@ -31,8 +31,8 @@ test('STRATEGY_SUITE - Should create a new Config Strategy', async () => {
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
         .send({
             description: 'Description of my new Config Strategy',
-            strategy: 'CIDR_VALIDATION',
-            operation: 'EQUAL',
+            strategy: StrategiesType.NETWORK,
+            operation: OperationsType.EQUAL,
             values: ['192.168.0.1/16'],
             config: configId2
         }).expect(201)
@@ -45,19 +45,34 @@ test('STRATEGY_SUITE - Should create a new Config Strategy', async () => {
     expect(response.body.description).toBe('Description of my new Config Strategy')
 })
 
-test('STRATEGY_SUITE - Should not create a new Config Strategy', async () => {
+test('STRATEGY_SUITE - Should not create a new Config Strategy - Config not found', async () => {
     const response = await request(app)
         .post('/configstrategy/create')
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
         .send({
             description: 'Description of my new Config Strategy',
-            strategy: 'CIDR_VALIDATION',
-            operation: 'EQUAL',
+            strategy: StrategiesType.NETWORK,
+            operation: OperationsType.EQUAL,
             values: ['192.168.0.1/16'],
             config: new mongoose.Types.ObjectId()
         }).expect(404)
 
     expect(response.body.message).toBe('Config not found')
+})
+
+test('STRATEGY_SUITE - Should not create a new Config Strategy - Duplicated Strategy at the same configuration', async () => {
+    const response = await request(app)
+        .post('/configstrategy/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            description: 'Description of my new Config Strategy',
+            strategy: StrategiesType.VALUE,
+            operation: OperationsType.EQUAL,
+            values: ['USER_1'],
+            config: configId1
+        }).expect(400)
+
+    expect(response.body.message).toBe(`Unable to complete the operation. Strategy '${StrategiesType.VALUE}' already exist for this configuration`)
 })
 
 test('STRATEGY_SUITE - Should not create a new Config Strategy - Wrong operation and strategies', async () => {
@@ -67,7 +82,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Wrong operation
         .send({
             description: 'Description of my new Config Strategy',
             strategy: 'WRONG_STRATEGY',
-            operation: 'EQUAL',
+            operation: OperationsType.EQUAL,
             values: ['192.168.0.1/16'],
             config: configId2
         }).expect(400)
@@ -77,11 +92,189 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Wrong operation
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
         .send({
             description: 'Description of my new Config Strategy',
-            strategy: 'CIDR_VALIDATION',
+            strategy: StrategiesType.NETWORK,
             operation: 'WORNG_OPERATION',
             values: ['192.168.0.1/16'],
             config: configId2
         }).expect(400)
+})
+
+test('STRATEGY_SUITE - Should not create a new Config Strategy - Number of values incorret', async () => {
+    
+    // VALUE
+    let requirements = strategyRequirements(StrategiesType.VALUE)
+    let { max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.EQUAL)[0]
+
+    let response = await request(app)
+        .post('/configstrategy/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            description: 'Description of my new Config Strategy',
+            strategy: StrategiesType.VALUE,
+            operation: OperationsType.EQUAL,
+            values: ['USER_1', 'USER_2'],
+            config: configId2
+        }).expect(400)
+
+    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EQUAL}', are min: ${min} and max: ${max} values`);
+
+    ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.EXIST)[0]);
+    response = await request(app)
+        .post('/configstrategy/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            description: 'Description of my new Config Strategy',
+            strategy: StrategiesType.VALUE,
+            operation: OperationsType.EXIST,
+            values: [],
+            config: configId2
+        }).expect(400)
+
+    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EXIST}', are min: ${min} and max: ${max} values`);
+    
+    // LOCATION
+    requirements = strategyRequirements(StrategiesType.LOCATION);
+    ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.EQUAL)[0]);
+
+    response = await request(app)
+        .post('/configstrategy/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            description: 'Description of my new Config Strategy',
+            strategy: StrategiesType.LOCATION,
+            operation: OperationsType.EQUAL,
+            values: ['CANADA', 'USA'],
+            config: configId2
+        }).expect(400)
+
+    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EQUAL}', are min: ${min} and max: ${max} values`);
+
+    ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.EXIST)[0]);
+
+    response = await request(app)
+        .post('/configstrategy/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            description: 'Description of my new Config Strategy',
+            strategy: StrategiesType.LOCATION,
+            operation: OperationsType.EXIST,
+            values: [],
+            config: configId2
+        }).expect(400)
+
+    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EXIST}', are min: ${min} and max: ${max} values`);
+ 
+    // NETWORK
+    requirements = strategyRequirements(StrategiesType.NETWORK);
+    ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.EXIST)[0]);
+
+    response = await request(app)
+        .post('/configstrategy/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            description: 'Description of my new Config Strategy',
+            strategy: StrategiesType.NETWORK,
+            operation: OperationsType.EXIST,
+            values: [],
+            config: configId2
+        }).expect(400)
+
+    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EXIST}', are min: ${min} and max: ${max} values`);
+    
+    // TIME
+    requirements = strategyRequirements(StrategiesType.TIME);
+    ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.GREATER)[0]);
+
+    response = await request(app)
+        .post('/configstrategy/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            description: 'Description of my new Config Strategy',
+            strategy: StrategiesType.TIME,
+            operation: OperationsType.GREATER,
+            values: ['2:00', '4:00'],
+            config: configId2
+        }).expect(400)
+
+    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.GREATER}', are min: ${min} and max: ${max} values`);
+    
+    ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.LOWER)[0]);
+
+    response = await request(app)
+        .post('/configstrategy/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            description: 'Description of my new Config Strategy',
+            strategy: StrategiesType.TIME,
+            operation: OperationsType.LOWER,
+            values: ['2:00', '4:00'],
+            config: configId2
+        }).expect(400)
+
+    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.LOWER}', are min: ${min} and max: ${max} values`);
+    
+    ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.BETWEEN)[0]);
+
+    response = await request(app)
+        .post('/configstrategy/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            description: 'Description of my new Config Strategy',
+            strategy: StrategiesType.TIME,
+            operation: OperationsType.BETWEEN,
+            values: ['2:00'],
+            config: configId2
+        }).expect(400)
+
+    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.BETWEEN}', are min: ${min} and max: ${max} values`);
+
+    // DATE
+    requirements = strategyRequirements(StrategiesType.DATE);
+    ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.GREATER)[0]);
+
+    response = await request(app)
+        .post('/configstrategy/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            description: 'Description of my new Config Strategy',
+            strategy: StrategiesType.DATE,
+            operation: OperationsType.GREATER,
+            values: ['2019-12-12', '2019-12-20'],
+            config: configId2
+        }).expect(400)
+
+    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.GREATER}', are min: ${min} and max: ${max} values`);
+    
+    ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.LOWER)[0]);
+
+    response = await request(app)
+        .post('/configstrategy/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            description: 'Description of my new Config Strategy',
+            strategy: StrategiesType.DATE,
+            operation: OperationsType.LOWER,
+            values: ['2019-12-12', '2019-12-20'],
+            config: configId2
+        }).expect(400)
+
+    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.LOWER}', are min: ${min} and max: ${max} values`);
+    
+    ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.BETWEEN)[0]);
+
+    response = await request(app)
+        .post('/configstrategy/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            description: 'Description of my new Config Strategy',
+            strategy: StrategiesType.DATE,
+            operation: OperationsType.BETWEEN,
+            values: ['2019-12-12'],
+            config: configId2
+        }).expect(400)
+
+    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.BETWEEN}', are min: ${min} and max: ${max} values`);
+
 })
 
 test('STRATEGY_SUITE - Should get Config Strategy information', async () => {
@@ -104,8 +297,8 @@ test('STRATEGY_SUITE - Should get Config Strategy information', async () => {
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
         .send({
             description: 'Description of my new Config Strategy',
-            strategy: 'CIDR_VALIDATION',
-            operation: 'EQUAL',
+            strategy: StrategiesType.NETWORK,
+            operation: OperationsType.EQUAL,
             values: ['192.168.0.1/16'],
             config: configId1
         }).expect(201)
@@ -140,8 +333,8 @@ test('STRATEGY_SUITE - Should get Config Strategy information by Id', async () =
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
         .send({
             description: 'Description of my new Config Strategy',
-            strategy: 'CIDR_VALIDATION',
-            operation: 'EQUAL',
+            strategy: StrategiesType.NETWORK,
+            operation: OperationsType.EQUAL,
             values: ['192.168.0.1/16'],
             config: configId1
         }).expect(201)

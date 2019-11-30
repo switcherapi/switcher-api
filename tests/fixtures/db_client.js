@@ -4,7 +4,7 @@ const Admin = require('../../src/models/admin')
 const Domain = require('../../src/models/domain')
 const GroupConfig = require('../../src/models/group-config')
 const Config = require('../../src/models/config')
-const { ConfigStrategy } = require('../../src/models/config-strategy')
+const { ConfigStrategy, StrategiesType, OperationsType } = require('../../src/models/config-strategy')
 
 const adminMasterAccountId = new mongoose.Types.ObjectId()
 const adminMasterAccount = {
@@ -55,60 +55,37 @@ const configDocument = {
 const configStrategyUSERId = new mongoose.Types.ObjectId()
 const configStrategyUSERDocument = {
     _id: configStrategyUSERId,
-    description: 'Test config strategy USER_VALIDATION',
+    description: 'Test config strategy User Validation',
     owner: adminMasterAccountId,
     config: configId,
     activated: false,
-    operation: 'EXIST',
-    strategy: 'USER_VALIDATION',
-    values: [
-        {
-            _id: new mongoose.Types.ObjectId(),
-            value: 'USER_1'
-        },
-        {
-            _id: new mongoose.Types.ObjectId(),
-            value: 'USER_2'
-        },
-        {
-            _id: new mongoose.Types.ObjectId(),
-            value: 'USER_3'
-        }
-    ]
+    operation: OperationsType.EXIST,
+    strategy: StrategiesType.VALUE,
+    values: ['USER_1', 'USER_2', 'USER_3']
 }
 
 const configStrategyCIDRId = new mongoose.Types.ObjectId()
 const configStrategyCIDRDocument = {
     _id: configStrategyCIDRId,
-    description: 'Test config strategy CIDR_VALIDATION',
+    description: 'Test config strategy Network Validation',
     owner: adminMasterAccountId,
     config: configId,
     activated: false,
-    operation: 'EXIST',
-    strategy: 'CIDR_VALIDATION',
-    values: [
-        {
-            _id: new mongoose.Types.ObjectId(),
-            value: '10.0.0.0/24'
-        }
-    ]
+    operation: OperationsType.EXIST,
+    strategy: StrategiesType.NETWORK,
+    values: ['10.0.0.0/24']
 }
 
 const configStrategyTIME_GREATId = new mongoose.Types.ObjectId()
 const configStrategyTIME_GREATDocument = {
     _id: configStrategyTIME_GREATId,
-    description: 'Test config strategy TIME_VALIDATION',
+    description: 'Test config strategy Date Validation',
     owner: adminMasterAccountId,
     config: configId,
     activated: false,
-    operation: 'GREATER',
-    strategy: 'TIME_VALIDATION',
-    values: [
-        {
-            _id: new mongoose.Types.ObjectId(),
-            value: '2019-12-01 13:00Z'
-        }
-    ]
+    operation: OperationsType.GREATER,
+    strategy: StrategiesType.DATE,
+    values: ['2019-12-01T13:00Z']
 }
 
 const configStrategyTIME_BETWEENId = new mongoose.Types.ObjectId()
@@ -118,18 +95,9 @@ const configStrategyTIME_BETWEENDocument = {
     owner: adminMasterAccountId,
     config: configId,
     activated: false,
-    operation: 'BETWEEN',
-    strategy: 'TIME_VALIDATION',
-    values: [
-        {
-            _id: new mongoose.Types.ObjectId(),
-            value: '2019-12-01 13:00Z'
-        },
-        {
-            _id: new mongoose.Types.ObjectId(),
-            value: '2019-12-03 13:00Z'
-        }
-    ]
+    operation: OperationsType.BETWEEN,
+    strategy: StrategiesType.TIME,
+    values: ['13:00Z', '14:00Z']
 }
 
 const configStrategyLOCATIONId = new mongoose.Types.ObjectId()
@@ -139,18 +107,9 @@ const configStrategyLOCATIONDocument = {
     owner: adminMasterAccountId,
     config: configId,
     activated: false,
-    operation: 'EXIST',
-    strategy: 'LOCATION_VALIDATION',
-    values: [
-        {
-            _id: new mongoose.Types.ObjectId(),
-            value: 'Vancouver'
-        },
-        {
-            _id: new mongoose.Types.ObjectId(),
-            value: 'Dallas'
-        }
-    ]
+    operation: OperationsType.EXIST,
+    strategy: StrategiesType.LOCATION,
+    values: ['Vancouver', 'Dallas']
 }
 
 const setupDatabase = async () => {
