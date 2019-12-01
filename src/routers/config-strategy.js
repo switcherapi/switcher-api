@@ -83,7 +83,6 @@ router.get('/configstrategy/:id', auth, async (req, res) => {
     }
 })
 
-// TODO: Need test
 router.get('/configstrategy/req/:strategy', auth, (req, res) => {
     try {
         const result = strategyRequirements(req.params.strategy, res)

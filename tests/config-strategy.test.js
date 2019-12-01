@@ -422,3 +422,54 @@ test('STRATEGY_SUITE - Should not update Config Strategy info', async () => {
         config: 'I_SHOULD_NOT_UPDATE_THIS'
     }).expect(400)
 })
+
+test('STRATEGY_SUITE - Should return a specific strategy requirements', async () => {
+    let response = await request(app)
+        .get('/configstrategy/req/' + StrategiesType.TIME)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send().expect(200)
+    
+    let requirements = strategyRequirements(StrategiesType.TIME)
+    expect(response.body).toMatchObject(requirements)
+
+    response = await request(app)
+        .get('/configstrategy/req/' + StrategiesType.VALUE)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send().expect(200)
+    
+    requirements = strategyRequirements(StrategiesType.VALUE)
+    expect(response.body).toMatchObject(requirements)
+
+    response = await request(app)
+        .get('/configstrategy/req/' + StrategiesType.DATE)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send().expect(200)
+    
+    requirements = strategyRequirements(StrategiesType.DATE)
+    expect(response.body).toMatchObject(requirements)
+
+    response = await request(app)
+        .get('/configstrategy/req/' + StrategiesType.LOCATION)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send().expect(200)
+    
+    requirements = strategyRequirements(StrategiesType.LOCATION)
+    expect(response.body).toMatchObject(requirements)
+
+    response = await request(app)
+    .get('/configstrategy/req/' + StrategiesType.NETWORK)
+    .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+    .send().expect(200)
+
+    requirements = strategyRequirements(StrategiesType.NETWORK)
+    expect(response.body).toMatchObject(requirements)
+})
+
+test('STRATEGY_SUITE - Should NOT return a specific strategy requirements', async () => {
+    let response = await request(app)
+        .get('/configstrategy/req/NON_EXISTENT_VALIDATION')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send().expect(404)
+    
+    expect(response.body.message).toEqual('Strategy \'NON_EXISTENT_VALIDATION\' not found')
+})
