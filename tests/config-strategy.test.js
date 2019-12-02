@@ -394,6 +394,13 @@ test('STRATEGY_SUITE - Should delete Config Strategy', async () => {
     expect(configStrategy).toBeNull()
 })
 
+test('STRATEGY_SUITE - Should NOT delete Config Strategy', async () => {
+    await request(app)
+        .delete('/configstrategy/NON_EXISTENT_ID')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send().expect(404)
+})
+
 test('STRATEGY_SUITE - Should update Config Strategy info', async () => {
 
     let configStrategy = await ConfigStrategy.findById(configStrategyId)
@@ -415,12 +422,12 @@ test('STRATEGY_SUITE - Should update Config Strategy info', async () => {
 
 test('STRATEGY_SUITE - Should not update Config Strategy info', async () => {
     await request(app)
-    .patch('/configstrategy/' + configStrategyId)
-    .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
-    .send({
-        activated: false,
-        config: 'I_SHOULD_NOT_UPDATE_THIS'
-    }).expect(400)
+        .patch('/configstrategy/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            activated: false,
+            config: 'I_SHOULD_NOT_UPDATE_THIS'
+        }).expect(400)
 })
 
 test('STRATEGY_SUITE - Should return a specific strategy requirements', async () => {
@@ -472,4 +479,189 @@ test('STRATEGY_SUITE - Should NOT return a specific strategy requirements', asyn
         .send().expect(404)
     
     expect(response.body.message).toEqual('Strategy \'NON_EXISTENT_VALIDATION\' not found')
+})
+
+test('STRATEGY_SUITE - Should add new value to Strategy values', async () => {
+    let response = await request(app)
+        .patch('/configstrategy/addval/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            value: 'USER_4'
+        }).expect(200)
+
+    expect(response.body.values[response.body.values.length - 1]).toEqual('USER_4');
+
+    // DB validation
+    const configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId })
+    const foundExistingOne = configStrategy.values.find((element) => element === 'USER_4')
+    expect('USER_4').toEqual(foundExistingOne)
+})
+
+test('STRATEGY_SUITE - Should NOT add new value to Strategy values', async () => {
+    let response = await request(app)
+        .patch('/configstrategy/addval/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            value: 'USER_3'
+        }).expect(400)
+
+    expect(response.body.error).toEqual('Value \'USER_3\' already exist');
+
+    response = await request(app)
+        .patch('/configstrategy/addval/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            not_valid_attribute: 'USER_3'
+        }).expect(400);
+
+    expect(response.body.error).toEqual('Invalid parameter');
+
+    response = await request(app)
+        .patch('/configstrategy/addval/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send().expect(400);
+
+    expect(response.body.error).toEqual('The attribute \'value\' must be assigned');
+
+    await request(app)
+        .patch('/configstrategy/addval/INVALID_STRATEGY_ID')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            value: 'USER_3'
+        }).expect(404);
+})
+
+test('STRATEGY_SUITE - Should update a value inside Strategy values', async () => {
+    let response = await request(app)
+        .patch('/configstrategy/updateval/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            oldvalue: 'USER_3',
+            newvalue: 'USER_THREE'
+        }).expect(200)
+
+    expect(response.body.values[response.body.values.length - 1]).toEqual('USER_THREE');
+
+    // DB validation
+    const configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId })
+    const foundExistingOne = configStrategy.values.find((element) => element === 'USER_THREE')
+    expect('USER_THREE').toEqual(foundExistingOne)
+
+    const notFoundOldOne = configStrategy.values.find((element) => element === 'USER_3')
+    expect(notFoundOldOne).toEqual(undefined)
+})
+
+test('STRATEGY_SUITE - Should NOT update a value inside Strategy values', async () => {
+    let response = await request(app)
+        .patch('/configstrategy/updateval/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            oldvalue: 'USER_3',
+            newvalue: 'USER_2'
+        }).expect(400)
+
+    expect(response.body.error).toEqual('Value \'USER_2\' already exist');
+
+    response = await request(app)
+        .patch('/configstrategy/updateval/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            old: 'USER_3',
+            new: 'USER_2'
+        }).expect(400)
+
+    expect(response.body.error).toEqual('Invalid parameter');
+
+    response = await request(app)
+        .patch('/configstrategy/updateval/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            oldvalue: 'USER_3333333',
+            newvalue: 'USER_5'
+        }).expect(404)
+
+    expect(response.body.error).toEqual('Old value \'USER_3333333\' not found');
+
+    response = await request(app)
+        .patch('/configstrategy/updateval/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send().expect(400)
+
+    expect(response.body.error).toEqual('Attributes \'oldvalue\' and \'newvalue\' must be assigned');
+})
+
+test('STRATEGY_SUITE - Should remove a value from Strategy values', async () => {
+    let configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId })
+    const numberOfValues = configStrategy.values.length
+
+    let response = await request(app)
+        .patch('/configstrategy/removeval/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            value: 'USER_3'
+        }).expect(200)
+
+    expect(response.body.values.length + 1).toEqual(numberOfValues);
+
+    // DB validation
+    configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId })
+    const notFoundOldOne = configStrategy.values.find((element) => element === 'USER_3')
+    expect(notFoundOldOne).toEqual(undefined)
+})
+
+test('STRATEGY_SUITE - Should NOT remove a value from Strategy values', async () => {
+    let response = await request(app)
+        .patch('/configstrategy/removeval/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            value: 'USER_44444'
+        }).expect(404)
+
+    expect(response.body.error).toEqual('Value \'USER_44444\' does not exist');
+
+    response = await request(app)
+        .patch('/configstrategy/removeval/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            val: 'USER_3'
+        }).expect(400)
+
+    expect(response.body.error).toEqual('Invalid parameter');
+
+    response = await request(app)
+        .patch('/configstrategy/removeval/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send().expect(400)
+
+    expect(response.body.error).toEqual('The attribute \'value\' must be assigned');
+})
+
+test('STRATEGY_SUITE - Should fetch all values from a specific Strategy', async () => {
+    let response = await request(app)
+        .get('/configstrategy/values/' + configStrategyId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send().expect(200)
+
+    expect(response.body).toEqual(configStrategyDocument.values);
+
+    response = await request(app)
+        .get('/configstrategy/values/' + configStrategyId + '?limit=2')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send().expect(200)
+
+    expect(response.body).toEqual(configStrategyDocument.values.slice(0,2));
+
+    response = await request(app)
+        .get('/configstrategy/values/' + configStrategyId + '?skip=1')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send().expect(200)
+
+    expect(response.body).toEqual(configStrategyDocument.values.slice(1,configStrategyDocument.values.length));
+})
+
+test('STRATEGY_SUITE - Should NOT fetch values from Strategy', async () => {
+    await request(app)
+        .get('/configstrategy/values/')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send().expect(404)
 })
