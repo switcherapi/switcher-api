@@ -1,7 +1,8 @@
-const express = require('express')
-const Config = require('../models/config')
-const { ConfigStrategy, strategyRequirements } = require('../models/config-strategy')
-const { auth } = require('../middleware/auth')
+import express from 'express';
+import Config from '../models/config';
+import { ConfigStrategy, strategyRequirements } from '../models/config-strategy';
+import { auth } from '../middleware/auth';
+
 const router = new express.Router()
 
 router.post('/configstrategy/create', auth, async (req, res) => {
@@ -295,4 +296,4 @@ router.get("/configstrategy/values/:id", auth, async (req, res) => {
     }
 })
 
-module.exports = router
+export default router;

@@ -1,12 +1,12 @@
-const mongoose = require('mongoose')
-const request = require('supertest')
-const app = require('../src/app')
-const Admin = require('../src/models/admin')
-const Domain = require('../src/models/domain')
-const GroupConfig = require('../src/models/group-config')
-const Config = require('../src/models/config')
-const { ConfigStrategy } = require('../src/models/config-strategy')
-const {
+import mongoose from 'mongoose';
+import request from 'supertest';
+import app from '../src/app';
+import Admin from '../src/models/admin';
+import Domain from '../src/models/domain';
+import GroupConfig from '../src/models/group-config';
+import Config from '../src/models/config';
+import { ConfigStrategy } from '../src/models/config-strategy';
+import { 
     setupDatabase,
     adminMasterAccountId,
     adminMasterAccount,
@@ -17,7 +17,7 @@ const {
     configId1,
     configId2,
     configStrategyId
-} = require('./fixtures/db_api')
+ } from './fixtures/db_api';
 
 beforeEach(setupDatabase)
 
@@ -53,7 +53,7 @@ test('GROUP_SUITE - Should not create a new Group Config - with wrong domain Id'
             description: 'Description of my new Group Config',
             domain: new mongoose.Types.ObjectId()
         }).expect(404)
-
+        
     expect(response.body.error).toBe('Domain not found')
 })
 

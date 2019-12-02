@@ -1,7 +1,8 @@
-const express = require('express')
-const Domain = require('../models/domain')
-const { auth } = require('../middleware/auth')
-const { masterPermission } = require('../middleware/validators')
+import express from 'express';
+import Domain from '../models/domain';
+import { auth } from '../middleware/auth';
+import { masterPermission } from '../middleware/validators';
+
 const router = new express.Router()
 
 router.get('/domain/generateKey/:id', auth, masterPermission('generate Domain token'), async (req, res) => {
@@ -117,4 +118,4 @@ router.patch('/domain/:id', auth, masterPermission('update Domain'), async (req,
     }
 })
 
-module.exports = router
+export default router;

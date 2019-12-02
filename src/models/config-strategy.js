@@ -1,8 +1,8 @@
-const mongoose = require('mongoose')
-const moment = require('moment')
-const IPCIDR = require('ip-cidr')
+import mongoose from 'mongoose';
+import moment from 'moment';
+import IPCIDR from 'ip-cidr';
 
-const StrategiesType = Object.freeze({
+export const StrategiesType = Object.freeze({
     NETWORK: 'NETWORK_VALIDATION',
     VALUE: 'VALUE_VALIDATION',
     TIME: 'TIME_VALIDATION',
@@ -10,7 +10,7 @@ const StrategiesType = Object.freeze({
     LOCATION: 'LOCATION_VALIDATION'
   });
 
-  const OperationsType = Object.freeze({
+export const OperationsType = Object.freeze({
     EQUAL: 'EQUAL',
     EXIST: 'EXIST',
     GREATER: 'GREATER',
@@ -69,7 +69,7 @@ const OperationValuesValidation = [
     }
 ]
 
-const strategyRequirements = (strategy, res) => {
+export const strategyRequirements = (strategy, res) => {
     const foundStrategy = Object.values(StrategiesType).find(element => element === strategy)
 
     if (!foundStrategy) {
@@ -94,7 +94,7 @@ const strategyRequirements = (strategy, res) => {
     }
 }
 
-const processOperation = (strategy, operation, input, values) => {
+export const processOperation = (strategy, operation, input, values) => {
     switch(strategy) {
         case StrategiesType.NETWORK:
             return processNETWORK(operation, input, values)
@@ -167,6 +167,14 @@ const processLocation = (operation, input, values) => {
     }
 }
 
+const existStrategy = async (strategyConfig) => {
+    if (strategyConfig.__v === undefined) {
+        const foundStrategy = await ConfigStrategy.find({ config: strategyConfig.config, strategy: strategyConfig.strategy })
+        return foundStrategy.length > 0
+    }
+    return false
+}
+
 const configStrategySchema = new mongoose.Schema({
     description: {
         type: String,
@@ -237,20 +245,4 @@ configStrategySchema.pre('validate', async function (next) {
 
 Object.assign(configStrategySchema.statics, { StrategiesType, OperationsType });
 
-const ConfigStrategy = mongoose.model('ConfigStrategy', configStrategySchema)
-
-const existStrategy = async (strategyConfig) => {
-    if (strategyConfig.__v === undefined) {
-        const foundStrategy = await ConfigStrategy.find({ config: strategyConfig.config, strategy: strategyConfig.strategy })
-        return foundStrategy.length > 0
-    }
-    return false
-}
-
-module.exports = {
-    ConfigStrategy,
-    StrategiesType,
-    OperationsType,
-    strategyRequirements,
-    processOperation
-}
+export const ConfigStrategy = mongoose.model('ConfigStrategy', configStrategySchema)

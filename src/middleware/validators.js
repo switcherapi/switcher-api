@@ -1,6 +1,6 @@
-const Config = require('../models/config')
+import Config from '../models/config';
 
-const masterPermission = function (action) {
+export const masterPermission = function (action) {
     return function (req, res, next) {
 
         if (!req.admin.master) {
@@ -12,7 +12,7 @@ const masterPermission = function (action) {
     }
 }
 
-const checkConfig = async (req, res, next) => {
+export const checkConfig = async (req, res, next) => {
 
     const config = await Config.findOne({ key: req.query.key })
 
@@ -22,9 +22,4 @@ const checkConfig = async (req, res, next) => {
     
     req.config = config
     next();
-}
-
-module.exports = {
-    masterPermission,
-    checkConfig
 }

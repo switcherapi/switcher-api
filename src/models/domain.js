@@ -1,6 +1,6 @@
-const mongoose = require('mongoose')
-const jwt = require('jsonwebtoken')
-const GroupConfig = require('./group-config')
+import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
+import GroupConfig from './group-config';
 
 const domainSchema = new mongoose.Schema({
     name: {

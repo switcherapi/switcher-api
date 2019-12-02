@@ -1,18 +1,12 @@
-const mongoose = require('mongoose')
-const request = require('supertest')
-const app = require('../src/app')
-const Admin = require('../src/models/admin')
-const Domain = require('../src/models/domain')
-const GroupConfig = require('../src/models/group-config')
-const Config = require('../src/models/config')
-const { ConfigStrategy } = require('../src/models/config-strategy')
-const {
-    setupDatabase,
-    adminMasterAccountId,
-    adminMasterAccount,
-    adminAccountId,
-    adminAccount
-} = require('./fixtures/db_api')
+import mongoose from 'mongoose';
+import request from 'supertest';
+import app from '../src/app';
+import Admin from '../src/models/admin';
+import Domain from '../src/models/domain';
+import GroupConfig from '../src/models/group-config';
+import Config from '../src/models/config';
+import { ConfigStrategy } from '../src/models/config-strategy';
+import { setupDatabase, adminMasterAccountId, adminMasterAccount, adminAccountId, adminAccount } from './fixtures/db_api';
 
 beforeEach(setupDatabase)
 
@@ -215,7 +209,7 @@ test('ADMIN_SUITE - Should not update its own account by non-me patch URI', asyn
         })
         .expect(400)
 
-    expect(response.body.message).toEqual('Unable to modify your own params')
+    expect(response.body.error).toEqual('Unable to modify your own params')
 })
 
 test('ADMIN_SUITE - Should not update others account without Master Credential by non-me patch URI', async () => {
@@ -234,7 +228,7 @@ test('ADMIN_SUITE - Should not update others account without Master Credential b
         })
         .expect(400)
 
-    expect(response.body.message).toEqual('Unable to update Admins without a Master Admin credential')
+    expect(response.body.error).toEqual('Unable to update Admins without a Master Admin credential')
 })
 
 test('ADMIN_SUITE - Should update valid admin by non-me patch URI', async () => {
@@ -371,7 +365,7 @@ test('ADMIN_SUITE - Should delete/me account for admin', async () => {
     expect(configStrategy).toEqual([])
 })
 
-test.only('ADMIN_SUITE - Should not delete/id account', async () => {
+test('ADMIN_SUITE - Should not delete/id account', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -421,7 +415,7 @@ test('ADMIN_SUITE - Should delete/id account', async () => {
         .send()
         .expect(200)
 
-    admin = await Admin.findById(adminMasterAccountId)
+    const admin = await Admin.findById(adminMasterAccountId)
     expect(admin).toBeNull()
 
     // DB validation - Verify deleted dependencies

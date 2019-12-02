@@ -1,16 +1,10 @@
-const graphql = require('graphql')
-const Domain = require('../models/domain')
-const GroupConfig = require('../models/group-config')
-const Config = require('../models/config')
-const { ConfigStrategy } = require('../models/config-strategy')
-const { 
-    GraphQLObjectType,
-    GraphQLString,
-    GraphQLList,
-    GraphQLBoolean
-} = graphql
+import Domain from '../models/domain';
+import GroupConfig from '../models/group-config';
+import Config from '../models/config';
+import { ConfigStrategy } from '../models/config-strategy';
+import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean } from 'graphql';
 
-const strategyType = new GraphQLObjectType({
+export const strategyType = new GraphQLObjectType({
     name: 'Strategy',
     fields: {
         strategy: {
@@ -28,7 +22,7 @@ const strategyType = new GraphQLObjectType({
     }
 })
 
-const configType = new GraphQLObjectType({
+export const configType = new GraphQLObjectType({
     name: 'Config',
     fields: {
         key: {
@@ -70,7 +64,7 @@ const configType = new GraphQLObjectType({
     }
 })
 
-const groupConfigType = new GraphQLObjectType({
+export const groupConfigType = new GraphQLObjectType({
     name: 'Group',
     fields: {
         name: {
@@ -108,7 +102,7 @@ const groupConfigType = new GraphQLObjectType({
     }
 })
 
-const domainType = new GraphQLObjectType({
+export const domainType = new GraphQLObjectType({
     name: 'Domain',
     fields: {
         name: {
@@ -146,7 +140,7 @@ const domainType = new GraphQLObjectType({
     }
 })
 
-const flatType = new GraphQLObjectType({
+export const flatType = new GraphQLObjectType({
     name: 'Configuration',
     fields: {
         domain: {
@@ -164,7 +158,7 @@ const flatType = new GraphQLObjectType({
     }
 })
 
-const resolveFromConfig = async (key) => {
+export const resolveFromConfig = async (key) => {
     const config = await Config.find({ key })
     const group = await GroupConfig.find({ _id: config[0].group })
     const domain = await Domain.find({ _id: group[0].domain })
@@ -178,7 +172,7 @@ const resolveFromConfig = async (key) => {
     }
 }
 
-const resolveFromGroup = async (groupConfig) => {
+export const resolveFromGroup = async (groupConfig) => {
     const group = await GroupConfig.find({ name: groupConfig })
     const config = await Config.find({ group: group[0]._id })
     const domain = await Domain.find({ _id: group[0].domain })
@@ -188,14 +182,4 @@ const resolveFromGroup = async (groupConfig) => {
         group,
         config
     }
-}
-
-module.exports = {
-    domainType,
-    groupConfigType,
-    configType,
-    strategyType,
-    flatType,
-    resolveFromConfig,
-    resolveFromGroup
 }

@@ -1,6 +1,8 @@
-const jwt = require('jsonwebtoken')
-const Admin = require('../models/admin')
-const Domain = require('../models/domain')
+"use strict";
+
+import jwt from 'jsonwebtoken';
+import Admin from '../models/admin';
+import Domain from '../models/domain';
 
 /**
  * Middleware
@@ -11,7 +13,7 @@ const Domain = require('../models/domain')
  * @param {*} res 
  * @param {*} next 
  */
-const auth = async (req, res, next) => {
+export async function auth(req, res, next) {
     try {
         const token = req.header('Authorization').replace('Bearer ', '')
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
@@ -38,7 +40,7 @@ const auth = async (req, res, next) => {
  * @param {*} res 
  * @param {*} next 
  */
-const appAuth = async (req, res, next) => {
+export async function appAuth(req, res, next) {
     try {
         const token = req.header('Authorization').replace('Bearer ', '')
 
@@ -55,9 +57,4 @@ const appAuth = async (req, res, next) => {
     } catch (e) {
         res.status(401).send({ error: 'Invalid API token.' })
     }
-}
-
-module.exports = {
-    auth,
-    appAuth
 }

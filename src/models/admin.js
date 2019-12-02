@@ -1,8 +1,8 @@
-const mongoose = require('mongoose')
-const validator = require('validator')
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-const Domain = require('./domain')
+import mongoose from 'mongoose';
+import validator from 'validator';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import Domain from './domain';
 
 const adminSchema = new mongoose.Schema({
     name: {
@@ -138,4 +138,4 @@ adminSchema.pre('remove', async function (next) {
 
 const Admin = mongoose.model('Admin', adminSchema)
 
-module.exports = Admin
+export default Admin;

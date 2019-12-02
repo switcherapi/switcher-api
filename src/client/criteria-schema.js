@@ -1,22 +1,10 @@
-const graphql = require('graphql')
-const GroupConfig = require('../models/group-config')
-const Config = require('../models/config')
-const { ConfigStrategy, processOperation } = require('../models/config-strategy')
-const {
-    domainType,
-    groupConfigType,
-    strategyType
-} = require('./config-schema')
-const { 
-    GraphQLObjectType,
-    GraphQLString,
-    GraphQLList,
-    GraphQLBoolean,
-    GraphQLNonNull,
-    GraphQLInputObjectType
-} = graphql
+import GroupConfig from '../models/group-config';
+import Config from '../models/config';
+import { ConfigStrategy, processOperation } from '../models/config-strategy';
+import { domainType, groupConfigType, strategyType } from './config-schema';
+import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLNonNull, GraphQLInputObjectType } from 'graphql';
 
-const strategyInputType = new GraphQLInputObjectType({
+export const strategyInputType = new GraphQLInputObjectType({
     name: 'StrategyInput',
     fields: {
         strategy: {
@@ -28,7 +16,7 @@ const strategyInputType = new GraphQLInputObjectType({
     }
 })
 
-const resultType = new GraphQLObjectType({
+export const resultType = new GraphQLObjectType({
     name: 'Result',
     fields: {
         return: {
@@ -49,7 +37,7 @@ const resultType = new GraphQLObjectType({
     }
 })
 
-const criteriaType = new GraphQLObjectType({
+export const criteriaType = new GraphQLObjectType({
     name: 'Criteria',
     fields: {
         key: {
@@ -67,7 +55,7 @@ const criteriaType = new GraphQLObjectType({
     }
 })
 
-const checkConfig = async (key) => {
+export const checkConfig = async (key) => {
     return await Config.findOne({ key })
 }
 
@@ -126,10 +114,4 @@ const evaluateCriteria = async (config, context) => {
     result.return = true
     result.reason = 'Success'
     return result
-}
-
-module.exports = {
-    strategyInputType,
-    criteriaType,
-    checkConfig
 }

@@ -1,12 +1,12 @@
-const mongoose = require('mongoose')
-const request = require('supertest')
-const app = require('../src/app')
-const Admin = require('../src/models/admin')
-const Domain = require('../src/models/domain')
-const GroupConfig = require('../src/models/group-config')
-const Config = require('../src/models/config')
-const { ConfigStrategy, StrategiesType, OperationsType, strategyRequirements } = require('../src/models/config-strategy')
-const {
+import mongoose from 'mongoose';
+import request from 'supertest';
+import app from '../src/app';
+import Admin from '../src/models/admin';
+import Domain from '../src/models/domain';
+import GroupConfig from '../src/models/group-config';
+import Config from '../src/models/config';
+import { ConfigStrategy, StrategiesType, OperationsType, strategyRequirements } from '../src/models/config-strategy';
+import { 
     setupDatabase,
     adminMasterAccountId,
     adminMasterAccount,
@@ -16,7 +16,7 @@ const {
     configId2,
     configStrategyId,
     configStrategyDocument
-} = require('./fixtures/db_api')
+ } from './fixtures/db_api';
 
 beforeEach(setupDatabase)
 

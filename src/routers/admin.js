@@ -1,7 +1,8 @@
-const express = require('express')
-const Admin = require('../models/admin')
-const { auth } = require('../middleware/auth')
-const { masterPermission } = require('../middleware/validators')
+import express from 'express';
+import Admin from '../models/admin';
+import { auth } from '../middleware/auth';
+import { masterPermission } from '../middleware/validators';
+
 const router = new express.Router()
 
 router.post('/admin/signup', async (req, res) => {
@@ -153,4 +154,4 @@ router.patch('/admin/:id', auth, masterPermission('update Admins'), async (req, 
     }
 })
 
-module.exports = router
+export default router;

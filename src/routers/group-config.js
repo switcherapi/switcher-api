@@ -1,7 +1,8 @@
-const express = require('express')
-const Domain = require('../models/domain')
-const GroupConfig = require('../models/group-config')
-const { auth } = require('../middleware/auth')
+import express from 'express';
+import Domain from '../models/domain';
+import GroupConfig from '../models/group-config';
+import { auth } from '../middleware/auth';
+
 const router = new express.Router()
 
 router.post('/groupconfig/create', auth, async (req, res) => {
@@ -9,18 +10,22 @@ router.post('/groupconfig/create', auth, async (req, res) => {
         ...req.body,
         owner: req.admin._id
     })
-    
-    const domain = await Domain.findById(req.body.domain).countDocuments()
-
-    if (domain === 0) {
-        return res.status(404).send({ error: 'Domain not found' })
-    }
 
     try {
-        await groupconfig.save()
-        res.status(201).send(groupconfig)
+        const domain = await Domain.findById(req.body.domain).countDocuments()
+
+        if (domain === 0) {
+            return res.status(404).send({ error: 'Domain not found' })
+        }
+
+        try {
+            await groupconfig.save()
+            res.status(201).send(groupconfig)
+        } catch (e) {
+            res.status(400).send(e)
+        }
     } catch (e) {
-        res.status(400).send(e)
+        res.status(404).send({ error: 'Domain not found' })
     }
 })
 
@@ -54,19 +59,23 @@ router.get("/groupconfig", auth, async (req, res) => {
             return res.status(404).send({ error: 'Domain not found' })
         }
 
-        await domain.populate({
-            path: 'groupConfig',
-            match,
-            options: {
-                limit: parseInt(req.query.limit),
-                skip: parseInt(req.query.skip),
-                sort
-            }
-        }).execPopulate()
+        try {
+            await domain.populate({
+                path: 'groupConfig',
+                match,
+                options: {
+                    limit: parseInt(req.query.limit),
+                    skip: parseInt(req.query.skip),
+                    sort
+                }
+            }).execPopulate()
 
-        res.send(domain.groupConfig)
+            res.send(domain.groupConfig)
+        } catch (e) {
+            res.status(500).send()
+        }
     } catch (e) {
-        res.status(500).send()
+        res.status(404).send({ error: 'Domain not found' })
     }
 })
 
@@ -75,12 +84,12 @@ router.get('/groupconfig/:id', auth, async (req, res) => {
         const groupconfig = await GroupConfig.findOne({ _id: req.params.id })
 
         if (!groupconfig) {
-            return res.status(404).send()
+            return res.status(404).send({ error: 'Group not found' })
         }
 
         res.send(groupconfig)
     } catch (e) {
-        res.status(404).send()
+        res.status(404).send({ error: 'Group not found' })
     }
 })
 
@@ -89,13 +98,17 @@ router.delete('/groupconfig/:id', auth, async (req, res) => {
         const groupconfig = await GroupConfig.findOne({ _id: req.params.id })
 
         if (!groupconfig) {
-            return res.status(404).send()
+            return res.status(404).send({ error: 'Group not found' })
         }
 
-        await groupconfig.remove()
-        res.send(groupconfig)
+        try {
+            await groupconfig.remove()
+            res.send(groupconfig)
+        } catch (e) {
+            res.status(500).send()
+        }
     } catch (e) {
-        res.status(500).send()
+        res.status(404).send({ error: 'Group not found' })
     }
 })
 
@@ -110,17 +123,21 @@ router.patch('/groupconfig/:id', auth, async (req, res) => {
 
     try {
         const groupconfig = await GroupConfig.findOne({ _id: req.params.id })
- 
+    
         if (!groupconfig) {
-            return res.status(404).send()
+            return res.status(404).send({ error: 'Group not found' })
         }
 
-        updates.forEach((update) => groupconfig[update] = req.body[update])
-        await groupconfig.save()
-        res.send(groupconfig)
+        try {
+            updates.forEach((update) => groupconfig[update] = req.body[update])
+            await groupconfig.save()
+            res.send(groupconfig)
+        } catch (e) {
+            res.status(400).send(e)
+        }
     } catch (e) {
-        res.status(400).send(e)
+        res.status(404).send({ error: 'Group not found' })
     }
 })
 
-module.exports = router
+export default router;

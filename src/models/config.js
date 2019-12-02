@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const { ConfigStrategy } = require('./config-strategy')
+import mongoose from 'mongoose';
+import { ConfigStrategy } from './config-strategy';
 
 const configSchema = new mongoose.Schema({
     key: {
@@ -53,4 +53,4 @@ configSchema.pre('remove', async function (next) {
 
 const Config = mongoose.model('Config', configSchema)
 
-module.exports = Config
+export default Config;

@@ -1,10 +1,10 @@
-const mongoose = require('mongoose')
-const jwt = require('jsonwebtoken')
-const Admin = require('../../src/models/admin')
-const Domain = require('../../src/models/domain')
-const GroupConfig = require('../../src/models/group-config')
-const Config = require('../../src/models/config')
-const { ConfigStrategy, StrategiesType, OperationsType } = require('../../src/models/config-strategy')
+import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
+import Admin from '../../src/models/admin';
+import Domain from '../../src/models/domain';
+import GroupConfig from '../../src/models/group-config';
+import Config from '../../src/models/config';
+import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
 
 const adminMasterAccountId = new mongoose.Types.ObjectId()
 const adminMasterAccount = {

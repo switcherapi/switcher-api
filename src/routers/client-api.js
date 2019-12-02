@@ -1,8 +1,9 @@
-const express = require('express')
-const GroupConfig = require('../models/group-config')
-const { ConfigStrategy } = require('../models/config-strategy')
-const { checkConfig } = require('../middleware/validators')
-const { appAuth } = require('../middleware/auth')
+import express from 'express';
+import GroupConfig from '../models/group-config';
+import { ConfigStrategy } from '../models/config-strategy';
+import { checkConfig } from '../middleware/validators';
+import { appAuth } from '../middleware/auth';
+
 const router = new express.Router()
 
 // GET /check?key=KEY
@@ -63,4 +64,4 @@ const evaluateCriteria = (criteria) => {
     return criteria
 }
 
-module.exports = router
+export default router;

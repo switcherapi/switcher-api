@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const Config = require('./config')
+import mongoose from 'mongoose';
+import Config from './config';
 
 const groupConfigSchema = new mongoose.Schema({
     name: {
@@ -60,4 +60,4 @@ groupConfigSchema.pre('remove', async function (next) {
 
 const GroupConfig = mongoose.model('GroupConfig', groupConfigSchema)
 
-module.exports = GroupConfig
+export default GroupConfig;

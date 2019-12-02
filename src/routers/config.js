@@ -1,7 +1,8 @@
-const express = require('express')
-const GroupConfig = require('../models/group-config')
-const Config = require('../models/config')
-const { auth } = require('../middleware/auth')
+import express from 'express';
+import GroupConfig from '../models/group-config';
+import Config from '../models/config';
+import { auth } from '../middleware/auth';
+
 const router = new express.Router()
 
 router.post('/config/create', auth, async (req, res) => {
@@ -123,4 +124,4 @@ router.patch('/config/:id', auth, async (req, res) => {
     }
 })
 
-module.exports = router
+export default router;

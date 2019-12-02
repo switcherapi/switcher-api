@@ -1,15 +1,16 @@
-const express = require('express')
-const graphqlHTTP = require('express-graphql')
+import express from 'express';
+import expressGraphQL from 'express-graphql';
+
 require('./db/mongoose')
 
-const clientApiRouter = require('./routers/client-api')
-const adminRouter = require('./routers/admin')
-const domainRouter = require('./routers/domain')
-const groupConfigRouter = require('./routers/group-config')
-const configRouter = require('./routers/config')
-const configStrategyRouter = require('./routers/config-strategy')
-const clientSchema = require('./client/client-schema')
-const { appAuth } = require('./middleware/auth')
+import clientApiRouter from './routers/client-api';
+import adminRouter from './routers/admin';
+import domainRouter from './routers/domain';
+import groupConfigRouter from './routers/group-config';
+import configRouter from './routers/config';
+import configStrategyRouter from './routers/config-strategy';
+import schema from './client/client-schema';
+import { appAuth } from './middleware/auth';
 
 const app = express()
 
@@ -28,9 +29,9 @@ app.use(configStrategyRouter)
 /**
  * Client API - GraphQL
  */
-app.use('/switcher', appAuth, graphqlHTTP({
-    schema: clientSchema,
+app.use('/switcher', appAuth, expressGraphQL({
+    schema,
     graphiql: true
 }))
 
-module.exports = app
+export default app;

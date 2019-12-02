@@ -1,12 +1,12 @@
-const mongoose = require('mongoose')
-const request = require('supertest')
-const app = require('../src/app')
-const Admin = require('../src/models/admin')
-const Domain = require('../src/models/domain')
-const GroupConfig = require('../src/models/group-config')
-const Config = require('../src/models/config')
-const { ConfigStrategy } = require('../src/models/config-strategy')
-const {
+import mongoose from 'mongoose';
+import request from 'supertest';
+import app from '../src/app';
+import Admin from '../src/models/admin';
+import Domain from '../src/models/domain';
+import GroupConfig from '../src/models/group-config';
+import Config from '../src/models/config';
+import { ConfigStrategy } from '../src/models/config-strategy';
+import { 
     setupDatabase,
     adminMasterAccountId,
     adminMasterAccount,
@@ -29,7 +29,7 @@ const {
     configStrategyLOCATIONId,
     configStrategyTIME_BETWEENId,
     configStrategyTIME_GREATId
-} = require('./fixtures/db_client')
+ } from './fixtures/db_client';
 
 const changeStrategy = async (strategyId, newOperation, status) => {
     const changeStrategy = await ConfigStrategy.findById(strategyId)

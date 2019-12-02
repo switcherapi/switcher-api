@@ -1,24 +1,7 @@
-const graphql = require('graphql')
-const Domain = require('../models/domain')
-const {
-    domainType,
-    flatType,
-    resolveFromConfig,
-    resolveFromGroup
-} = require('./config-schema')
-const {
-    strategyInputType,
-    criteriaType,
-    checkConfig
-} = require('./criteria-schema')
-const { 
-    GraphQLSchema,
-    GraphQLObjectType,
-    GraphQLString,
-    GraphQLList,
-    GraphQLBoolean,
-    GraphQLNonNull
-} = graphql
+import { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLNonNull } from 'graphql';
+import { domainType, flatType, resolveFromConfig, resolveFromGroup } from './config-schema';
+import { strategyInputType, criteriaType, checkConfig } from './criteria-schema';
+import Domain from '../models/domain';
 
 const queryType = new GraphQLObjectType({
     name: 'Query',
@@ -92,4 +75,4 @@ const schema = new GraphQLSchema({
   query: queryType
 })
 
-module.exports = schema
+export default schema;
