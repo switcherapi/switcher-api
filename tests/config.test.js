@@ -54,7 +54,7 @@ test('CONFIG_SUITE - Should not create a new Config - with wrong group config Id
             domain: new mongoose.Types.ObjectId()
         }).expect(404)
 
-    expect(response.body.message).toBe('Group Config not found')
+    expect(response.body.error).toBe('Group Config not found')
 })
 
 test('CONFIG_SUITE - Should get Config information', async () => {

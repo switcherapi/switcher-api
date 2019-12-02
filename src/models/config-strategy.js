@@ -75,7 +75,7 @@ const strategyRequirements = (strategy, res) => {
     if (!foundStrategy) {
         return res.status(404)
             .send({
-                message: `Strategy '${strategy}' not found`,
+                error: `Strategy '${strategy}' not found`,
                 tip: `You might want one of these: ${Object.values(StrategiesType)}`
         })
     }

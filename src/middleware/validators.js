@@ -5,7 +5,7 @@ const masterPermission = function (action) {
 
         if (!req.admin.master) {
             return res.status(400).send({
-                message: `Unable to ${action} without a Master Admin credential`
+                error: `Unable to ${action} without a Master Admin credential`
             })
         }
         next();

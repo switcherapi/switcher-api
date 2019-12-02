@@ -371,7 +371,7 @@ test('ADMIN_SUITE - Should delete/me account for admin', async () => {
     expect(configStrategy).toEqual([])
 })
 
-test('ADMIN_SUITE - Should not delete/id account', async () => {
+test.only('ADMIN_SUITE - Should not delete/id account', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -385,7 +385,13 @@ test('ADMIN_SUITE - Should not delete/id account', async () => {
         .send()
         .expect(400)
 
-        expect(response.body.message).toEqual('Unable to delete Admins without a Master Admin credential')
+        expect(response.body.error).toEqual('Unable to delete Admins without a Master Admin credential')
+
+    await request(app)
+        .delete('/admin/INVALID_ADMIN_ID')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send()
+        .expect(404)
 })
 
 test('ADMIN_SUITE - Should delete/id account', async () => {

@@ -89,17 +89,21 @@ router.delete('/admin/me', auth, async (req, res) => {
 })
 
 router.delete('/admin/:id', auth, masterPermission('delete Admins'), async (req, res) => {
-    const admin = await Admin.findOne({ _id: req.params.id })
-
-    if (!admin) {
-        return res.status(404).send()
-    }
-
     try {
-        await admin.remove()
-        res.send(admin)
+        const admin = await Admin.findById(req.params.id)
+
+        if (!admin) {
+            return res.status(404).send()
+        }
+
+        try {
+            await admin.remove()
+            res.send(admin)
+        } catch (e) {
+            return res.status(500).send()
+        }
     } catch (e) {
-        res.status(500).send()
+        res.status(404).send()
     }
 })
 
@@ -133,7 +137,7 @@ router.patch('/admin/:id', auth, masterPermission('update Admins'), async (req, 
     }
 
     if (admin.id === req.admin.id) {
-        return res.status(400).send({ message: 'Unable to modify your own params' })
+        return res.status(400).send({ error: 'Unable to modify your own params' })
     }
 
     if (!isValidOperation) {

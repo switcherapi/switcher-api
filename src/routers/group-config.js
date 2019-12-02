@@ -13,7 +13,7 @@ router.post('/groupconfig/create', auth, async (req, res) => {
     const domain = await Domain.findById(req.body.domain).countDocuments()
 
     if (domain === 0) {
-        return res.status(404).send({ message: 'Domain not found' })
+        return res.status(404).send({ error: 'Domain not found' })
     }
 
     try {
@@ -34,7 +34,7 @@ router.get("/groupconfig", auth, async (req, res) => {
 
     if (!req.query.domain) {
         return res.status(500).send({
-            message: 'Please, specify the \'domain\' id'
+            error: 'Please, specify the \'domain\' id'
         })
     }
 
@@ -51,7 +51,7 @@ router.get("/groupconfig", auth, async (req, res) => {
         const domain = await Domain.findById(req.query.domain)
 
         if (!domain) {
-            return res.status(404).send({ message: 'Domain not found' })
+            return res.status(404).send({ error: 'Domain not found' })
         }
 
         await domain.populate({

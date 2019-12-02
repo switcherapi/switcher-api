@@ -13,7 +13,7 @@ router.post('/config/create', auth, async (req, res) => {
     const group = await GroupConfig.findById(req.body.group).countDocuments()
     
     if (group === 0) {
-        return res.status(404).send({ message: 'Group Config not found' })
+        return res.status(404).send({ error: 'Group Config not found' })
     }
 
     try {
@@ -34,7 +34,7 @@ router.get("/config", auth, async (req, res) => {
 
     if (!req.query.group) {
         return res.status(500).send({
-            message: 'Please, specify the \'group\' id'
+            error: 'Please, specify the \'group\' id'
         })
     }
 

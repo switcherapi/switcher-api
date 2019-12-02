@@ -54,7 +54,7 @@ test('GROUP_SUITE - Should not create a new Group Config - with wrong domain Id'
             domain: new mongoose.Types.ObjectId()
         }).expect(404)
 
-    expect(response.body.message).toBe('Domain not found')
+    expect(response.body.error).toBe('Domain not found')
 })
 
 test('GROUP_SUITE - Should get Group Config information', async () => {
@@ -178,14 +178,14 @@ test('GROUP_SUITE - Should update Group Config info', async () => {
         .patch('/groupconfig/' + groupConfigId)
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
         .send({
-            name: 'Uodated Group Name',
+            name: 'Updated Group Name',
             activated: false
         }).expect(200)
     
     // DB validation - verify data updated
     group = await GroupConfig.findById(groupConfigId)
     expect(group).not.toBeNull()
-    expect(group.name).toEqual('Uodated Group Name')
+    expect(group.name).toEqual('Updated Group Name')
     expect(group.activated).toEqual(false)
 })
 
@@ -194,7 +194,7 @@ test('GROUP_SUITE - Should not update Group Config info', async () => {
     .patch('/groupconfig/' + groupConfigId)
     .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
     .send({
-        name: 'Uodated Group Name',
+        name: 'Updated Group Name',
         activated: false,
         owner: 'I_SHOULD_NOT_UPDATE_THIS'
     }).expect(400)

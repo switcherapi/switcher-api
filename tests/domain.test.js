@@ -66,7 +66,7 @@ test('DOMAIN_SUITE - Should not create a new Domain - with no Master credential'
             description: 'Description of my new Domain'
         }).expect(400)
 
-    expect(response.body.message).toEqual('Unable to create Domains without a Master Admin credential')
+    expect(response.body.error).toEqual('Unable to create Domains without a Master Admin credential')
 })
 
 test('DOMAIN_SUITE - Should generate Token for a Domain', async () => {

@@ -14,13 +14,13 @@ router.post('/configstrategy/create', auth, async (req, res) => {
         const config = await Config.findById(req.body.config).countDocuments()
 
         if (config === 0) {
-            return res.status(404).send({ message: 'Config not found' })
+            return res.status(404).send({ error: 'Config not found' })
         }
 
         await configStrategy.save()
         res.status(201).send(configStrategy)
     } catch (e) {
-        res.status(400).send({ message: e.message })
+        res.status(400).send({ error: e.message })
     }
 })
 
@@ -34,7 +34,7 @@ router.get("/configstrategy", auth, async (req, res) => {
 
     if (!req.query.config) {
         return res.status(500).send({
-            message: 'Please, specify the \'config\' id'
+            error: 'Please, specify the \'config\' id'
         })
     }
 

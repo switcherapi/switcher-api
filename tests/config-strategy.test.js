@@ -57,7 +57,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Config not foun
             config: new mongoose.Types.ObjectId()
         }).expect(404)
 
-    expect(response.body.message).toBe('Config not found')
+    expect(response.body.error).toBe('Config not found')
 })
 
 test('STRATEGY_SUITE - Should not create a new Config Strategy - Duplicated Strategy at the same configuration', async () => {
@@ -72,7 +72,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Duplicated Stra
             config: configId1
         }).expect(400)
 
-    expect(response.body.message).toBe(`Unable to complete the operation. Strategy '${StrategiesType.VALUE}' already exist for this configuration`)
+    expect(response.body.error).toBe(`Unable to complete the operation. Strategy '${StrategiesType.VALUE}' already exist for this configuration`)
 })
 
 test('STRATEGY_SUITE - Should not create a new Config Strategy - Wrong operation and strategies', async () => {
@@ -116,7 +116,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Number of value
             config: configId2
         }).expect(400)
 
-    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EQUAL}', are min: ${min} and max: ${max} values`);
+    expect(response.body.error).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EQUAL}', are min: ${min} and max: ${max} values`);
 
     ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.EXIST)[0]);
     response = await request(app)
@@ -130,7 +130,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Number of value
             config: configId2
         }).expect(400)
 
-    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EXIST}', are min: ${min} and max: ${max} values`);
+    expect(response.body.error).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EXIST}', are min: ${min} and max: ${max} values`);
     
     // LOCATION
     requirements = strategyRequirements(StrategiesType.LOCATION);
@@ -147,7 +147,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Number of value
             config: configId2
         }).expect(400)
 
-    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EQUAL}', are min: ${min} and max: ${max} values`);
+    expect(response.body.error).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EQUAL}', are min: ${min} and max: ${max} values`);
 
     ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.EXIST)[0]);
 
@@ -162,7 +162,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Number of value
             config: configId2
         }).expect(400)
 
-    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EXIST}', are min: ${min} and max: ${max} values`);
+    expect(response.body.error).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EXIST}', are min: ${min} and max: ${max} values`);
  
     // NETWORK
     requirements = strategyRequirements(StrategiesType.NETWORK);
@@ -179,7 +179,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Number of value
             config: configId2
         }).expect(400)
 
-    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EXIST}', are min: ${min} and max: ${max} values`);
+    expect(response.body.error).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EXIST}', are min: ${min} and max: ${max} values`);
     
     // TIME
     requirements = strategyRequirements(StrategiesType.TIME);
@@ -196,7 +196,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Number of value
             config: configId2
         }).expect(400)
 
-    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.GREATER}', are min: ${min} and max: ${max} values`);
+    expect(response.body.error).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.GREATER}', are min: ${min} and max: ${max} values`);
     
     ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.LOWER)[0]);
 
@@ -211,7 +211,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Number of value
             config: configId2
         }).expect(400)
 
-    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.LOWER}', are min: ${min} and max: ${max} values`);
+    expect(response.body.error).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.LOWER}', are min: ${min} and max: ${max} values`);
     
     ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.BETWEEN)[0]);
 
@@ -226,7 +226,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Number of value
             config: configId2
         }).expect(400)
 
-    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.BETWEEN}', are min: ${min} and max: ${max} values`);
+    expect(response.body.error).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.BETWEEN}', are min: ${min} and max: ${max} values`);
 
     // DATE
     requirements = strategyRequirements(StrategiesType.DATE);
@@ -243,7 +243,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Number of value
             config: configId2
         }).expect(400)
 
-    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.GREATER}', are min: ${min} and max: ${max} values`);
+    expect(response.body.error).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.GREATER}', are min: ${min} and max: ${max} values`);
     
     ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.LOWER)[0]);
 
@@ -258,7 +258,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Number of value
             config: configId2
         }).expect(400)
 
-    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.LOWER}', are min: ${min} and max: ${max} values`);
+    expect(response.body.error).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.LOWER}', are min: ${min} and max: ${max} values`);
     
     ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.BETWEEN)[0]);
 
@@ -273,7 +273,7 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Number of value
             config: configId2
         }).expect(400)
 
-    expect(response.body.message).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.BETWEEN}', are min: ${min} and max: ${max} values`);
+    expect(response.body.error).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.BETWEEN}', are min: ${min} and max: ${max} values`);
 
 })
 
@@ -478,7 +478,7 @@ test('STRATEGY_SUITE - Should NOT return a specific strategy requirements', asyn
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
         .send().expect(404)
     
-    expect(response.body.message).toEqual('Strategy \'NON_EXISTENT_VALIDATION\' not found')
+    expect(response.body.error).toEqual('Strategy \'NON_EXISTENT_VALIDATION\' not found')
 })
 
 test('STRATEGY_SUITE - Should add new value to Strategy values', async () => {
