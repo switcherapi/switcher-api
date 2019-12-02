@@ -317,7 +317,7 @@
 			"response": []
 		},
 		{
-			"name": "Admin - Delete",
+			"name": "Admin - Delete Me",
 			"request": {
 				"method": "DELETE",
 				"header": [],
@@ -329,6 +329,24 @@
 					"path": [
 						"admin",
 						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - Delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/admin/5dd83521be2907222c95db8c",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"5dd83521be2907222c95db8c"
 					]
 				}
 			},
@@ -393,13 +411,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/domain/generateKey",
+					"raw": "{{url}}/domain/generateKey/5dd836aba48c311d387f0cfd",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"domain",
-						"generateKey"
+						"generateKey",
+						"5dd836aba48c311d387f0cfd"
 					]
 				}
 			},
@@ -534,7 +553,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Rollout 2020\",\n\t\"description\": \"Changes that will be applied during the rollout\",\n\t\"domain\": \"5dd36adc57445636ccdeb522\"\n}",
+					"raw": "{\n\t\"name\": \"Rollout 2020\",\n\t\"description\": \"Changes that will be applied during the rollout\",\n\t\"domain\": \"5de0720844b53441281c0f9b\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -636,13 +655,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/groupconfig/5dd06217fd3f1e403806db30",
+					"raw": "{{url}}/groupconfig/5de0721444b53441281c0f9c",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"groupconfig",
-						"5dd06217fd3f1e403806db30"
+						"5de0721444b53441281c0f9c"
 					],
 					"query": [
 						{
@@ -692,7 +711,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"key\": \"FF2FOR2021\",\n\t\"description\": \"Feature Flag\",\n\t\"group\": \"5dd36ae257445636ccdeb523\"\n}",
+					"raw": "{\n\t\"key\": \"FF2FOR2021\",\n\t\"description\": \"Feature Flag\",\n\t\"group\": \"5de0721444b53441281c0f9c\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -752,7 +771,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/config?group=5dd231391f11a7307c164531",
+					"raw": "{{url}}/config?group=5de0721444b53441281c0f9c",
 					"host": [
 						"{{url}}"
 					],
@@ -782,7 +801,7 @@
 						},
 						{
 							"key": "group",
-							"value": "5dd231391f11a7307c164531"
+							"value": "5de0721444b53441281c0f9c"
 						}
 					]
 				}
@@ -851,7 +870,41 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"description\": \"Rollout users\",\n    \"strategy\": \"USER_VALIDATION\",\n    \"values\": [\n        {\n            \"value\": \"John\"\n        },\n        {\n            \"value\": \"Miller\"\n        },\n        {\n            \"value\": \"Roger\"\n        }\n    ],\n    \"operation\": \"EXIST\",\n    \"config\": \"5dd36aee57445636ccdeb524\"\n}",
+					"raw": "{\n    \"description\": \"Rollout users\",\n    \"strategy\": \"VALUE_VALIDATION\",\n    \"values\": [\"John\",\"Miller\",\"Roger\"],\n    \"operation\": \"EXIST\",\n    \"config\": \"5de0721f44b53441281c0f9d\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/configstrategy/create",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigStrategy - Create 2",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"Rollout countries\",\n    \"strategy\": \"LOCATION_VALIDATION\",\n    \"values\": [\"USA\", \"Canada\"],\n    \"operation\": \"EXIST\",\n    \"config\": \"5de0721f44b53441281c0f9d\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -885,7 +938,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"description\": \"Strategy 2\",\n\t\"strategy\": \"1 == 1\",\n\t\"activated\": \"true\"\n}",
+					"raw": "{\n\t\"activated\": \"true\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -893,13 +946,118 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/configstrategy/5dd2334c1f11a7307c164536",
+					"raw": "{{url}}/configstrategy/5de216acb987552fa428783a",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"configstrategy",
-						"5dd2334c1f11a7307c164536"
+						"5de216acb987552fa428783a"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigStrategy - Add Value",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"value\": \"Brazil\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/configstrategy/addval/5de1e309d3162634b832e8a7",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"addval",
+						"5de1e309d3162634b832e8a7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigStrategy - Update Value",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"oldvalue\": \"Brazil1\",\n\t\"newvalue\": \"USA\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/configstrategy/updateval/5de1e309d3162634b832e8a7",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"updateval",
+						"5de1e309d3162634b832e8a7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigStrategy - Delete Value",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"value\": \"Brazil\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/configstrategy/removeval/5de1e309d3162634b832e8a7",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"removeval",
+						"5de1e309d3162634b832e8a7"
 					]
 				}
 			},
@@ -911,7 +1069,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/configstrategy?config=5dd0dc5b89b6342628955860",
+					"raw": "{{url}}/configstrategy?config=5de0721f44b53441281c0f9d",
 					"host": [
 						"{{url}}"
 					],
@@ -941,7 +1099,7 @@
 						},
 						{
 							"key": "config",
-							"value": "5dd0dc5b89b6342628955860"
+							"value": "5de0721f44b53441281c0f9d"
 						}
 					]
 				}
@@ -954,20 +1112,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/configstrategy/5dd0907fb504761b64fa5891",
+					"raw": "{{url}}/configstrategy/5de1e309d3162634b832e8a7",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"configstrategy",
-						"5dd0907fb504761b64fa5891"
+						"5de1e309d3162634b832e8a7"
 					],
 					"query": [
-						{
-							"key": "key",
-							"value": "5dd06217fd3f1e403806db30",
-							"disabled": true
-						},
 						{
 							"key": "skip",
 							"value": "2",
@@ -979,18 +1132,73 @@
 			"response": []
 		},
 		{
-			"name": "ConfigSrategy - Delete",
+			"name": "ConfigStrategy - Read Values",
 			"request": {
-				"method": "DELETE",
+				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/configstrategy/5dd08fcdfd39402760aac664",
+					"raw": "{{url}}/configstrategy/values/5de1e309d3162634b832e8a7?",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"configstrategy",
-						"5dd08fcdfd39402760aac664"
+						"values",
+						"5de1e309d3162634b832e8a7"
+					],
+					"query": [
+						{
+							"key": "sort",
+							"value": "true",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigStrategy - Read Requirements",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/configstrategy/req/TIME_VALIDATION",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"req",
+						"TIME_VALIDATION"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigSrategy - Delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/configstrategy/5de1e309d3162634b832e8a7",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"5de1e309d3162634b832e8a7"
 					]
 				}
 			},
@@ -1004,7 +1212,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGQyMzA5OTFmMTFhNzMwN2MxNjQ1MmEiLCJpYXQiOjE1NzQwNTYwODl9.vPIkIdtZqdJwZu7o7NWKVkwZ7QQmg-id69Sbfzo-P7s",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGUwNzIwODQ0YjUzNDQxMjgxYzBmOWIiLCJpYXQiOjE1NzQ5OTAzNDR9.Bq2uELOp0ui5IWpZEY35EITcs8g6XYBbCZXKchweOtg",
 							"type": "string"
 						}
 					]
@@ -1048,6 +1256,191 @@
 							"key": "debug",
 							"value": "true"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Client - Criteria (GraphQL)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGUwNzIwODQ0YjUzNDQxMjgxYzBmOWIiLCJpYXQiOjE1NzQ5OTAzNDR9.Bq2uELOp0ui5IWpZEY35EITcs8g6XYBbCZXKchweOtg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "{\r\n  criteria(\r\n      key: \"FF2FOR2021\", \r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              },\r\n              {\r\n                  strategy: \"LOCATION_VALIDATION\", \r\n                  input: \"Canada\"\r\n              }\r\n            ]\r\n        ) {\r\n    key\r\n    activated\r\n    result {\r\n        return\r\n        reason\r\n        domain {\r\n            name\r\n            activated\r\n            description\r\n            group {\r\n                name\r\n                activated\r\n                description\r\n                config {\r\n                    key\r\n                    activated\r\n                    description\r\n                    strategies {\r\n                        strategy\r\n                        activated\r\n                        operation\r\n                        values\r\n                    }\r\n                }\r\n            }\r\n        }\r\n        group {\r\n            name\r\n            activated\r\n            description\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n  }\r\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{url}}/switcher",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"switcher"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Client - Simple Criteria (GraphQL)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGUwNzIwODQ0YjUzNDQxMjgxYzBmOWIiLCJpYXQiOjE1NzQ5OTAzNDR9.Bq2uELOp0ui5IWpZEY35EITcs8g6XYBbCZXKchweOtg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "{\r\n  criteria(\r\n      key: \"FF2FOR2021\", \r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              },\r\n              {\r\n                  strategy: \"LOCATION_VALIDATION\", \r\n                  input: \"Canada\"\r\n              }\r\n            ]\r\n        ) {\r\n    activated\r\n  }\r\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{url}}/switcher",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"switcher"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Client - Domain Tree (GraphQL)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGUwNzIwODQ0YjUzNDQxMjgxYzBmOWIiLCJpYXQiOjE1NzQ5OTAzNDR9.Bq2uELOp0ui5IWpZEY35EITcs8g6XYBbCZXKchweOtg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "{\r\n    domain(name: \"currency-api\") {\r\n        name\r\n        description\r\n        activated\r\n        group {\r\n            name\r\n            description\r\n            activated\r\n            config {\r\n                key\r\n                description\r\n                activated\r\n                strategies {\r\n                    strategy\r\n                    activated\r\n                    operation\r\n                    values\r\n                }\r\n            }\r\n        }\r\n    }\r\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{url}}/switcher",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"switcher"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Client - Configuration Flat (GraphQL)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGUwNzIwODQ0YjUzNDQxMjgxYzBmOWIiLCJpYXQiOjE1NzQ5OTAzNDR9.Bq2uELOp0ui5IWpZEY35EITcs8g6XYBbCZXKchweOtg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "{\r\n    configuration(key: \"FF2FOR2021\") { #FF3FOR2030\r\n        domain {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        group {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        config {\r\n            key\r\n            description\r\n            activated\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{url}}/switcher",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"switcher"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Client - Configuration Flat by Group (GraphQL)",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGUwNzIwODQ0YjUzNDQxMjgxYzBmOWIiLCJpYXQiOjE1NzQ5OTAzNDR9.Bq2uELOp0ui5IWpZEY35EITcs8g6XYBbCZXKchweOtg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "{\r\n    configuration(group: \"Rollout 2020\") {\r\n        domain {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        group {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        config {\r\n            key\r\n            description\r\n            activated\r\n            strategies {\r\n                strategy\r\n                values\r\n            }\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{url}}/switcher",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"switcher"
 					]
 				}
 			},

@@ -28,7 +28,7 @@ app.use(configStrategyRouter)
 /**
  * Client API - GraphQL
  */
-app.use('/check-criteria', appAuth, graphqlHTTP({
+app.use('/switcher', appAuth, graphqlHTTP({
     schema: clientSchema,
     graphiql: true
 }))
