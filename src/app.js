@@ -9,7 +9,7 @@ import domainRouter from './routers/domain';
 import groupConfigRouter from './routers/group-config';
 import configRouter from './routers/config';
 import configStrategyRouter from './routers/config-strategy';
-import schema from './client/client-schema';
+import schema from './client/query-schema';
 import { appAuth } from './middleware/auth';
 
 const app = express()

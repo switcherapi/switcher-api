@@ -1,7 +1,4 @@
-import Domain from '../models/domain';
-import GroupConfig from '../models/group-config';
-import Config from '../models/config';
-import { ConfigStrategy } from '../models/config-strategy';
+import { resolveConfigStrategy, resolveConfig, resolveGroupConfig } from './resolvers';
 import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean } from 'graphql';
 
 export const strategyType = new GraphQLObjectType({
@@ -50,15 +47,8 @@ export const configType = new GraphQLObjectType({
                     type: GraphQLBoolean
                 }
             },
-            resolve: async (source, { _id, strategy, operation, activated }, context) => {
-                const args = {}
-
-                if (_id) { args._id = _id }
-                if (strategy) { args.strategy = strategy }
-                if (operation) { args.operation = operation }
-                if (activated !== undefined) { args.activated = activated }
-
-                return await ConfigStrategy.find({ config: source._id, ...args })
+            resolve: async (source, { _id, strategy, operation, activated }) => {
+                return await resolveConfigStrategy(source, _id, strategy, operation, activated);
             }
         }
     }
@@ -89,14 +79,8 @@ export const groupConfigType = new GraphQLObjectType({
                     type: GraphQLBoolean
                 }
             },
-            resolve: async (source, { _id, key, activated }, context) => {
-                const args = {}
-
-                if (_id) { args._id = _id }
-                if (key) { args.key = key }
-                if (activated !== undefined) { args.activated = activated }
-
-                return await Config.find({ group: source._id, ...args })
+            resolve: async (source, { _id, key, activated }) => {
+                return await resolveConfig(source, _id, key, activated);
             }
         }
     }
@@ -128,20 +112,14 @@ export const domainType = new GraphQLObjectType({
                 }
             },
             resolve: async (source, { _id, name, activated }, context) => {
-                const args = {}
-
-                if (_id) { args._id = _id }
-                if (name) { args.name = name }
-                if (activated !== undefined) { args.activated = activated }
-
-                return await GroupConfig.find({ domain: source._id, ...args })
+                return await resolveGroupConfig(source, _id, name, activated);
             }
         }
     }
 })
 
-export const flatType = new GraphQLObjectType({
-    name: 'Configuration',
+export const flatConfigurationType = new GraphQLObjectType({
+    name: 'FlatConfiguration',
     fields: {
         domain: {
             type: new GraphQLList(domainType)
@@ -157,29 +135,3 @@ export const flatType = new GraphQLObjectType({
         }
     }
 })
-
-export const resolveFromConfig = async (key) => {
-    const config = await Config.find({ key })
-    const group = await GroupConfig.find({ _id: config[0].group })
-    const domain = await Domain.find({ _id: group[0].domain })
-    const strategies = await ConfigStrategy.find({ config: config[0]._id })
-
-    return {
-        domain,
-        group,
-        config,
-        strategies
-    }
-}
-
-export const resolveFromGroup = async (groupConfig) => {
-    const group = await GroupConfig.find({ name: groupConfig })
-    const config = await Config.find({ group: group[0]._id })
-    const domain = await Domain.find({ _id: group[0].domain })
-
-    return {
-        domain,
-        group,
-        config
-    }
-}

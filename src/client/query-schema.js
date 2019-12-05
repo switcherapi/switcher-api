@@ -1,7 +1,7 @@
 import { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLNonNull } from 'graphql';
-import { domainType, flatType, resolveFromConfig, resolveFromGroup } from './config-schema';
-import { strategyInputType, criteriaType, checkConfig } from './criteria-schema';
-import Domain from '../models/domain';
+import { domainType, flatConfigurationType } from './configuration-type';
+import { strategyInputType, criteriaType } from './criteria-type';
+import { resolveConfigByKey, resolveDomain, resolveFlatConfigurationByConfig, resolveFlatConfigurationTypeByGroup } from './resolvers';
 
 const queryType = new GraphQLObjectType({
     name: 'Query',
@@ -16,9 +16,9 @@ const queryType = new GraphQLObjectType({
                     type: new GraphQLList(strategyInputType)
                 }
             },
-            resolve: (source, { key, entry }, context) => {
+            resolve: async (source, { key, entry }, context) => {
                 context.entry = entry
-                return checkConfig(key)
+                return resolveConfigByKey(key)
             }
         },
         domain: {
@@ -37,19 +37,12 @@ const queryType = new GraphQLObjectType({
                     type: GraphQLBoolean
                 }
             },
-            resolve: async (source, { _id, name, token, activated }, context) => {
-                const args = {}
-
-                if (_id) { args._id = _id }
-                if (name) { args.name = name }
-                if (token) { args.token = token }
-                if (activated !== undefined) { args.activated = activated }
-
-                return await Domain.find({ ...args })
+            resolve: async (source, { _id, name, token, activated }) => {
+                return await resolveDomain(_id, name, token, activated)
             }
         },
         configuration: {
-            type: flatType,
+            type: flatConfigurationType,
             args: {
                 group: {
                     type: GraphQLString
@@ -60,11 +53,11 @@ const queryType = new GraphQLObjectType({
             },
             resolve: async (source, { group, key }, context) => {
                 if (key) {
-                    return resolveFromConfig(key)
+                    return resolveFlatConfigurationByConfig(key)
                 }
 
                 if (group) {
-                    return resolveFromGroup(group)
+                    return resolveFlatConfigurationTypeByGroup(group)
                 }
             }
         },
