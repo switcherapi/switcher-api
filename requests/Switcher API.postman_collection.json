@@ -353,6 +353,58 @@
 			"response": []
 		},
 		{
+			"name": "Environment - Create",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"QA\",\n\t\"domain\": \"5deac6bc2d61a41fa0a84788\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/environment/create",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"environment",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Environment - Delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/environment/5deac77f2d61a41fa0a8478f",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"environment",
+						"5deac77f2d61a41fa0a8478f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Domain - Create",
 			"request": {
 				"method": "POST",
@@ -399,6 +451,11 @@
 						"name": "Content-Type",
 						"type": "text",
 						"value": "application/json"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -411,14 +468,20 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/domain/generateKey/5dd836aba48c311d387f0cfd",
+					"raw": "{{url}}/domain/generateKey/5deaafc93df3aa22e4c91403?env=QA",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"domain",
 						"generateKey",
-						"5dd836aba48c311d387f0cfd"
+						"5deaafc93df3aa22e4c91403"
+					],
+					"query": [
+						{
+							"key": "env",
+							"value": "QA"
+						}
 					]
 				}
 			},
@@ -453,6 +516,76 @@
 					"path": [
 						"domain",
 						"5dd207c01f48e8428cc1f03c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Domain - Update Env",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"default\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/domain/updateStatus/5de9babb40778d3b5c82a07b",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"domain",
+						"updateStatus",
+						"5de9babb40778d3b5c82a07b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Domain - Remove Env",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"env\": \"QA\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/domain/removeStatus/5de9babb40778d3b5c82a07b",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"domain",
+						"removeStatus",
+						"5de9babb40778d3b5c82a07b"
 					]
 				}
 			},
@@ -553,7 +686,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Rollout 2020\",\n\t\"description\": \"Changes that will be applied during the rollout\",\n\t\"domain\": \"5de0720844b53441281c0f9b\"\n}",
+					"raw": "{\n\t\"name\": \"Rollout 2020\",\n\t\"description\": \"Changes that will be applied during the rollout\",\n\t\"domain\": \"5deac6bc2d61a41fa0a84788\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -608,6 +741,76 @@
 			"response": []
 		},
 		{
+			"name": "Group - Update Env",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"default\": true,\n\t\"QA\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/groupconfig/updateStatus/5de9c927248192258cd1c3f0",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"groupconfig",
+						"updateStatus",
+						"5de9c927248192258cd1c3f0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Group - Remove Env",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"env\": \"default\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/groupconfig/removeStatus/5de9c927248192258cd1c3f0",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"groupconfig",
+						"removeStatus",
+						"5de9c927248192258cd1c3f0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Group - Read",
 			"request": {
 				"method": "GET",
@@ -655,13 +858,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/groupconfig/5de0721444b53441281c0f9c",
+					"raw": "{{url}}/groupconfig/5de9fc74279fa52e0c9cf499",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"groupconfig",
-						"5de0721444b53441281c0f9c"
+						"5de9fc74279fa52e0c9cf499"
 					],
 					"query": [
 						{
@@ -711,7 +914,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"key\": \"FF2FOR2021\",\n\t\"description\": \"Feature Flag\",\n\t\"group\": \"5de0721444b53441281c0f9c\"\n}",
+					"raw": "{\n\t\"key\": \"FF2FOR2030\",\n\t\"description\": \"Feature Flag\",\n\t\"group\": \"5deac6ce2d61a41fa0a8478a\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -766,6 +969,76 @@
 			"response": []
 		},
 		{
+			"name": "Config - Update Env",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"default\": true,\n\t\"QA\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/config/updateStatus/5de9c927248192258cd1c3f0",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"config",
+						"updateStatus",
+						"5de9c927248192258cd1c3f0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Config - Remove Env",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"env\": \"default\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/config/removeStatus/5de9c927248192258cd1c3f0",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"config",
+						"removeStatus",
+						"5de9c927248192258cd1c3f0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Config - Read",
 			"request": {
 				"method": "GET",
@@ -814,13 +1087,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/config/5dd088b463f32f24aca56156",
+					"raw": "{{url}}/config/5de9fc84279fa52e0c9cf49a",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"config",
-						"5dd088b463f32f24aca56156"
+						"5de9fc84279fa52e0c9cf49a"
 					],
 					"query": [
 						{
@@ -870,7 +1143,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"description\": \"Rollout users\",\n    \"strategy\": \"VALUE_VALIDATION\",\n    \"values\": [\"John\",\"Miller\",\"Roger\"],\n    \"operation\": \"EXIST\",\n    \"config\": \"5de0721f44b53441281c0f9d\"\n}",
+					"raw": "{\n    \"description\": \"Rollout users\",\n    \"strategy\": \"VALUE_VALIDATION\",\n    \"values\": [\"John\",\"Miller\",\"Roger\"],\n    \"operation\": \"EXIST\",\n    \"config\": \"5deac6f02d61a41fa0a8478c\",\n    \"env\": \"default\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -904,7 +1177,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"description\": \"Rollout countries\",\n    \"strategy\": \"LOCATION_VALIDATION\",\n    \"values\": [\"USA\", \"Canada\"],\n    \"operation\": \"EXIST\",\n    \"config\": \"5de0721f44b53441281c0f9d\"\n}",
+					"raw": "{\n    \"description\": \"Rollout countries\",\n    \"strategy\": \"LOCATION_VALIDATION\",\n    \"values\": [\"USA\", \"Canada\"],\n    \"operation\": \"EXIST\",\n    \"config\": \"5deac6f02d61a41fa0a8478c\",\n    \"env\": \"default\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1064,6 +1337,76 @@
 			"response": []
 		},
 		{
+			"name": "ConfigStrategy - Update Env",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"default\": true,\n\t\"QA\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/configstrategy/updateStatus/5de9ffb4616fd02be086d84d",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"updateStatus",
+						"5de9ffb4616fd02be086d84d"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigStrategy - Remove Env",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"env\": \"default\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/configstrategy/removeStatus/5de9ffb4616fd02be086d84d",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"removeStatus",
+						"5de9ffb4616fd02be086d84d"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "ConfigStrategy - Read",
 			"request": {
 				"method": "GET",
@@ -1112,13 +1455,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/configstrategy/5de1e309d3162634b832e8a7",
+					"raw": "{{url}}/configstrategy/5de9ffb4616fd02be086d84d",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"configstrategy",
-						"5de1e309d3162634b832e8a7"
+						"5de9ffb4616fd02be086d84d"
 					],
 					"query": [
 						{
@@ -1272,7 +1615,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGUwNzIwODQ0YjUzNDQxMjgxYzBmOWIiLCJpYXQiOjE1NzQ5OTAzNDR9.Bq2uELOp0ui5IWpZEY35EITcs8g6XYBbCZXKchweOtg",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGVhYWZjOTNkZjNhYTIyZTRjOTE0MDMiLCJlbnZpcm9ubWVudCI6ImRlZmF1bHQiLCJpYXQiOjE1NzU2NjE1MTN9.JPpLOWjGnzk2fN7SxEfI1yqfSJX88UEcyTaKCMBix5M",
 							"type": "string"
 						}
 					]
@@ -1282,7 +1625,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "{\r\n  criteria(\r\n      key: \"FF2FOR2021\", \r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              },\r\n              {\r\n                  strategy: \"LOCATION_VALIDATION\", \r\n                  input: \"Canada\"\r\n              }\r\n            ]\r\n        ) {\r\n    key\r\n    activated\r\n    result {\r\n        return\r\n        reason\r\n        domain {\r\n            name\r\n            activated\r\n            description\r\n            group {\r\n                name\r\n                activated\r\n                description\r\n                config {\r\n                    key\r\n                    activated\r\n                    description\r\n                    strategies {\r\n                        strategy\r\n                        activated\r\n                        operation\r\n                        values\r\n                    }\r\n                }\r\n            }\r\n        }\r\n        group {\r\n            name\r\n            activated\r\n            description\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n  }\r\n}",
+						"query": "{\r\n  criteria(\r\n      key: \"FF2FOR2020\", \r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              },\r\n              {\r\n                  strategy: \"LOCATION_VALIDATION\", \r\n                  input: \"Canada\"\r\n              }\r\n            ]\r\n        ) {\r\n    key\r\n    activated\r\n    result {\r\n        return\r\n        reason\r\n        domain {\r\n            name\r\n            activated\r\n            description\r\n            group {\r\n                name\r\n                activated\r\n                description\r\n                config {\r\n                    key\r\n                    activated\r\n                    description\r\n                    strategies {\r\n                        strategy\r\n                        activated\r\n                        operation\r\n                        values\r\n                    }\r\n                }\r\n            }\r\n        }\r\n        group {\r\n            name\r\n            activated\r\n            description\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n  }\r\n}",
 						"variables": ""
 					}
 				},
@@ -1309,7 +1652,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGUwNzIwODQ0YjUzNDQxMjgxYzBmOWIiLCJpYXQiOjE1NzQ5OTAzNDR9.Bq2uELOp0ui5IWpZEY35EITcs8g6XYBbCZXKchweOtg",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGVhYWZjOTNkZjNhYTIyZTRjOTE0MDMiLCJlbnZpcm9ubWVudCI6ImRlZmF1bHQiLCJpYXQiOjE1NzU2NjE1MTN9.JPpLOWjGnzk2fN7SxEfI1yqfSJX88UEcyTaKCMBix5M",
 							"type": "string"
 						}
 					]
@@ -1319,7 +1662,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "{\r\n  criteria(\r\n      key: \"FF2FOR2021\", \r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              },\r\n              {\r\n                  strategy: \"LOCATION_VALIDATION\", \r\n                  input: \"Canada\"\r\n              }\r\n            ]\r\n        ) {\r\n    activated\r\n  }\r\n}",
+						"query": "{\r\n  criteria(\r\n      key: \"FF2FOR2020\", \r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              },\r\n              {\r\n                  strategy: \"LOCATION_VALIDATION\", \r\n                  input: \"Canada\"\r\n              }\r\n            ]\r\n        ) {\r\n    result {\r\n        return\r\n        reason\r\n    }\r\n  }\r\n}",
 						"variables": ""
 					}
 				},
@@ -1346,7 +1689,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGUwNzIwODQ0YjUzNDQxMjgxYzBmOWIiLCJpYXQiOjE1NzQ5OTAzNDR9.Bq2uELOp0ui5IWpZEY35EITcs8g6XYBbCZXKchweOtg",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGVhYWZjOTNkZjNhYTIyZTRjOTE0MDMiLCJlbnZpcm9ubWVudCI6ImRlZmF1bHQiLCJpYXQiOjE1NzU2NjE1MTN9.JPpLOWjGnzk2fN7SxEfI1yqfSJX88UEcyTaKCMBix5M",
 							"type": "string"
 						}
 					]
@@ -1383,7 +1726,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGUwNzIwODQ0YjUzNDQxMjgxYzBmOWIiLCJpYXQiOjE1NzQ5OTAzNDR9.Bq2uELOp0ui5IWpZEY35EITcs8g6XYBbCZXKchweOtg",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGVhYWZjOTNkZjNhYTIyZTRjOTE0MDMiLCJlbnZpcm9ubWVudCI6ImRlZmF1bHQiLCJpYXQiOjE1NzU2NjE1MTN9.JPpLOWjGnzk2fN7SxEfI1yqfSJX88UEcyTaKCMBix5M",
 							"type": "string"
 						}
 					]
@@ -1393,7 +1736,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "{\r\n    configuration(key: \"FF2FOR2021\") { #FF3FOR2030\r\n        domain {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        group {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        config {\r\n            key\r\n            description\r\n            activated\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n}",
+						"query": "{\r\n    configuration(key: \"FF2FOR2020\") { #FF3FOR2030\r\n        domain {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        group {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        config {\r\n            key\r\n            description\r\n            activated\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n}",
 						"variables": ""
 					}
 				},
@@ -1420,7 +1763,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGUwNzIwODQ0YjUzNDQxMjgxYzBmOWIiLCJpYXQiOjE1NzQ5OTAzNDR9.Bq2uELOp0ui5IWpZEY35EITcs8g6XYBbCZXKchweOtg",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGVhYWZjOTNkZjNhYTIyZTRjOTE0MDMiLCJlbnZpcm9ubWVudCI6ImRlZmF1bHQiLCJpYXQiOjE1NzU2NjE1MTN9.JPpLOWjGnzk2fN7SxEfI1yqfSJX88UEcyTaKCMBix5M",
 							"type": "string"
 						}
 					]
