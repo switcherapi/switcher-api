@@ -1,4 +1,5 @@
 import { domainType, groupConfigType, strategyType } from './configuration-type';
+import { EnvType } from '../models/environment';
 import { resolveCriteria } from './resolvers';
 import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLNonNull, GraphQLInputObjectType } from 'graphql';
 
@@ -42,7 +43,11 @@ export const criteriaType = new GraphQLObjectType({
             type: GraphQLString
         },
         activated: {
-            type: GraphQLBoolean
+            type: GraphQLBoolean,
+            resolve: (source, args, { environment }) => {
+                return source.activated.get(environment) === undefined ? 
+                    source.activated.get(EnvType.DEFAULT) : source.activated.get(environment)
+            }
         },
         result: {
             type: resultType,

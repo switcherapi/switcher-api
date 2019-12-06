@@ -5,6 +5,7 @@ require('./db/mongoose')
 
 import clientApiRouter from './routers/client-api';
 import adminRouter from './routers/admin';
+import environment from './routers/environment';
 import domainRouter from './routers/domain';
 import groupConfigRouter from './routers/group-config';
 import configRouter from './routers/config';
@@ -21,6 +22,7 @@ app.use(express.json())
  */
 app.use(clientApiRouter)
 app.use(adminRouter)
+app.use(environment)
 app.use(domainRouter)
 app.use(groupConfigRouter)
 app.use(configRouter)

@@ -1,5 +1,7 @@
 import express from 'express';
 import Config from '../models/config';
+import { Environment } from '../models/environment';
+import { masterPermission, checkEnvironmentStatusChange, checkEnvironmentStatusRemoval } from '../middleware/validators';
 import { ConfigStrategy, strategyRequirements } from '../models/config-strategy';
 import { auth } from '../middleware/auth';
 
@@ -7,16 +9,28 @@ const router = new express.Router()
 
 router.post('/configstrategy/create', auth, async (req, res) => {
     try {
-        const configStrategy = new ConfigStrategy({
-            ...req.body,
-            owner: req.admin._id
-        })
+        const config = await Config.findById(req.body.config)
 
-        const config = await Config.findById(req.body.config).countDocuments()
-
-        if (config === 0) {
+        if (!config) {
             return res.status(404).send({ error: 'Config not found' })
         }
+
+        if (!req.body.env) {
+            return res.status(400).send({ error: 'Must specify environment' })
+        }
+
+        const environment = await Environment.findOne({ name: req.body.env, domain: config.domain })
+
+        if (!environment) {
+            return res.status(400).send({ error: 'Environment does not exist' })
+        }
+
+        const configStrategy = new ConfigStrategy({
+            ...req.body,
+            activated: new Map().set(environment.name, true),
+            domain: config.domain,
+            owner: req.admin._id
+        })
 
         await configStrategy.save()
         res.status(201).send(configStrategy)
@@ -114,7 +128,7 @@ router.delete('/configstrategy/:id', auth, async (req, res) => {
 
 router.patch('/configstrategy/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['description', 'activated', 'values']
+    const allowedUpdates = ['description', 'values']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
@@ -293,6 +307,46 @@ router.get("/configstrategy/values/:id", auth, async (req, res) => {
         }
     } catch (e) {
         res.status(500).send()
+    }
+})
+
+router.patch('/configstrategy/updateStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
+    try {
+        const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
+        
+        if (!configStrategy) {
+            return res.status(404).send()
+        }
+
+        const updates = await checkEnvironmentStatusChange(req, res, configStrategy.domain)
+        
+        updates.forEach((update) => configStrategy.activated.set(update, req.body[update]))
+        await configStrategy.save()
+        res.send(configStrategy)
+    } catch (e) {
+        res.status(400).send({ error: e.message })
+    }
+})
+
+router.patch('/configstrategy/removeStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
+    try {
+        const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
+        
+        if (!configStrategy) {
+            return res.status(404).send()
+        }
+
+        await checkEnvironmentStatusRemoval(req, res, configStrategy.domain, true)
+
+        if (configStrategy.activated.size === 1) {
+            return res.status(400).send({ error: 'Invalid operation. One environment status must be saved' })
+        }
+
+        configStrategy.activated.delete(req.body.env)
+        await configStrategy.save()
+        res.send(configStrategy)
+    } catch (e) {
+        res.status(400).send({ error: e.message })
     }
 })
 

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { ConfigStrategy } from './config-strategy';
+import { EnvType } from './environment';
 
 const configSchema = new mongoose.Schema({
     key: {
@@ -14,15 +15,21 @@ const configSchema = new mongoose.Schema({
         trim: true
     },
     activated: {
-        type: Boolean,
+        type: Map,
+        of: Boolean,
         required: true,
-        default: true
+        default: new Map().set(EnvType.DEFAULT, true)
     },
     group: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'GroupConfig'
-    }, 
+    },
+    domain: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Domain'
+    },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -37,13 +44,6 @@ configSchema.virtual('configStrategy', {
     localField: '_id',
     foreignField: 'config'
 })
-
-configSchema.methods.toJSON = function () {
-    const config = this
-    const configObject = config.toObject()
-    
-    return configObject
-}
 
 configSchema.pre('remove', async function (next) {
     const config = this

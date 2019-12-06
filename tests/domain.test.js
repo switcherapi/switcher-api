@@ -6,6 +6,7 @@ import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
 import Config from '../src/models/config';
 import { ConfigStrategy } from '../src/models/config-strategy';
+import { EnvType } from '../src/models/environment';
 import { 
     setupDatabase,
     adminMasterAccountId,
@@ -50,7 +51,7 @@ test('DOMAIN_SUITE - Should create a new Domain', async () => {
     expect(response.body.name).toBe('New Domain')
 })
 
-test('DOMAIN_SUITE - Should not create a new Domain - with no Master credential', async () => {
+test('DOMAIN_SUITE - Should NOT create a new Domain - with no Master credential', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -90,7 +91,7 @@ test('DOMAIN_SUITE - Should generate Token for a Domain', async () => {
     expect(domain.token).not.toEqual(response.body.token)
 })
 
-test('DOMAIN_SUITE - Should not generate Token for a Domain', async () => {
+test('DOMAIN_SUITE - Should NOT generate Token for a Domain', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -164,7 +165,7 @@ test('DOMAIN_SUITE - Should get Domain information by Id', async () => {
         .send().expect(200)
 })
 
-test('DOMAIN_SUITE - Should not found Domain information by Id', async () => {
+test('DOMAIN_SUITE - Should NOT found Domain information by Id', async () => {
     await request(app)
         .get('/domain/' + domainId + 'NOTEXIST')
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -220,7 +221,7 @@ test('DOMAIN_SUITE - Should delete Domain', async () => {
     expect(configStrategy).toBeNull()
 })
 
-test('DOMAIN_SUITE - Should not delete Domain', async () => {
+test('DOMAIN_SUITE - Should NOT delete Domain', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -265,7 +266,7 @@ test('DOMAIN_SUITE - Should update Domain info', async () => {
     expect(responseNewToken.body.token).toEqual(newToken.token)
 })
 
-test('DOMAIN_SUITE - Should not update Domain info without Master credential', async () => {
+test('DOMAIN_SUITE - Should NOT update Domain info without Master credential', async () => {
     const responseLogin = await request(app)
         .post('/admin/login')
         .send({
@@ -278,4 +279,157 @@ test('DOMAIN_SUITE - Should not update Domain info without Master credential', a
         .get('/domain/generateKey/' + domainId)
         .set('Authorization', `Bearer ${responseLogin.body.token}`)
         .send().expect(400)
+})
+
+test('DOMAIN_SUITE - Should update Domain environment status - default', async () => {
+    expect(domainDocument.activated.get(EnvType.DEFAULT)).toEqual(true);
+
+    const response = await request(app)
+        .patch('/domain/updateStatus/' + domainId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            default: false
+        }).expect(200);
+
+    expect(response.body.activated[EnvType.DEFAULT]).toEqual(false);
+
+    // DB validation - verify status updated
+    const domain = await Domain.findById(domainId)
+    expect(domain.activated.get(EnvType.DEFAULT)).toEqual(false);
+})
+
+test('DOMAIN_SUITE - Should update Domain environment status - QA', async () => {
+    // QA Environment still does not exist
+    expect(domainDocument.activated.get('QA')).toEqual(undefined);
+
+    // Creating QA Environment...
+    await request(app)
+        .post('/environment/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            name: 'QA',
+            domain: domainId
+        }).expect(201)
+
+    const response = await request(app)
+        .patch('/domain/updateStatus/' + domainId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            QA: true
+        }).expect(200);
+
+    expect(response.body.activated['QA']).toEqual(true);
+
+    // DB validation - verify status updated
+    let domain = await Domain.findById(domainId)
+    expect(domain.activated.get(EnvType.DEFAULT)).toEqual(true);
+    expect(domain.activated.get('QA')).toEqual(true);
+
+    // Inactivating QA. Default environment should stay activated
+    await request(app)
+        .patch('/domain/updateStatus/' + domainId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            QA: false
+        }).expect(200);
+
+    domain = await Domain.findById(domainId)
+    expect(domain.activated.get(EnvType.DEFAULT)).toEqual(true);
+    expect(domain.activated.get('QA')).toEqual(false);
+})
+
+test('DOMAIN_SUITE - Should NOT update Domain environment status - Permission denied', async () => {
+    await request(app)
+        .patch('/domain/updateStatus/' + domainId)
+        .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+        .send({
+            default: false
+        }).expect(400);
+})
+
+test('DOMAIN_SUITE - Should NOT update Domain environment status - Domain not fould', async () => {
+    await request(app)
+        .patch('/domain/updateStatus/FAKE_DOMAIN')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            default: false
+        }).expect(400);
+})
+
+test('DOMAIN_SUITE - Should remove Domain environment status', async () => {
+    // Creating QA Environment...
+    await request(app)
+        .post('/environment/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            name: 'QA',
+            domain: domainId
+        }).expect(201)
+    
+    await request(app)
+        .patch('/domain/updateStatus/' + domainId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            QA: true
+        }).expect(200);
+
+    let domain = await Domain.findById(domainId)
+    expect(domain.activated.get('QA')).toEqual(true);
+
+    await request(app)
+        .patch('/domain/removeStatus/' + domainId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            env: 'QA'
+        }).expect(200);
+
+    // DB validation - verify status updated
+    domain = await Domain.findById(domainId)
+    expect(domain.activated.get('QA')).toEqual(undefined);
+})
+
+test('DOMAIN_SUITE - Should NOT remove Domain environment status', async () => {
+    // Creating QA Environment...
+    await request(app)
+        .post('/environment/create')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            name: 'QA',
+            domain: domainId
+        }).expect(201)
+
+    await request(app)
+        .patch('/domain/updateStatus/' + domainId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            QA: true
+        }).expect(200);
+
+    // default environment cannot be removed
+    await request(app)
+        .patch('/domain/removeStatus/' + domainId)
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            env: EnvType.DEFAULT
+        }).expect(400);
+    
+    // QA environment cannot be removed without permission
+    await request(app)
+        .patch('/domain/removeStatus/' + domainId)
+        .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+        .send({
+            env: 'QA'
+        }).expect(400);
+
+    // Domain does not exist
+    await request(app)
+        .patch('/domain/removeStatus/FAKE_DOMAIN')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            env: 'QA'
+        }).expect(400);
+
+    const domain = await Domain.findById(domainId)
+    expect(domain.activated.get(EnvType.DEFAULT)).toEqual(true);
+    expect(domain.activated.get('QA')).toEqual(true);
 })

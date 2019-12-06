@@ -2,6 +2,7 @@ import express from 'express';
 import Domain from '../models/domain';
 import GroupConfig from '../models/group-config';
 import { auth } from '../middleware/auth';
+import { masterPermission, checkEnvironmentStatusChange, checkEnvironmentStatusRemoval } from '../middleware/validators';
 
 const router = new express.Router()
 
@@ -137,6 +138,44 @@ router.patch('/groupconfig/:id', auth, async (req, res) => {
         }
     } catch (e) {
         res.status(404).send({ error: 'Group not found' })
+    }
+})
+
+// TODO: Need test
+router.patch('/groupconfig/updateStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
+    try {
+        const groupconfig = await GroupConfig.findOne({ _id: req.params.id })
+        
+        if (!groupconfig) {
+            return res.status(404).send()
+        }
+
+        const updates = await checkEnvironmentStatusChange(req, res, groupconfig.domain)
+        
+        updates.forEach((update) => groupconfig.activated.set(update, req.body[update]))
+        await groupconfig.save()
+        res.send(groupconfig)
+    } catch (e) {
+        res.status(400).send({ error: e.message })
+    }
+})
+
+// TODO: Need test
+router.patch('/groupconfig/removeStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
+    try {
+        const groupconfig = await GroupConfig.findOne({ _id: req.params.id })
+        
+        if (!groupconfig) {
+            return res.status(404).send()
+        }
+
+        await checkEnvironmentStatusRemoval(req, res, groupconfig.domain)
+
+        groupconfig.activated.delete(req.body.env)
+        await groupconfig.save()
+        res.send(groupconfig)
+    } catch (e) {
+        res.status(400).send({ error: e.message })
     }
 })
 

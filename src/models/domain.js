@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import GroupConfig from './group-config';
+import { EnvType } from './environment';
 
 const domainSchema = new mongoose.Schema({
     name: {
@@ -15,9 +16,10 @@ const domainSchema = new mongoose.Schema({
         trim: true
     },
     activated: {
-        type: Boolean,
+        type: Map,
+        of: Boolean,
         required: true,
-        default: true
+        default: new Map().set(EnvType.DEFAULT, true)
     },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
@@ -37,9 +39,27 @@ domainSchema.virtual('groupConfig', {
     foreignField: 'domain'
 })
 
-domainSchema.methods.generateAuthToken = async function () {
+domainSchema.virtual('config', {
+    ref: 'Config',
+    localField: '_id',
+    foreignField: 'domain'
+})
+
+domainSchema.virtual('configStrategy', {
+    ref: 'ConfigStrategy',
+    localField: '_id',
+    foreignField: 'domain'
+})
+
+domainSchema.virtual('environment', {
+    ref: 'Environment',
+    localField: '_id',
+    foreignField: 'domain'
+})
+
+domainSchema.methods.generateAuthToken = async function (environment) {
     const domain = this
-    const token = jwt.sign(({ _id: domain.id.toString() }), process.env.JWT_CONFIG_SECRET)
+    const token = jwt.sign(({ _id: domain.id.toString(), environment }), process.env.JWT_CONFIG_SECRET)
 
     return token
 }

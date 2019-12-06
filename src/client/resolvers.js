@@ -1,3 +1,4 @@
+import { EnvType } from '../models/environment';
 import Domain from '../models/domain';
 import GroupConfig from '../models/group-config';
 import Config from '../models/config';
@@ -84,7 +85,8 @@ const checkConfigStrategies = async (configId) => {
 
 export const resolveCriteria = async (config, context) => {
     context.key = config.key
-
+    const environment = context.environment
+    
     const group = await checkGroup(config._id)
     const strategies = await checkConfigStrategies(config._id)
     
@@ -94,17 +96,25 @@ export const resolveCriteria = async (config, context) => {
         strategies
     }
 
-    if (!config.activated || !group.activated || !context.domain.activated) {
+    // Check flags
+    if (config.activated.get(environment) === undefined ? !config.activated.get(EnvType.DEFAULT) : !config.activated.get(environment)) {
         result.return = false
-        result.reason = !config.activated ? 'Config disabled' : 
-                        !group.activated ? 'Group disabled' : 
-                        !context.domain.activated ? 'Domain disabled' : ''
+        result.reason = 'Config disabled'
+        return result
+    } else if (group.activated.get(environment) === undefined ? !group.activated.get(EnvType.DEFAULT) : !group.activated.get(environment)) {
+        result.return = false
+        result.reason = 'Group disabled'
+        return result
+    } else if (context.domain.activated.get(environment) === undefined ? !context.domain.activated.get(EnvType.DEFAULT) : !context.domain.activated.get(environment)) {
+        result.return = false
+        result.reason = 'Domain disabled'
         return result
     }
 
+    // Check strategies
     if (strategies) {
         for (var i = 0; i < strategies.length; i++) {
-            if (!strategies[i].activated) {
+            if (!strategies[i].activated.get(environment)) {
                 continue;
             }
 

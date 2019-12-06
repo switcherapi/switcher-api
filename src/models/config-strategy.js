@@ -182,9 +182,9 @@ const configStrategySchema = new mongoose.Schema({
         trim: true
     },
     activated: {
-        type: Boolean,
-        required: true,
-        default: true
+        type: Map,
+        of: Boolean,
+        required: true
     },
     strategy: {
         type: String,
@@ -205,7 +205,12 @@ const configStrategySchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'Config'
-    }, 
+    },
+    domain: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Domain'
+    },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,

@@ -1,4 +1,5 @@
 import Config from '../models/config';
+import { Environment, EnvType } from '../models/environment';
 
 export const masterPermission = function (action) {
     return function (req, res, next) {
@@ -22,4 +23,29 @@ export const checkConfig = async (req, res, next) => {
     
     req.config = config
     next();
+}
+
+export const checkEnvironmentStatusChange = async (req, res, domain) => {
+    const environment = await Environment.find({ domain }).select('name -_id')
+    const updates = Object.keys(req.body)
+    const isValidOperation = updates.every((update) => {
+        return environment.filter((e) => e.name === update).length > 0
+    })
+
+    if (!isValidOperation) {
+        throw new Error('Invalid updates')
+    }
+
+    return updates
+}
+
+export const checkEnvironmentStatusRemoval = async (req, res, domain, strategy = false ) => {
+    const environment = await Environment.find({ domain }).select('name -_id')
+    const isValidOperation = environment.filter((e) => 
+        e.name === req.body.env && 
+        !strategy ? req.body.env !== EnvType.DEFAULT : strategy).length > 0
+        
+    if (!isValidOperation) {
+        throw new Error('Invalid environment')
+    }
 }

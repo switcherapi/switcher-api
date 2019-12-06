@@ -1,22 +1,25 @@
 import express from 'express';
 import Domain from '../models/domain';
+import { Environment, EnvType } from '../models/environment';
 import { auth } from '../middleware/auth';
-import { masterPermission } from '../middleware/validators';
+import { masterPermission, checkEnvironmentStatusChange, checkEnvironmentStatusRemoval } from '../middleware/validators';
 
 const router = new express.Router()
 
-router.get('/domain/generateKey/:id', auth, masterPermission('generate Domain token'), async (req, res) => {
+router.get('/domain/generateKey/:domain/', auth, masterPermission('generate Domain token'), async (req, res) => {
     try {
-        const domain = await Domain.findOne({ _id: req.params.id })
+        const domain = await Domain.findOne({ _id: req.params.domain })
+        const environment = await Environment.findOne({ name: req.query.env || EnvType.DEFAULT })
 
-        if (!domain) {
+        if (!domain || !environment) {
             return res.status(404).send()
         }
 
-        const token = await domain.generateAuthToken()
+        const token = await domain.generateAuthToken(environment.name)
         
         res.status(201).send({ token })
     } catch (e) {
+        console.log(e)
         res.status(400).send(e)
     }
 })
@@ -26,14 +29,21 @@ router.post('/domain/create', auth, masterPermission('create Domains'), async (r
         const domain = new Domain({
             ...req.body,
             owner: req.admin._id
-        })
+        });
 
-        const token = await domain.generateAuthToken()
-        domain.token = token
-        await domain.save()
+        const environment = new Environment({
+            domain: domain._id,
+            owner: req.admin._id
+        });
+
+        environment.save();
+
+        const token = await domain.generateAuthToken(environment.name);
+        domain.token = token;
+        await domain.save();
         res.status(201).send(domain)
     } catch (e) {
-        res.status(400).send(e)
+        res.status(400).send(e);
     }
 })
 
@@ -115,6 +125,40 @@ router.patch('/domain/:id', auth, masterPermission('update Domain'), async (req,
         res.send(domain)
     } catch (e) {
         res.status(400).send(e)
+    }
+})
+
+router.patch('/domain/updateStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
+    try {
+        const updates = await checkEnvironmentStatusChange(req, res, req.params.id)
+        const domain = await Domain.findOne({ _id: req.params.id })
+        
+        if (!domain) {
+            return res.status(404).send()
+        }
+        
+        updates.forEach((update) => domain.activated.set(update, req.body[update]))
+        await domain.save()
+        res.send(domain)
+    } catch (e) {
+        res.status(400).send({ error: e.message })
+    }
+})
+
+router.patch('/domain/removeStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
+    try {
+        await checkEnvironmentStatusRemoval(req, res, req.params.id)
+        const domain = await Domain.findOne({ _id: req.params.id })
+        
+        if (!domain) {
+            return res.status(404).send()
+        }
+
+        domain.activated.delete(req.body.env)
+        await domain.save()
+        res.send(domain)
+    } catch (e) {
+        res.status(400).send({ error: e.message })
     }
 })
 

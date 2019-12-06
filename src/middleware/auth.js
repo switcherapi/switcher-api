@@ -45,7 +45,7 @@ export async function appAuth(req, res, next) {
         const token = req.header('Authorization').replace('Bearer ', '')
 
         const decoded = jwt.verify(token, process.env.JWT_CONFIG_SECRET)
-        const domain = await Domain.findOne({ _id: decoded._id, token })
+        const domain = await Domain.findOne({ _id: decoded._id })
 
         if (!domain) {
             throw new Error()
@@ -53,6 +53,7 @@ export async function appAuth(req, res, next) {
 
         req.token = token
         req.domain = domain
+        req.environment = decoded.environment
         next()
     } catch (e) {
         res.status(401).send({ error: 'Invalid API token.' })

@@ -2,22 +2,24 @@ import express from 'express';
 import GroupConfig from '../models/group-config';
 import Config from '../models/config';
 import { auth } from '../middleware/auth';
+import { masterPermission, checkEnvironmentStatusChange, checkEnvironmentStatusRemoval } from '../middleware/validators';
 
 const router = new express.Router()
 
 router.post('/config/create', auth, async (req, res) => {
-    const config = new Config({
-        ...req.body,
-        owner: req.admin._id
-    })
-
-    const group = await GroupConfig.findById(req.body.group).countDocuments()
-    
-    if (group === 0) {
-        return res.status(404).send({ error: 'Group Config not found' })
-    }
-
     try {
+        const group = await GroupConfig.findById(req.body.group)
+
+        if (!group) {
+            return res.status(404).send({ error: 'Group Config not found' })
+        }
+    
+        const config = new Config({
+            ...req.body,
+            domain: group.domain,
+            owner: req.admin._id
+        })
+
         await config.save()
         res.status(201).send(config)
     } catch (e) {
@@ -121,6 +123,42 @@ router.patch('/config/:id', auth, async (req, res) => {
         res.send(config)
     } catch (e) {
         res.status(400).send(e)
+    }
+})
+
+router.patch('/config/updateStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
+    try {
+        const config = await Config.findOne({ _id: req.params.id })
+        
+        if (!config) {
+            return res.status(404).send()
+        }
+
+        const updates = await checkEnvironmentStatusChange(req, res, config.domain)
+        
+        updates.forEach((update) => config.activated.set(update, req.body[update]))
+        await config.save()
+        res.send(config)
+    } catch (e) {
+        res.status(400).send({ error: e.message })
+    }
+})
+
+router.patch('/config/removeStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
+    try {
+        const config = await Config.findOne({ _id: req.params.id })
+        
+        if (!config) {
+            return res.status(404).send()
+        }
+
+        await checkEnvironmentStatusRemoval(req, res, config.domain)
+
+        config.activated.delete(req.body.env)
+        await config.save()
+        res.send(config)
+    } catch (e) {
+        res.status(400).send({ error: e.message })
     }
 })
 

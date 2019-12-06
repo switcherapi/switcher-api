@@ -1,5 +1,6 @@
 import { resolveConfigStrategy, resolveConfig, resolveGroupConfig } from './resolvers';
 import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean } from 'graphql';
+import { EnvType } from '../models/environment';
 
 export const strategyType = new GraphQLObjectType({
     name: 'Strategy',
@@ -8,7 +9,11 @@ export const strategyType = new GraphQLObjectType({
             type: GraphQLString
         },
         activated: {
-            type: GraphQLBoolean
+            type: GraphQLBoolean,
+            resolve: (source, args, { environment }) => {
+                return source.activated.get(environment) === undefined ? 
+                    source.activated.get(EnvType.DEFAULT) : source.activated.get(environment)
+            }
         },
         operation: {
             type: GraphQLString
@@ -29,7 +34,11 @@ export const configType = new GraphQLObjectType({
             type: GraphQLString
         },
         activated: {
-            type: GraphQLBoolean
+            type: GraphQLBoolean,
+            resolve: (source, args, { environment }) => {
+                return source.activated.get(environment) === undefined ? 
+                    source.activated.get(EnvType.DEFAULT) : source.activated.get(environment)
+            }
         },
         strategies: {
             type: new GraphQLList(strategyType),
@@ -44,7 +53,11 @@ export const configType = new GraphQLObjectType({
                     type: GraphQLString
                 }, 
                 activated: {
-                    type: GraphQLBoolean
+                    type: GraphQLBoolean,
+                    resolve: (source, args, { environment }) => {
+                        return source.activated.get(environment) === undefined ? 
+                            source.activated.get(EnvType.DEFAULT) : source.activated.get(environment)
+                    }
                 }
             },
             resolve: async (source, { _id, strategy, operation, activated }) => {
@@ -64,7 +77,11 @@ export const groupConfigType = new GraphQLObjectType({
             type: GraphQLString
         },
         activated: {
-            type: GraphQLBoolean
+            type: GraphQLBoolean,
+            resolve: (source, args, { environment }) => {
+                return source.activated.get(environment) === undefined ? 
+                    source.activated.get(EnvType.DEFAULT) : source.activated.get(environment)
+            }
         },
         config: {
             type: new GraphQLList(configType),
@@ -76,7 +93,11 @@ export const groupConfigType = new GraphQLObjectType({
                     type: GraphQLString
                 }, 
                 activated: {
-                    type: GraphQLBoolean
+                    type: GraphQLBoolean,
+                    resolve: (source, args, { environment }) => {
+                        return source.activated.get(environment) === undefined ? 
+                            source.activated.get(EnvType.DEFAULT) : source.activated.get(environment)
+                    }
                 }
             },
             resolve: async (source, { _id, key, activated }) => {
@@ -96,7 +117,11 @@ export const domainType = new GraphQLObjectType({
             type: GraphQLString
         },
         activated: {
-            type: GraphQLBoolean
+            type: GraphQLBoolean,
+            resolve: (source, args, { environment }) => {
+                return source.activated.get(environment) === undefined ? 
+                    source.activated.get(EnvType.DEFAULT) : source.activated.get(environment)
+            }
         },
         group: {
             type: new GraphQLList(groupConfigType),
@@ -108,10 +133,14 @@ export const domainType = new GraphQLObjectType({
                     type: GraphQLString
                 }, 
                 activated: {
-                    type: GraphQLBoolean
+                    type: GraphQLBoolean,
+                    resolve: (source, args, { environment }) => {
+                        return source.activated.get(environment) === undefined ? 
+                            source.activated.get(EnvType.DEFAULT) : source.activated.get(environment)
+                    }
                 }
             },
-            resolve: async (source, { _id, name, activated }, context) => {
+            resolve: async (source, { _id, name, activated }) => {
                 return await resolveGroupConfig(source, _id, name, activated);
             }
         }

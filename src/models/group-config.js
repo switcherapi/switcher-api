@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import Config from './config';
+import { EnvType } from '../models/environment';
 
 const groupConfigSchema = new mongoose.Schema({
     name: {
@@ -14,9 +15,10 @@ const groupConfigSchema = new mongoose.Schema({
         trim: true
     },
     activated: {
-        type: Boolean,
+        type: Map,
+        of: Boolean,
         required: true,
-        default: true
+        default: new Map().set(EnvType.DEFAULT, true)
     },
     domain: {
         type: mongoose.Schema.Types.ObjectId,
@@ -37,13 +39,6 @@ groupConfigSchema.virtual('config', {
     localField: '_id',
     foreignField: 'group'
 })
-
-groupConfigSchema.methods.toJSON = function () {
-    const groupConfig = this
-    const groupConfigObject = groupConfig.toObject()
-    
-    return groupConfigObject
-}
 
 groupConfigSchema.pre('remove', async function (next) {
     var ObjectId = (require('mongoose').Types.ObjectId);
