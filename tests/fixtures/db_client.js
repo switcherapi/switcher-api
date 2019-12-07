@@ -115,19 +115,6 @@ const configStrategyTIME_BETWEENDocument = {
     domain: domainId
 }
 
-const configStrategyLOCATIONId = new mongoose.Types.ObjectId()
-const configStrategyLOCATIONDocument = {
-    _id: configStrategyLOCATIONId,
-    description: 'Test config strategy LOCATION_VALIDATION',
-    activated: new Map().set(EnvType.DEFAULT, false),
-    owner: adminMasterAccountId,
-    config: configId,
-    operation: OperationsType.EXIST,
-    strategy: StrategiesType.LOCATION,
-    values: ['Vancouver', 'Dallas'],
-    domain: domainId
-}
-
 const setupDatabase = async () => {
     await ConfigStrategy.deleteMany()
     await Config.deleteMany()
@@ -143,7 +130,6 @@ const setupDatabase = async () => {
     await new Config(configDocument).save()
     await new ConfigStrategy(configStrategyUSERDocument).save()
     await new ConfigStrategy(configStrategyCIDRDocument).save()
-    await new ConfigStrategy(configStrategyLOCATIONDocument).save()
     await new ConfigStrategy(configStrategyTIME_BETWEENDocument).save()
     await new ConfigStrategy(configStrategyTIME_GREATDocument).save()
 }
@@ -162,12 +148,10 @@ module.exports = {
     configDocument,
     configStrategyUSERDocument,
     configStrategyCIDRDocument,
-    configStrategyLOCATIONDocument,
     configStrategyTIME_BETWEENDocument,
     configStrategyTIME_GREATDocument,
     configStrategyUSERId,
     configStrategyCIDRId,
-    configStrategyLOCATIONId,
     configStrategyTIME_BETWEENId,
     configStrategyTIME_GREATId
 }

@@ -75,7 +75,3 @@ describe('Processing strategy: TIME', () => {
 describe('Processing strategy: DATE', () => {
 
 })
-
-describe('Processing strategy: LOCATION', () => {
-
-})

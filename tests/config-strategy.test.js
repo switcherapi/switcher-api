@@ -139,40 +139,6 @@ test('STRATEGY_SUITE - Should not create a new Config Strategy - Number of value
 
     expect(response.body.error).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EXIST}', are min: ${min} and max: ${max} values`);
     
-    // LOCATION
-    requirements = strategyRequirements(StrategiesType.LOCATION);
-    ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.EQUAL)[0]);
-
-    response = await request(app)
-        .post('/configstrategy/create')
-        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
-        .send({
-            description: 'Description of my new Config Strategy',
-            strategy: StrategiesType.LOCATION,
-            operation: OperationsType.EQUAL,
-            values: ['CANADA', 'USA'],
-            config: configId2,
-            env: EnvType.DEFAULT
-        }).expect(400)
-
-    expect(response.body.error).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EQUAL}', are min: ${min} and max: ${max} values`);
-
-    ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.EXIST)[0]);
-
-    response = await request(app)
-        .post('/configstrategy/create')
-        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
-        .send({
-            description: 'Description of my new Config Strategy',
-            strategy: StrategiesType.LOCATION,
-            operation: OperationsType.EXIST,
-            values: [],
-            config: configId2,
-            env: EnvType.DEFAULT
-        }).expect(400)
-
-    expect(response.body.error).toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EXIST}', are min: ${min} and max: ${max} values`);
- 
     // NETWORK
     requirements = strategyRequirements(StrategiesType.NETWORK);
     ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.EXIST)[0]);
@@ -470,14 +436,6 @@ test('STRATEGY_SUITE - Should return a specific strategy requirements', async ()
         .send().expect(200)
     
     requirements = strategyRequirements(StrategiesType.DATE)
-    expect(response.body).toMatchObject(requirements)
-
-    response = await request(app)
-        .get('/configstrategy/req/' + StrategiesType.LOCATION)
-        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
-        .send().expect(200)
-    
-    requirements = strategyRequirements(StrategiesType.LOCATION)
     expect(response.body).toMatchObject(requirements)
 
     response = await request(app)

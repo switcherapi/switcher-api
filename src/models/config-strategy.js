@@ -6,8 +6,7 @@ export const StrategiesType = Object.freeze({
     NETWORK: 'NETWORK_VALIDATION',
     VALUE: 'VALUE_VALIDATION',
     TIME: 'TIME_VALIDATION',
-    DATE: 'DATE_VALIDATION',
-    LOCATION: 'LOCATION_VALIDATION'
+    DATE: 'DATE_VALIDATION'
   });
 
 export const OperationsType = Object.freeze({
@@ -36,10 +35,6 @@ const OperationPerStrategy = [
     {
         strategy: StrategiesType.DATE,
         operations: [OperationsType.BETWEEN, OperationsType.LOWER, OperationsType.GREATER]
-    },
-    {
-        strategy: StrategiesType.LOCATION,
-        operations: [OperationsType.EXIST, OperationsType.NOT_EXIST, OperationsType.EQUAL, OperationsType.NOT_EQUAL]
     }
 ]
 
@@ -116,8 +111,6 @@ export const processOperation = (strategy, operation, input, values) => {
             return processTime(operation, input, values)
         case StrategiesType.DATE:
             return processDate(operation, input, values)
-        case StrategiesType.LOCATION:
-            return processLocation(operation, input, values)
     }
 }
 
@@ -190,20 +183,6 @@ const processDate = (operation, input, values) => {
             return moment(input).isSameOrAfter(values[0])
         case OperationsType.BETWEEN:
             return moment(input).isBetween(values[0], values[1])
-    }
-}
-
-const processLocation = (operation, input, values) => {
-    switch(operation) {
-        case OperationsType.EXIST:
-            const found = values.find((element) => element === input)
-            return found ? true : false
-        case OperationsType.NOT_EXIST:
-            return !processLocation(OperationsType.EXIST, input, values);
-        case OperationsType.EQUAL:
-            return input === values[0]
-        case OperationsType.NOT_EQUAL:
-            return !processLocation(OperationsType.EQUAL, input, values);
     }
 }
 
