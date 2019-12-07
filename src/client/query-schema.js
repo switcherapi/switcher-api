@@ -1,6 +1,7 @@
 import { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLNonNull } from 'graphql';
 import { domainType, flatConfigurationType } from './configuration-type';
 import { EnvType } from '../models/environment';
+import Config from '../models/config';
 import { strategyInputType, criteriaType } from './criteria-type';
 import { resolveConfigByKey, resolveDomain, resolveFlatConfigurationByConfig, resolveFlatConfigurationTypeByGroup } from './resolvers';
 
@@ -42,8 +43,8 @@ const queryType = new GraphQLObjectType({
                     }
                 }
             },
-            resolve: async (source, { _id, name, token, activated }) => {
-                return await resolveDomain(_id, name, token, activated)
+            resolve: async (source, { _id, name, token, activated }, { environment }) => {
+                return await resolveDomain(_id, name, token, activated, environment)
             }
         },
         configuration: {

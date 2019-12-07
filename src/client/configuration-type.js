@@ -1,6 +1,9 @@
 import { resolveConfigStrategy, resolveConfig, resolveGroupConfig } from './resolvers';
 import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean } from 'graphql';
+import GroupConfig from '../models/group-config';
+import { ConfigStrategy } from '../models/config-strategy';
 import { EnvType } from '../models/environment';
+import Config from '../models/config';
 
 export const strategyType = new GraphQLObjectType({
     name: 'Strategy',
@@ -60,8 +63,8 @@ export const configType = new GraphQLObjectType({
                     }
                 }
             },
-            resolve: async (source, { _id, strategy, operation, activated }) => {
-                return await resolveConfigStrategy(source, _id, strategy, operation, activated);
+            resolve: async (source, { _id, strategy, operation, activated }, { environment }) => {
+                return await resolveConfigStrategy(source, _id, strategy, operation, activated, environment);
             }
         }
     }
@@ -100,8 +103,8 @@ export const groupConfigType = new GraphQLObjectType({
                     }
                 }
             },
-            resolve: async (source, { _id, key, activated }) => {
-                return await resolveConfig(source, _id, key, activated);
+            resolve: async (source, { _id, key, activated }, { environment }) => {
+                return await resolveConfig(source, _id, key, activated, environment);
             }
         }
     }
@@ -140,8 +143,8 @@ export const domainType = new GraphQLObjectType({
                     }
                 }
             },
-            resolve: async (source, { _id, name, activated }) => {
-                return await resolveGroupConfig(source, _id, name, activated);
+            resolve: async (source, { _id, name, activated }, { environment }) => {
+                return await resolveGroupConfig(source, _id, name, activated, environment);
             }
         }
     }
@@ -151,16 +154,38 @@ export const flatConfigurationType = new GraphQLObjectType({
     name: 'FlatConfiguration',
     fields: {
         domain: {
-            type: new GraphQLList(domainType)
+            type: domainType,
+            resolve: (source, args, { domain }) => {
+                return domain
+            }
         },
         group: {
-            type: new GraphQLList(groupConfigType)
+            type: new GraphQLList(groupConfigType),
+            resolve: async (source, args) => {
+                if (source.config) {
+                    return await GroupConfig.find({ _id: source.config[0].group })
+                } else if (source.group) {
+                    return source.group
+                }
+            }
         },
         config: {
-            type: new GraphQLList(configType)
+            type: new GraphQLList(configType),
+            resolve: async (source, args) => {
+                if (source.config) {
+                    return source.config
+                } else if (source.group) {
+                    return await Config.find({ group: source.group[0]._id })
+                }
+            }
         },
         strategies: {
-            type: new GraphQLList(strategyType)
+            type: new GraphQLList(strategyType),
+            resolve: async (source, args) => {
+                if (source.config) {
+                    return await ConfigStrategy.find({ config: source.config[0]._id })
+                }
+            }
         }
     }
 })

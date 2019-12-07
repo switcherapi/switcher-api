@@ -4,71 +4,71 @@ import GroupConfig from '../models/group-config';
 import Config from '../models/config';
 import { ConfigStrategy, processOperation } from '../models/config-strategy';
 
-export const resolveConfigStrategy = async (source, _id, strategy, operation, activated) => {
+export const resolveConfigStrategy = async (source, _id, strategy, operation, activated, environment) => {
     const args = {}
 
     if (_id) { args._id = _id }
     if (strategy) { args.strategy = strategy }
     if (operation) { args.operation = operation }
-    if (activated !== undefined) { args.activated = activated }
+    if (activated !== undefined) { 
+        args.activated = { [`${environment}`]: activated }
+    }
 
     return await ConfigStrategy.find({ config: source._id, ...args })
 }
 
-export const resolveConfig = async (source, _id, key, activated) => {
+export const resolveConfig = async (source, _id, key, activated, environment) => {
     const args = {}
 
     if (_id) { args._id = _id }
     if (key) { args.key = key }
-    if (activated !== undefined) { args.activated = activated }
+    if (activated !== undefined) { 
+        args.activated = { [`${environment}`]: activated }
+    }
 
     return await Config.find({ group: source._id, ...args })
 }
 
-export const resolveGroupConfig = async (source, _id, name, activated) => {
+export const resolveGroupConfig = async (source, _id, name, activated, environment) => {
     const args = {}
 
     if (_id) { args._id = _id }
     if (name) { args.name = name }
-    if (activated !== undefined) { args.activated = activated }
+    if (activated !== undefined) { 
+        args.activated = { [`${environment}`]: activated }
+    }
 
     return await GroupConfig.find({ domain: source._id, ...args })
 }
 
-export const resolveDomain = async (_id, name, token, activated) => {
+export const resolveDomain = async (_id, name, token, activated, environment) => {
     const args = {}
 
     if (_id) { args._id = _id }
     if (name) { args.name = name }
     if (token) { args.token = token }
-    if (activated !== undefined) { args.activated = activated }
+    if (activated !== undefined) { 
+        args.activated = { [`${environment}`]: activated }
+    }
 
     return await Domain.find({ ...args })
 }
 
 export const resolveFlatConfigurationByConfig = async (key) => {
-    const config = await Config.find({ key })
-    const group = await GroupConfig.find({ _id: config[0].group })
-    const domain = await Domain.find({ _id: group[0].domain })
-    const strategies = await ConfigStrategy.find({ config: config[0]._id })
-
-    return {
-        domain,
-        group,
-        config,
-        strategies
+    const config = await Config.find({ key });
+    if (config.length > 0) {
+        return { config }
+    } else {
+        return undefined;
     }
 }
 
 export const resolveFlatConfigurationTypeByGroup = async (groupConfig) => {
-    const group = await GroupConfig.find({ name: groupConfig })
-    const config = await Config.find({ group: group[0]._id })
-    const domain = await Domain.find({ _id: group[0].domain })
-
-    return {
-        domain,
-        group,
-        config
+    const group = await GroupConfig.find({ name: groupConfig });
+    if (group.length > 0) {
+        return { group }
+    } else {
+        return undefined;
     }
 }
 
@@ -110,7 +110,7 @@ export const resolveCriteria = async (config, context) => {
         result.reason = 'Domain disabled'
         return result
     }
-
+    
     // Check strategies
     if (strategies) {
         for (var i = 0; i < strategies.length; i++) {
