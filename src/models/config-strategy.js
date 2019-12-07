@@ -151,14 +151,14 @@ const processNETWORK = async (operation, input, values) => {
 const processVALUE = (operation, input, values) => {
     switch(operation) {
         case OperationsType.EXIST:
-            const found = values.find((element) => element === input)
-            return found ? true : false
+            return values.includes(input)
         case OperationsType.NOT_EXIST:
-            return !processVALUE(OperationsType.EXIST, input, values);
+            return !values.includes(input)
         case OperationsType.EQUAL:
             return input === values[0]
         case OperationsType.NOT_EQUAL:
-            return !processVALUE(OperationsType.EQUAL, input, values);
+            const result = values.filter(element => element === input)
+            return result.length === 0
     }
 }
 
