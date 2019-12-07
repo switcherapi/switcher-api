@@ -12,7 +12,9 @@ export const StrategiesType = Object.freeze({
 
 export const OperationsType = Object.freeze({
     EQUAL: 'EQUAL',
+    NOT_EQUAL: 'NOT_EQUAL',
     EXIST: 'EXIST',
+    NOT_EXIST: 'NOT_EXIST',
     GREATER: 'GREATER',
     LOWER: 'LOWER',
     BETWEEN: 'BETWEEN'
@@ -21,11 +23,11 @@ export const OperationsType = Object.freeze({
 const OperationPerStrategy = [
     {
         strategy: StrategiesType.NETWORK,
-        operations: [OperationsType.EXIST]
+        operations: [OperationsType.EXIST, OperationsType.NOT_EXIST]
     },
     {
         strategy: StrategiesType.VALUE,
-        operations: [OperationsType.EXIST, OperationsType.EQUAL]
+        operations: [OperationsType.EXIST, OperationsType.NOT_EXIST, OperationsType.EQUAL, OperationsType.NOT_EQUAL]
     },
     {
         strategy: StrategiesType.TIME,
@@ -37,7 +39,7 @@ const OperationPerStrategy = [
     },
     {
         strategy: StrategiesType.LOCATION,
-        operations: [OperationsType.EXIST, OperationsType.EQUAL]
+        operations: [OperationsType.EXIST, OperationsType.NOT_EXIST, OperationsType.EQUAL, OperationsType.NOT_EQUAL]
     }
 ]
 
@@ -48,9 +50,19 @@ const OperationValuesValidation = [
         max: 1
     },
     {
+        operation: OperationsType.NOT_EQUAL,
+        min: 1,
+        max: 1
+    },
+    {
         operation: OperationsType.EXIST,
         min: 1,
-        max: 100
+        max: process.env.MAX_EXIST_STRATEGYOPERATION
+    },
+    {
+        operation: OperationsType.NOT_EXIST,
+        min: 1,
+        max: process.env.MAX_EXIST_STRATEGYOPERATION
     },
     {
         operation: OperationsType.GREATER,
@@ -117,6 +129,8 @@ const processNETWORK = (operation, input, values) => {
                 if (cidr.contains(input) || values[i] === input) {
                     return true
                 }
+            case OperationsType.NOT_EXIST:
+                return !processNETWORK(OperationsType.EXIST, input, values);
         }
     }
 
@@ -128,8 +142,12 @@ const processVALUE = (operation, input, values) => {
         case OperationsType.EXIST:
             const found = values.find((element) => element === input)
             return found ? true : false
+        case OperationsType.NOT_EXIST:
+            return !processVALUE(OperationsType.EXIST, input, values);
         case OperationsType.EQUAL:
             return input === values[0]
+        case OperationsType.NOT_EQUAL:
+            return !processVALUE(OperationsType.EQUAL, input, values);
     }
 }
 
@@ -162,8 +180,12 @@ const processLocation = (operation, input, values) => {
         case OperationsType.EXIST:
             const found = values.find((element) => element === input)
             return found ? true : false
+        case OperationsType.NOT_EXIST:
+            return !processLocation(OperationsType.EXIST, input, values);
         case OperationsType.EQUAL:
             return input === values[0]
+        case OperationsType.NOT_EQUAL:
+            return !processLocation(OperationsType.EQUAL, input, values);
     }
 }
 
@@ -220,7 +242,7 @@ const configStrategySchema = new mongoose.Schema({
     timestamps: true
 })
 
-configStrategySchema.pre('validate', async function (next) {
+configStrategySchema.pre('save', async function (next) {
     const strategyConfig = this
 
     const strategy = strategyConfig.strategy
