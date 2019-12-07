@@ -121,17 +121,35 @@ export const processOperation = (strategy, operation, input, values) => {
     }
 }
 
-const processNETWORK = (operation, input, values) => {
-    for (var i = 0; i < values.length; i++) {
-        const cidr = new IPCIDR(values[i]);  
-        switch(operation) {
-            case OperationsType.EXIST:
-                if (cidr.contains(input) || values[i] === input) {
-                    return true
+const processNETWORK = async (operation, input, values) => {
+
+    const cidrRegex = '^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$'
+    
+    switch(operation) {
+        case OperationsType.EXIST:
+            for (var i = 0; i < values.length; i++) {
+                if (values[i].match(cidrRegex)) {
+                    const cidr = new IPCIDR(values[i]);
+                    if (cidr.contains(input)) {
+                        return true
+                    }
+                } else {
+                    return values.includes(input)
                 }
-            case OperationsType.NOT_EXIST:
-                return !processNETWORK(OperationsType.EXIST, input, values);
-        }
+            }
+            break;
+        case OperationsType.NOT_EXIST:
+            const result = values.filter(element => {
+                if (element.match(cidrRegex)) {
+                    const cidr = new IPCIDR(element);
+                    if (cidr.contains(input)) {
+                        return true
+                    }
+                } else {
+                    return values.includes(input)
+                }
+            })
+            return result.length === 0
     }
 
     return false

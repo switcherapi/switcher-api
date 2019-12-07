@@ -14,7 +14,8 @@
     "test-group": "env-cmd -e test jest -t 'GROUP_SUITE'",
     "test-config": "env-cmd -e test jest -t 'CONFIG_SUITE'",
     "test-strategy": "env-cmd -e test jest -t 'STRATEGY_SUITE'",
-    "test-client": "env-cmd -e test jest -t 'CLIENT_SUITE'"
+    "test-client": "env-cmd -e test jest -t 'CLIENT_SUITE'",
+    "test-unit-strategy": "env-cmd -e test jest -t 'UNIT_STRATEGY'"
   },
   "keywords": [
     "feature",
