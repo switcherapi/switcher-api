@@ -147,7 +147,7 @@ router.patch('/configstrategy/:id', auth, async (req, res) => {
             await configStrategy.save()
             res.send(configStrategy)
         } catch (e) {
-            res.status(400).send(e)
+            res.status(400).send({ error: e.message })
         }
     } catch (e) {
         res.status(404).send(e)
@@ -186,7 +186,7 @@ router.patch('/configstrategy/addval/:id', auth, async (req, res) => {
             await configStrategy.save()
             res.send(configStrategy)
         } catch (e) {
-            res.status(400).send(e)
+            res.status(400).send({ error: e.message })
         }
     } catch (e) {
         res.status(404).send(e)
@@ -233,7 +233,7 @@ router.patch('/configstrategy/updateval/:id', auth, async (req, res) => {
             await configStrategy.save()
             res.send(configStrategy)
         } catch (e) {
-            res.status(400).send(e)
+            res.status(400).send({ error: e.message })
         }
     } catch (e) {
         res.status(404).send(e)
@@ -272,10 +272,10 @@ router.patch('/configstrategy/removeval/:id', auth, async (req, res) => {
             await configStrategy.save()
             res.send(configStrategy)
         } catch (e) {
-            res.status(400).send(e)
+            res.status(400).send({ error: e.message })
         }
     } catch (e) {
-        res.status(400).send(e)
+        res.status(400).send({ error: e.message })
     }
 })
 

@@ -460,8 +460,8 @@ describe("Testing domain", () => {
                                                        "activated":false,
                                                        "operation":"BETWEEN",
                                                        "values":[
-                                                          "13:00Z",
-                                                          "14:00Z"
+                                                          "13:00",
+                                                          "14:00"
                                                        ]
                                                     },
                                                     {
@@ -469,7 +469,7 @@ describe("Testing domain", () => {
                                                        "activated":false,
                                                        "operation":"GREATER",
                                                        "values":[
-                                                           "2019-12-01T13:00Z"
+                                                           "2019-12-01T13:00"
                                                        ]
                                                     }
                                                  ]

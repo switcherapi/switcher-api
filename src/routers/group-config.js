@@ -115,7 +115,7 @@ router.delete('/groupconfig/:id', auth, async (req, res) => {
 
 router.patch('/groupconfig/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['name', 'description', 'activated']
+    const allowedUpdates = ['name', 'description']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
@@ -141,7 +141,6 @@ router.patch('/groupconfig/:id', auth, async (req, res) => {
     }
 })
 
-// TODO: Need test
 router.patch('/groupconfig/updateStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
     try {
         const groupconfig = await GroupConfig.findOne({ _id: req.params.id })
@@ -160,7 +159,6 @@ router.patch('/groupconfig/updateStatus/:id', auth, masterPermission('update Dom
     }
 })
 
-// TODO: Need test
 router.patch('/groupconfig/removeStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
     try {
         const groupconfig = await GroupConfig.findOne({ _id: req.params.id })

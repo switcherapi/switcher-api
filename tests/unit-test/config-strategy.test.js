@@ -1,5 +1,6 @@
 import { 
     processOperation,
+    validateStrategyValue,
     StrategiesType,
     OperationsType
 } from '../../src/models/config-strategy';
@@ -60,6 +61,28 @@ describe('Processing strategy: NETWORK', () => {
         const result = await processOperation(
             StrategiesType.NETWORK, OperationsType.NOT_EXIST, '127.0.0.0', mock_values2);
         expect(result).toBe(true);
+    })
+
+    test('UNIT_STRATEGY_SUITE - Should return true for a valid IPv4 address as input', () => {
+        try {
+            const result = validateStrategyValue(StrategiesType.NETWORK, '10.0.0.3')
+            expect(result).toBe(true);
+        } catch (e) { }
+    })
+
+    test('UNIT_STRATEGY_SUITE - Should NOT return for an invalid IPv4 address as input', () => {
+        try {
+            validateStrategyValue(StrategiesType.NETWORK, '10.0.0.322A')
+        } catch (e) {
+            expect(e.message).not.toBeNull()
+        }
+    })
+    
+    test('UNIT_STRATEGY_SUITE - Should return true for a valid CIDR address as input', () => {
+        try {
+            const result = validateStrategyValue(StrategiesType.NETWORK, '10.0.0.0/24')
+            expect(result).toBe(true);
+        } catch (e) { }
     })
 
 })
@@ -172,6 +195,21 @@ describe('Processing strategy: TIME', () => {
             StrategiesType.TIME, OperationsType.BETWEEN, '07:00', mock_values2);
         expect(result).toBe(false);
     })
+
+    test('UNIT_STRATEGY_SUITE - Should return true for a valid time as input', () => {
+        try {
+            const result = validateStrategyValue(StrategiesType.TIME, '16:00')
+            expect(result).toBe(true);
+        } catch (e) { }
+    })
+
+    test('UNIT_STRATEGY_SUITE - Should NOT return for an invalid time as input', () => {
+        try {
+            validateStrategyValue(StrategiesType.TIME, '2019-12-10')
+        } catch (e) {
+            expect(e.message).not.toBeNull()
+        }
+    })
 })
 
 describe('Processing strategy: DATE', () => {
@@ -251,5 +289,27 @@ describe('Processing strategy: DATE', () => {
         const result = processOperation(
             StrategiesType.DATE, OperationsType.GREATER, '2019-12-01T08:40', mock_values3);
         expect(result).toBe(true);
+    })
+
+    test('UNIT_STRATEGY_SUITE - Should return true for a valid date as input', () => {
+        try {
+            const result = validateStrategyValue(StrategiesType.DATE, '2019-12-10')
+            expect(result).toBe(true);
+        } catch (e) { }
+    })
+
+    test('UNIT_STRATEGY_SUITE - Should NOT return for an invalid date format as input', () => {
+        try {
+            validateStrategyValue(StrategiesType.DATE, '19-12-10')
+        } catch (e) {
+            expect(e.message).not.toBeNull()
+        }
+    })
+    
+    test('UNIT_STRATEGY_SUITE - Should return true for a valid date/time as input', () => {
+        try {
+            const result = validateStrategyValue(StrategiesType.DATE, '2019-12-10T08:00')
+            expect(result).toBe(true);
+        } catch (e) { }
     })
 })

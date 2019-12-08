@@ -122,7 +122,7 @@ export const configStrategyTIME_GREATDocument = {
     config: configId,
     operation: OperationsType.GREATER,
     strategy: StrategiesType.DATE,
-    values: ['2019-12-01T13:00Z'],
+    values: ['2019-12-01T13:00'],
     domain: domainId
 }
 
@@ -135,7 +135,7 @@ export const configStrategyTIME_BETWEENDocument = {
     config: configId,
     operation: OperationsType.BETWEEN,
     strategy: StrategiesType.TIME,
-    values: ['13:00Z', '14:00Z'],
+    values: ['13:00', '14:00'],
     domain: domainId
 }
 

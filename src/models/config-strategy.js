@@ -19,10 +19,12 @@ export const OperationsType = Object.freeze({
     BETWEEN: 'BETWEEN'
   });
 
-const OperationPerStrategy = [
+const StrategyRequirementDefinition = [
     {
         strategy: StrategiesType.NETWORK,
-        operations: [OperationsType.EXIST, OperationsType.NOT_EXIST]
+        operations: [OperationsType.EXIST, OperationsType.NOT_EXIST],
+        format: '10.0.0.0/24 (CIDR) or 10.0.0.1 (IPv4 address)',
+        validator: '^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$'
     },
     {
         strategy: StrategiesType.VALUE,
@@ -30,11 +32,15 @@ const OperationPerStrategy = [
     },
     {
         strategy: StrategiesType.TIME,
-        operations: [OperationsType.BETWEEN, OperationsType.LOWER, OperationsType.GREATER]
+        operations: [OperationsType.BETWEEN, OperationsType.LOWER, OperationsType.GREATER],
+        format: 'HH:mm',
+        validator: '^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'
     },
     {
         strategy: StrategiesType.DATE,
-        operations: [OperationsType.BETWEEN, OperationsType.LOWER, OperationsType.GREATER]
+        operations: [OperationsType.BETWEEN, OperationsType.LOWER, OperationsType.GREATER],
+        format: 'YYYY-MM-DD or YYYY-MM-DDTHH:mm',
+        validator: '([12][0-9]{3}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01]))(T(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9])?$'
     }
 ]
 
@@ -76,6 +82,15 @@ const OperationValuesValidation = [
     }
 ]
 
+export const validateStrategyValue = (strategy, value) => {
+    const strategyRules = StrategyRequirementDefinition.filter(element => element.strategy === strategy)
+
+    if (!value.match(strategyRules[0].validator)) {
+        throw new Error(`Value does not match with the requirements for this Strategy. Please, try using: ${strategyRules[0].format}`)
+    }
+    return true
+}
+
 export const strategyRequirements = (strategy, res) => {
     const foundStrategy = Object.values(StrategiesType).find(element => element === strategy)
 
@@ -87,10 +102,10 @@ export const strategyRequirements = (strategy, res) => {
         })
     }
 
-    const operationsAvailable = OperationPerStrategy.find(element => element.strategy === foundStrategy).operations
+    const operationsAvailable = StrategyRequirementDefinition.find(element => element.strategy === foundStrategy)
 
     let operationRequirements = []
-    operationsAvailable.forEach((o) => {
+    operationsAvailable.operations.forEach((o) => {
         operationRequirements.push(OperationValuesValidation.find(element => element.operation === o))
     })
 
@@ -246,21 +261,31 @@ configStrategySchema.pre('save', async function (next) {
     const operationStrategy = strategyConfig.operation
     const { min, max } = OperationValuesValidation.filter(element => element.operation === operationStrategy)[0]
 
+    // Verify if strategy already exist
     if (await existStrategy(strategyConfig)) {
         const err = new Error(`Unable to complete the operation. Strategy '${strategy}' already exist for this configuration`)
         next(err);
     }
 
+    // Verify strategy value quantity
     if (!strategyConfig.values || strategyConfig.values.length < min || strategyConfig.values.length > max) {
         const err =  new Error(`Unable to complete the operation. The number of values for the operation '${operationStrategy}', are min: ${min} and max: ${max} values`)
         next(err);
     }
 
-    const operations = OperationPerStrategy.find(element => element.strategy === strategy).operations
+    const operations = StrategyRequirementDefinition.find(element => element.strategy === strategy).operations
     const foundOperation = operations.filter((element) => element === operationStrategy)
 
+    // Verify strategy operation requirements
     if (!foundOperation) {
         const err =  new Error(`Unable to complete the operation. The strategy '${strategy}' needs ${operations} as operation`)
+        next(err);
+    }
+
+    // Verify strategy values format
+    try {
+        strategyConfig.values.forEach(value => validateStrategyValue(strategy, value))
+    } catch (err) {
         next(err);
     }
 
