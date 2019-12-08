@@ -2,10 +2,21 @@ import express from 'express';
 import Admin from '../models/admin';
 import { auth } from '../middleware/auth';
 import { masterPermission } from '../middleware/validators';
+import { check, validationResult } from 'express-validator';
 
 const router = new express.Router()
 
-router.post('/admin/signup', async (req, res) => {
+router.post('/admin/signup', [
+    check('name').isLength({ min: 2 }),
+    check('email').isEmail(),
+    check('password').isLength({ min: 5 })
+], async (req, res) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
     const admin = new Admin(req.body)
     admin.master = true
 
@@ -18,7 +29,17 @@ router.post('/admin/signup', async (req, res) => {
     }
 })
 
-router.post('/admin/create', auth, masterPermission('create Admins'), async (req, res) => {
+router.post('/admin/create', [
+    check('name').isLength({ min: 2 }),
+    check('email').isEmail(),
+    check('password').isLength({ min: 5 })
+], auth, masterPermission('create Admins'), async (req, res) => {
+    
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
     const admin = new Admin(req.body)
 
     try {
@@ -30,7 +51,10 @@ router.post('/admin/create', auth, masterPermission('create Admins'), async (req
     }
 })
 
-router.post('/admin/login', async (req, res) => {
+router.post('/admin/login', [
+    check('email').isEmail(),
+    check('password').isLength({ min: 5 })
+], async (req, res) => {
     try {
         const admin = await Admin.findByCredentials(req.body.email, req.body.password)
         const token = await admin.generateAuthToken()

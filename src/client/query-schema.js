@@ -1,7 +1,6 @@
 import { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLNonNull } from 'graphql';
 import { domainType, flatConfigurationType } from './configuration-type';
 import { EnvType } from '../models/environment';
-import Config from '../models/config';
 import { strategyInputType, criteriaType } from './criteria-type';
 import { resolveConfigByKey, resolveDomain, resolveFlatConfigurationByConfig, resolveFlatConfigurationTypeByGroup } from './resolvers';
 
