@@ -31,7 +31,7 @@ app.use(configStrategyRouter)
 /**
  * Client API - GraphQL
  */
-app.use('/switcher', appAuth, expressGraphQL({
+app.use('/graphql', appAuth, expressGraphQL({
     schema,
     graphiql: true
 }))

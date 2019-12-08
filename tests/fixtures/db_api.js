@@ -7,8 +7,8 @@ import Config from '../../src/models/config';
 import { EnvType, Environment } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
 
-const adminMasterAccountId = new mongoose.Types.ObjectId()
-const adminMasterAccount = {
+export const adminMasterAccountId = new mongoose.Types.ObjectId()
+export const adminMasterAccount = {
     _id: adminMasterAccountId,
     name: 'Master Admin',
     email: 'master@mail.com',
@@ -22,8 +22,8 @@ const adminMasterAccount = {
     }]
 }
 
-const adminAccountId = new mongoose.Types.ObjectId()
-const adminAccount = {
+export const adminAccountId = new mongoose.Types.ObjectId()
+export const adminAccount = {
     _id: adminAccountId,
     name: 'Admin',
     email: 'admin@mail.com',
@@ -37,8 +37,8 @@ const adminAccount = {
     }]
 }
 
-const domainId = new mongoose.Types.ObjectId()
-const domainDocument = {
+export const domainId = new mongoose.Types.ObjectId()
+export const domainDocument = {
     _id: domainId,
     name: 'Domain',
     description: 'Test Domain',
@@ -47,16 +47,16 @@ const domainDocument = {
     token: jwt.sign(({ _id: domainId, environment: EnvType.DEFAULT }) , process.env.JWT_CONFIG_SECRET)
 }
 
-const environment1Id = new mongoose.Types.ObjectId()
-const environment1 = {
+export const environment1Id = new mongoose.Types.ObjectId()
+export const environment1 = {
     _id: environment1Id,
     name: EnvType.DEFAULT,
     domain: domainId,
     owner: adminMasterAccountId
 }
 
-const groupConfigId = new mongoose.Types.ObjectId()
-const groupConfigDocument = {
+export const groupConfigId = new mongoose.Types.ObjectId()
+export const groupConfigDocument = {
     _id: groupConfigId,
     name: 'Group Test',
     description: 'Test Group',
@@ -65,8 +65,8 @@ const groupConfigDocument = {
     domain: domainId
 }
 
-const configId1 = new mongoose.Types.ObjectId()
-const config1Document = {
+export const configId1 = new mongoose.Types.ObjectId()
+export const config1Document = {
     _id: configId1,
     key: 'TEST_CONFIG_KEY_1',
     description: 'Test config 1',
@@ -76,8 +76,8 @@ const config1Document = {
     domain: domainId
 }
 
-const configId2 = new mongoose.Types.ObjectId()
-const config2Document = {
+export const configId2 = new mongoose.Types.ObjectId()
+export const config2Document = {
     _id: configId2,
     key: 'TEST_CONFIG_KEY_2',
     description: 'Test config 2',
@@ -87,8 +87,8 @@ const config2Document = {
     domain: domainId
 }
 
-const configStrategyId = new mongoose.Types.ObjectId()
-const configStrategyDocument = {
+export const configStrategyId = new mongoose.Types.ObjectId()
+export const configStrategyDocument = {
     _id: configStrategyId,
     description: 'Test config strategy',
     activated: new Map().set(EnvType.DEFAULT, true),
@@ -100,7 +100,7 @@ const configStrategyDocument = {
     domain: domainId
 }
 
-const setupDatabase = async () => {
+export const setupDatabase = async () => {
     await ConfigStrategy.deleteMany()
     await Config.deleteMany()
     await GroupConfig.deleteMany()
@@ -117,22 +117,4 @@ const setupDatabase = async () => {
     await new Config(config1Document).save()
     await new Config(config2Document).save()
     await new ConfigStrategy(configStrategyDocument).save()
-}
-
-module.exports = {
-    setupDatabase,
-    adminMasterAccountId,
-    adminMasterAccount,
-    adminAccountId,
-    adminAccount,
-    environment1,
-    domainDocument,
-    domainId,
-    groupConfigId,
-    groupConfigDocument,
-    configId1,
-    config1Document,
-    configId2,
-    configStrategyId,
-    configStrategyDocument
 }
