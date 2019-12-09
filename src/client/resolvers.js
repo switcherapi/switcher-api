@@ -4,7 +4,7 @@ import GroupConfig from '../models/group-config';
 import Config from '../models/config';
 import { ConfigStrategy, processOperation } from '../models/config-strategy';
 
-export const resolveConfigStrategy = async (source, _id, strategy, operation, activated, environment) => {
+export async function resolveConfigStrategy(source, _id, strategy, operation, activated, environment) {
     const args = {}
 
     if (_id) { args._id = _id }
@@ -17,7 +17,7 @@ export const resolveConfigStrategy = async (source, _id, strategy, operation, ac
     return await ConfigStrategy.find({ config: source._id, ...args })
 }
 
-export const resolveConfig = async (source, _id, key, activated, environment) => {
+export async function resolveConfig(source, _id, key, activated, environment) {
     const args = {}
 
     if (_id) { args._id = _id }
@@ -29,7 +29,7 @@ export const resolveConfig = async (source, _id, key, activated, environment) =>
     return await Config.find({ group: source._id, ...args })
 }
 
-export const resolveGroupConfig = async (source, _id, name, activated, environment) => {
+export async function resolveGroupConfig(source, _id, name, activated, environment) {
     const args = {}
 
     if (_id) { args._id = _id }
@@ -41,7 +41,7 @@ export const resolveGroupConfig = async (source, _id, name, activated, environme
     return await GroupConfig.find({ domain: source._id, ...args })
 }
 
-export const resolveDomain = async (_id, name, token, activated, environment) => {
+export async function resolveDomain(_id, name, token, activated, environment) {
     const args = {}
 
     if (_id) { args._id = _id }
@@ -54,7 +54,7 @@ export const resolveDomain = async (_id, name, token, activated, environment) =>
     return await Domain.find({ ...args })
 }
 
-export const resolveFlatConfigurationByConfig = async (key) => {
+export async function resolveFlatConfigurationByConfig(key) {
     const config = await Config.find({ key });
     if (config.length > 0) {
         return { config }
@@ -63,7 +63,7 @@ export const resolveFlatConfigurationByConfig = async (key) => {
     }
 }
 
-export const resolveFlatConfigurationTypeByGroup = async (groupConfig) => {
+export async function resolveFlatConfigurationTypeByGroup(groupConfig) {
     const group = await GroupConfig.find({ name: groupConfig });
     if (group.length > 0) {
         return { group }
@@ -72,23 +72,23 @@ export const resolveFlatConfigurationTypeByGroup = async (groupConfig) => {
     }
 }
 
-const checkGroup = async (configId) => {
+async function checkGroup(configId) {
     const config = await Config.findOne({ _id: configId })
     const group = await GroupConfig.findOne({ _id: config.group })
     return group
 }
 
-const checkConfigStrategies = async (configId) => {
-    const strategies = await ConfigStrategy.find({ config: configId })
+async function checkConfigStrategies (configId, strategyFilter) {
+    const strategies = await ConfigStrategy.find({ config: configId }, strategyFilter)
     return strategies
 }
 
-export const resolveCriteria = async (config, context) => {
+export async function resolveCriteria(config, context, strategyFilter) {
     context.key = config.key
     const environment = context.environment
     
     const group = await checkGroup(config._id)
-    const strategies = await checkConfigStrategies(config._id)
+    const strategies = await checkConfigStrategies(config._id, strategyFilter)
     
     const result = {
         domain: context.domain,
@@ -138,6 +138,4 @@ export const resolveCriteria = async (config, context) => {
     return result
 }
 
-export const resolveConfigByKey = async (key) => {
-    return await Config.findOne({ key })
-}
+export const resolveConfigByKey = async (key) => await Config.findOne({ key })

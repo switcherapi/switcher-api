@@ -1,67 +1,50 @@
 import express from 'express';
-import GroupConfig from '../models/group-config';
-import { ConfigStrategy } from '../models/config-strategy';
 import { checkConfig } from '../middleware/validators';
 import { appAuth } from '../middleware/auth';
+import { resolveCriteria } from '../client/resolvers';
+import Domain from '../models/domain';
+import { EnvType } from '../models/environment';
+import { addMetrics } from '../models/metric'
 
 const router = new express.Router()
 
 // GET /check?key=KEY
-// GET /check?key=KEY&debug=true
-router.get('/check', appAuth, checkConfig, async (req, res) => {
-
-    let debug = false
-
-    if (req.query.debug) {
-        debug = req.query.debug === 'true'
-    }
-
+// GET /check?key=KEY&showReason=true
+// GET /check?key=KEY&showStrategy=true
+// GET /check?key=KEY&bypassMetric=true
+router.get('/criteria', appAuth, checkConfig, async (req, res) => {
     try {
-        
-        const configStrategy = await ConfigStrategy.find({ config: req.config._id }, 'activated strategy -_id')
-        const configGroup = await GroupConfig.findOne({ _id: req.config.group._id })
+        const environment = req.environment
+        const domain = req.domain
+        const entry = req.body.entry
 
-        const criteria = {
-            key: req.config.key,
-            activated: req.config.activated,
-            group: configGroup.name,
-            groupActivated: configGroup.activated,
-            strategies: configStrategy
+        const context = { domain, entry, environment }
+
+        const result = await resolveCriteria(req.config, context, ['values', 'description', 'strategy', 'operation', 'activated', '-_id'])
+
+        if (result) {
+            if (!req.query.bypassMetric && environment === EnvType.DEFAULT) {
+                addMetrics(req, result)
+            }
+
+            delete result.domain
+            delete result.group
+
+            if (!req.query.showReason) {
+                delete result.reason
+            }
+
+            if (!req.query.showStrategy) {
+                delete result.strategies
+            }
+
+            res.send(result)
+        } else {
+            res.status(500).send({ error: 'Something went wrong while executing the criteria validation' })
         }
-
-        evaluateCriteria(criteria)
-
-        if (!debug) {
-            delete criteria.group
-            delete criteria.activated
-            delete criteria.groupActivated
-            delete criteria.strategies
-        }
-
-        res.send(criteria)
     } catch (e) {
-        console.log(e)
-        res.status(404).send()
+        res.status(500).send()
     }
 })
-
-const evaluateCriteria = (criteria) => {
-    let ativated = criteria.activated && criteria.groupActivated
-
-    if (!ativated) {
-        criteria.result = false
-        return criteria
-    }
-
-    criteria.strategies.forEach((strategy) => {
-        if (strategy.activated) {
-            // Execute strategy
-            ativated = false
-        }
-    })
-
-    criteria.result = ativated
-    return criteria
-}
 
 export default router;

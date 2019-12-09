@@ -82,7 +82,7 @@ const OperationValuesValidation = [
     }
 ]
 
-export const validateStrategyValue = (strategy, value) => {
+export function validateStrategyValue(strategy, value) {
     const strategyRules = StrategyRequirementDefinition.filter(element => element.strategy === strategy)
 
     if (!value.match(strategyRules[0].validator)) {
@@ -91,7 +91,7 @@ export const validateStrategyValue = (strategy, value) => {
     return true
 }
 
-export const strategyRequirements = (strategy, res) => {
+export function strategyRequirements(strategy, res) {
     const foundStrategy = Object.values(StrategiesType).find(element => element === strategy)
 
     if (!foundStrategy) {
@@ -116,7 +116,7 @@ export const strategyRequirements = (strategy, res) => {
     }
 }
 
-export const processOperation = (strategy, operation, input, values) => {
+export function processOperation(strategy, operation, input, values) {
     switch(strategy) {
         case StrategiesType.NETWORK:
             return processNETWORK(operation, input, values)
@@ -129,7 +129,7 @@ export const processOperation = (strategy, operation, input, values) => {
     }
 }
 
-const processNETWORK = async (operation, input, values) => {
+function processNETWORK(operation, input, values) {
 
     const cidrRegex = '^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$'
     
@@ -163,7 +163,7 @@ const processNETWORK = async (operation, input, values) => {
     return false
 }
 
-const processVALUE = (operation, input, values) => {
+function processVALUE(operation, input, values) {
     switch(operation) {
         case OperationsType.EXIST:
             return values.includes(input)
@@ -177,7 +177,7 @@ const processVALUE = (operation, input, values) => {
     }
 }
 
-const processTime = (operation, input, values) => {
+function processTime(operation, input, values) {
     const today = moment().format('YYYY-MM-DD')
 
     switch(operation) {
@@ -190,7 +190,7 @@ const processTime = (operation, input, values) => {
     }
 }
 
-const processDate = (operation, input, values) => {
+function processDate(operation, input, values) {
     switch(operation) {
         case OperationsType.LOWER:
             return moment(input).isSameOrBefore(values[0])
@@ -201,7 +201,7 @@ const processDate = (operation, input, values) => {
     }
 }
 
-const existStrategy = async (strategyConfig) => {
+async function existStrategy(strategyConfig) {
     if (strategyConfig.__v === undefined) {
         const foundStrategy = await ConfigStrategy.find({ config: strategyConfig.config, strategy: strategyConfig.strategy })
         return foundStrategy.length > 0

@@ -13,7 +13,7 @@ export const masterPermission = function (action) {
     }
 }
 
-export const checkConfig = async (req, res, next) => {
+export async function checkConfig(req, res, next) {
 
     const config = await Config.findOne({ key: req.query.key })
 
@@ -25,7 +25,7 @@ export const checkConfig = async (req, res, next) => {
     next();
 }
 
-export const checkEnvironmentStatusChange = async (req, res, domain) => {
+export async function checkEnvironmentStatusChange (req, res, domain) {
     const environment = await Environment.find({ domain }).select('name -_id')
     const updates = Object.keys(req.body)
     const isValidOperation = updates.every((update) => {
@@ -39,7 +39,7 @@ export const checkEnvironmentStatusChange = async (req, res, domain) => {
     return updates
 }
 
-export const checkEnvironmentStatusRemoval = async (req, res, domain, strategy = false ) => {
+export async function checkEnvironmentStatusRemoval(req, res, domain, strategy = false ) {
     const environment = await Environment.find({ domain }).select('name -_id')
     const isValidOperation = environment.filter((e) => 
         e.name === req.body.env && 

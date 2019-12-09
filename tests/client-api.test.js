@@ -49,7 +49,7 @@ afterAll(async () => {
     await mongoose.disconnect()
 })
 
-describe("Testing criteria", () => {
+describe("Testing criteria [GraphQL] ", () => {
 
     afterAll(setupDatabase)
 
@@ -590,6 +590,75 @@ describe("Testing domain", () => {
                          }`;
                 
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                done();
+            })
+    })
+})
+
+describe("Testing criteria [REST] ", () => {
+
+    test('CLIENT_SUITE - Should return success on a simple CRITERIA response', (done) => {
+        request(app)
+            .get(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .send({
+                entry: [
+                    {
+                        strategy: StrategiesType.VALUE,
+                        input: 'USER_1'
+                    },
+                    {
+                        strategy: StrategiesType.NETWORK,
+                        input: '10.0.0.3'
+                    }]})
+            .expect(200)
+            .end((err, { body }) => {
+                expect(body.strategies.length).toEqual(4);
+                expect(body.reason).toEqual('Success');
+                expect(body.return).toBe(true);
+                done();
+            })
+    })
+
+    test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Bad login input', (done) => {
+        request(app)
+            .get(`/criteria?key=${keyConfig}&showReason=true`)
+            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .send({
+                entry: [
+                    {
+                        strategy: StrategiesType.VALUE,
+                        input: 'USER_4'
+                    },
+                    {
+                        strategy: StrategiesType.NETWORK,
+                        input: '10.0.0.3'
+                    }]})
+            .expect(200)
+            .end((err, { body }) => {
+                expect(body.strategies).toBe(undefined)
+                expect(body.reason).toEqual(`Strategy '${StrategiesType.VALUE}' does not agree`);
+                expect(body.return).toBe(false);
+                done();
+            })
+    })
+
+    test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Invalid KEY', (done) => {
+        request(app)
+            .get(`/criteria?key=INVALID_KEY&showReason=true`)
+            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .send({
+                entry: [
+                    {
+                        strategy: StrategiesType.VALUE,
+                        input: 'USER_1'
+                    },
+                    {
+                        strategy: StrategiesType.NETWORK,
+                        input: '10.0.0.3'
+                    }]})
+            .expect(404)
+            .end((err, RES) => {
                 done();
             })
     })
