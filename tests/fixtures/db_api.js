@@ -4,6 +4,7 @@ import Admin from '../../src/models/admin';
 import Domain from '../../src/models/domain';
 import GroupConfig from '../../src/models/group-config';
 import Config from '../../src/models/config';
+import Component from '../../src/models/component';
 import { EnvType, Environment } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
 
@@ -107,6 +108,7 @@ export const setupDatabase = async () => {
     await Domain.deleteMany()
     await Admin.deleteMany()
     await Environment.deleteMany()
+    await Component.deleteMany()
 
     await new Admin(adminMasterAccount).save()
     await new Admin(adminAccount).save()

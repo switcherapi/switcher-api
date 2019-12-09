@@ -20,6 +20,10 @@ const configSchema = new mongoose.Schema({
         required: true,
         default: new Map().set(EnvType.DEFAULT, true)
     },
+    components: [{
+        type: String,
+        trim: true
+    }],
     group: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,

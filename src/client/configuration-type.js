@@ -66,6 +66,9 @@ export const configType = new GraphQLObjectType({
             resolve: async (source, { _id, strategy, operation, activated }, { environment }) => {
                 return await resolveConfigStrategy(source, _id, strategy, operation, activated, environment);
             }
+        },
+        components: {
+            type: new GraphQLList(GraphQLString)
         }
     }
 })

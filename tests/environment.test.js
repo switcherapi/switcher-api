@@ -7,6 +7,7 @@ import {
     adminMasterAccount,
     adminAccount,
     environment1,
+    environment1Id,
     domainId
  } from './fixtures/db_api';
 
@@ -65,6 +66,34 @@ describe('Insertion tests', () => {
                 name: 'DEV',
                 domain: 'FAKE_DOMAIN'
             }).expect(400)
+    })
+})
+
+describe('Reading tests', () => {
+    test('ENV_SUITE - Should read all Environments from a Domain', async () => {
+        const response = await request(app)
+            .get('/environment?domain=' + domainId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(200)
+
+        const defaultEnv = response.body.filter(env => env.name === EnvType.DEFAULT)
+        expect(defaultEnv[0].name).toBe(EnvType.DEFAULT)
+    })
+
+    test('ENV_SUITE - Should read one single Environment', async () => {
+        const response = await request(app)
+            .get('/environment/' + environment1Id)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(200)
+
+        expect(response.body.name).toBe(EnvType.DEFAULT)
+    })
+
+    test('ENV_SUITE - Should NOT read Environment - Not found', async () => {
+        const response = await request(app)
+            .get('/environment/NOT_FOUND')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(404)
     })
 })
 

@@ -1,4 +1,5 @@
 import express from 'express';
+import Component from '../models/component';
 import GroupConfig from '../models/group-config';
 import Config from '../models/config';
 import { auth } from '../middleware/auth';
@@ -27,9 +28,9 @@ router.post('/config/create', auth, async (req, res) => {
     }
 })
 
-// GET /config?activated=false
-// GET /config?limit=10&skip=20
-// GET /config?sortBy=createdAt:desc
+// GET /config?group=ID&activated=false
+// GET /config?group=ID&limit=10&skip=20
+// GET /config?group=ID&sortBy=createdAt:desc
 // GET /config?group=ID
 router.get("/config", auth, async (req, res) => {
     const match = {}
@@ -104,7 +105,7 @@ router.delete('/config/:id', auth, async (req, res) => {
 
 router.patch('/config/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['key', 'description', 'activated']
+    const allowedUpdates = ['key', 'description']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
@@ -159,6 +160,58 @@ router.patch('/config/removeStatus/:id', auth, masterPermission('update Domain E
         res.send(config)
     } catch (e) {
         res.status(400).send({ error: e.message })
+    }
+})
+
+router.patch('/config/addComponent/:id', auth, async (req, res) => {
+    try {
+        const config = await Config.findOne({ _id: req.params.id })
+            
+        if (!config) {
+            return res.status(404).send()
+        }
+
+        try {
+            const component = await Component.findOne({ name: req.body.component })
+
+            if (!component) {
+                return res.status(404).send({ error: `Component ${req.body.component} not found` })
+            }
+
+            config.components.push(component.name)
+            await config.save()
+            res.send(config)
+        } catch (e) {
+            res.status(400).send({ error: e.message })
+        }
+    } catch (e) {
+        res.status(404).send()
+    }
+})
+
+router.patch('/config/removeComponent/:id', auth, async (req, res) => {
+    try {
+        const config = await Config.findOne({ _id: req.params.id })
+            
+        if (!config) {
+            return res.status(404).send()
+        }
+
+        try {
+            const component = await Component.findOne({ name: req.body.component })
+
+            if (!component) {
+                return res.status(404).send({ error: `Component ${req.body.component} not found` })
+            }
+
+            config.components = config.components.filter(element => element !== req.body.component)
+            await config.save()
+            res.send(config)
+        } catch (e) {
+            res.status(400).send({ error: e.message })
+        }
+    } catch (e) {
+        res.status(404).send()
     }
 })
 

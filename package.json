@@ -9,6 +9,7 @@
     "prod": "env-cmd -e prod nodemon ./src/start.js",
     "test": "env-cmd -e test jest --runInBand",
     "test-env": "env-cmd -e test jest -t 'ENV_SUITE'",
+    "test-component": "env-cmd -e test jest -t 'COMPONENT_SUITE'",
     "test-admin": "env-cmd -e test jest -t 'ADMIN_SUITE'",
     "test-domain": "env-cmd -e test jest -t 'DOMAIN_SUITE'",
     "test-group": "env-cmd -e test jest -t 'GROUP_SUITE'",
