@@ -18,7 +18,7 @@ export async function checkConfig(req, res, next) {
     const config = await Config.findOne({ key: req.query.key })
 
     if (!config) {
-        return res.status(404).send()
+        return res.status(404).send({ error: `Unable to load a key ${req.query.key}` })
     }
     
     req.config = config

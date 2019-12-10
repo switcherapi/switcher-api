@@ -38,4 +38,8 @@ app.use('/graphql', appAuth, expressGraphQL({
     graphiql: true
 }))
 
+app.get('*', (req, res) => {
+    res.status(404).send({ error: 'Operation not found' })
+})
+
 export default app;
