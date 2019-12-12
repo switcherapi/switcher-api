@@ -1,18 +1,10 @@
 "use strict";
 
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import Admin from '../models/admin';
 import Domain from '../models/domain';
 
-/**
- * Middleware
- * 
- * Auth for managing switchers
- * 
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
- */
 export async function auth(req, res, next) {
     try {
         const token = req.header('Authorization').replace('Bearer ', '')
@@ -31,23 +23,14 @@ export async function auth(req, res, next) {
     }
 }
 
-/**
- * Middleware
- * 
- * Auth to access switchers
- * 
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
- */
 export async function appAuth(req, res, next) {
     try {
         const token = req.header('Authorization').replace('Bearer ', '')
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-        const decoded = jwt.verify(token, process.env.JWT_CONFIG_SECRET)
         const domain = await Domain.findOne({ _id: decoded._id })
-
-        if (!domain) {
+        
+        if (!domain || domain.apihash.substring(50,domain.apihash.length-1) !== decoded.vc) {
             throw new Error()
         }
 
@@ -57,5 +40,25 @@ export async function appAuth(req, res, next) {
         next()
     } catch (e) {
         res.status(401).send({ error: 'Invalid API token.' })
+    }
+}
+
+export async function appGenerateCredentials(req, res, next) {
+    try {
+        const key = req.header('switcher-api-key')
+        const domain = await Domain.findByCredentials(req.body.domain, key)
+
+        if (!domain) {
+            throw new Error()
+        }
+
+        const token = await domain.generateAuthToken(req.body.environment)
+
+        req.token = token
+        req.domain = domain
+        req.environment = req.body.environment
+        next()
+    } catch (e) {
+        res.status(401).send({ error: 'Invalid API Key.' })
     }
 }

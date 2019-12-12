@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 import app from '../src/app';
+import bcrypt from 'bcrypt';
 import Admin from '../src/models/admin';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
@@ -29,27 +30,20 @@ describe('Testing Domain insertion', () => {
     beforeAll(setupDatabase)
 
     test('DOMAIN_SUITE - Should create a new Domain', async () => {
-        const responseLogin = await request(app)
-            .post('/admin/login')
-            .send({
-                email: adminMasterAccount.email,
-                password: adminMasterAccount.password
-            }).expect(200)
-
         const response = await request(app)
             .post('/domain/create')
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send({
                 name: 'New Domain',
                 description: 'Description of my new Domain'
             }).expect(201)
 
         // DB validation - document created
-        const domain = await Domain.findById(response.body._id)
+        const domain = await Domain.findById(response.body.domain._id)
         expect(domain).not.toBeNull()
 
         // Response validation
-        expect(response.body.name).toBe('New Domain')
+        expect(response.body.domain.name).toBe('New Domain')
     })
 
     test('DOMAIN_SUITE - Should NOT create a new Domain - with no Master credential', async () => {
@@ -71,28 +65,21 @@ describe('Testing Domain insertion', () => {
         expect(response.body.error).toEqual('Unable to create Domains without a Master Admin credential')
     })
 
-    test('DOMAIN_SUITE - Should generate Token for a Domain', async () => {
-        const responseLogin = await request(app)
-            .post('/admin/login')
-            .send({
-                email: adminMasterAccount.email,
-                password: adminMasterAccount.password
-            }).expect(200)
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
+    test('DOMAIN_SUITE - Should generate a valid API Key for a Domain', async () => {
         const response = await request(app)
-            .get('/domain/generateKey/' + domainId)
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .get('/domain/generateApiKey/' + domainId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(201)
 
-        expect(response.body.token).not.toBeNull()
+        expect(response.body.apiKey).not.toBeNull()
 
         // DB validation - current Domain token should not be as the same as the generated
         const domain = await Domain.findById(domainId)
-        expect(domain.token).not.toEqual(response.body.token)
+        const isMatch = await bcrypt.compare(response.body.apiKey, domain.apihash)
+        expect(isMatch).toBe(true)
     })
 
-    test('DOMAIN_SUITE - Should NOT generate Token for a Domain', async () => {
+    test('DOMAIN_SUITE - Should NOT generate an API Key for a Domain - No Master Admin credential', async () => {
         const responseLogin = await request(app)
             .post('/admin/login')
             .send({
@@ -101,7 +88,7 @@ describe('Testing Domain insertion', () => {
             }).expect(200)
 
         await request(app)
-            .get('/domain/generateKey/' + domainId)
+            .get('/domain/generateApiKey/' + domainId)
             .set('Authorization', `Bearer ${responseLogin.body.token}`)
             .send().expect(400)
     })
@@ -117,7 +104,7 @@ describe('Testing fect Domain info', () => {
             .send().expect(200)
 
         expect(response.body.length).toEqual(1)
-
+        expect(response.body[0].activated[EnvType.DEFAULT]).toEqual(true);
         expect(String(response.body[0]._id)).toEqual(String(domainDocument._id))
         expect(response.body[0].name).toEqual(domainDocument.name)
         expect(String(response.body[0].owner)).toEqual(String(domainDocument.owner))
@@ -133,7 +120,7 @@ describe('Testing fect Domain info', () => {
             }).expect(201)
 
         // DB validation - document created
-        const domain = await Domain.findById(response.body._id)
+        const domain = await Domain.findById(response.body.domain._id)
         expect(domain).not.toBeNull()
 
         response = await request(app)
@@ -165,7 +152,7 @@ describe('Testing fect Domain info', () => {
             }).expect(201)
 
         response = await request(app)
-            .get('/domain/' + response.body._id)
+            .get('/domain/' + response.body.domain._id)
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(200)
     })
@@ -245,34 +232,19 @@ describe('Testing update Domain info', () => {
     beforeAll(setupDatabase)
 
     test('DOMAIN_SUITE - Should update Domain info', async () => {
-        const responseLogin = await request(app)
-            .post('/admin/login')
-            .send({
-                email: adminMasterAccount.email,
-                password: adminMasterAccount.password
-            }).expect(200)
-
-        const oldToken = await Domain.findById(domainId).select('token')
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const responseNewToken = await request(app)
-            .get('/domain/generateKey/' + domainId)
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
-            .send().expect(201)
-
-        expect(responseNewToken.body.token).not.toBeNull()
+        const oldQuery = await Domain.findById(domainId).select('description')
 
         await request(app)
             .patch('/domain/' + domainId)
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send({
-                token: responseNewToken.body.token
+                description: 'Description updated'
             }).expect(200)
         
-        // DB validation - verify token updated
-        const newToken = await Domain.findById(domainId).select('token')
-        expect(oldToken).not.toEqual(newToken.token)
-        expect(responseNewToken.body.token).toEqual(newToken.token)
+        // DB validation - verify description updated
+        const newQuery = await Domain.findById(domainId).select('description')
+        expect(oldQuery).not.toEqual(newQuery)
+        expect(newQuery.description).toEqual('Description updated')
     })
 
     test('DOMAIN_SUITE - Should NOT update Domain info without Master credential', async () => {
@@ -284,10 +256,12 @@ describe('Testing update Domain info', () => {
             }).expect(200)
 
         await new Promise(resolve => setTimeout(resolve, 1000));
-        const responseNewToken = await request(app)
-            .get('/domain/generateKey/' + domainId)
+        await request(app)
+            .patch('/domain/' + domainId)
             .set('Authorization', `Bearer ${responseLogin.body.token}`)
-            .send().expect(400)
+            .send({
+                description: 'Description updated'
+            }).expect(400)
     })
 
     test('DOMAIN_SUITE - Should update Domain environment status - default', async () => {

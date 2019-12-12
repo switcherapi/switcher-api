@@ -7,12 +7,13 @@ import Config from '../src/models/config';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../src/models/config-strategy';
 import { 
     setupDatabase,
-    domainPrdToken,
-    domainQAToken,
+    adminMasterAccount,
+    apiKey,
     keyConfig,
     configId,
     groupConfigId,
     domainId,
+    domainDocument,
     configStrategyUSERId
 } from './fixtures/db_client';
 import { EnvType } from '../src/models/environment';
@@ -50,13 +51,26 @@ afterAll(async () => {
 })
 
 describe("Testing criteria [GraphQL] ", () => {
+    let token
+
+    beforeAll(async () => {
+        const response = await request(app)
+            .get('/criteria/auth')
+            .set('switcher-api-key', `${apiKey}`)
+            .send({
+                domain: domainDocument.name,
+                environment: EnvType.DEFAULT
+            }).expect(200)
+
+        token = response.body.token
+    })
 
     afterAll(setupDatabase)
 
     test('CLIENT_SUITE - Should return success on a simple CRITERIA response', (done) => {
         request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
                     criteria(
@@ -81,7 +95,7 @@ describe("Testing criteria [GraphQL] ", () => {
     test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Bad login input', (done) => {
         request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
                     criteria(
@@ -106,7 +120,7 @@ describe("Testing criteria [GraphQL] ", () => {
     test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Missing input', (done) => {
         request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
                     criteria(
@@ -130,7 +144,7 @@ describe("Testing criteria [GraphQL] ", () => {
     test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Invalid KEY', (done) => {
         request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
                     criteria(
@@ -149,9 +163,9 @@ describe("Testing criteria [GraphQL] ", () => {
 
     test('CLIENT_SUITE - Should return config disabled for PRD environment while activated in QA', async () => {
         // Config enabled
-        let response = await request(app)
+        const response = await request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
                     criteria(
@@ -175,7 +189,7 @@ describe("Testing criteria [GraphQL] ", () => {
         await changeConfigStatus(configId, false, EnvType.DEFAULT)
         const response = await request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
                     criteria(
@@ -196,10 +210,20 @@ describe("Testing criteria [GraphQL] ", () => {
     })
 
     test('CLIENT_SUITE - It will be activated on QA environment', async () => {
+        let qaToken
+        const responseToken = await request(app)
+            .get('/criteria/auth')
+            .set('switcher-api-key', `${apiKey}`)
+            .send({
+                domain: domainDocument.name,
+                environment: 'QA'
+            }).expect(200)
+        qaToken = responseToken.body.token
+
         await changeConfigStatus(configId, true, 'QA');
         const response = await request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainQAToken}`)
+            .set('Authorization', `Bearer ${qaToken}`)
             .send({ query: `
                 {
                     criteria(
@@ -220,11 +244,21 @@ describe("Testing criteria [GraphQL] ", () => {
     })
 
     test('CLIENT_SUITE - Should return false after changing strategy operation', async () => {
+        let qaToken
+        const responseToken = await request(app)
+            .get('/criteria/auth')
+            .set('switcher-api-key', `${apiKey}`)
+            .send({
+                domain: domainDocument.name,
+                environment: 'QA'
+            }).expect(200)
+        qaToken = responseToken.body.token
+
         await changeStrategy(configStrategyUSERId, OperationsType.NOT_EXIST, true, 'QA')
         await changeStrategy(configStrategyUSERId, undefined, false, EnvType.DEFAULT)
         const response = await request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainQAToken}`)
+            .set('Authorization', `Bearer ${qaToken}`)
             .send({ query: `
                 {
                     criteria(
@@ -248,7 +282,7 @@ describe("Testing criteria [GraphQL] ", () => {
         await changeConfigStatus(configId, true, EnvType.DEFAULT);
         const response = await request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
                     criteria(
@@ -272,7 +306,7 @@ describe("Testing criteria [GraphQL] ", () => {
         await changeGroupConfigStatus(groupConfigId, false, EnvType.DEFAULT)
         const response = await request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
                     criteria(
@@ -297,7 +331,7 @@ describe("Testing criteria [GraphQL] ", () => {
         await changeDomainStatus(domainId, false, EnvType.DEFAULT)
         const response = await request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
                     criteria(
@@ -319,13 +353,26 @@ describe("Testing criteria [GraphQL] ", () => {
 })
 
 describe("Testing domain", () => {
+    let token
+
+    beforeAll(async () => {
+        const response = await request(app)
+            .get('/criteria/auth')
+            .set('switcher-api-key', `${apiKey}`)
+            .send({
+                domain: domainDocument.name,
+                environment: EnvType.DEFAULT
+            }).expect(200)
+
+        token = response.body.token
+    })
 
     afterAll(setupDatabase)
 
     test('CLIENT_SUITE - Should return the Domain structure', (done) => {
         request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
                     domain(name: "Domain") {
@@ -408,7 +455,7 @@ describe("Testing domain", () => {
     test('CLIENT_SUITE - Should return the Domain structure - Disabling strategies (resolver test)', (done) => {
         request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
                     domain(name: "Domain") {
@@ -490,7 +537,7 @@ describe("Testing domain", () => {
     test('CLIENT_SUITE - Should return the Domain structure - Disabling group config (resolver test)', (done) => {
         request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
                     domain(name: "Domain") {
@@ -540,7 +587,7 @@ describe("Testing domain", () => {
     test('CLIENT_SUITE - Should return the Domain structure - Disabling config (resolver test)', (done) => {
         request(app)
             .post('/graphql')
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
                     domain(name: "Domain") {
@@ -596,11 +643,24 @@ describe("Testing domain", () => {
 })
 
 describe("Testing criteria [REST] ", () => {
+    let token
+
+    beforeAll(async () => {
+        const response = await request(app)
+            .get('/criteria/auth')
+            .set('switcher-api-key', `${apiKey}`)
+            .send({
+                domain: domainDocument.name,
+                environment: EnvType.DEFAULT
+            }).expect(200)
+
+        token = response.body.token
+    })
 
     test('CLIENT_SUITE - Should return success on a simple CRITERIA response', (done) => {
         request(app)
             .get(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({
                 entry: [
                     {
@@ -623,7 +683,7 @@ describe("Testing criteria [REST] ", () => {
     test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Bad login input', (done) => {
         request(app)
             .get(`/criteria?key=${keyConfig}&showReason=true`)
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({
                 entry: [
                     {
@@ -646,7 +706,7 @@ describe("Testing criteria [REST] ", () => {
     test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Invalid KEY', (done) => {
         request(app)
             .get(`/criteria?key=INVALID_KEY&showReason=true`)
-            .set('Authorization', `Bearer ${domainPrdToken}`)
+            .set('Authorization', `Bearer ${token}`)
             .send({
                 entry: [
                     {
@@ -661,5 +721,74 @@ describe("Testing criteria [REST] ", () => {
             .end((err, RES) => {
                 done();
             })
+    })
+
+    test('CLIENT_SUITE - Should NOT return due to a API Key change, then it should return after renewing the token', async () => {
+        const firstResponse = await request(app)
+            .get(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                entry: [
+                    {
+                        strategy: StrategiesType.VALUE,
+                        input: 'USER_1'
+                    },
+                    {
+                        strategy: StrategiesType.NETWORK,
+                        input: '10.0.0.3'
+                    }]})
+            .expect(200)
+    
+        expect(firstResponse.body.strategies.length).toEqual(4);
+        expect(firstResponse.body.reason).toEqual('Success');
+        expect(firstResponse.body.return).toBe(true);
+
+        const responseNewApiKey = await request(app)
+            .get('/domain/generateApiKey/' + domainId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(201)
+
+        const secondResponse = await request(app)
+            .get(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                entry: [
+                    {
+                        strategy: StrategiesType.VALUE,
+                        input: 'USER_1'
+                    },
+                    {
+                        strategy: StrategiesType.NETWORK,
+                        input: '10.0.0.3'
+                    }]})
+            .expect(401)
+
+        expect(secondResponse.body.error).toEqual('Invalid API token.');
+
+        const responseNewToken = await request(app)
+            .get('/criteria/auth')
+            .set('switcher-api-key', `${responseNewApiKey.body.apiKey}`)
+            .send({
+                domain: domainDocument.name,
+                environment: EnvType.DEFAULT
+            }).expect(200)
+
+        token = responseNewToken.body.token
+
+        await request(app)
+            .get(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                entry: [
+                    {
+                        strategy: StrategiesType.VALUE,
+                        input: 'USER_1'
+                    },
+                    {
+                        strategy: StrategiesType.NETWORK,
+                        input: '10.0.0.3'
+                    }]})
+            .expect(200)
+        
     })
 })

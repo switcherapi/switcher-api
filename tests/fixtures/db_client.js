@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import Admin from '../../src/models/admin';
 import Domain from '../../src/models/domain';
 import GroupConfig from '../../src/models/group-config';
@@ -23,16 +24,14 @@ export const adminMasterAccount = {
     }]
 }
 
+export let apiKey = undefined
 export const domainId = new mongoose.Types.ObjectId()
-export const domainPrdToken = jwt.sign(({ _id: domainId, environment: EnvType.DEFAULT }) , process.env.JWT_CONFIG_SECRET)
-export const domainQAToken = jwt.sign(({ _id: domainId, environment: 'QA' }) , process.env.JWT_CONFIG_SECRET)
 export const domainDocument = {
     _id: domainId,
     name: 'Domain',
     description: 'Test Domain',
     activated: new Map().set(EnvType.DEFAULT, true),
-    owner: adminMasterAccountId,
-    token: domainPrdToken
+    owner: adminMasterAccountId
 }
 
 export const environment1Id = new mongoose.Types.ObjectId()
@@ -152,7 +151,12 @@ export const setupDatabase = async () => {
     await new Admin(adminMasterAccount).save()
     await new Environment(environment1).save()
     await new Environment(environment2).save()
+
+    apiKey = await bcrypt.hash(domainDocument._id + 'Domain', 8)
+    const hash = await bcrypt.hash(apiKey, 8)
+    domainDocument.apihash = hash
     await new Domain(domainDocument).save()
+    
     await new GroupConfig(groupConfigDocument).save()
     await new Config(configDocument).save()
     await new Config(configPrdQADocument).save()

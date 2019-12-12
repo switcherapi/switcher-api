@@ -112,7 +112,7 @@ export async function resolveCriteria(config, context, strategyFilter) {
     }
     
     // Check strategies
-    if (strategies) {
+    if (strategies && context.entry) {
         for (var i = 0; i < strategies.length; i++) {
             if (!strategies[i].activated.get(environment)) {
                 continue;

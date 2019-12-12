@@ -77,14 +77,15 @@ adminSchema.virtual('configStrategy', {
     foreignField: 'owner'
 })
 
-adminSchema.methods.toJSON = function () {
-    const admin = this
-    const adminObject = admin.toObject()
-
-    delete adminObject.password
-    delete adminObject.tokens
-    
-    return adminObject
+adminSchema.options.toJSON = {
+    getters: true,
+    virtuals: true,
+    minimize: false,
+    transform: function (doc, ret, options) {
+        delete ret.password
+        delete ret.tokens
+        return ret
+    }
 }
 
 adminSchema.methods.generateAuthToken = async function () {

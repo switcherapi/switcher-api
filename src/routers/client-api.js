@@ -1,10 +1,11 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
 import { checkConfig } from '../middleware/validators';
-import { appAuth } from '../middleware/auth';
+import { appAuth, appGenerateCredentials } from '../middleware/auth';
 import { resolveCriteria } from '../client/resolvers';
-import Domain from '../models/domain';
 import { EnvType } from '../models/environment';
 import { addMetrics } from '../models/metric'
+import { compileFunction } from 'vm';
 
 const router = new express.Router()
 
@@ -20,7 +21,7 @@ router.get('/criteria', appAuth, checkConfig, async (req, res) => {
 
         const context = { domain, entry, environment }
 
-        const result = await resolveCriteria(req.config, context, ['values', 'description', 'strategy', 'operation', 'activated', '-_id'])
+        const result = await resolveCriteria(req.config, context, 'values description strategy operation activated -_id')
 
         if (result) {
             if (!req.query.bypassMetric && environment === EnvType.DEFAULT) {
@@ -43,7 +44,17 @@ router.get('/criteria', appAuth, checkConfig, async (req, res) => {
             res.status(500).send({ error: 'Something went wrong while executing the criteria validation' })
         }
     } catch (e) {
+        console.log(e)
         res.status(500).send()
+    }
+})
+
+router.get('/criteria/auth', appGenerateCredentials, async (req, res) => {
+    try {
+        const { exp } = jwt.decode(req.token)
+        res.send({ token: req.token, exp })
+    } catch (e) {
+        res.status(400).send()
     }
 })
 

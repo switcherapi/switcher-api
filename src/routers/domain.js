@@ -6,20 +6,18 @@ import { masterPermission, checkEnvironmentStatusChange, checkEnvironmentStatusR
 
 const router = new express.Router()
 
-router.get('/domain/generateKey/:domain/', auth, masterPermission('generate Domain token'), async (req, res) => {
+router.get('/domain/generateApiKey/:domain/', auth, masterPermission('generate API Key'), async (req, res) => {
     try {
         const domain = await Domain.findOne({ _id: req.params.domain })
-        const environment = await Environment.findOne({ name: req.query.env || EnvType.DEFAULT })
 
-        if (!domain || !environment) {
+        if (!domain) {
             return res.status(404).send()
         }
 
-        const token = await domain.generateAuthToken(environment.name)
+        const apiKey = await domain.generateApiKey();
         
-        res.status(201).send({ token })
+        res.status(201).send({ apiKey })
     } catch (e) {
-        console.log(e)
         res.status(400).send(e)
     }
 })
@@ -38,10 +36,8 @@ router.post('/domain/create', auth, masterPermission('create Domains'), async (r
 
         environment.save();
 
-        const token = await domain.generateAuthToken(environment.name);
-        domain.token = token;
-        await domain.save();
-        res.status(201).send(domain)
+        const apiKey = await domain.generateApiKey();
+        res.status(201).send({ domain, apiKey })
     } catch (e) {
         res.status(400).send(e);
     }
@@ -106,7 +102,7 @@ router.delete('/domain/:id', auth, masterPermission('delete Domain'), async (req
 
 router.patch('/domain/:id', auth, masterPermission('update Domain'), async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['name', 'description', 'token']
+    const allowedUpdates = ['description']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {

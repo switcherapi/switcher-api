@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import GroupConfig from './group-config';
 import { EnvType } from './environment';
 
@@ -26,8 +27,10 @@ const domainSchema = new mongoose.Schema({
         required: true,
         ref: 'Admin'
     },
-    token: {
-        type: String
+    apihash: {
+        type: String,
+        required: true,
+        unique: true
     }
 }, {
     timestamps: true
@@ -57,11 +60,56 @@ domainSchema.virtual('environment', {
     foreignField: 'domain'
 })
 
+domainSchema.options.toJSON = {
+    getters: true,
+    virtuals: true,
+    minimize: false,
+    transform: function (doc, ret, options) {
+        delete ret.apihash
+        return ret
+    }
+}
+
+domainSchema.methods.generateApiKey = async function () {
+    const domain = this
+    const apiKey = await bcrypt.hash(domain._id + domain.name, 8)
+    const hash = await bcrypt.hash(apiKey, 8)
+    domain.apihash = hash    
+    domain.save()
+
+    return apiKey
+}
+
 domainSchema.methods.generateAuthToken = async function (environment) {
     const domain = this
-    const token = jwt.sign(({ _id: domain.id.toString(), environment }), process.env.JWT_CONFIG_SECRET)
+
+    var options = {
+        expiresIn: process.env.JWT_CLIENT_TOKEN_EXP_TIME
+    };
+
+    const token = jwt.sign(({ 
+        _id: domain.id.toString(), 
+        environment, 
+        vc: domain.apihash.substring(50, domain.apihash.length-1) 
+    }), process.env.JWT_SECRET, options)
 
     return token
+}
+
+domainSchema.statics.findByCredentials = async (name, apiKey) => {
+    const domain = await Domain.findOne({ name })
+
+    if (!domain) {
+        throw new Error('Unable to find this Domain')
+    }
+
+    const isMatch = await bcrypt.compare(apiKey, domain.apihash)
+
+    if (!isMatch) {
+        throw new Error('Unable to find this Domain')
+    }
+
+    return domain
 }
 
 domainSchema.pre('remove', async function (next) {

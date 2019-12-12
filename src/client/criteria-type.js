@@ -52,7 +52,7 @@ export const criteriaType = new GraphQLObjectType({
         result: {
             type: resultType,
             resolve: (source, params, context) => {
-                return resolveCriteria(source, context)
+                return resolveCriteria(source, context, 'values description strategy operation activated -_id')
             }
         }
     }
