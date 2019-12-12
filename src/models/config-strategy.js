@@ -7,7 +7,7 @@ export const StrategiesType = Object.freeze({
     VALUE: 'VALUE_VALIDATION',
     TIME: 'TIME_VALIDATION',
     DATE: 'DATE_VALIDATION'
-  });
+});
 
 export const OperationsType = Object.freeze({
     EQUAL: 'EQUAL',
@@ -17,7 +17,7 @@ export const OperationsType = Object.freeze({
     GREATER: 'GREATER',
     LOWER: 'LOWER',
     BETWEEN: 'BETWEEN'
-  });
+});
 
 const StrategyRequirementDefinition = [
     {

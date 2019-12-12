@@ -23,7 +23,7 @@ const queryType = new GraphQLObjectType({
             }
         },
         domain: {
-            type: new GraphQLList(domainType),
+            type: domainType,
             args: {
                 _id: {
                     type: GraphQLString

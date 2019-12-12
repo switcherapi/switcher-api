@@ -51,7 +51,7 @@ export async function resolveDomain(_id, name, token, activated, environment) {
         args.activated = { [`${environment}`]: activated }
     }
 
-    return await Domain.find({ ...args })
+    return await Domain.findOne({ ...args })
 }
 
 export async function resolveFlatConfigurationByConfig(key) {
