@@ -2,7 +2,8 @@ import express from 'express';
 import Domain from '../models/domain';
 import GroupConfig from '../models/group-config';
 import { auth } from '../middleware/auth';
-import { masterPermission, checkEnvironmentStatusChange, checkEnvironmentStatusRemoval } from '../middleware/validators';
+import { masterPermission, checkEnvironmentStatusChange } from '../middleware/validators';
+import { removeGroupStatus } from './common/index'
 
 const router = new express.Router()
 
@@ -161,17 +162,7 @@ router.patch('/groupconfig/updateStatus/:id', auth, masterPermission('update Dom
 
 router.patch('/groupconfig/removeStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
     try {
-        const groupconfig = await GroupConfig.findOne({ _id: req.params.id })
-        
-        if (!groupconfig) {
-            return res.status(404).send()
-        }
-
-        await checkEnvironmentStatusRemoval(req, res, groupconfig.domain)
-
-        groupconfig.activated.delete(req.body.env)
-        await groupconfig.save()
-        res.send(groupconfig)
+        res.send(await removeGroupStatus(req.params.id, req.body.env))
     } catch (e) {
         res.status(400).send({ error: e.message })
     }

@@ -7,7 +7,7 @@ import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
 import Config from '../src/models/config';
 import { ConfigStrategy } from '../src/models/config-strategy';
-import { EnvType } from '../src/models/environment';
+import { EnvType, Environment } from '../src/models/environment';
 import { 
     setupDatabase,
     adminMasterAccountId,
@@ -18,7 +18,8 @@ import {
     groupConfigId,
     configId1,
     configId2,
-    configStrategyId
+    configStrategyId,
+    environment1Id
  } from './fixtures/db_api';
 
 afterAll(async () => { 
@@ -188,6 +189,9 @@ describe('Testing fect Domain info', () => {
         let configStrategy = await ConfigStrategy.findById(configStrategyId)
         expect(configStrategy).not.toBeNull()
 
+        let environment = await Environment.findById(environment1Id)
+        expect(environment).not.toBeNull()
+
         await request(app)
             .delete('/domain/' + domainId)
             .set('Authorization', `Bearer ${responseLogin.body.token}`)
@@ -211,6 +215,9 @@ describe('Testing fect Domain info', () => {
 
         configStrategy = await ConfigStrategy.findById(configStrategyId)
         expect(configStrategy).toBeNull()
+
+        environment = await Environment.findById(environment1Id)
+        expect(environment).toBeNull()
     })
 
     test('DOMAIN_SUITE - Should NOT delete Domain', async () => {

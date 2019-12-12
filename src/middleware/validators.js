@@ -39,7 +39,7 @@ export async function checkEnvironmentStatusChange (req, res, domain) {
     return updates
 }
 
-export async function checkEnvironmentStatusRemoval(req, res, domain, strategy = false ) {
+export async function checkEnvironmentStatusRemoval(req, res, domain, strategy = false) {
     const environment = await Environment.find({ domain }).select('name -_id')
     const isValidOperation = environment.filter((e) => 
         e.name === req.body.env && 

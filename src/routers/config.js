@@ -3,7 +3,8 @@ import Component from '../models/component';
 import GroupConfig from '../models/group-config';
 import Config from '../models/config';
 import { auth } from '../middleware/auth';
-import { masterPermission, checkEnvironmentStatusChange, checkEnvironmentStatusRemoval } from '../middleware/validators';
+import { masterPermission, checkEnvironmentStatusChange } from '../middleware/validators';
+import { removeConfigStatus } from './common/index'
 
 const router = new express.Router()
 
@@ -147,17 +148,7 @@ router.patch('/config/updateStatus/:id', auth, masterPermission('update Domain E
 
 router.patch('/config/removeStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
     try {
-        const config = await Config.findOne({ _id: req.params.id })
-        
-        if (!config) {
-            return res.status(404).send()
-        }
-
-        await checkEnvironmentStatusRemoval(req, res, config.domain)
-
-        config.activated.delete(req.body.env)
-        await config.save()
-        res.send(config)
+        res.send(await removeConfigStatus(req.params.id, req.body.env))
     } catch (e) {
         res.status(400).send({ error: e.message })
     }

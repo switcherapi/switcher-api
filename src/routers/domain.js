@@ -1,8 +1,9 @@
 import express from 'express';
 import Domain from '../models/domain';
-import { Environment, EnvType } from '../models/environment';
+import { Environment } from '../models/environment';
 import { auth } from '../middleware/auth';
-import { masterPermission, checkEnvironmentStatusChange, checkEnvironmentStatusRemoval } from '../middleware/validators';
+import { masterPermission, checkEnvironmentStatusChange } from '../middleware/validators';
+import { removeDomainStatus } from './common/index'
 
 const router = new express.Router()
 
@@ -143,16 +144,7 @@ router.patch('/domain/updateStatus/:id', auth, masterPermission('update Domain E
 
 router.patch('/domain/removeStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
     try {
-        await checkEnvironmentStatusRemoval(req, res, req.params.id)
-        const domain = await Domain.findOne({ _id: req.params.id })
-        
-        if (!domain) {
-            return res.status(404).send()
-        }
-
-        domain.activated.delete(req.body.env)
-        await domain.save()
-        res.send(domain)
+        res.send(await removeDomainStatus(req.params.id, req.body.env))
     } catch (e) {
         res.status(400).send({ error: e.message })
     }

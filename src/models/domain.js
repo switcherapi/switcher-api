@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import GroupConfig from './group-config';
-import { EnvType } from './environment';
+import { EnvType, Environment } from './environment';
 
 const domainSchema = new mongoose.Schema({
     name: {
@@ -121,6 +121,8 @@ domainSchema.pre('remove', async function (next) {
     if (group) {
         group.forEach((g) => g.remove())
     }
+    
+    await Environment.deleteMany({ domain: domain._id })
     
     next()
 })

@@ -1,9 +1,10 @@
 import express from 'express';
 import Config from '../models/config';
 import { Environment } from '../models/environment';
-import { masterPermission, checkEnvironmentStatusChange, checkEnvironmentStatusRemoval } from '../middleware/validators';
+import { masterPermission, checkEnvironmentStatusChange } from '../middleware/validators';
 import { ConfigStrategy, strategyRequirements } from '../models/config-strategy';
 import { auth } from '../middleware/auth';
+import { removeConfigStrategyStatus } from './common/index'
 
 const router = new express.Router()
 
@@ -330,21 +331,7 @@ router.patch('/configstrategy/updateStatus/:id', auth, masterPermission('update 
 
 router.patch('/configstrategy/removeStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
     try {
-        const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
-        
-        if (!configStrategy) {
-            return res.status(404).send()
-        }
-
-        await checkEnvironmentStatusRemoval(req, res, configStrategy.domain, true)
-
-        if (configStrategy.activated.size === 1) {
-            return res.status(400).send({ error: 'Invalid operation. One environment status must be saved' })
-        }
-
-        configStrategy.activated.delete(req.body.env)
-        await configStrategy.save()
-        res.send(configStrategy)
+        res.send(await removeConfigStrategyStatus(req.params.id, req.body.env))
     } catch (e) {
         res.status(400).send({ error: e.message })
     }

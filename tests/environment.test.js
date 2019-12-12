@@ -2,13 +2,20 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import app from '../src/app';
 import { Environment, EnvType } from '../src/models/environment';
+import Domain from '../src/models/domain';
+import GroupConfig from '../src/models/group-config';
+import Config from '../src/models/config';
+import { ConfigStrategy } from '../src/models/config-strategy';
 import { 
     setupDatabase,
     adminMasterAccount,
     adminAccount,
     environment1,
     environment1Id,
-    domainId
+    domainId,
+    groupConfigId,
+    configId1,
+    configStrategyId
  } from './fixtures/db_api';
 
 afterAll(async () => { 
@@ -145,5 +152,85 @@ describe('Deletion tests', () => {
             .delete('/environment/' + response.body._id)
             .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
             .send().expect(400)
+    })
+
+    test('ENV_SUITE - Should recover an Environment', async () => {
+        const envName = 'Recoverable Environment'
+        let envId
+
+        let response = await request(app)
+            .post('/environment/create')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                name: envName,
+                domain: domainId
+            }).expect(201)
+
+        envId = response.body._id
+
+        await request(app)
+            .patch('/domain/updateStatus/' + domainId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                [`${envName}`]: true
+            }).expect(200);
+
+        await request(app)
+            .patch('/groupconfig/updateStatus/' + groupConfigId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                [`${envName}`]: true
+            }).expect(200);
+
+        await request(app)
+            .patch('/config/updateStatus/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                [`${envName}`]: true
+            }).expect(200);
+
+        await request(app)
+            .patch('/configstrategy/updateStatus/' + configStrategyId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                [`${envName}`]: true
+            }).expect(200);
+
+        let domain = await Domain.findById(domainId)
+        expect(domain.activated.get(EnvType.DEFAULT)).toEqual(true);
+        expect(domain.activated.get(envName)).toEqual(true);
+
+        let group = await GroupConfig.findById(groupConfigId)
+        expect(group.activated.get(EnvType.DEFAULT)).toEqual(true);
+        expect(group.activated.get(envName)).toEqual(true);
+
+        let config = await Config.findById(configId1)
+        expect(config.activated.get(EnvType.DEFAULT)).toEqual(true);
+        expect(config.activated.get(envName)).toEqual(true);
+
+        let strategy = await ConfigStrategy.findById(configStrategyId)
+        expect(strategy.activated.get(EnvType.DEFAULT)).toEqual(true);
+        expect(strategy.activated.get(envName)).toEqual(true);
+
+        await request(app)
+            .patch('/environment/recover/' + envId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(200)
+
+        domain = await Domain.findById(domainId)
+        expect(domain.activated.get(EnvType.DEFAULT)).toEqual(true);
+        expect(domain.activated.get(envName)).toEqual(undefined);
+
+        group = await GroupConfig.findById(groupConfigId)
+        expect(group.activated.get(EnvType.DEFAULT)).toEqual(true);
+        expect(group.activated.get(envName)).toEqual(undefined);
+
+        config = await Config.findById(configId1)
+        expect(config.activated.get(EnvType.DEFAULT)).toEqual(true);
+        expect(config.activated.get(envName)).toEqual(undefined);
+
+        strategy = await ConfigStrategy.findById(configStrategyId)
+        expect(strategy.activated.get(EnvType.DEFAULT)).toEqual(true);
+        expect(strategy.activated.get(envName)).toEqual(undefined);
     })
 })
