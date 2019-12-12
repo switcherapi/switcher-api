@@ -31,9 +31,6 @@ const queryType = new GraphQLObjectType({
                 name: {
                     type: GraphQLString
                 },
-                token: {
-                    type: GraphQLString
-                }, 
                 activated: {
                     type: GraphQLBoolean,
                     resolve: (source, args, { environment }) => {
@@ -42,8 +39,8 @@ const queryType = new GraphQLObjectType({
                     }
                 }
             },
-            resolve: async (source, { _id, name, token, activated }, { environment }) => {
-                return await resolveDomain(_id, name, token, activated, environment)
+            resolve: async (source, { _id, name, activated }, { environment }) => {
+                return await resolveDomain(_id, name, activated, environment)
             }
         },
         configuration: {

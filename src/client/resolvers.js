@@ -41,12 +41,11 @@ export async function resolveGroupConfig(source, _id, name, activated, environme
     return await GroupConfig.find({ domain: source._id, ...args })
 }
 
-export async function resolveDomain(_id, name, token, activated, environment) {
+export async function resolveDomain(_id, name, activated, environment) {
     const args = {}
 
     if (_id) { args._id = _id }
     if (name) { args.name = name }
-    if (token) { args.token = token }
     if (activated !== undefined) { 
         args.activated = { [`${environment}`]: activated }
     }

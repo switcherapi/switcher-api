@@ -403,7 +403,7 @@ describe("Testing domain", () => {
                 const expected = `
                         {
                             "data":{
-                               "domain":[
+                               "domain":
                                   {
                                      "name":"Domain",
                                      "description":"Test Domain",
@@ -443,9 +443,8 @@ describe("Testing domain", () => {
                                         }
                                      ]
                                   }
-                               ]
                             }
-                         }`;
+                        }`;
                 
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
@@ -486,7 +485,7 @@ describe("Testing domain", () => {
                 const expected = `
                         {
                             "data":{
-                               "domain":[
+                               "domain":
                                   {
                                      "name":"Domain",
                                      "description":"Test Domain",
@@ -525,10 +524,9 @@ describe("Testing domain", () => {
                                         }
                                      ]
                                   }
-                               ]
                             }
-                         }`;
-                
+                        }`;
+                    
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
             })
@@ -567,15 +565,15 @@ describe("Testing domain", () => {
             .end((err, res) => {
                 const expected = `
                         {
-                            "data":{
-                               "domain":[
+                            "data":
+                            {
+                               "domain":
                                   {
                                      "name":"Domain",
                                      "description":"Test Domain",
                                      "activated":true,
                                      "group":[]
                                   }
-                               ]
                             }
                          }`;
                 
@@ -618,7 +616,7 @@ describe("Testing domain", () => {
                 const expected = `
                         {
                             "data":{
-                               "domain":[
+                               "domain":
                                   {
                                      "name":"Domain",
                                      "description":"Test Domain",
@@ -632,7 +630,6 @@ describe("Testing domain", () => {
                                         }
                                      ]
                                   }
-                               ]
                             }
                          }`;
                 
