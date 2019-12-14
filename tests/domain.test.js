@@ -6,6 +6,7 @@ import Admin from '../src/models/admin';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
 import Config from '../src/models/config';
+import History from '../src/models/history';
 import { ConfigStrategy } from '../src/models/config-strategy';
 import { EnvType, Environment } from '../src/models/environment';
 import { 
@@ -73,11 +74,10 @@ describe('Testing Domain insertion', () => {
             .send().expect(201)
 
         expect(response.body.apiKey).not.toBeNull()
-
         // DB validation - current Domain token should not be as the same as the generated
-        const domain = await Domain.findById(domainId)
+        const domain = await Domain.findById(domainId).lean()
         const isMatch = await bcrypt.compare(response.body.apiKey, domain.apihash)
-        expect(isMatch).toBe(true)
+        expect(isMatch).toEqual(true)
     })
 
     test('DOMAIN_SUITE - Should NOT generate an API Key for a Domain - No Master Admin credential', async () => {
@@ -191,7 +191,7 @@ describe('Testing fect Domain info', () => {
 
         let environment = await Environment.findById(environment1Id)
         expect(environment).not.toBeNull()
-
+        
         await request(app)
             .delete('/domain/' + domainId)
             .set('Authorization', `Bearer ${responseLogin.body.token}`)
@@ -286,6 +286,54 @@ describe('Testing update Domain info', () => {
         // DB validation - verify status updated
         const domain = await Domain.findById(domainId)
         expect(domain.activated.get(EnvType.DEFAULT)).toEqual(false);
+    })
+
+    test('DOMAIN_SUITE - Should record changes on history collection', async () => {
+        let response = await request(app)
+            .post('/domain/create')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                name: 'New Domain Record',
+                description: 'Description of my new Domain'
+            }).expect(201)
+        
+        const id = response.body.domain._id
+        response = await request(app)
+                .get('/domain/history/' + id)
+                .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+                .send().expect(200)
+        
+        expect(response.body).toEqual([])
+
+        await request(app)
+            .patch('/domain/' + id)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                description: 'New description'
+            }).expect(200)
+
+        response = await request(app)
+            .get('/domain/history/' + id)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(200)
+
+        expect(response.body).not.toEqual([])
+
+        // DB validation
+        let history = await History.find({ elementId: id })
+        expect(history[0].oldValue.get('description')).toEqual('Description of my new Domain')
+        expect(history[0].newValue.get('description')).toEqual('New description')
+
+        await request(app)
+            .patch('/domain/updateStatus/' + id)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                default: false
+            }).expect(200);
+        
+        // DB validation
+        history = await History.find({ elementId: id })
+        expect(history.length).toEqual(2)
     })
 })
 

@@ -52,7 +52,8 @@ describe('Testing Admin insertion', () => {
                 password: adminMasterAccount.password
             }).expect(200)
 
-        const response = await request(app).post('/admin/create')
+        const response = await request(app)
+            .post('/admin/create')
             .set('Authorization', `Bearer ${responseLogin.body.token}`)
             .send({
                 name: 'Admin',

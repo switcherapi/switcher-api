@@ -99,6 +99,49 @@ router.get('/configstrategy/:id', auth, async (req, res) => {
     }
 })
 
+// GET /configstrategy/ID?sortBy=createdAt:desc
+// GET /configstrategy/ID?limit=10&skip=20
+// GET /configstrategy/ID
+router.get('/configstrategy/history/:id', auth, async (req, res) => {
+    const sort = {}
+
+    if (!req.params.id) {
+        return res.status(500).send({
+            error: 'Please, specify the \'strategy\' id'
+        })
+    }
+
+    if (req.query.sortBy) {
+        const parts = req.query.sortBy.split(':')
+        sort[`${parts[0]}.${parts[1]}`] = parts[2] === 'desc' ? -1 : 1
+    }
+
+    try {
+        const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
+
+        if (!configStrategy) {
+            return res.status(404).send()
+        }
+        try {
+            await configStrategy.populate({
+                path: 'history',
+                select: 'oldValue newValue -_id',
+                options: {
+                    limit: parseInt(req.query.limit),
+                    skip: parseInt(req.query.skip),
+                    sort
+                }
+            }).execPopulate()
+
+            res.send(configStrategy.history)
+        } catch (e) {
+            res.status(400).send()
+        }
+    } catch (e) {
+        res.status(404).send()
+    }
+})
+
 router.get('/configstrategy/req/:strategy', auth, (req, res) => {
     try {
         const result = strategyRequirements(req.params.strategy, res)
@@ -129,7 +172,7 @@ router.delete('/configstrategy/:id', auth, async (req, res) => {
 
 router.patch('/configstrategy/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['description', 'values']
+    const allowedUpdates = ['description', 'values', 'operation']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
@@ -152,7 +195,7 @@ router.patch('/configstrategy/:id', auth, async (req, res) => {
         }
     } catch (e) {
         res.status(404).send(e)
-}
+    }
 })
 
 router.patch('/configstrategy/addval/:id', auth, async (req, res) => {

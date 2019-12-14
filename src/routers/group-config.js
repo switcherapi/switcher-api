@@ -95,6 +95,49 @@ router.get('/groupconfig/:id', auth, async (req, res) => {
     }
 })
 
+// GET /groupconfig/ID?sortBy=createdAt:desc
+// GET /groupconfig/ID?limit=10&skip=20
+// GET /groupconfig/ID
+router.get('/groupconfig/history/:id', auth, async (req, res) => {
+    const sort = {}
+
+    if (!req.params.id) {
+        return res.status(500).send({
+            error: 'Please, specify the \'groupconfig\' id'
+        })
+    }
+
+    if (req.query.sortBy) {
+        const parts = req.query.sortBy.split(':')
+        sort[`${parts[0]}.${parts[1]}`] = parts[2] === 'desc' ? -1 : 1
+    }
+
+    try {
+        const groupconfig = await GroupConfig.findOne({ _id: req.params.id })
+
+        if (!groupconfig) {
+            return res.status(404).send()
+        }
+        try {
+            await groupconfig.populate({
+                path: 'history',
+                select: 'oldValue newValue -_id',
+                options: {
+                    limit: parseInt(req.query.limit),
+                    skip: parseInt(req.query.skip),
+                    sort
+                }
+            }).execPopulate()
+
+            res.send(groupconfig.history)
+        } catch (e) {
+            res.status(400).send()
+        }
+    } catch (e) {
+        res.status(404).send()
+    }
+})
+
 router.delete('/groupconfig/:id', auth, async (req, res) => {
     try {
         const groupconfig = await GroupConfig.findOne({ _id: req.params.id })

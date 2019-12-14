@@ -85,6 +85,49 @@ router.get('/domain/:id', auth, async (req, res) => {
     }
 })
 
+// GET /domain/ID?sortBy=createdAt:desc
+// GET /domain/ID?limit=10&skip=20
+// GET /domain/ID
+router.get('/domain/history/:id', auth, async (req, res) => {
+    const sort = {}
+
+    if (!req.params.id) {
+        return res.status(500).send({
+            error: 'Please, specify the \'domain\' id'
+        })
+    }
+
+    if (req.query.sortBy) {
+        const parts = req.query.sortBy.split(':')
+        sort[`${parts[0]}.${parts[1]}`] = parts[2] === 'desc' ? -1 : 1
+    }
+
+    try {
+        const domain = await Domain.findOne({ _id: req.params.id })
+
+        if (!domain) {
+            return res.status(404).send()
+        }
+        try {
+            await domain.populate({
+                path: 'history',
+                select: 'oldValue newValue -_id',
+                options: {
+                    limit: parseInt(req.query.limit),
+                    skip: parseInt(req.query.skip),
+                    sort
+                }
+            }).execPopulate()
+
+            res.send(domain.history)
+        } catch (e) {
+            res.status(400).send()
+        }
+    } catch (e) {
+        res.status(404).send()
+    }
+})
+
 router.delete('/domain/:id', auth, masterPermission('delete Domain'), async (req, res) => {
     try {
         const domain = await Domain.findOne({ _id: req.params.id })

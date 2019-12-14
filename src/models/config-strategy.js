@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import History from './history';
+import { recordHistory } from './common/index';
 import moment from 'moment';
 import IPCIDR from 'ip-cidr';
 
@@ -201,6 +203,13 @@ function processDate(operation, input, values) {
     }
 }
 
+async function recordStrategyHistory(strategyConfig, modifiedField) {
+    if (strategyConfig.__v !== undefined && modifiedField.length) {
+        const oldStrategy = await ConfigStrategy.findById(strategyConfig._id).select(modifiedField);
+        recordHistory(modifiedField, oldStrategy, strategyConfig)
+    }
+}
+
 async function existStrategy(strategyConfig) {
     if (strategyConfig.__v === undefined) {
         const foundStrategy = await ConfigStrategy.find({ config: strategyConfig.config, strategy: strategyConfig.strategy })
@@ -254,6 +263,31 @@ const configStrategySchema = new mongoose.Schema({
     timestamps: true
 })
 
+configStrategySchema.virtual('history', {
+    ref: 'History',
+    localField: '_id',
+    foreignField: 'elementId'
+})
+
+configStrategySchema.options.toJSON = {
+    getters: true,
+    virtuals: true,
+    minimize: false,
+    transform: function (doc, ret, options) {
+        if (ret.updatedAt || ret.createdAt) {
+            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
+            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
+        }
+        return ret
+    }
+}
+
+configStrategySchema.pre('remove', async function (next) {
+    const strategyConfig = this
+    await History.deleteMany({ elementId: strategyConfig._id })
+    next()
+})
+
 configStrategySchema.pre('save', async function (next) {
     const strategyConfig = this
 
@@ -264,13 +298,13 @@ configStrategySchema.pre('save', async function (next) {
     // Verify if strategy already exist
     if (await existStrategy(strategyConfig)) {
         const err = new Error(`Unable to complete the operation. Strategy '${strategy}' already exist for this configuration`)
-        next(err);
+        return next(err);
     }
 
     // Verify strategy value quantity
     if (!strategyConfig.values || strategyConfig.values.length < min || strategyConfig.values.length > max) {
         const err =  new Error(`Unable to complete the operation. The number of values for the operation '${operationStrategy}', are min: ${min} and max: ${max} values`)
-        next(err);
+        return next(err);
     }
 
     const operations = StrategyRequirementDefinition.find(element => element.strategy === strategy).operations
@@ -279,15 +313,17 @@ configStrategySchema.pre('save', async function (next) {
     // Verify strategy operation requirements
     if (!foundOperation) {
         const err =  new Error(`Unable to complete the operation. The strategy '${strategy}' needs ${operations} as operation`)
-        next(err);
+        return next(err);
     }
 
     // Verify strategy values format
     try {
         strategyConfig.values.forEach(value => validateStrategyValue(strategy, value))
     } catch (err) {
-        next(err);
+        return next(err);
     }
+
+    await recordStrategyHistory(strategyConfig, this.modifiedPaths());
 
     next()
 })

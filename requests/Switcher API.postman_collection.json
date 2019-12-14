@@ -1287,6 +1287,47 @@
 			"response": []
 		},
 		{
+			"name": "Config - Read Hsitory",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/config/history/5df1664d9194d613400a52eb",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"config",
+						"history",
+						"5df1664d9194d613400a52eb"
+					],
+					"query": [
+						{
+							"key": "sortBy",
+							"value": "oldValue:updatedAt:desc",
+							"disabled": true
+						},
+						{
+							"key": "sortBy",
+							"value": "newValue:updatedAt:desc",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Group - Delete",
 			"request": {
 				"method": "DELETE",
@@ -1561,13 +1602,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/config/5de9fc84279fa52e0c9cf49a",
+					"raw": "{{url}}/config/5df166619194d613400a52ec",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"config",
-						"5de9fc84279fa52e0c9cf49a"
+						"5df166619194d613400a52ec"
 					],
 					"query": [
 						{
@@ -1685,7 +1726,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"activated\": \"true\"\n}",
+					"raw": "{\n\t\"description\": \"Changed\",\n\t\"operation\": \"NOT_EXIST\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1693,13 +1734,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/configstrategy/5de216acb987552fa428783a",
+					"raw": "{{url}}/configstrategy/5df1668d9194d613400a52ee",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"configstrategy",
-						"5de216acb987552fa428783a"
+						"5df1668d9194d613400a52ee"
 					]
 				}
 			},
@@ -1719,7 +1760,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"value\": \"Brazil\"\n}",
+					"raw": "{\n\t\"value\": \"Canada\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1727,14 +1768,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/configstrategy/addval/5de1e309d3162634b832e8a7",
+					"raw": "{{url}}/configstrategy/addval/5df1668d9194d613400a52ee",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"configstrategy",
 						"addval",
-						"5de1e309d3162634b832e8a7"
+						"5df1668d9194d613400a52ee"
 					]
 				}
 			},
@@ -1762,14 +1803,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/configstrategy/updateval/5ded62e9eaaa2b3bd4c4225d",
+					"raw": "{{url}}/configstrategy/updateval/5df1668d9194d613400a52ee",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"configstrategy",
 						"updateval",
-						"5ded62e9eaaa2b3bd4c4225d"
+						"5df1668d9194d613400a52ee"
 					]
 				}
 			},
@@ -1789,7 +1830,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"value\": \"Brazil\"\n}",
+					"raw": "{\n\t\"value\": \"Canada\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1797,14 +1838,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/configstrategy/removeval/5de1e309d3162634b832e8a7",
+					"raw": "{{url}}/configstrategy/removeval/5df1668d9194d613400a52ee",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"configstrategy",
 						"removeval",
-						"5de1e309d3162634b832e8a7"
+						"5df1668d9194d613400a52ee"
 					]
 				}
 			},
@@ -1824,7 +1865,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"default\": true,\n\t\"QA\": true\n}",
+					"raw": "{\n\t\"default\": true,\n\t\"QA\": false\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1886,7 +1927,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/configstrategy?config=5de0721f44b53441281c0f9d",
+					"raw": "{{url}}/configstrategy?sortBy=createdAt:asc&config=5df1664d9194d613400a52eb",
 					"host": [
 						"{{url}}"
 					],
@@ -1896,8 +1937,7 @@
 					"query": [
 						{
 							"key": "sortBy",
-							"value": "createdAt:asc",
-							"disabled": true
+							"value": "createdAt:asc"
 						},
 						{
 							"key": "activated",
@@ -1916,7 +1956,7 @@
 						},
 						{
 							"key": "config",
-							"value": "5de0721f44b53441281c0f9d"
+							"value": "5df1664d9194d613400a52eb"
 						}
 					]
 				}
@@ -1998,6 +2038,47 @@
 						"configstrategy",
 						"req",
 						"TIME_VALIDATION"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigStrategy - Read Hsitory",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/configstrategy/history/5df1668d9194d613400a52ee",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"history",
+						"5df1668d9194d613400a52ee"
+					],
+					"query": [
+						{
+							"key": "sortBy",
+							"value": "oldValue:updatedAt:desc",
+							"disabled": true
+						},
+						{
+							"key": "sortBy",
+							"value": "newValue:updatedAt:desc",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "1",
+							"disabled": true
+						}
 					]
 				}
 			},

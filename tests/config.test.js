@@ -5,6 +5,7 @@ import Admin from '../src/models/admin';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
 import Config from '../src/models/config';
+import History from '../src/models/history';
 import { EnvType } from '../src/models/environment';
 import { ConfigStrategy } from '../src/models/config-strategy';
 import { 
@@ -323,6 +324,55 @@ describe('Testing Environment status change', () => {
         expect(config.activated.get('QA1')).toEqual(undefined);
     })
 
+    test('CONFIG_SUITE - Should record changes on history collection', async () => {
+        let response = await request(app)
+            .post('/config/create')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                key: 'TEST_HIST_RECORD',
+                description: 'Description of my new Config',
+                group: groupConfigId
+            }).expect(201)
+        
+        const configId = response.body._id
+        response = await request(app)
+                .get('/config/history/' + configId)
+                .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+                .send().expect(200)
+        
+        expect(response.body).toEqual([])
+
+        await request(app)
+            .patch('/config/' + configId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                description: 'New description'
+            }).expect(200)
+
+        response = await request(app)
+            .get('/config/history/' + configId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(200)
+
+        expect(response.body).not.toEqual([])
+
+        // DB validation
+        let history = await History.find({ elementId: configId })
+        expect(history[0].oldValue.get('description')).toEqual('Description of my new Config')
+        expect(history[0].newValue.get('description')).toEqual('New description')
+
+        await request(app)
+            .patch('/config/updateStatus/' + configId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                default: false
+            }).expect(200);
+        
+        // DB validation
+        history = await History.find({ elementId: configId })
+        expect(history.length).toEqual(2)
+    })
+
     test('CONFIG_SUITE - Should NOT remove Config environment status', async () => {
         // Creating QA3 Environment...
         await request(app)
@@ -445,5 +495,17 @@ describe('Testing component association', () => {
         // DB validation - document updated
         const config = await Config.findById(configId1)
         expect(config.components.length).toEqual(0)
+    })
+
+    test('STRATEGY_SUITE - Should remove records from history after deleting element', async () => {
+        let history = await History.find({ elementId: configId1 })
+        expect(history.length > 0).toEqual(true)
+        await request(app)
+            .delete('/config/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(200)
+
+        history = await History.find({ elementId: configId1 })
+        expect(history.length).toEqual(0)
     })
 })

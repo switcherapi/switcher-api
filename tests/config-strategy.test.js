@@ -5,6 +5,7 @@ import Admin from '../src/models/admin';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
 import Config from '../src/models/config';
+import History from '../src/models/history';
 import { EnvType } from '../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType, strategyRequirements } from '../src/models/config-strategy';
 import { 
@@ -430,38 +431,56 @@ describe('Testing update strategies #1', () => {
             }).expect(400)
     })
 
-    test('STRATEGY_SUITE - Should return a specific strategy requirements', async () => {
+    test('STRATEGY_SUITE - Should record changes on history collection', async () => {
         let response = await request(app)
-            .get('/configstrategy/req/' + StrategiesType.TIME)
+            .post('/configstrategy/create')
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
-            .send().expect(200)
+            .send({
+                description: 'Description of my new Config Strategy',
+                strategy: StrategiesType.DATE,
+                operation: OperationsType.LOWER,
+                values: ['2019-12-10'],
+                config: configId2,
+                env: EnvType.DEFAULT
+            }).expect(201)
         
-        let requirements = strategyRequirements(StrategiesType.TIME)
-        expect(response.body).toMatchObject(requirements)
+        const strategyId = response.body._id
+        response = await request(app)
+                .get('/configstrategy/history/' + strategyId)
+                .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+                .send().expect(200)
+        
+        expect(response.body).toEqual([])
+
+        await request(app)
+            .patch('/configstrategy/' + strategyId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                description: 'New description'
+            }).expect(200)
 
         response = await request(app)
-            .get('/configstrategy/req/' + StrategiesType.VALUE)
+            .get('/configstrategy/history/' + strategyId)
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(200)
-        
-        requirements = strategyRequirements(StrategiesType.VALUE)
-        expect(response.body).toMatchObject(requirements)
 
-        response = await request(app)
-            .get('/configstrategy/req/' + StrategiesType.DATE)
+        expect(response.body).not.toEqual([])
+
+        // DB validation
+        let history = await History.find({ elementId: strategyId })
+        expect(history[0].oldValue.get('description')).toEqual('Description of my new Config Strategy')
+        expect(history[0].newValue.get('description')).toEqual('New description')
+
+        await request(app)
+            .patch('/configstrategy/updateStatus/' + strategyId)
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
-            .send().expect(200)
+            .send({
+                default: false
+            }).expect(200);
         
-        requirements = strategyRequirements(StrategiesType.DATE)
-        expect(response.body).toMatchObject(requirements)
-
-        response = await request(app)
-        .get('/configstrategy/req/' + StrategiesType.NETWORK)
-        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
-        .send().expect(200)
-
-        requirements = strategyRequirements(StrategiesType.NETWORK)
-        expect(response.body).toMatchObject(requirements)
+        // DB validation
+        history = await History.find({ elementId: strategyId })
+        expect(history.length).toEqual(2)
     })
 
     test('STRATEGY_SUITE - Should NOT return a specific strategy requirements', async () => {
@@ -836,4 +855,17 @@ describe('Scenario: default environment being deleted', () => {
         expect(strategy.activated.get(EnvType.DEFAULT)).toEqual(undefined);
         expect(strategy.activated.get('QA')).toEqual(true);
     })
+
+    test('STRATEGY_SUITE - Should remove records from history after deleting element', async () => {
+        let history = await History.find({ elementId: configStrategyId })
+        expect(history.length > 0).toEqual(true)
+        await request(app)
+            .delete('/configstrategy/' + configStrategyId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(200)
+
+        history = await History.find({ elementId: configStrategyId })
+        expect(history.length).toEqual(0)
+    })
+
 })

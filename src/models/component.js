@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
 
 const componentSchema = new mongoose.Schema({
     name: {
@@ -24,6 +25,19 @@ const componentSchema = new mongoose.Schema({
 }, {
     timestamps: true
 })
+
+componentSchema.options.toJSON = {
+    getters: true,
+    virtuals: true,
+    minimize: false,
+    transform: function (doc, ret, options) {
+        if (ret.updatedAt || ret.createdAt) {
+            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
+            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
+        }
+        return ret
+    }
+}
 
 const existComponent = async (component) => {
     if (component.__v === undefined) {

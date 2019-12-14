@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
 import Config from './config';
+import History from './history';
 import { EnvType } from '../models/environment';
+import { recordHistory } from './common/index'
 
 const groupConfigSchema = new mongoose.Schema({
     name: {
@@ -34,6 +37,32 @@ const groupConfigSchema = new mongoose.Schema({
     timestamps: true
 })
 
+groupConfigSchema.virtual('history', {
+    ref: 'History',
+    localField: '_id',
+    foreignField: 'elementId'
+})
+
+groupConfigSchema.options.toJSON = {
+    getters: true,
+    virtuals: true,
+    minimize: false,
+    transform: function (doc, ret, options) {
+        if (ret.updatedAt || ret.createdAt) {
+            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
+            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
+        }
+        return ret
+    }
+}
+
+async function recordGroupHistory(group, modifiedField) {
+    if (group.__v !== undefined && modifiedField.length) {
+        const oldGroup = await GroupConfig.findById(group._id).select(modifiedField);
+        recordHistory(modifiedField, oldGroup, group)
+    }
+}
+
 groupConfigSchema.virtual('config', {
     ref: 'Config',
     localField: '_id',
@@ -49,7 +78,18 @@ groupConfigSchema.pre('remove', async function (next) {
     if (config) {
         config.forEach((c) => c.remove())
     }
+
+    const history = await History.find({ elementId: group._id })
+    if (history) {
+        history.forEach((h) => h.remove())
+    }
     
+    next()
+})
+
+groupConfigSchema.pre('save', async function (next) {
+    const group = this
+    await recordGroupHistory(group, this.modifiedPaths());
     next()
 })
 

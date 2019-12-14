@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
+import moment from 'moment';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Domain from './domain';
@@ -82,6 +83,10 @@ adminSchema.options.toJSON = {
     virtuals: true,
     minimize: false,
     transform: function (doc, ret, options) {
+        if (ret.updatedAt || ret.createdAt) {
+            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
+            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
+        }
         delete ret.password
         delete ret.tokens
         return ret

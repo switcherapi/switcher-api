@@ -5,6 +5,7 @@ import Admin from '../src/models/admin';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
 import Config from '../src/models/config';
+import History from '../src/models/history';
 import { EnvType } from '../src/models/environment';
 import { ConfigStrategy } from '../src/models/config-strategy';
 import { 
@@ -222,6 +223,55 @@ describe('Testing update Group info', () => {
         const group = await GroupConfig.findById(groupConfigId)
         expect(group.activated.get(EnvType.DEFAULT)).toEqual(false);
     })
+
+    test('GROUP_SUITE - Should record changes on history collection', async () => {
+        let response = await request(app)
+            .post('/groupconfig/create')
+            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .send({
+                name: 'Group Record Test',
+                description: 'Description of my new Group Config',
+                domain: domainId
+            }).expect(201)
+        
+        const groupId = response.body._id
+        response = await request(app)
+                .get('/groupconfig/history/' + groupId)
+                .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+                .send().expect(200)
+        
+        expect(response.body).toEqual([])
+
+        await request(app)
+            .patch('/groupconfig/' + groupId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                description: 'New description'
+            }).expect(200)
+
+        response = await request(app)
+            .get('/groupconfig/history/' + groupId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(200)
+
+        expect(response.body).not.toEqual([])
+
+        // DB validation
+        let history = await History.find({ elementId: groupId })
+        expect(history[0].oldValue.get('description')).toEqual('Description of my new Group Config')
+        expect(history[0].newValue.get('description')).toEqual('New description')
+
+        await request(app)
+            .patch('/groupconfig/updateStatus/' + groupId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                default: false
+            }).expect(200);
+        
+        // DB validation
+        history = await History.find({ elementId: groupId })
+        expect(history.length).toEqual(2)
+    })
 })
 
 describe('Testing envrionment status change #1', () => {
@@ -365,5 +415,17 @@ describe('Testing environment status change #2', () => {
         const group = await GroupConfig.findById(groupConfigId)
         expect(group.activated.get(EnvType.DEFAULT)).toEqual(true);
         expect(group.activated.get('QA1')).toEqual(true);
+    })
+
+    test('STRATEGY_SUITE - Should remove records from history after deleting element', async () => {
+        let history = await History.find({ elementId: groupConfigId })
+        expect(history.length > 0).toEqual(true)
+        await request(app)
+            .delete('/groupconfig/' + groupConfigId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(200)
+
+        history = await History.find({ elementId: groupConfigId })
+        expect(history.length).toEqual(0)
     })
 })

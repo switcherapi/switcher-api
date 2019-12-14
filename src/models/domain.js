@@ -1,8 +1,11 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import GroupConfig from './group-config';
+import History from './history';
 import { EnvType, Environment } from './environment';
+import { recordHistory } from './common/index'
 
 const domainSchema = new mongoose.Schema({
     name: {
@@ -60,11 +63,21 @@ domainSchema.virtual('environment', {
     foreignField: 'domain'
 })
 
+domainSchema.virtual('history', {
+    ref: 'History',
+    localField: '_id',
+    foreignField: 'elementId'
+})
+
 domainSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
     transform: function (doc, ret, options) {
+        if (ret.updatedAt || ret.createdAt) {
+            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
+            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
+        }
         delete ret.apihash
         return ret
     }
@@ -75,7 +88,7 @@ domainSchema.methods.generateApiKey = async function () {
     const apiKey = await bcrypt.hash(domain._id + domain.name, 8)
     const hash = await bcrypt.hash(apiKey, 8)
     domain.apihash = hash    
-    domain.save()
+    await domain.save()
 
     return apiKey
 }
@@ -117,13 +130,33 @@ domainSchema.pre('remove', async function (next) {
 
     const domain = this
     const group = await GroupConfig.find({ domain: new ObjectId(domain._id) })
-    
     if (group) {
         group.forEach((g) => g.remove())
     }
-    
-    await Environment.deleteMany({ domain: domain._id })
-    
+
+    const environment = await Environment.find({ domain: new ObjectId(domain._id) })
+    if (environment) {
+        environment.forEach((e) => e.remove())
+    }
+
+    const history = await History.find({ elementId: new ObjectId(domain._id) })
+    if (history) {
+        history.forEach((h) => h.remove())
+    }
+
+    next()
+})
+
+async function recordDomainHistory(domain, modifiedField) {
+    if (domain.__v !== undefined && modifiedField.length) {
+        const oldDomain = await Domain.findById(domain._id).select(modifiedField);
+        recordHistory(modifiedField, oldDomain, domain)
+    }
+}
+
+domainSchema.pre('save', async function (next) {
+    const domain = this
+    await recordDomainHistory(domain, this.modifiedPaths());
     next()
 })
 
