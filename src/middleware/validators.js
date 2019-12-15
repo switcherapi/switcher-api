@@ -15,7 +15,7 @@ export const masterPermission = function (action) {
 
 export async function checkConfig(req, res, next) {
 
-    const config = await Config.findOne({ key: req.query.key })
+    const config = await Config.findOne({ key: req.query.key }).lean()
 
     if (!config) {
         return res.status(404).send({ error: `Unable to load a key ${req.query.key}` })

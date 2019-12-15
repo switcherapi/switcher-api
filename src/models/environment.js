@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
 
 export const EnvType = Object.freeze({
     DEFAULT: 'default'
@@ -24,6 +25,19 @@ const environmentSchema = new mongoose.Schema({
 }, {
     timestamps: true
 })
+
+environmentSchema.options.toJSON = {
+    getters: true,
+    virtuals: true,
+    minimize: false,
+    transform: function (doc, ret, options) {
+        if (ret.updatedAt || ret.createdAt) {
+            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
+            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
+        }
+        return ret
+    }
+}
 
 environmentSchema.pre('validate', async function (next) {
     const { name, domain } = this

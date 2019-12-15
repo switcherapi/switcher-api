@@ -548,7 +548,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Android\",\n\t\"description\": \"Operational system\",\n\t\"domain\": \"5deac6bc2d61a41fa0a84788\"\n}",
+					"raw": "{\n\t\"name\": \"Android\",\n\t\"description\": \"Operational system\",\n\t\"domain\": \"5df166239194d613400a52e7\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2103,6 +2103,91 @@
 			"response": []
 		},
 		{
+			"name": "Metrics - W/ Filter",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/metric/5df166239194d613400a52e7",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"metric",
+						"5df166239194d613400a52e7"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "FF2FOR2030",
+							"disabled": true
+						},
+						{
+							"key": "component",
+							"value": "Windows",
+							"disabled": true
+						},
+						{
+							"key": "result",
+							"value": "false",
+							"disabled": true
+						},
+						{
+							"key": "group",
+							"value": "Rollout 2030",
+							"disabled": true
+						},
+						{
+							"key": "dateBefore",
+							"value": "2019-12-14 17:06:59",
+							"disabled": true
+						},
+						{
+							"key": "dateAfter",
+							"value": "2019-12-14 17:06:30",
+							"disabled": true
+						},
+						{
+							"key": "sortBy",
+							"value": "result",
+							"description": "Can add params separated by ;",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "3",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "9",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Client - Criteria/Auth (REST)",
 			"event": [
 				{
@@ -2148,7 +2233,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"domain\": \"currency-api\",\n\t\"environment\": \"default\"\n}",
+					"raw": "{\n\t\"domain\": \"currency-api\",\n\t\"component\": \"Android\",\n\t\"environment\": \"default\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2212,7 +2297,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"entry\": [\n\t\t{\n\t\t\t\"strategy\": \"VALUE_VALIDATION\",\n\t\t\t\"input\": \"Roger\"\n\t\t},\n\t\t{\n\t\t\t\"strategy\": \"NETWORK_VALIDATION\",\n\t\t\t\"input\": \"192.168.0.2\"\n    \t}]\n}",
+					"raw": "{\n\t\"entry\": [\n\t\t{\n\t\t\t\"strategy\": \"VALUE_VALIDATION\",\n\t\t\t\"input\": \"Roger\"\n\t\t},\n\t\t{\n\t\t\t\"strategy\": \"NETWORK_VALIDATION\",\n\t\t\t\"input\": \"10.0.0.3\"\n    \t}]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2220,7 +2305,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/criteria?key=FF2FOR2030",
+					"raw": "{{url}}/criteria?showReason=true&showStrategy=true&key=FF2FOR2020",
 					"host": [
 						"{{url}}"
 					],
@@ -2230,13 +2315,11 @@
 					"query": [
 						{
 							"key": "showReason",
-							"value": "true",
-							"disabled": true
+							"value": "true"
 						},
 						{
 							"key": "showStrategy",
-							"value": "true",
-							"disabled": true
+							"value": "true"
 						},
 						{
 							"key": "bypassMetric",
@@ -2245,7 +2328,7 @@
 						},
 						{
 							"key": "key",
-							"value": "FF2FOR2030"
+							"value": "FF2FOR2020"
 						}
 					]
 				}
@@ -2347,7 +2430,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "{\r\n  criteria(\r\n      key: \"FF2FOR2020\", \r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              }\r\n            ]\r\n        ) {\r\n    key\r\n    activated\r\n    result {\r\n        return\r\n        reason\r\n        domain {\r\n            name\r\n            activated\r\n            description\r\n            group {\r\n                name\r\n                activated\r\n                description\r\n                config {\r\n                    key\r\n                    activated\r\n                    description\r\n                    strategies {\r\n                        strategy\r\n                        activated\r\n                        operation\r\n                        values\r\n                    }\r\n                }\r\n            }\r\n        }\r\n        group {\r\n            name\r\n            activated\r\n            description\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n  }\r\n}",
+						"query": "{\r\n  criteria(\r\n      key: \"FF2FOR2020\",\r\n    #   bypassMetric: false,\r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              }\r\n            ]\r\n        ) {\r\n    key\r\n    activated\r\n    result {\r\n        return\r\n        reason\r\n        domain {\r\n            name\r\n            activated\r\n            description\r\n            group {\r\n                name\r\n                activated\r\n                description\r\n                config {\r\n                    key\r\n                    activated\r\n                    description\r\n                    strategies {\r\n                        strategy\r\n                        activated\r\n                        operation\r\n                        values\r\n                    }\r\n                }\r\n            }\r\n        }\r\n        group {\r\n            name\r\n            activated\r\n            description\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n  }\r\n}",
 						"variables": ""
 					}
 				},

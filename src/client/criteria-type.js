@@ -45,8 +45,8 @@ export const criteriaType = new GraphQLObjectType({
         activated: {
             type: GraphQLBoolean,
             resolve: (source, args, { environment }) => {
-                return source.activated.get(environment) === undefined ? 
-                    source.activated.get(EnvType.DEFAULT) : source.activated.get(environment)
+                return source.activated[`${environment}`] === undefined ? 
+                    source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`]
             }
         },
         result: {

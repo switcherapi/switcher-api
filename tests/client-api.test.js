@@ -14,7 +14,8 @@ import {
     groupConfigId,
     domainId,
     domainDocument,
-    configStrategyUSERId
+    configStrategyUSERId,
+    component1
 } from './fixtures/db_client';
 import { EnvType } from '../src/models/environment';
 
@@ -59,6 +60,7 @@ describe("Testing criteria [GraphQL] ", () => {
             .set('switcher-api-key', `${apiKey}`)
             .send({
                 domain: domainDocument.name,
+                component: component1.name,
                 environment: EnvType.DEFAULT
             }).expect(200)
 
@@ -216,6 +218,7 @@ describe("Testing criteria [GraphQL] ", () => {
             .set('switcher-api-key', `${apiKey}`)
             .send({
                 domain: domainDocument.name,
+                component: component1.name,
                 environment: 'QA'
             }).expect(200)
         qaToken = responseToken.body.token
@@ -250,6 +253,7 @@ describe("Testing criteria [GraphQL] ", () => {
             .set('switcher-api-key', `${apiKey}`)
             .send({
                 domain: domainDocument.name,
+                component: component1.name,
                 environment: 'QA'
             }).expect(200)
         qaToken = responseToken.body.token
@@ -361,6 +365,7 @@ describe("Testing domain", () => {
             .set('switcher-api-key', `${apiKey}`)
             .send({
                 domain: domainDocument.name,
+                component: component1.name,
                 environment: EnvType.DEFAULT
             }).expect(200)
 
@@ -648,6 +653,7 @@ describe("Testing criteria [REST] ", () => {
             .set('switcher-api-key', `${apiKey}`)
             .send({
                 domain: domainDocument.name,
+                component: component1.name,
                 environment: EnvType.DEFAULT
             }).expect(200)
 
@@ -767,6 +773,7 @@ describe("Testing criteria [REST] ", () => {
             .set('switcher-api-key', `${responseNewApiKey.body.apiKey}`)
             .send({
                 domain: domainDocument.name,
+                component: component1.name,
                 environment: EnvType.DEFAULT
             }).expect(200)
 

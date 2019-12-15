@@ -2,6 +2,7 @@ import { EnvType } from '../models/environment';
 import Domain from '../models/domain';
 import GroupConfig from '../models/group-config';
 import Config from '../models/config';
+import { addMetrics } from '../models/metric';
 import { ConfigStrategy, processOperation } from '../models/config-strategy';
 
 export async function resolveConfigStrategy(source, _id, strategy, operation, activated, environment) {
@@ -14,7 +15,7 @@ export async function resolveConfigStrategy(source, _id, strategy, operation, ac
         args.activated = { [`${environment}`]: activated }
     }
 
-    return await ConfigStrategy.find({ config: source._id, ...args })
+    return await ConfigStrategy.find({ config: source._id, ...args }).lean()
 }
 
 export async function resolveConfig(source, _id, key, activated, environment) {
@@ -26,7 +27,7 @@ export async function resolveConfig(source, _id, key, activated, environment) {
         args.activated = { [`${environment}`]: activated }
     }
 
-    return await Config.find({ group: source._id, ...args })
+    return await Config.find({ group: source._id, ...args }).lean()
 }
 
 export async function resolveGroupConfig(source, _id, name, activated, environment) {
@@ -38,7 +39,7 @@ export async function resolveGroupConfig(source, _id, name, activated, environme
         args.activated = { [`${environment}`]: activated }
     }
 
-    return await GroupConfig.find({ domain: source._id, ...args })
+    return await GroupConfig.find({ domain: source._id, ...args }).lean()
 }
 
 export async function resolveDomain(_id, name, activated, environment) {
@@ -50,11 +51,11 @@ export async function resolveDomain(_id, name, activated, environment) {
         args.activated = { [`${environment}`]: activated }
     }
 
-    return await Domain.findOne({ ...args })
+    return await Domain.findOne({ ...args }).lean()
 }
 
 export async function resolveFlatConfigurationByConfig(key) {
-    const config = await Config.find({ key });
+    const config = await Config.find({ key }).lean();
     if (config.length > 0) {
         return { config }
     } else {
@@ -63,7 +64,7 @@ export async function resolveFlatConfigurationByConfig(key) {
 }
 
 export async function resolveFlatConfigurationTypeByGroup(groupConfig) {
-    const group = await GroupConfig.find({ name: groupConfig });
+    const group = await GroupConfig.find({ name: groupConfig }).lean();
     if (group.length > 0) {
         return { group }
     } else {
@@ -72,13 +73,13 @@ export async function resolveFlatConfigurationTypeByGroup(groupConfig) {
 }
 
 async function checkGroup(configId) {
-    const config = await Config.findOne({ _id: configId })
-    const group = await GroupConfig.findOne({ _id: config.group })
+    const config = await Config.findOne({ _id: configId }, null, { lean: true })
+    const group = await GroupConfig.findOne({ _id: config.group }, null, { lean: true })
     return group
 }
 
 async function checkConfigStrategies (configId, strategyFilter) {
-    const strategies = await ConfigStrategy.find({ config: configId }, strategyFilter)
+    const strategies = await ConfigStrategy.find({ config: configId }, strategyFilter).lean()
     return strategies
 }
 
@@ -89,52 +90,53 @@ export async function resolveCriteria(config, context, strategyFilter) {
     const group = await checkGroup(config._id)
     const strategies = await checkConfigStrategies(config._id, strategyFilter)
     
-    const result = {
+    let result = {
         domain: context.domain,
         group,
-        strategies
+        strategies,
+        return: true,
+        reason: 'Success'
     }
 
     // Check flags
-    if (config.activated.get(environment) === undefined ? !config.activated.get(EnvType.DEFAULT) : !config.activated.get(environment)) {
+    if (config.activated[`${environment}`] === undefined ? !config.activated[`${EnvType.DEFAULT}`] : !config.activated[`${environment}`]) {
         result.return = false
         result.reason = 'Config disabled'
-        return result
-    } else if (group.activated.get(environment) === undefined ? !group.activated.get(EnvType.DEFAULT) : !group.activated.get(environment)) {
+    } else if (group.activated[`${environment}`] === undefined ? !group.activated[`${EnvType.DEFAULT}`] : !group.activated[`${environment}`]) {
         result.return = false
         result.reason = 'Group disabled'
-        return result
-    } else if (context.domain.activated.get(environment) === undefined ? !context.domain.activated.get(EnvType.DEFAULT) : !context.domain.activated.get(environment)) {
+    } else if (context.domain.activated[`${environment}`] === undefined ? !context.domain.activated[`${EnvType.DEFAULT}`] : !context.domain.activated[`${environment}`]) {
         result.return = false
         result.reason = 'Domain disabled'
-        return result
     }
     
     // Check strategies
-    if (strategies && context.entry) {
+    if (result.return && strategies) {
         for (var i = 0; i < strategies.length; i++) {
-            if (!strategies[i].activated.get(environment)) {
+            if (!strategies[i].activated[`${environment}`]) {
                 continue;
             }
 
-            const input = context.entry.filter(e => e.strategy == strategies[i].strategy)
-            if (input.length > 0) {
+            const input = context.entry ? context.entry.filter(e => e.strategy == strategies[i].strategy) : []
+            if (input.length) {
                 if (!processOperation(strategies[i].strategy, strategies[i].operation, input[0].input, strategies[i].values)) {
                     result.return = false
                     result.reason = `Strategy '${strategies[i].strategy}' does not agree`
-                    return result
+                    break;
                 }
             } else {
                 result.return = false
                 result.reason = `Strategy '${strategies[i].strategy}' did not receive any input`
-                return result
+                break;
             }
         }
     }
 
-    result.return = true
-    result.reason = 'Success'
+    if (!context.bypassMetric && process.env.METRICS_ACTIVATED === 'true') {
+        addMetrics(context, result)
+    }
+
     return result
 }
 
-export const resolveConfigByKey = async (key) => await Config.findOne({ key })
+export const resolveConfigByKey = async (key) => await Config.findOne({ key }, null, { lean: true })

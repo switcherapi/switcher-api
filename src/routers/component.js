@@ -40,7 +40,7 @@ router.get("/component", auth, async (req, res) => {
 
     try {
         const components = await Component.find({ domain: req.query.domain },
-            ['_id', 'name','description'],
+            ['_id', 'name', 'description'],
             {
                 skip: parseInt(req.query.skip),
                 limit: parseInt(req.query.limit),

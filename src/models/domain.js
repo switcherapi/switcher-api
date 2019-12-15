@@ -93,7 +93,7 @@ domainSchema.methods.generateApiKey = async function () {
     return apiKey
 }
 
-domainSchema.methods.generateAuthToken = async function (environment) {
+domainSchema.methods.generateAuthToken = async function (environment, component) {
     const domain = this
 
     var options = {
@@ -102,7 +102,8 @@ domainSchema.methods.generateAuthToken = async function (environment) {
 
     const token = jwt.sign(({ 
         _id: domain.id.toString(), 
-        environment, 
+        environment,
+        component,
         vc: domain.apihash.substring(50, domain.apihash.length-1) 
     }), process.env.JWT_SECRET, options)
 

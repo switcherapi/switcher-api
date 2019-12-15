@@ -21,7 +21,7 @@ export async function recordHistory(modifiedField, oldDocument, newDocument) {
         newValue: newValues
     });
     
-    if (process.env.KEEP_HISTORY === 'true') {
+    if (process.env.HISTORY_ACTIVATED === 'true') {
         await history.save();
     }
 }

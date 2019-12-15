@@ -241,6 +241,9 @@ describe('Testing update Domain info', () => {
     test('DOMAIN_SUITE - Should update Domain info', async () => {
         const oldQuery = await Domain.findById(domainId).select('description')
 
+        let history = await History.find({ elementId: domainId })
+        expect(history.length).toEqual(0)
+
         await request(app)
             .patch('/domain/' + domainId)
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -252,6 +255,10 @@ describe('Testing update Domain info', () => {
         const newQuery = await Domain.findById(domainId).select('description')
         expect(oldQuery).not.toEqual(newQuery)
         expect(newQuery.description).toEqual('Description updated')
+
+        // DB validation - verify history record added
+        history = await History.find({ elementId: domainId })
+        expect(history.length > 0).toEqual(true)
     })
 
     test('DOMAIN_SUITE - Should NOT update Domain info without Master credential', async () => {
@@ -353,6 +360,9 @@ describe('Testing environment configurations', () => {
                 domain: domainId
             }).expect(201)
 
+        let history = await History.find({ elementId: domainId })
+        expect(history.length).toEqual(0)
+
         const response = await request(app)
             .patch('/domain/updateStatus/' + domainId)
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -366,6 +376,11 @@ describe('Testing environment configurations', () => {
         let domain = await Domain.findById(domainId)
         expect(domain.activated.get(EnvType.DEFAULT)).toEqual(true);
         expect(domain.activated.get('QA')).toEqual(true);
+
+        // DB validation - verify history record added
+        history = await History.find({ elementId: domainId })
+        expect(history[0].oldValue.get('activated')[EnvType.DEFAULT]).toEqual(true);
+        expect(history[0].newValue.get('activated')['QA']).toEqual(true);
 
         // Inactivating QA. Default environment should stay activated
         await request(app)

@@ -15,10 +15,14 @@ const queryType = new GraphQLObjectType({
                 },
                 entry: {
                     type: new GraphQLList(strategyInputType)
+                },
+                bypassMetric: {
+                    type: GraphQLBoolean
                 }
             },
-            resolve: async (source, { key, entry }, context) => {
+            resolve: async (source, { key, entry, bypassMetric }, context) => {
                 context.entry = entry
+                context.bypassMetric = bypassMetric
                 return resolveConfigByKey(key)
             }
         },

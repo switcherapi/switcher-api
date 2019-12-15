@@ -3,9 +3,6 @@ import jwt from 'jsonwebtoken';
 import { checkConfig } from '../middleware/validators';
 import { appAuth, appGenerateCredentials } from '../middleware/auth';
 import { resolveCriteria } from '../client/resolvers';
-import { EnvType } from '../models/environment';
-import { addMetrics } from '../models/metric'
-import { compileFunction } from 'vm';
 
 const router = new express.Router()
 
@@ -19,15 +16,11 @@ router.get('/criteria', appAuth, checkConfig, async (req, res) => {
         const domain = req.domain
         const entry = req.body.entry
 
-        const context = { domain, entry, environment }
+        const context = { domain, entry, environment, bypassMetric: req.query.bypassMetric, component: req.component }
 
         const result = await resolveCriteria(req.config, context, 'values description strategy operation activated -_id')
 
         if (result) {
-            if (!req.query.bypassMetric && environment === EnvType.DEFAULT) {
-                addMetrics(req, result)
-            }
-
             delete result.domain
             delete result.group
 
@@ -44,7 +37,6 @@ router.get('/criteria', appAuth, checkConfig, async (req, res) => {
             res.status(500).send({ error: 'Something went wrong while executing the criteria validation' })
         }
     } catch (e) {
-        console.log(e)
         res.status(500).send()
     }
 })

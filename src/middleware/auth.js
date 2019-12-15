@@ -1,9 +1,9 @@
 "use strict";
 
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 import Admin from '../models/admin';
 import Domain from '../models/domain';
+import Component from '../models/component';
 
 export async function auth(req, res, next) {
     try {
@@ -28,7 +28,7 @@ export async function appAuth(req, res, next) {
         const token = req.header('Authorization').replace('Bearer ', '')
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-        const domain = await Domain.findOne({ _id: decoded._id })
+        const domain = await Domain.findOne({ _id: decoded._id }).lean()
         
         if (!domain || domain.apihash.substring(50,domain.apihash.length-1) !== decoded.vc) {
             throw new Error()
@@ -36,6 +36,7 @@ export async function appAuth(req, res, next) {
 
         req.token = token
         req.domain = domain
+        req.component = decoded.component
         req.environment = decoded.environment
         next()
     } catch (e) {
@@ -52,13 +53,19 @@ export async function appGenerateCredentials(req, res, next) {
             throw new Error()
         }
 
-        const token = await domain.generateAuthToken(req.body.environment)
+        const { name } = await Component.findOne({ name: req.body.component })
+
+        if (!name) {
+            throw new Error()
+        }
+
+        const token = await domain.generateAuthToken(req.body.environment, name)
 
         req.token = token
         req.domain = domain
         req.environment = req.body.environment
         next()
     } catch (e) {
-        res.status(401).send({ error: 'Invalid API Key.' })
+        res.status(401).send({ error: 'Invalid token request' })
     }
 }

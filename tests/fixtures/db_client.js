@@ -7,6 +7,7 @@ import GroupConfig from '../../src/models/group-config';
 import Config from '../../src/models/config';
 import Component from '../../src/models/component';
 import History from '../../src/models/history';
+import { Metric } from '../../src/models/metric';
 import { Environment, EnvType } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
 
@@ -140,6 +141,15 @@ export const configStrategyTIME_BETWEENDocument = {
     domain: domainId
 }
 
+export const component1Id = new mongoose.Types.ObjectId()
+export const component1 = {
+    _id: component1Id,
+    name: 'TestApp',
+    description: 'Test app',
+    domain: domainId,
+    owner: adminMasterAccountId
+}
+
 export const setupDatabase = async () => {
     await ConfigStrategy.deleteMany()
     await Config.deleteMany()
@@ -149,6 +159,7 @@ export const setupDatabase = async () => {
     await Environment.deleteMany()
     await Component.deleteMany()
     await History.deleteMany()
+    await Metric.deleteMany()
 
     await new Admin(adminMasterAccount).save()
     await new Environment(environment1).save()
@@ -166,4 +177,5 @@ export const setupDatabase = async () => {
     await new ConfigStrategy(configStrategyCIDRDocument).save()
     await new ConfigStrategy(configStrategyTIME_BETWEENDocument).save()
     await new ConfigStrategy(configStrategyTIME_GREATDocument).save()
+    await new Component(component1).save()
 }
