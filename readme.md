@@ -3,18 +3,18 @@
 - Postman (optional for request examples)
 
 # About  
-Switcher API is an online Feature Flag API used to toggle features over different applications at same time.
+Switcher API is an online Feature Flag API used to toggle features over different applications at the same time.
 
 Main features:
 - It is a remote API. No fixed or immutable configuration files.
 - You no longer only toggle code, but business features. You can set up your eco-system to share switchers between applications.
-- Cross environment. You are still working on your feature but want to keep production environment safe from whatever change you make.
-- Parallel strategies for the same switcher. Your test environemnt does not have the same variable as prodution. You can setup different strategies.
+- Cross environment. You are still working on your feature but want to keep the production environment safe from whatever change you make.
+- Parallel strategies for the same switcher. Your test environment does not have the same variable as production. You can set up different strategies.
 - It keeps track of every configuration change.
 - Produce relevant metrics.
-- High security flow using OAuth 2.0 flow and diferent levels of credentials for administrators.
+- High-security flow using OAuth 2.0 flow and different levels of credentials for administrators.
 - Client URIs exposed in REST and GraphQL.
-- Generate a snapshot from your domain/environment to use with the offline mode of your Switcher Client. (https://github.com/petruki/switcher-client-master)
+- Generate a snapshot from your domain/environment to use with the offline mode of your Switcher Client.  (https://github.com/petruki/switcher-client-master)
 
 # Configuration
 1) npm install
