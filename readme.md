@@ -3,7 +3,7 @@
 - Postman (optional for request examples)
 
 # About  
-Switcher API is an online Feature Flag API used to toggle features over different applications at the same time.
+**Switcher API** is an online *Feature Flag* API used to toggle features over different applications at the same time.
 
 Main features:
 - It is a remote API. No fixed or immutable configuration files.
@@ -12,8 +12,8 @@ Main features:
 - Parallel strategies for the same switcher. Your test environment does not have the same variable as production. You can set up different strategies.
 - It keeps track of every configuration change.
 - Produce relevant metrics.
-- High-security flow using OAuth 2.0 flow and different levels of credentials for administrators.
-- Client URIs exposed in REST and GraphQL.
+- High-security flow using *OAuth 2.0* flow and different levels of credentials for administrators.
+- Client URIs exposed in **REST** and **GraphQL**.
 - Generate a snapshot from your domain/environment to use with the offline mode of your Switcher Client.  (https://github.com/petruki/switcher-client-master)
 
 # Configuration
@@ -61,13 +61,13 @@ Different suites were created to test them separately if you want.
 npm run test-admin
 ```
 
-### Testing using hands-on
+# Testing using hands-on
 Assuming you are running it...
-- {{url}} = endpoint from where you are running.
-- All calls use Bearer Token. Remember to grap the token after signing up.
+- {{url}} = endpoint from where you are running the API.
+- All calls use **Bearer Token**. Remember to grab the token after signing up..
 
-1) Create a master admin user.
-{{url}}/admin/signup [POST]
+**1) Create a master admin user.**
+- {{url}}/admin/signup [POST]
 ```
 {
 	"name": "Master User",
@@ -75,21 +75,21 @@ Assuming you are running it...
 	"password": "12312312312"
 }
 ```
-copy from the response the generated token to use in conjunction with the next steps.
+[x]*copy from the response the generated token to use in conjunction with the next steps.*
 
-2) Create your domain.
-{{url}}/domain/create [POST]
+**2) Create your domain.**
+- {{url}}/domain/create [POST]
 ```
 {
 	"name": "MyCompany Solutions",
 	"description": "Your company/business description here"
 }
 ```
-copy from the response the domain _id for the next step.
-copy from the response your API Key for executing your configuration later on. You can generate it again if you lost it.
+[x]*copy from the response the domain _id for the next step.*
+[x]*copy from the response your API Key for executing your configuration later on. You can generate it again if you lost it.*
 
-3) Create a component.
-{{url}}/component/create [POST]
+**3) Create a component.**
+- {{url}}/component/create [POST]
 ```
 {
 	"name": "MyApp 2.0",
@@ -98,8 +98,8 @@ copy from the response your API Key for executing your configuration later on. Y
 }
 ```
 
-4) Create a switcher group.
-{{url}}/groupconfig/create [POST]
+**4) Create a switcher group.**
+- {{url}}/groupconfig/create [POST]
 ```
 {
 	"name": "Project New Feature",
@@ -107,10 +107,10 @@ copy from the response your API Key for executing your configuration later on. Y
 	"domain": "5df166239194d613400a52e7"
 }
 ```
-copy from the response the group _id for the next step.
+[x]*copy from the response the group _id for the next step.*
 
-5) Create a switcher configuration. This is the one you will use on your application.
-{{url}}/config/create
+**5) Create a switcher configuration. This is the one you will use on your application.**
+- {{url}}/config/create
 ```
 {
 	"key": "NEW_FEATURE",
@@ -118,10 +118,10 @@ copy from the response the group _id for the next step.
 	"group": "5df166429194d613400a52ea"
 }
 ```
-copy from the response the config _id for the next optional step.
+[x]*copy from the response the config _id for the next optional step.*
 
-6) Optional step - Create a strategy for this configuration.
-{{url}}/configstrategy/create
+**6) Optional step - Create a strategy for this configuration.**
+- {{url}}/configstrategy/create
 ```
 {
     "description": "Users allowed to use this new feature",
@@ -134,15 +134,15 @@ copy from the response the config _id for the next optional step.
 ```
 - Field 'env' is only available to set up on strategy creation since its values might not be the same in production environment.
 
-### Using the configuration
+# Using the configuration
 Let's use your configuration. Do you still have the API Key generated when you had created your domain?
 
 * I don't have it anymore. Just proceed calling:
-{{url}}/domain/generateApiKey/{{YOUR_DOMAIN_ID_HERE}} [GET]
-- copy your new API Key
+- {{url}}/domain/generateApiKey/{{YOUR_DOMAIN_ID_HERE}} [GET]
+[x]*copy your new API Key*
 
-1) Getting your token.
-{{url}}/criteria/auth [GET]
+**1) Getting your token.**
+- {{url}}/criteria/auth [GET]
 
 - Header 
 Key: switcher-api-key
@@ -154,10 +154,10 @@ Value: {{YOUR API KEY HERE}}
 	"environment": "default"
 }
 ```
-copy from the response your token.
+[x]*copy from the response your token.*
 
-2) Executing your configuration.
-{{url}}/criteria?key=NEW_FEATURE [GET]
+**2) Executing your configuration.**
+- {{url}}/criteria?key=NEW_FEATURE [GET]
 ```
 {
 	"entry": [
