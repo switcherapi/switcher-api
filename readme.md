@@ -21,35 +21,35 @@ Main features:
 2) Add .env-cmdrc file into the project directory.
 3) Fill it according to the description below.
 
-    {
-        "dev": {
-            "PORT": "3000",
-            "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-dev",
-            "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
-            "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
-            "MAX_EXIST_STRATEGYOPERATION": 100,
-            "HISTORY_ACTIVATED": true,
-            "METRICS_ACTIVATED": true
-        },
-        "prod": {
-            "PORT": "3000",
-            "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-prd",
-            "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
-            "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
-            "MAX_EXIST_STRATEGYOPERATION": 100,
-            "HISTORY_ACTIVATED": false,
-            "METRICS_ACTIVATED": true
-        },
-        "test": {
-            "PORT": "3000",
-            "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-test",
-            "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
-            "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
-            "MAX_EXIST_STRATEGYOPERATION": 100,
-            "HISTORY_ACTIVATED": true,
-            "METRICS_ACTIVATED": true
-        }
+{
+    "dev": {
+        "PORT": "3000",
+        "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-dev",
+        "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
+        "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
+        "MAX_EXIST_STRATEGYOPERATION": 100,
+        "HISTORY_ACTIVATED": true,
+        "METRICS_ACTIVATED": true
+    },
+    "prod": {
+        "PORT": "3000",
+        "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-prd",
+        "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
+        "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
+        "MAX_EXIST_STRATEGYOPERATION": 100,
+        "HISTORY_ACTIVATED": false,
+        "METRICS_ACTIVATED": true
+    },
+    "test": {
+        "PORT": "3000",
+        "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-test",
+        "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
+        "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
+        "MAX_EXIST_STRATEGYOPERATION": 100,
+        "HISTORY_ACTIVATED": true,
+        "METRICS_ACTIVATED": true
     }
+}
 
 # Testing using JEST
 Different suites were created to test them separately if you want.
