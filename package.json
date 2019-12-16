@@ -1,8 +1,12 @@
 {
   "name": "switcher-api",
   "version": "1.0.0",
-  "description": "Feature Flag/Toogle API",
+  "description": "Feature Flag/Toggle API",
   "main": "start.js",
+  "author": {
+    "name": "Rogerio Petruki",
+    "email": "roger.petruki@gmail.com"
+  },
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "env-cmd -e dev nodemon ./src/start.js",
@@ -21,9 +25,10 @@
   },
   "keywords": [
     "feature",
-    "flag"
+    "flag",
+    "toggle",
+    "switcher-api"
   ],
-  "author": "Rogerio Petruki",
   "license": "ISC",
   "dependencies": {
     "@sendgrid/mail": "^6.4.0",
@@ -52,5 +57,9 @@
     "jest": "^24.9.0",
     "nodemon": "^1.19.4",
     "supertest": "^4.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/petruki/switcher-api"
   }
 }
