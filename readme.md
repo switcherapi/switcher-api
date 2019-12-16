@@ -147,10 +147,8 @@ Let's use your configuration. Do you still have the API Key generated when you h
 - {{url}}/criteria/auth [GET]
 
 - Header 
-
-Key: switcher-api-key
-
-Value: {{YOUR API KEY HERE}}
+    - Key: switcher-api-key
+    - Value: {{YOUR API KEY HERE}}
 ```
 {
 	"domain": "MyCompany Solutions",
