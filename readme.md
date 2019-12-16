@@ -21,6 +21,7 @@ Main features:
 2) Add .env-cmdrc file into the project directory.
 3) Fill it according to the description below.
 
+```
 {
     "dev": {
         "PORT": "3000",
@@ -50,6 +51,7 @@ Main features:
         "METRICS_ACTIVATED": true
     }
 }
+```
 
 # Testing using JEST
 Different suites were created to test them separately if you want.
