@@ -75,7 +75,7 @@ Assuming you are running it...
 	"password": "12312312312"
 }
 ```
-[x] *copy from the response the generated token to use in conjunction with the next steps.*
+*copy from the response the generated token to use in conjunction with the next steps.*
 
 **2) Create your domain.**
 - {{url}}/domain/create [POST]
@@ -85,8 +85,8 @@ Assuming you are running it...
 	"description": "Your company/business description here"
 }
 ```
-[x] *copy from the response the domain _id for the next step.*
-[x] *copy from the response your API Key for executing your configuration later on. You can generate it again if you lost it.*
+*copy from the response the domain _id for the next step.*
+*copy from the response your API Key for executing your configuration later on. You can generate it again if you lost it.*
 
 **3) Create a component.**
 - {{url}}/component/create [POST]
@@ -107,7 +107,7 @@ Assuming you are running it...
 	"domain": "5df166239194d613400a52e7"
 }
 ```
-[x] *copy from the response the group _id for the next step.*
+*copy from the response the group _id for the next step.*
 
 **5) Create a switcher configuration. This is the one you will use on your application.**
 - {{url}}/config/create
@@ -118,7 +118,7 @@ Assuming you are running it...
 	"group": "5df166429194d613400a52ea"
 }
 ```
-[x] *copy from the response the config _id for the next optional step.*
+*copy from the response the config _id for the next optional step.*
 
 **6) Optional step - Create a strategy for this configuration.**
 - {{url}}/configstrategy/create
@@ -138,7 +138,7 @@ Assuming you are running it...
 Let's use your configuration. Do you still have the API Key generated when you had created your domain?
 
 - {{url}}/domain/generateApiKey/{{YOUR_DOMAIN_ID_HERE}} [GET]
-[x] *copy your new API Key*
+*copy your new API Key*
 
 **1) Getting your token.**
 - {{url}}/criteria/auth [GET]
@@ -153,7 +153,7 @@ Value: {{YOUR API KEY HERE}}
 	"environment": "default"
 }
 ```
-[x] *copy from the response your token.*
+*copy from the response your token.*
 
 **2) Executing your configuration.**
 - {{url}}/criteria?key=NEW_FEATURE [GET]
