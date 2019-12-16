@@ -65,7 +65,8 @@ npm run test-admin
 Assuming you are running it...
 
 {{url}} = endpoint from where you are running the API.
-- All calls use **Bearer Token**. Remember to grab the token after signing up..
+
+All calls use **Bearer Token**. Remember to grab the token after signing up..
 
 **1) Create a master admin user.**
 - {{url}}/admin/signup [POST]
@@ -79,8 +80,7 @@ Assuming you are running it...
 *copy from the response the generated token to use in conjunction with the next steps.*
 
 **2) Create your domain.**
-
-{{url}}/domain/create [POST]
+- {{url}}/domain/create [POST]
 ```
 {
 	"name": "MyCompany Solutions",
@@ -92,8 +92,7 @@ Assuming you are running it...
 *copy from the response your API Key for executing your configuration later on. You can generate it again if you lost it.*
 
 **3) Create a component.**
-
-{{url}}/component/create [POST]
+- {{url}}/component/create [POST]
 ```
 {
 	"name": "MyApp 2.0",
@@ -103,8 +102,7 @@ Assuming you are running it...
 ```
 
 **4) Create a switcher group.**
-
-{{url}}/groupconfig/create [POST]
+- {{url}}/groupconfig/create [POST]
 ```
 {
 	"name": "Project New Feature",
@@ -115,8 +113,7 @@ Assuming you are running it...
 *copy from the response the group _id for the next step.*
 
 **5) Create a switcher configuration. This is the one you will use on your application.**
-
-{{url}}/config/create
+- {{url}}/config/create
 ```
 {
 	"key": "NEW_FEATURE",
@@ -127,8 +124,7 @@ Assuming you are running it...
 *copy from the response the config _id for the next optional step.*
 
 **6) Optional step - Create a strategy for this configuration.**
-
-{{url}}/configstrategy/create
+- {{url}}/configstrategy/create
 ```
 {
     "description": "Users allowed to use this new feature",
@@ -143,8 +139,7 @@ Assuming you are running it...
 
 # Using the configuration
 Let's use your configuration. Do you still have the API Key generated when you had created your domain?
-
-{{url}}/domain/generateApiKey/{{YOUR_DOMAIN_ID_HERE}} [GET]
+- {{url}}/domain/generateApiKey/{{YOUR_DOMAIN_ID_HERE}} [GET]
 
 *copy your new API Key*
 
