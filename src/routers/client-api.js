@@ -10,7 +10,7 @@ const router = new express.Router()
 // GET /check?key=KEY&showReason=true
 // GET /check?key=KEY&showStrategy=true
 // GET /check?key=KEY&bypassMetric=true
-router.get('/criteria', appAuth, checkConfig, async (req, res) => {
+router.post('/criteria', appAuth, checkConfig, async (req, res) => {
     try {
         const environment = req.environment
         const domain = req.domain
@@ -41,7 +41,7 @@ router.get('/criteria', appAuth, checkConfig, async (req, res) => {
     }
 })
 
-router.get('/criteria/auth', appGenerateCredentials, async (req, res) => {
+router.post('/criteria/auth', appGenerateCredentials, async (req, res) => {
     try {
         const { exp } = jwt.decode(req.token)
         res.send({ token: req.token, exp })

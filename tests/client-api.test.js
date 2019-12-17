@@ -56,7 +56,7 @@ describe("Testing criteria [GraphQL] ", () => {
 
     beforeAll(async () => {
         const response = await request(app)
-            .get('/criteria/auth')
+            .post('/criteria/auth')
             .set('switcher-api-key', `${apiKey}`)
             .send({
                 domain: domainDocument.name,
@@ -214,7 +214,7 @@ describe("Testing criteria [GraphQL] ", () => {
     test('CLIENT_SUITE - It will be activated on QA environment', async () => {
         let qaToken
         const responseToken = await request(app)
-            .get('/criteria/auth')
+            .post('/criteria/auth')
             .set('switcher-api-key', `${apiKey}`)
             .send({
                 domain: domainDocument.name,
@@ -249,7 +249,7 @@ describe("Testing criteria [GraphQL] ", () => {
     test('CLIENT_SUITE - Should return false after changing strategy operation', async () => {
         let qaToken
         const responseToken = await request(app)
-            .get('/criteria/auth')
+            .post('/criteria/auth')
             .set('switcher-api-key', `${apiKey}`)
             .send({
                 domain: domainDocument.name,
@@ -361,7 +361,7 @@ describe("Testing domain", () => {
 
     beforeAll(async () => {
         const response = await request(app)
-            .get('/criteria/auth')
+            .post('/criteria/auth')
             .set('switcher-api-key', `${apiKey}`)
             .send({
                 domain: domainDocument.name,
@@ -649,7 +649,7 @@ describe("Testing criteria [REST] ", () => {
 
     beforeAll(async () => {
         const response = await request(app)
-            .get('/criteria/auth')
+            .post('/criteria/auth')
             .set('switcher-api-key', `${apiKey}`)
             .send({
                 domain: domainDocument.name,
@@ -662,7 +662,7 @@ describe("Testing criteria [REST] ", () => {
 
     test('CLIENT_SUITE - Should return success on a simple CRITERIA response', (done) => {
         request(app)
-            .get(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${token}`)
             .send({
                 entry: [
@@ -685,7 +685,7 @@ describe("Testing criteria [REST] ", () => {
 
     test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Bad login input', (done) => {
         request(app)
-            .get(`/criteria?key=${keyConfig}&showReason=true`)
+            .post(`/criteria?key=${keyConfig}&showReason=true`)
             .set('Authorization', `Bearer ${token}`)
             .send({
                 entry: [
@@ -708,7 +708,7 @@ describe("Testing criteria [REST] ", () => {
 
     test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Invalid KEY', (done) => {
         request(app)
-            .get(`/criteria?key=INVALID_KEY&showReason=true`)
+            .post(`/criteria?key=INVALID_KEY&showReason=true`)
             .set('Authorization', `Bearer ${token}`)
             .send({
                 entry: [
@@ -728,7 +728,7 @@ describe("Testing criteria [REST] ", () => {
 
     test('CLIENT_SUITE - Should NOT return due to a API Key change, then it should return after renewing the token', async () => {
         const firstResponse = await request(app)
-            .get(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${token}`)
             .send({
                 entry: [
@@ -752,7 +752,7 @@ describe("Testing criteria [REST] ", () => {
             .send().expect(201)
 
         const secondResponse = await request(app)
-            .get(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${token}`)
             .send({
                 entry: [
@@ -769,7 +769,7 @@ describe("Testing criteria [REST] ", () => {
         expect(secondResponse.body.error).toEqual('Invalid API token.');
 
         const responseNewToken = await request(app)
-            .get('/criteria/auth')
+            .post('/criteria/auth')
             .set('switcher-api-key', `${responseNewApiKey.body.apiKey}`)
             .send({
                 domain: domainDocument.name,
@@ -780,7 +780,7 @@ describe("Testing criteria [REST] ", () => {
         token = responseNewToken.body.token
 
         await request(app)
-            .get(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${token}`)
             .send({
                 entry: [
