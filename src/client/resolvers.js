@@ -90,28 +90,28 @@ export async function resolveCriteria(config, context, strategyFilter) {
     const group = await checkGroup(config._id)
     const strategies = await checkConfigStrategies(config._id, strategyFilter)
     
-    let result = {
+    let response = {
         domain: context.domain,
         group,
         strategies,
-        return: true,
+        result: true,
         reason: 'Success'
     }
 
     // Check flags
     if (config.activated[`${environment}`] === undefined ? !config.activated[`${EnvType.DEFAULT}`] : !config.activated[`${environment}`]) {
-        result.return = false
-        result.reason = 'Config disabled'
+        response.result = false
+        response.reason = 'Config disabled'
     } else if (group.activated[`${environment}`] === undefined ? !group.activated[`${EnvType.DEFAULT}`] : !group.activated[`${environment}`]) {
-        result.return = false
-        result.reason = 'Group disabled'
+        response.result = false
+        response.reason = 'Group disabled'
     } else if (context.domain.activated[`${environment}`] === undefined ? !context.domain.activated[`${EnvType.DEFAULT}`] : !context.domain.activated[`${environment}`]) {
-        result.return = false
-        result.reason = 'Domain disabled'
+        response.result = false
+        response.reason = 'Domain disabled'
     }
     
     // Check strategies
-    if (result.return && strategies) {
+    if (response.result && strategies) {
         for (var i = 0; i < strategies.length; i++) {
             if (!strategies[i].activated[`${environment}`]) {
                 continue;
@@ -120,23 +120,23 @@ export async function resolveCriteria(config, context, strategyFilter) {
             const input = context.entry ? context.entry.filter(e => e.strategy == strategies[i].strategy) : []
             if (input.length) {
                 if (!processOperation(strategies[i].strategy, strategies[i].operation, input[0].input, strategies[i].values)) {
-                    result.return = false
-                    result.reason = `Strategy '${strategies[i].strategy}' does not agree`
+                    response.result = false
+                    response.reason = `Strategy '${strategies[i].strategy}' does not agree`
                     break;
                 }
             } else {
-                result.return = false
-                result.reason = `Strategy '${strategies[i].strategy}' did not receive any input`
+                response.result = false
+                response.reason = `Strategy '${strategies[i].strategy}' did not receive any input`
                 break;
             }
         }
     }
 
     if (!context.bypassMetric && process.env.METRICS_ACTIVATED === 'true') {
-        addMetrics(context, result)
+        addMetrics(context, response)
     }
 
-    return result
+    return response
 }
 
 export const resolveConfigByKey = async (key) => await Config.findOne({ key }, null, { lean: true })

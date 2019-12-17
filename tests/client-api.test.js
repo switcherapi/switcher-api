@@ -79,14 +79,14 @@ describe("Testing criteria [GraphQL] ", () => {
                         key: "${keyConfig}", 
                         entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
                                 { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { result { return reason } }
+                        ) { response { result reason } }
                 }  
             `})
             .expect(200)
             .end((err, res) => {
                 const expected = `
                     {
-                        "data": { "criteria": { "result": { "return": true, "reason": "Success" } } }
+                        "data": { "criteria": { "response": { "result": true, "reason": "Success" } } }
                     }`;
                 
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
@@ -104,14 +104,14 @@ describe("Testing criteria [GraphQL] ", () => {
                         key: "${keyConfig}", 
                         entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_4" },
                                 { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { result { return reason } }
+                        ) { response { result reason } }
                 }  
             `})
             .expect(200)
             .end((err, res) => {
                 const expected = `
                     {
-                        "data": { "criteria": { "result": { "return": false, "reason": "Strategy '${StrategiesType.VALUE}' does not agree" } } }
+                        "data": { "criteria": { "response": { "result": false, "reason": "Strategy '${StrategiesType.VALUE}' does not agree" } } }
                     }`;
                 
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
@@ -128,14 +128,14 @@ describe("Testing criteria [GraphQL] ", () => {
                     criteria(
                         key: "${keyConfig}", 
                         entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_2" }]
-                        ) { result { return reason } }
+                        ) { response { result reason } }
                 }  
             `})
             .expect(200)
             .end((err, res) => {
                 const expected = `
                     {
-                        "data": { "criteria": { "result": { "return": false, "reason": "Strategy '${StrategiesType.NETWORK}' did not receive any input" } } }
+                        "data": { "criteria": { "response": { "result": false, "reason": "Strategy '${StrategiesType.NETWORK}' did not receive any input" } } }
                     }`;
                 
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
@@ -153,7 +153,7 @@ describe("Testing criteria [GraphQL] ", () => {
                         key: "INVALID_KEY", 
                         entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
                                 { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { result { return reason } }
+                        ) { response { result reason } }
                 } 
             `})
             .expect(200)
@@ -174,14 +174,14 @@ describe("Testing criteria [GraphQL] ", () => {
                         key: "${keyConfig}", 
                         entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
                                 { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { result { return reason } }
+                        ) { response { result reason } }
                 }  
             `})
             .expect(200);
 
         let expected = `
             {
-                "data": { "criteria": { "result": { "return": true, "reason": "Success" } } }
+                "data": { "criteria": { "response": { "result": true, "reason": "Success" } } }
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
@@ -198,14 +198,14 @@ describe("Testing criteria [GraphQL] ", () => {
                         key: "${keyConfig}", 
                         entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
                                 { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { result { return reason } }
+                        ) { response { result reason } }
                 }  
             `})
             .expect(200);
 
         const expected = `
             {
-                "data": { "criteria": { "result": { "return": false, "reason": "Config disabled" } } }
+                "data": { "criteria": { "response": { "result": false, "reason": "Config disabled" } } }
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
@@ -233,14 +233,14 @@ describe("Testing criteria [GraphQL] ", () => {
                         key: "${keyConfig}", 
                         entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
                                 { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { result { return reason } }
+                        ) { response { result reason } }
                 }  
             `})
             .expect(200);
 
         const expected = `
             {
-                "data": { "criteria": { "result": { "return": true, "reason": "Success" } } }
+                "data": { "criteria": { "response": { "result": true, "reason": "Success" } } }
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
@@ -269,14 +269,14 @@ describe("Testing criteria [GraphQL] ", () => {
                         key: "${keyConfig}", 
                         entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
                                 { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { result { return reason } }
+                        ) { response { result reason } }
                 }  
             `})
             .expect(200);
 
         const expected = `
             {
-                "data": { "criteria": { "result": { "return": false, "reason": "Strategy '${StrategiesType.VALUE}' does not agree" } } }
+                "data": { "criteria": { "response": { "result": false, "reason": "Strategy '${StrategiesType.VALUE}' does not agree" } } }
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
@@ -293,14 +293,14 @@ describe("Testing criteria [GraphQL] ", () => {
                         key: "${keyConfig}", 
                         entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
                                 { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { result { return reason } }
+                        ) { response { result reason } }
                 }  
             `})
             .expect(200);
 
         const expected = `
             {
-                "data": { "criteria": { "result": { "return": true, "reason": "Success" } } }
+                "data": { "criteria": { "response": { "result": true, "reason": "Success" } } }
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
@@ -317,14 +317,14 @@ describe("Testing criteria [GraphQL] ", () => {
                         key: "${keyConfig}", 
                         entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
                                 { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { result { return reason } }
+                        ) { response { result reason } }
                 }  
             `})
             .expect(200);
 
         const expected = `
             {
-                "data": { "criteria": { "result": { "return": false, "reason": "Group disabled" } } }
+                "data": { "criteria": { "response": { "result": false, "reason": "Group disabled" } } }
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
@@ -342,14 +342,14 @@ describe("Testing criteria [GraphQL] ", () => {
                         key: "${keyConfig}", 
                         entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
                                 { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { result { return reason } }
+                        ) { response { result reason } }
                 }  
             `})
             .expect(200);
 
         const expected = `
             {
-                "data": { "criteria": { "result": { "return": false, "reason": "Domain disabled" } } }
+                "data": { "criteria": { "response": { "result": false, "reason": "Domain disabled" } } }
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
@@ -678,7 +678,7 @@ describe("Testing criteria [REST] ", () => {
             .end((err, { body }) => {
                 expect(body.strategies.length).toEqual(4);
                 expect(body.reason).toEqual('Success');
-                expect(body.return).toBe(true);
+                expect(body.result).toBe(true);
                 done();
             })
     })
@@ -701,7 +701,7 @@ describe("Testing criteria [REST] ", () => {
             .end((err, { body }) => {
                 expect(body.strategies).toBe(undefined)
                 expect(body.reason).toEqual(`Strategy '${StrategiesType.VALUE}' does not agree`);
-                expect(body.return).toBe(false);
+                expect(body.result).toBe(false);
                 done();
             })
     })
@@ -744,7 +744,7 @@ describe("Testing criteria [REST] ", () => {
     
         expect(firstResponse.body.strategies.length).toEqual(4);
         expect(firstResponse.body.reason).toEqual('Success');
-        expect(firstResponse.body.return).toBe(true);
+        expect(firstResponse.body.result).toBe(true);
 
         const responseNewApiKey = await request(app)
             .get('/domain/generateApiKey/' + domainId)

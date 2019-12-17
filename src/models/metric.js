@@ -50,15 +50,15 @@ metricSchema.options.toJSON = {
     }
 }
 
-export function addMetrics(context, result) {
+export function addMetrics(context, response) {
     const metric = new Metric({
         key: context.key,
         component: context.component,
         entry: context.entry,
-        result: result.return,
-        reason: result.reason,
-        group: result.group.name,
-        domain: result.domain._id,
+        result: response.result,
+        reason: response.reason,
+        group: response.group.name,
+        domain: response.domain._id,
         date: Date.now()
     })
     metric.save()

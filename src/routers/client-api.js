@@ -18,21 +18,21 @@ router.post('/criteria', appAuth, checkConfig, async (req, res) => {
 
         const context = { domain, entry, environment, bypassMetric: req.query.bypassMetric, component: req.component }
 
-        const result = await resolveCriteria(req.config, context, 'values description strategy operation activated -_id')
+        const response = await resolveCriteria(req.config, context, 'values description strategy operation activated -_id')
 
-        if (result) {
-            delete result.domain
-            delete result.group
+        if (response) {
+            delete response.domain
+            delete response.group
 
             if (!req.query.showReason) {
-                delete result.reason
+                delete response.reason
             }
 
             if (!req.query.showStrategy) {
-                delete result.strategies
+                delete response.strategies
             }
 
-            res.send(result)
+            res.send(response)
         } else {
             res.status(500).send({ error: 'Something went wrong while executing the criteria validation' })
         }

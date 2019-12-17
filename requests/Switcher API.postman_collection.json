@@ -2203,9 +2203,6 @@
 					}
 				}
 			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"auth": {
 					"type": "apikey",
@@ -2222,7 +2219,7 @@
 						}
 					]
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
@@ -2272,9 +2269,6 @@
 		},
 		{
 			"name": "Client - Criteria (REST) - Input",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -2286,7 +2280,7 @@
 						}
 					]
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
@@ -2337,9 +2331,6 @@
 		},
 		{
 			"name": "Client - Criteria (REST)",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -2351,7 +2342,7 @@
 						}
 					]
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
@@ -2370,7 +2361,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/criteria?showReason=true&showStrategy=true&key=FF2FOR2030",
+					"raw": "{{url}}/criteria?key=FF2FOR2030",
 					"host": [
 						"{{url}}"
 					],
@@ -2380,11 +2371,13 @@
 					"query": [
 						{
 							"key": "showReason",
-							"value": "true"
+							"value": "true",
+							"disabled": true
 						},
 						{
 							"key": "showStrategy",
-							"value": "true"
+							"value": "true",
+							"disabled": true
 						},
 						{
 							"key": "bypassMetric",
@@ -2430,7 +2423,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "{\r\n  criteria(\r\n      key: \"FF2FOR2020\",\r\n    #   bypassMetric: false,\r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              }\r\n            ]\r\n        ) {\r\n    key\r\n    activated\r\n    result {\r\n        return\r\n        reason\r\n        domain {\r\n            name\r\n            activated\r\n            description\r\n            group {\r\n                name\r\n                activated\r\n                description\r\n                config {\r\n                    key\r\n                    activated\r\n                    description\r\n                    strategies {\r\n                        strategy\r\n                        activated\r\n                        operation\r\n                        values\r\n                    }\r\n                }\r\n            }\r\n        }\r\n        group {\r\n            name\r\n            activated\r\n            description\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n  }\r\n}",
+						"query": "{\r\n  criteria(\r\n      key: \"FF2FOR2020\",\r\n    #   bypassMetric: false,\r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              }\r\n            ]\r\n        ) {\r\n    key\r\n    activated\r\n    response {\r\n        result\r\n        reason\r\n        domain {\r\n            name\r\n            activated\r\n            description\r\n            group {\r\n                name\r\n                activated\r\n                description\r\n                config {\r\n                    key\r\n                    activated\r\n                    description\r\n                    strategies {\r\n                        strategy\r\n                        activated\r\n                        operation\r\n                        values\r\n                    }\r\n                }\r\n            }\r\n        }\r\n        group {\r\n            name\r\n            activated\r\n            description\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n  }\r\n}",
 						"variables": ""
 					}
 				},
@@ -2464,7 +2457,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "{\r\n  criteria(\r\n      key: \"FF2FOR2030\", \r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              },\r\n              {\r\n                  strategy: \"NETWORK_VALIDATION\", \r\n                  input: \"192.168.0.2\"\r\n              }\r\n            ]\r\n        ) {\r\n    result {\r\n        return\r\n        reason\r\n    }\r\n  }\r\n}",
+						"query": "{\r\n  criteria(\r\n      key: \"FF2FOR2030\", \r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              },\r\n              {\r\n                  strategy: \"NETWORK_VALIDATION\", \r\n                  input: \"192.168.0.2\"\r\n              }\r\n            ]\r\n        ) {\r\n    response {\r\n        result\r\n        reason\r\n    }\r\n  }\r\n}",
 						"variables": ""
 					}
 				},

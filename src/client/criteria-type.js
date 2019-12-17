@@ -15,10 +15,10 @@ export const strategyInputType = new GraphQLInputObjectType({
     }
 })
 
-export const resultType = new GraphQLObjectType({
+export const responseType = new GraphQLObjectType({
     name: 'Result',
     fields: {
-        return: {
+        result: {
             type: GraphQLBoolean  
         },
         reason: {
@@ -49,8 +49,8 @@ export const criteriaType = new GraphQLObjectType({
                     source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`]
             }
         },
-        result: {
-            type: resultType,
+        response: {
+            type: responseType,
             resolve: (source, params, context) => {
                 return resolveCriteria(source, context)
             }
