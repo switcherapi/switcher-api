@@ -1,2 +1,8 @@
 node_modules/
 .env-cmdrc
+*.coveralls*
+coverage.html
+coverage
+.nyc_output
+package-lock.json
+dist
