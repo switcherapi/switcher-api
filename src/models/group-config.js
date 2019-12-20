@@ -76,7 +76,7 @@ groupConfigSchema.pre('remove', async function (next) {
     const config = await Config.find({ group: new ObjectId(group._id) })
 
     if (config) {
-        config.forEach((c) => c.remove())
+        config.forEach(async (c) => await c.remove())
     }
 
     const history = await History.find({ elementId: group._id })

@@ -132,12 +132,12 @@ domainSchema.pre('remove', async function (next) {
     const domain = this
     const group = await GroupConfig.find({ domain: new ObjectId(domain._id) })
     if (group) {
-        group.forEach((g) => g.remove())
+        group.forEach(async (g) => await g.remove())
     }
 
     const environment = await Environment.find({ domain: new ObjectId(domain._id) })
     if (environment) {
-        environment.forEach((e) => e.remove())
+        environment.forEach(async (e) => await e.remove())
     }
 
     const history = await History.find({ elementId: new ObjectId(domain._id) })

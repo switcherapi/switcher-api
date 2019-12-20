@@ -136,7 +136,7 @@ adminSchema.pre('remove', async function (next) {
     const domain = await Domain.find({ owner: new ObjectId(admin._id) })
 
     if (domain) {
-        domain.forEach((d) => d.remove())
+        domain.forEach(async (d) => await d.remove())
     }
 
     next()
