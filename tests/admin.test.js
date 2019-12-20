@@ -349,7 +349,7 @@ describe('Testing Domain logout', () => {
         expect(adminAfter.tokens.length).toEqual(0)
     })
 
-    test('ADMIN_SUITE - Should delete/me account for admin', async () => {
+    test.only('ADMIN_SUITE - Should delete/me account for admin', async () => {
         const responseLogin = await request(app)
             .post('/admin/login')
             .send({
@@ -363,6 +363,8 @@ describe('Testing Domain logout', () => {
             .send()
             .expect(200)
         
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         const admin = await Admin.findById(adminMasterAccountId)
         expect(admin).toBeNull()
 
