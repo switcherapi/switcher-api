@@ -349,7 +349,7 @@ describe('Testing Domain logout', () => {
         expect(adminAfter.tokens.length).toEqual(0)
     })
 
-    test.only('ADMIN_SUITE - Should delete/me account for admin', async () => {
+    test('ADMIN_SUITE - Should delete/me account for admin', async () => {
         const responseLogin = await request(app)
             .post('/admin/login')
             .send({
