@@ -104,17 +104,9 @@ router.patch('/component/:id', [
 router.delete('/component/:id', auth, masterPermission('delete Components'), async (req, res) => {
     try {
         const component = await Component.findById(req.params.id)
-
-        if (!component) {
-            return res.status(404).send()
-        }
-
-        try {
-            await component.remove()
-            res.send(component)
-        } catch (e) {
-            return res.status(500).send()
-        }
+        
+        await component.remove()
+        res.send(component)
     } catch (e) {
         res.status(404).send()
     }

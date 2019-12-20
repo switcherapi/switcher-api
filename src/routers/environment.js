@@ -101,12 +101,10 @@ router.patch('/environment/recover/:id', auth, masterPermission('recover Environ
         }
 
         try {
-            await removeDomainStatus(environment.domain, environment.name)
-
-            const groupConfigs = await GroupConfig.find({ domain: environment.domain })
-            if (groupConfigs.length) {
-                groupConfigs.forEach(async function(group) {
-                    await removeGroupStatus(group._id, environment.name)
+            const strategies = await ConfigStrategy.find({ domain: environment.domain })
+            if (strategies.length) {
+                strategies.forEach(async function(strategy) {
+                    await removeConfigStrategyStatus(strategy._id, environment.name)
                 })
             }
 
@@ -117,12 +115,14 @@ router.patch('/environment/recover/:id', auth, masterPermission('recover Environ
                 })
             }
 
-            const strategies = await ConfigStrategy.find({ domain: environment.domain })
-            if (strategies.length) {
-                strategies.forEach(async function(strategy) {
-                    await removeConfigStrategyStatus(strategy._id, environment.name)
+            const groupConfigs = await GroupConfig.find({ domain: environment.domain })
+            if (groupConfigs.length) {
+                groupConfigs.forEach(async function(group) {
+                    await removeGroupStatus(group._id, environment.name)
                 })
             }
+            
+            await removeDomainStatus(environment.domain, environment.name)
 
             res.send({ message: `Environment '${environment.name}' recovered` })
         } catch (e) {

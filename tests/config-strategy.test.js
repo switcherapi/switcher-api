@@ -701,6 +701,7 @@ describe('Testing fetch strategies', () => {
         const strategy = await ConfigStrategy.findById(configStrategyId)
         expect(strategy.activated.get(EnvType.DEFAULT)).toEqual(false);
     })
+
 })
 
 describe('Scenario: creating QA environment after innactivate PRD switch', () => {

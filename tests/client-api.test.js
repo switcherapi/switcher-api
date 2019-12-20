@@ -94,6 +94,96 @@ describe("Testing criteria [GraphQL] ", () => {
             })
     })
 
+    test('CLIENT_SUITE - Should return success on Flat view resolved by Group name', (done) => {
+        request(app)
+            .post('/graphql')
+            .set('Authorization', `Bearer ${token}`)
+            .send({ query: `
+                {
+                    configuration(group: "Group Test") {
+                        domain { name description activated }
+                        group { name description activated }
+                        config { key description activated }
+                        strategies { strategy activated operation values }
+                    }
+                }  
+            `})
+            .expect(200)
+            .end((err, res) => {
+                const expected = `
+                {"data":{"configuration":{"domain":{"name":"Domain","description":"Test Domain","activated":true},"group":[{"name":"Group Test","description":"Test Group","activated":true}],"config":[{"key":"TEST_CONFIG_KEY","description":"Test config 1","activated":true},{"key":"TEST_CONFIG_KEY_PRD_QA","description":"Test config 2 - Off in PRD and ON in QA","activated":false}],"strategies":null}}}`;
+                
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                done();
+            })
+    })
+
+    test('CLIENT_SUITE - Should NOT return on Flat view resolved by an unknown Group name', (done) => {
+        request(app)
+            .post('/graphql')
+            .set('Authorization', `Bearer ${token}`)
+            .send({ query: `
+                {
+                    configuration(group: "UNKNOWN GROUP NAME") {
+                        domain { name description activated }
+                        group { name description activated }
+                        config { key description activated }
+                        strategies { strategy activated operation values }
+                    }
+                }  
+            `})
+            .expect(200)
+            .end((err, res) => {
+                expect(JSON.parse(res.text).data.configuration).toEqual(null);
+                done();
+            })
+    })
+
+    test('CLIENT_SUITE - Should return success on Flat view resolved by Config Key', (done) => {
+        request(app)
+            .post('/graphql')
+            .set('Authorization', `Bearer ${token}`)
+            .send({ query: `
+                {
+                    configuration(key: "${keyConfig}") {
+                        domain { name description activated }
+                        group { name description activated }
+                        config { key description activated }
+                        strategies { strategy activated operation values }
+                    }
+                }  
+            `})
+            .expect(200)
+            .end((err, res) => {
+                const expected = `
+                {"data":{"configuration":{"domain":{"name":"Domain","description":"Test Domain","activated":true},"group":[{"name":"Group Test","description":"Test Group","activated":true}],"config":[{"key":"TEST_CONFIG_KEY","description":"Test config 1","activated":true}],"strategies":[{"strategy":"VALUE_VALIDATION","activated":true,"operation":"EXIST","values":["USER_1","USER_2","USER_3"]},{"strategy":"NETWORK_VALIDATION","activated":true,"operation":"EXIST","values":["10.0.0.0/24"]},{"strategy":"TIME_VALIDATION","activated":false,"operation":"BETWEEN","values":["13:00","14:00"]},{"strategy":"DATE_VALIDATION","activated":false,"operation":"GREATER","values":["2019-12-01T13:00"]}]}}}`;
+                
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                done();
+            })
+    })
+
+    test('CLIENT_SUITE - Should NOT return on Flat view resolved by an unknown Config Key', (done) => {
+        request(app)
+            .post('/graphql')
+            .set('Authorization', `Bearer ${token}`)
+            .send({ query: `
+                {
+                    configuration(key: "UNKNOWN_CONFIG_KEY") {
+                        domain { name description activated }
+                        group { name description activated }
+                        config { key description activated }
+                        strategies { strategy activated operation values }
+                    }
+                }  
+            `})
+            .expect(200)
+            .end((err, res) => {
+                expect(JSON.parse(res.text).data.configuration).toEqual(null);
+                done();
+            })
+    })
+
     test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Bad login input', (done) => {
         request(app)
             .post('/graphql')
@@ -380,24 +470,10 @@ describe("Testing domain", () => {
             .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
-                    domain(name: "Domain") {
-                        name
-                        description
-                        activated
-                        group(activated: true) {
-                            name
-                            description
-                            activated
-                            config(activated: true) {
-                                key
-                                description
-                                activated
-                                strategies(activated: true) {
-                                    strategy
-                                    activated
-                                    operation
-                                    values
-                                }
+                    domain(name: "Domain") { name description activated
+                        group(activated: true) { name description activated
+                            config(activated: true) { key description activated
+                                strategies(activated: true) { strategy activated operation  values }
                             }
                         }
                     }
@@ -462,24 +538,10 @@ describe("Testing domain", () => {
             .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
-                    domain(name: "Domain") {
-                        name
-                        description
-                        activated
-                        group(activated: true) {
-                            name
-                            description
-                            activated
-                            config(activated: true) {
-                                key
-                                description
-                                activated
-                                strategies(activated: false) {
-                                    strategy
-                                    activated
-                                    operation
-                                    values
-                                }
+                    domain(name: "Domain") { name description activated
+                        group(activated: true) { name description activated
+                            config(activated: true) { key description activated
+                                strategies(activated: false) { strategy activated operation values }
                             }
                         }
                     }
@@ -543,24 +605,10 @@ describe("Testing domain", () => {
             .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
-                    domain(name: "Domain") {
-                        name
-                        description
-                        activated
-                        group(activated: false) {
-                            name
-                            description
-                            activated
-                            config(activated: false) {
-                                key
-                                description
-                                activated
-                                strategies(activated: false) {
-                                    strategy
-                                    activated
-                                    operation
-                                    values
-                                }
+                    domain(name: "Domain") { name description activated
+                        group(activated: false) { name description activated
+                            config(activated: false) { key description activated
+                                strategies(activated: false) { strategy activated operation values }
                             }
                         }
                     }
@@ -593,24 +641,10 @@ describe("Testing domain", () => {
             .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
-                    domain(name: "Domain") {
-                        name
-                        description
-                        activated
-                        group(activated: true) {
-                            name
-                            description
-                            activated
-                            config(activated: false) {
-                                key
-                                description
-                                activated
-                                strategies(activated: false) {
-                                    strategy
-                                    activated
-                                    operation
-                                    values
-                                }
+                    domain(name: "Domain") { name description activated
+                        group(activated: true) { name description activated
+                            config(activated: false) { key description activated
+                                strategies(activated: false) { strategy activated operation values }
                             }
                         }
                     }

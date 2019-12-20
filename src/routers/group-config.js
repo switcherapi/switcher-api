@@ -35,7 +35,7 @@ router.post('/groupconfig/create', auth, async (req, res) => {
 // GET /groupconfig?limit=10&skip=20
 // GET /groupconfig?sortBy=createdAt:desc
 // GET /groupconfig?domain=ID
-router.get("/groupconfig", auth, async (req, res) => {
+router.get('/groupconfig', auth, async (req, res) => {
     const match = {}
     const sort = {}
 
@@ -173,13 +173,9 @@ router.patch('/groupconfig/:id', auth, async (req, res) => {
             return res.status(404).send({ error: 'Group not found' })
         }
 
-        try {
-            updates.forEach((update) => groupconfig[update] = req.body[update])
-            await groupconfig.save()
-            res.send(groupconfig)
-        } catch (e) {
-            res.status(400).send(e)
-        }
+        updates.forEach((update) => groupconfig[update] = req.body[update])
+        await groupconfig.save()
+        res.send(groupconfig)
     } catch (e) {
         res.status(404).send({ error: 'Group not found' })
     }

@@ -130,6 +130,13 @@ describe('Testing fect Domain info', () => {
             .send().expect(200)
 
         expect(response.body.length).toEqual(2)
+
+        response = await request(app)
+            .get('/domain?limit=1')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(200)
+
+        expect(response.body.length).toEqual(1)
     })
 
     test('DOMAIN_SUITE - Should get Domain information by Id', async () => {
@@ -261,6 +268,16 @@ describe('Testing update Domain info', () => {
         expect(history.length > 0).toEqual(true)
     })
 
+    test('DOMAIN_SUITE - Should NOT update Domain info', async () => {
+        await request(app)
+            .patch('/domain/UNKNOWN_DOMAIN_ID')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                description: 'Description updated'
+            }).expect(404)
+
+    })
+
     test('DOMAIN_SUITE - Should NOT update Domain info without Master credential', async () => {
         const responseLogin = await request(app)
             .post('/admin/login')
@@ -293,6 +310,26 @@ describe('Testing update Domain info', () => {
         // DB validation - verify status updated
         const domain = await Domain.findById(domainId)
         expect(domain.activated.get(EnvType.DEFAULT)).toEqual(false);
+    })
+
+    test('DOMAIN_SUITE - Should NOT update environment status given an unknown Domain ID ', async () => {
+        await request(app)
+            .patch('/domain/updateStatus/UNKNOWN_DOMAIN_ID')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                default: false
+            }).expect(404);
+    })
+
+    test('DOMAIN_SUITE - Should NOT update environment status given an unknown environment name ', async () => {
+        const response = await request(app)
+            .patch('/domain/updateStatus/' + domainId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                UNKNWON_ENV_NAME: false
+            }).expect(400);
+        
+        expect(response.body.error).toEqual('Invalid updates');
     })
 
     test('DOMAIN_SUITE - Should record changes on history collection', async () => {
@@ -399,15 +436,6 @@ describe('Testing environment configurations', () => {
         await request(app)
             .patch('/domain/updateStatus/' + domainId)
             .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
-            .send({
-                default: false
-            }).expect(400);
-    })
-
-    test('DOMAIN_SUITE - Should NOT update Domain environment status - Domain not fould', async () => {
-        await request(app)
-            .patch('/domain/updateStatus/FAKE_DOMAIN')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send({
                 default: false
             }).expect(400);

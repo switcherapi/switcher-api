@@ -46,7 +46,7 @@ router.post('/domain/create', auth, masterPermission('create Domains'), async (r
 
 // GET /domain?limit=10&skip=20
 // GET /domain?sortBy=createdAt:desc
-router.get("/domain", auth, async (req, res) => {
+router.get('/domain', auth, async (req, res) => {
     const match = {}
     const sort = {}
 
@@ -155,33 +155,35 @@ router.patch('/domain/:id', auth, masterPermission('update Domain'), async (req,
 
     try {
         const domain = await Domain.findOne({ _id: req.params.id })
-        
-        if (!domain) {
-            return res.status(404).send()
-        }
 
-        updates.forEach((update) => domain[update] = req.body[update])
-        await domain.save()
-        res.send(domain)
+        try {
+            updates.forEach((update) => domain[update] = req.body[update])
+
+            await domain.save()
+            res.send(domain)
+        } catch (e) {
+            res.status(400).send(e)
+        }
     } catch (e) {
-        res.status(400).send(e)
+        return res.status(404).send()
     }
 })
 
 router.patch('/domain/updateStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
-    try {
-        const updates = await checkEnvironmentStatusChange(req, res, req.params.id)
+    try {    
         const domain = await Domain.findOne({ _id: req.params.id })
-        
-        if (!domain) {
-            return res.status(404).send()
+
+        try {
+            const updates = await checkEnvironmentStatusChange(req, res, req.params.id)
+
+            updates.forEach((update) => domain.activated.set(update, req.body[update]))
+            await domain.save()
+            res.send(domain)
+        } catch (e) {
+            res.status(400).send({ error: e.message })
         }
-        
-        updates.forEach((update) => domain.activated.set(update, req.body[update]))
-        await domain.save()
-        res.send(domain)
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        return res.status(404).send()
     }
 })
 

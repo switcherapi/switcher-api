@@ -38,14 +38,3 @@ export async function checkEnvironmentStatusChange (req, res, domain) {
 
     return updates
 }
-
-export async function checkEnvironmentStatusRemoval(req, res, domain, strategy = false) {
-    const environment = await Environment.find({ domain }).select('name -_id')
-    const isValidOperation = environment.filter((e) => 
-        e.name === req.body.env && 
-        !strategy ? req.body.env !== EnvType.DEFAULT : strategy).length > 0
-        
-    if (!isValidOperation) {
-        throw new Error('Invalid environment')
-    }
-}

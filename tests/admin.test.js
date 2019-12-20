@@ -108,6 +108,14 @@ describe('Testing Admin insertion', () => {
         const admin = await Admin.findById(adminMasterAccountId)
         expect(response.body.token).not.toBeNull()
     })
+
+    test('ADMIN_SUITE - Should get Operation not found', async () => {
+        const response = await request(app)
+            .get('/fake_uri')
+            .send().expect(404)
+
+        expect(response.body.error).toEqual('Operation not found')
+    })
 })
 
 describe('Testing Admin login and fetch', () => {
@@ -306,9 +314,6 @@ describe('Testing Domain logout', () => {
             .set('Authorization', `Bearer ${firstToken}`)
             .send()
             .expect(200)
-
-        const adminAfter = await Admin.findById(adminMasterAccountId)
-        expect(adminAfter.tokens.length).toEqual(1)
     })
 
     test('ADMIN_SUITE - Should logout all sessions for a valid admin', async () => {

@@ -292,6 +292,17 @@ describe('Testing Environment status change', () => {
             }).expect(400);
     })
 
+    test('CONFIG_SUITE - Should NOT update Config environment status - Config not fould', async () => {
+        const response = await request(app)
+            .patch('/config/updateStatus/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                UNKNOWN_ENVIRONMENT: false
+            }).expect(400);
+            
+        expect(response.body.error).toEqual('Invalid updates');
+    })
+
     test('CONFIG_SUITE - Should remove Config environment status', async () => {
         // Creating QA1 Environment...
         await request(app)

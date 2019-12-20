@@ -97,6 +97,21 @@ describe('Testing fetch Group info', () => {
             .send().expect(200)
 
         expect(response.body.length).toEqual(2)
+
+        // Query filter tests
+        response = await request(app)
+            .get('/groupconfig?domain=' + domainId + '&limit=1')
+            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .send().expect(200)
+
+        expect(response.body.length).toEqual(1)
+
+        response = await request(app)
+            .get('/groupconfig?domain=' + domainId + '&sortBy=createdAt:desc')
+            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .send().expect(200)
+
+        expect(response.body.length).toEqual(2)
     })
 
     test('GROUP_SUITE - Should get Group Config information by Id', async () => {
@@ -197,7 +212,7 @@ describe('Testing update Group info', () => {
         expect(group.name).toEqual('Updated Group Name')
     })
 
-    test('GROUP_SUITE - Should not update Group Config info', async () => {
+    test('GROUP_SUITE - Should NOT update Group Config info', async () => {
         await request(app)
         .patch('/groupconfig/' + groupConfigId)
         .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -205,6 +220,15 @@ describe('Testing update Group info', () => {
             name: 'Updated Group Name',
             owner: 'I_SHOULD_NOT_UPDATE_THIS'
         }).expect(400)
+    })
+
+    test('GROUP_SUITE - Should NOT update an unknown Group Config', async () => {
+        await request(app)
+        .patch('/groupconfig/UNKNOWN_GROUP_ID')
+        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .send({
+            name: 'Updated Group Name'
+        }).expect(404)
     })
 
     test('GROUP_SUITE - Should update Group environment status - default', async () => {
