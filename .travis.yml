@@ -5,5 +5,3 @@ node_js:
 
 services:
   - mongodb
-  
-after_success: npm run coveralls

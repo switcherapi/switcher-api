@@ -1,3 +1,4 @@
+![Build Status](https://travis-ci.com/petruki/switcher-api.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/petruki/switcher-api/badge.svg?branch=master)](https://coveralls.io/github/petruki/switcher-api?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
