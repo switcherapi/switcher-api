@@ -21,7 +21,7 @@ export async function removeDomainStatus(domainId, environmentName) {
         const domain = await Domain.findOne({ _id: domainId })
         
         if (!domain) {
-            new Error('Domain does not exist')
+            throw new Error('Domain does not exist')
         }
 
         domain.activated.delete(environmentName)
@@ -36,7 +36,7 @@ export async function removeGroupStatus(groupId, environmentName) {
         const groupconfig = await GroupConfig.findOne({ _id: groupId })
         
         if (!groupconfig) {
-            new Error('GroupConfig does not exist')
+            throw new Error('GroupConfig does not exist')
         }
 
         await checkEnvironmentStatusRemoval(groupconfig.domain, environmentName)
@@ -53,7 +53,7 @@ export async function removeConfigStatus(configId, environmentName) {
         const config = await Config.findOne({ _id: configId })
         
         if (!config) {
-            new Error('Config does not exist')
+            throw new Error('Config does not exist')
         }
 
         await checkEnvironmentStatusRemoval(config.domain, environmentName)
@@ -70,7 +70,7 @@ export async function removeConfigStrategyStatus(strategyId, environmentName) {
         const configStrategy = await ConfigStrategy.findOne({ _id: strategyId })
         
         if (!configStrategy) {
-            new Error('Strategy does not exist')
+            throw new Error('Strategy does not exist')
         }
 
         await checkEnvironmentStatusRemoval(configStrategy.domain, environmentName, true)
