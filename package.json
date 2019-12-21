@@ -25,6 +25,9 @@
     "test-metric": "env-cmd -e test jest -t 'METRIC_SUITE'",
     "test-unit-strategy": "env-cmd -e test jest -t 'UNIT_STRATEGY'"
   },
+  "jest": {
+    "testResultsProcessor": "jest-sonar-reporter"
+  },
   "keywords": [
     "feature",
     "flag",
@@ -57,6 +60,7 @@
     "coveralls": "^3.0.9",
     "env-cmd": "^10.0.1",
     "jest": "^24.9.0",
+    "jest-sonar-reporter": "^2.0.0",
     "nodemon": "^1.19.4",
     "supertest": "^4.0.2"
   },

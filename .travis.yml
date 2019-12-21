@@ -3,6 +3,29 @@ language: node_js
 node_js:
   - "10"
 
+addons:
+  sonarcloud:
+    organization: "petruki"
+    token:
+      secure: ${SONAR_TOKEN}
+
+jobs:
+  include:
+    - stage: compile
+      script:
+        - npm install
+    - stage: test
+      script:
+        - npm test
+    - stage: sonar
+      script:
+        - sonar-scanner
+
+stages:
+  - compile
+  - test
+  - sonar
+
 after_success: npm run coveralls
 
 services:
