@@ -12,7 +12,7 @@ import groupConfigRouter from './routers/group-config';
 import configRouter from './routers/config';
 import configStrategyRouter from './routers/config-strategy';
 import metricRouter from './routers/metric';
-import schema from './client/query-schema';
+import schema from './client/schema';
 import { appAuth } from './middleware/auth';
 
 const app = express()

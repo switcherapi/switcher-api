@@ -1,5 +1,5 @@
 import Config from '../models/config';
-import { Environment, EnvType } from '../models/environment';
+import { Environment } from '../models/environment';
 
 export const masterPermission = function (action) {
     return function (req, res, next) {
