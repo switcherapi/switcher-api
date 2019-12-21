@@ -17,14 +17,11 @@ jobs:
     - stage: test
       script:
         - npm test
-    - stage: sonar
-      script:
         - sonar-scanner
 
 stages:
   - compile
   - test
-  - sonar
 
 after_success: npm run coveralls
 
