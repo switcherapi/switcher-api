@@ -8,7 +8,7 @@
 - Postman (optional for request examples)
 
 # About  
-**Switcher API** is an online *Feature Flag* API used to toggle features over different applications at the same time.
+**Switcher API** is an online *Feature Flag* API used to toggle features over different applications simultaneously.
 
 Main features:
 - It is a remote API. No fixed or immutable configuration files.
