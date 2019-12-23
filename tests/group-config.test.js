@@ -32,7 +32,7 @@ describe('Testing Group insertion', () => {
     test('GROUP_SUITE - Should create a new Group Config', async () => {
         const response = await request(app)
             .post('/groupconfig/create')
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send({
                 name: 'New Group Config',
                 description: 'Description of my new Group Config',
@@ -50,7 +50,7 @@ describe('Testing Group insertion', () => {
     test('GROUP_SUITE - Should not create a new Group Config - with wrong domain Id', async () => {
         const response = await request(app)
             .post('/groupconfig/create')
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send({
                 name: 'New Group Config',
                 description: 'Description of my new Group Config',
@@ -67,7 +67,7 @@ describe('Testing fetch Group info', () => {
     test('GROUP_SUITE - Should get Group Config information', async () => {
         let response = await request(app)
             .get('/groupconfig?domain=' + domainId)
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(1)
@@ -80,7 +80,7 @@ describe('Testing fetch Group info', () => {
         // Adding new Group Config
         response = await request(app)
             .post('/groupconfig/create')
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send({
                 name: 'New Group Config 2',
                 description: 'Description of my new Group Config 2',
@@ -93,7 +93,7 @@ describe('Testing fetch Group info', () => {
 
         response = await request(app)
             .get('/groupconfig?domain=' + domainId)
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(2)
@@ -101,14 +101,14 @@ describe('Testing fetch Group info', () => {
         // Query filter tests
         response = await request(app)
             .get('/groupconfig?domain=' + domainId + '&limit=1')
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(1)
 
         response = await request(app)
             .get('/groupconfig?domain=' + domainId + '&sortBy=createdAt:desc')
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(2)
@@ -117,7 +117,7 @@ describe('Testing fetch Group info', () => {
     test('GROUP_SUITE - Should get Group Config information by Id', async () => {
         let response = await request(app)
             .get('/groupconfig/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(200)
 
         expect(String(response.body._id)).toEqual(String(groupConfigDocument._id))
@@ -128,7 +128,7 @@ describe('Testing fetch Group info', () => {
         // Adding new Group Config
         response = await request(app)
             .post('/groupconfig/create')
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send({
                 name: 'New Group Config 3',
                 description: 'Description of my new Group Config 3',
@@ -137,7 +137,7 @@ describe('Testing fetch Group info', () => {
 
         response = await request(app)
             .get('/groupconfig/' + response.body._id)
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(200)
     })
 
@@ -251,7 +251,7 @@ describe('Testing update Group info', () => {
     test('GROUP_SUITE - Should record changes on history collection', async () => {
         let response = await request(app)
             .post('/groupconfig/create')
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send({
                 name: 'Group Record Test',
                 description: 'Description of my new Group Config',

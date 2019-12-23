@@ -7,7 +7,7 @@ import { removeGroupStatus } from './common/index'
 
 const router = new express.Router()
 
-router.post('/groupconfig/create', auth, async (req, res) => {
+router.post('/groupconfig/create', auth, masterPermission('create Group'), async (req, res) => {
     const groupconfig = new GroupConfig({
         ...req.body,
         owner: req.admin._id
@@ -31,23 +31,11 @@ router.post('/groupconfig/create', auth, async (req, res) => {
     }
 })
 
-// GET /groupconfig?activated=false
 // GET /groupconfig?limit=10&skip=20
 // GET /groupconfig?sortBy=createdAt:desc
 // GET /groupconfig?domain=ID
 router.get('/groupconfig', auth, async (req, res) => {
-    const match = {}
     const sort = {}
-
-    if (!req.query.domain) {
-        return res.status(500).send({
-            error: 'Please, specify the \'domain\' id'
-        })
-    }
-
-    if (req.query.activated) {
-        match.activated = req.query.activated === 'true'
-    }
 
     if (req.query.sortBy) {
         const parts = req.query.sortBy.split(':')
@@ -64,7 +52,6 @@ router.get('/groupconfig', auth, async (req, res) => {
         try {
             await domain.populate({
                 path: 'groupConfig',
-                match,
                 options: {
                     limit: parseInt(req.query.limit),
                     skip: parseInt(req.query.skip),
@@ -138,7 +125,7 @@ router.get('/groupconfig/history/:id', auth, async (req, res) => {
     }
 })
 
-router.delete('/groupconfig/:id', auth, async (req, res) => {
+router.delete('/groupconfig/:id', auth, masterPermission('delete Group'), async (req, res) => {
     try {
         const groupconfig = await GroupConfig.findOne({ _id: req.params.id })
 
@@ -157,7 +144,7 @@ router.delete('/groupconfig/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/groupconfig/:id', auth, async (req, res) => {
+router.patch('/groupconfig/:id', auth, masterPermission('update Group'), async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['name', 'description']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
@@ -181,7 +168,7 @@ router.patch('/groupconfig/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/groupconfig/updateStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
+router.patch('/groupconfig/updateStatus/:id', auth, masterPermission('update Group Environment'), async (req, res) => {
     try {
         const groupconfig = await GroupConfig.findOne({ _id: req.params.id })
         
@@ -199,7 +186,7 @@ router.patch('/groupconfig/updateStatus/:id', auth, masterPermission('update Dom
     }
 })
 
-router.patch('/groupconfig/removeStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
+router.patch('/groupconfig/removeStatus/:id', auth, masterPermission('update Group Environment'), async (req, res) => {
     try {
         res.send(await removeGroupStatus(req.params.id, req.body.env))
     } catch (e) {

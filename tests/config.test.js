@@ -47,17 +47,26 @@ describe('Testing configuration insertion', () => {
         expect(response.body.key).toBe('NEW_CONFIG')
     })
 
-    test('CONFIG_SUITE - Should not create a new Config - with wrong group config Id', async () => {
+    test('CONFIG_SUITE - Should NOT create a new Config - with wrong group config Id', async () => {
         const response = await request(app)
             .post('/config/create')
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send({
                 key: 'NEW_CONFIG',
                 description: 'Description of my new Config',
-                domain: new mongoose.Types.ObjectId()
+                group: new mongoose.Types.ObjectId()
             }).expect(404)
 
         expect(response.body.error).toBe('Group Config not found')
+
+        await request(app)
+            .post('/config/create')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                key: 'NEW_CONFIG',
+                description: 'Description of my new Config',
+                group: 'INVALID_VALUE_ID'
+            }).expect(400)
     })
 })
 
@@ -92,7 +101,7 @@ describe('Testing fetch configuration info', () => {
         expect(config).not.toBeNull()
 
         response = await request(app)
-            .get('/config?group=' + groupConfigId)
+            .get('/config?group=' + groupConfigId + '&sortBy=createdAt:desc')
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(200)
 
@@ -136,6 +145,18 @@ describe('Testing fetch configuration info', () => {
 
 describe('Testing configuration deletion', () => {
     beforeAll(setupDatabase)
+
+    test('CONFIG_SUITE - Should NOT delete Config - Wrong and bad Id', async () => {
+        await request(app)
+            .delete('/config/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(404)
+
+        await request(app)
+            .delete('/config/WRONG_ID_VALUE')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(500)
+    })
 
     test('CONFIG_SUITE - Should delete Config', async () => {
         // DB validation Before deleting
@@ -203,14 +224,28 @@ describe('Testing update info', () => {
         expect(config.description).toEqual('New description')
     })
 
-    test('CONFIG_SUITE - Should not update Config info', async () => {
+    test('CONFIG_SUITE - Should NOT update Config info', async () => {
         await request(app)
-        .patch('/config/' + configId1)
-        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
-        .send({
-            activated: false,
-            owner: 'I_SHOULD_NOT_UPDATE_THIS'
-        }).expect(400)
+            .patch('/config/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                activated: false,
+                owner: 'I_SHOULD_NOT_UPDATE_THIS'
+            }).expect(400)
+
+        await request(app)
+            .patch('/config/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                description: 'New description'
+            }).expect(404)
+
+        await request(app)
+            .patch('/config/WRONG_ID_VALUE')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                description: 'New description'
+            }).expect(500)
     })
 
     test('CONFIG_SUITE - Should update Config environment status - default', async () => {
@@ -290,9 +325,16 @@ describe('Testing Environment status change', () => {
             .send({
                 default: false
             }).expect(400);
+
+        await request(app)
+            .patch('/config/updateStatus/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                default: false
+            }).expect(404);
     })
 
-    test('CONFIG_SUITE - Should NOT update Config environment status - Config not fould', async () => {
+    test('CONFIG_SUITE - Should NOT update Config environment status - Unknown environment name', async () => {
         const response = await request(app)
             .patch('/config/updateStatus/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -361,7 +403,7 @@ describe('Testing Environment status change', () => {
             }).expect(200)
 
         response = await request(app)
-            .get('/config/history/' + configId)
+            .get('/config/history/' + configId + '?sortBy=createdAt:desc')
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(200)
 

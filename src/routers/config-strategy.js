@@ -8,7 +8,7 @@ import { removeConfigStrategyStatus } from './common/index'
 
 const router = new express.Router()
 
-router.post('/configstrategy/create', auth, async (req, res) => {
+router.post('/configstrategy/create', auth, masterPermission('create Strategy'), async (req, res) => {
     try {
         const config = await Config.findById(req.body.config)
 
@@ -40,23 +40,11 @@ router.post('/configstrategy/create', auth, async (req, res) => {
     }
 })
 
-// GET /configstrategy?activated=false
 // GET /configstrategy?limit=10&skip=20
 // GET /configstrategy?sortBy=createdAt:desc
 // GET /configstrategy?config=ID
 router.get("/configstrategy", auth, async (req, res) => {
-    const match = {}
     const sort = {}
-
-    if (!req.query.config) {
-        return res.status(500).send({
-            error: 'Please, specify the \'config\' id'
-        })
-    }
-
-    if (req.query.activated) {
-        match.activated = req.query.activated === 'true'
-    }
 
     if (req.query.sortBy) {
         const parts = req.query.sortBy.split(':')
@@ -72,7 +60,6 @@ router.get("/configstrategy", auth, async (req, res) => {
 
         await config.populate({
             path: 'configStrategy',
-            match,
             options: {
                 limit: parseInt(req.query.limit),
                 skip: parseInt(req.query.skip),
@@ -104,12 +91,6 @@ router.get('/configstrategy/:id', auth, async (req, res) => {
 // GET /configstrategy/ID
 router.get('/configstrategy/history/:id', auth, async (req, res) => {
     const sort = {}
-
-    if (!req.params.id) {
-        return res.status(500).send({
-            error: 'Please, specify the \'strategy\' id'
-        })
-    }
 
     if (req.query.sortBy) {
         const parts = req.query.sortBy.split(':')
@@ -151,7 +132,7 @@ router.get('/configstrategy/req/:strategy', auth, (req, res) => {
     }
 })
 
-router.delete('/configstrategy/:id', auth, async (req, res) => {
+router.delete('/configstrategy/:id', auth, masterPermission('delete Strategy'), async (req, res) => {
     try {
         const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
 
@@ -170,7 +151,7 @@ router.delete('/configstrategy/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/configstrategy/:id', auth, async (req, res) => {
+router.patch('/configstrategy/:id', auth, masterPermission('update Strategy'), async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['description', 'values', 'operation']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
@@ -198,7 +179,7 @@ router.patch('/configstrategy/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/configstrategy/addval/:id', auth, async (req, res) => {
+router.patch('/configstrategy/addval/:id', auth, masterPermission('create Strategy values'), async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['value']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
@@ -237,7 +218,7 @@ router.patch('/configstrategy/addval/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/configstrategy/updateval/:id', auth, async (req, res) => {
+router.patch('/configstrategy/updateval/:id', auth, masterPermission('update Strategy values'), async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['oldvalue', 'newvalue']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
@@ -284,7 +265,7 @@ router.patch('/configstrategy/updateval/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/configstrategy/removeval/:id', auth, async (req, res) => {
+router.patch('/configstrategy/removeval/:id', auth, masterPermission('remove Strategy values'), async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['value']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
@@ -354,7 +335,7 @@ router.get("/configstrategy/values/:id", auth, async (req, res) => {
     }
 })
 
-router.patch('/configstrategy/updateStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
+router.patch('/configstrategy/updateStatus/:id', auth, masterPermission('update Strategy Environment'), async (req, res) => {
     try {
         const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
         
@@ -372,7 +353,7 @@ router.patch('/configstrategy/updateStatus/:id', auth, masterPermission('update 
     }
 })
 
-router.patch('/configstrategy/removeStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
+router.patch('/configstrategy/removeStatus/:id', auth, masterPermission('update Strategy Environment'), async (req, res) => {
     try {
         res.send(await removeConfigStrategyStatus(req.params.id, req.body.env))
     } catch (e) {

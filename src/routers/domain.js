@@ -23,7 +23,7 @@ router.get('/domain/generateApiKey/:domain/', auth, masterPermission('generate A
     }
 })
 
-router.post('/domain/create', auth, masterPermission('create Domains'), async (req, res) => {
+router.post('/domain/create', auth, masterPermission('create Domain'), async (req, res) => {
     try {
         const domain = new Domain({
             ...req.body,
@@ -47,7 +47,6 @@ router.post('/domain/create', auth, masterPermission('create Domains'), async (r
 // GET /domain?limit=10&skip=20
 // GET /domain?sortBy=createdAt:desc
 router.get('/domain', auth, async (req, res) => {
-    const match = {}
     const sort = {}
 
     if (req.query.sortBy) {
@@ -58,7 +57,6 @@ router.get('/domain', auth, async (req, res) => {
     try {
         await req.admin.populate({
             path: 'domain',
-            match,
             options: {
                 limit: parseInt(req.query.limit),
                 skip: parseInt(req.query.skip),

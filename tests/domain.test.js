@@ -64,7 +64,7 @@ describe('Testing Domain insertion', () => {
                 description: 'Description of my new Domain'
             }).expect(400)
 
-        expect(response.body.error).toEqual('Unable to create Domains without a Master Admin credential')
+        expect(response.body.error).toEqual('Unable to create Domain without a Master Admin credential')
     })
 
     test('DOMAIN_SUITE - Should generate a valid API Key for a Domain', async () => {
