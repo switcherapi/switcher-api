@@ -59,15 +59,15 @@ Main features:
 ```
 
 # Testing using JEST
-Different suites were created to test them separately if you want.
+Different suites were created to test them separately.
 
 - Example: test only Admin routers:
 ```
 npm run test-admin
 ```
 
-# Testing using hands-on
-Assuming you are running it...
+# Hands-on testing
+Find attached into this repository some request samples (./requests). You just need to import to your Postman
 
 {{url}} = endpoint from where you are running the API.
 

@@ -93,6 +93,18 @@ describe('Testing Domain insertion', () => {
             .set('Authorization', `Bearer ${responseLogin.body.token}`)
             .send().expect(400)
     })
+
+    test('DOMAIN_SUITE - Should NOT generate an API Key for an inexistent Domain', async () => {
+        await request(app)
+            .get('/domain/generateApiKey/INVALID_DOMAIN_ID')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(400)
+
+        await request(app)
+            .get('/domain/generateApiKey/5dd05cfa98adc4285457e29a')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(404)
+    })
 })
 
 describe('Testing fect Domain info', () => {
@@ -125,7 +137,7 @@ describe('Testing fect Domain info', () => {
         expect(domain).not.toBeNull()
 
         response = await request(app)
-            .get('/domain')
+            .get('/domain?sortBy=createdAt:desc')
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(200)
 
@@ -168,6 +180,11 @@ describe('Testing fect Domain info', () => {
     test('DOMAIN_SUITE - Should NOT found Domain information by Id', async () => {
         await request(app)
             .get('/domain/' + domainId + 'NOTEXIST')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(404)
+
+        await request(app)
+            .get('/domain/5dd05cfa98adc4285457e29a')
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(404)
     })
@@ -239,6 +256,16 @@ describe('Testing fect Domain info', () => {
             .delete('/domain/' + domainId)
             .set('Authorization', `Bearer ${responseLogin.body.token}`)
             .send().expect(400)
+
+        await request(app)
+            .delete('/domain/5dd05cfa98adc4285457e29a')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(404)
+
+        await request(app)
+            .delete('/domain/INVALID_DOMAIN_ID')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(500)
     })
 })
 
@@ -274,8 +301,23 @@ describe('Testing update Domain info', () => {
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send({
                 description: 'Description updated'
-            }).expect(404)
+            }).expect(500)
 
+        await request(app)
+            .patch('/domain/5dd05cfa98adc4285457e29a')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                description: 'Description updated'
+            }).expect(404)
+    })
+
+    test('DOMAIN_SUITE - Should NOT update Domain name', async () => {
+        await request(app)
+            .patch('/domain/' + domainId)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                name: 'New Domain name'
+            }).expect(400)
     })
 
     test('DOMAIN_SUITE - Should NOT update Domain info without Master credential', async () => {
@@ -318,10 +360,17 @@ describe('Testing update Domain info', () => {
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send({
                 default: false
+            }).expect(500);
+
+        await request(app)
+            .patch('/domain/updateStatus/5dd05cfa98adc4285457e29a')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                default: false
             }).expect(404);
     })
 
-    test('DOMAIN_SUITE - Should NOT update environment status given an unknown environment name ', async () => {
+    test('DOMAIN_SUITE - Should NOT update environment status given an unknown environment name', async () => {
         const response = await request(app)
             .patch('/domain/updateStatus/' + domainId)
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
@@ -357,7 +406,7 @@ describe('Testing update Domain info', () => {
             }).expect(200)
 
         response = await request(app)
-            .get('/domain/history/' + id)
+            .get('/domain/history/' + id + '?sortBy=createdAt:desc')
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(200)
 

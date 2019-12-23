@@ -91,12 +91,6 @@ router.get('/domain/:id', auth, async (req, res) => {
 router.get('/domain/history/:id', auth, async (req, res) => {
     const sort = {}
 
-    if (!req.params.id) {
-        return res.status(500).send({
-            error: 'Please, specify the \'domain\' id'
-        })
-    }
-
     if (req.query.sortBy) {
         const parts = req.query.sortBy.split(':')
         sort[`${parts[0]}.${parts[1]}`] = parts[2] === 'desc' ? -1 : 1
@@ -139,7 +133,6 @@ router.delete('/domain/:id', auth, masterPermission('delete Domain'), async (req
         await domain.remove()
         res.send(domain)
     } catch (e) {
-        console.log(e)
         res.status(500).send()
     }
 })
@@ -156,22 +149,26 @@ router.patch('/domain/:id', auth, masterPermission('update Domain'), async (req,
     try {
         const domain = await Domain.findOne({ _id: req.params.id })
 
-        try {
-            updates.forEach((update) => domain[update] = req.body[update])
-
-            await domain.save()
-            res.send(domain)
-        } catch (e) {
-            res.status(400).send(e)
+        if (!domain) {
+            return res.status(404).send()
         }
+
+        updates.forEach((update) => domain[update] = req.body[update])
+
+        await domain.save()
+        res.send(domain)
     } catch (e) {
-        return res.status(404).send()
+        return res.status(500).send()
     }
 })
 
 router.patch('/domain/updateStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
     try {    
         const domain = await Domain.findOne({ _id: req.params.id })
+
+        if (!domain) {
+            return res.status(404).send()
+        }
 
         try {
             const updates = await checkEnvironmentStatusChange(req, res, req.params.id)
@@ -183,7 +180,7 @@ router.patch('/domain/updateStatus/:id', auth, masterPermission('update Domain E
             res.status(400).send({ error: e.message })
         }
     } catch (e) {
-        return res.status(404).send()
+        return res.status(500).send()
     }
 })
 
