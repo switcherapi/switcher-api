@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import { Metric } from '../../src/models/metric';
 import Admin from '../../src/models/admin';
+import { EnvType } from '../../src/models/environment';
 
 export const adminMasterAccountId = new mongoose.Types.ObjectId()
 export const adminMasterAccount = {
@@ -26,6 +27,7 @@ export const entry1 = {
     result: true,
     reason: 'Success',
     group: 'GROUP 1',
+    environment: EnvType.DEFAULT,
     domain: domainId,
     date: '2019-12-14 17:00'
 }
@@ -37,6 +39,7 @@ export const entry2 = {
     result: false,
     reason: 'Something went wrong',
     group: 'GROUP 1',
+    environment: EnvType.DEFAULT,
     domain: domainId,
     date: '2019-12-14 18:00'
 }
@@ -48,6 +51,7 @@ export const entry3 = {
     result: true,
     reason: 'Success',
     group: 'GROUP 1',
+    environment: EnvType.DEFAULT,
     domain: domainId,
     date: '2019-12-14 19:00'
 }
@@ -59,8 +63,21 @@ export const entry4 = {
     result: false,
     reason: 'Something went wrong',
     group: 'GROUP 1',
+    environment: EnvType.DEFAULT,
     domain: domainId,
     date: '2019-12-14 20:00'
+}
+
+export const entry5 = {
+    _id: new mongoose.Types.ObjectId(),
+    key: 'KEY_2',
+    component: 'Component 2',
+    result: false,
+    reason: 'Something went wrong in QA',
+    group: 'GROUP 1',
+    environment: 'QA',
+    domain: domainId,
+    date: '2019-12-13 18:00'
 }
 
 export const setupDatabase = async () => {

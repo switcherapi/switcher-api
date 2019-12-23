@@ -1559,7 +1559,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/config?group=5de0721444b53441281c0f9c",
+					"raw": "{{url}}/config?group=5df166359194d613400a52e9",
 					"host": [
 						"{{url}}"
 					],
@@ -1570,11 +1570,6 @@
 						{
 							"key": "sortBy",
 							"value": "createdAt:asc",
-							"disabled": true
-						},
-						{
-							"key": "activated",
-							"value": "true",
 							"disabled": true
 						},
 						{
@@ -1589,7 +1584,7 @@
 						},
 						{
 							"key": "group",
-							"value": "5de0721444b53441281c0f9c"
+							"value": "5df166359194d613400a52e9"
 						}
 					]
 				}
@@ -2154,6 +2149,11 @@
 						{
 							"key": "group",
 							"value": "Rollout 2030",
+							"disabled": true
+						},
+						{
+							"key": "environment",
+							"value": "QA",
 							"disabled": true
 						},
 						{

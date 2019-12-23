@@ -47,6 +47,20 @@ describe('Fetch metrics', () => {
         })
     })
 
+    test('METRIC_SUITE - Should fetch records by Environment', async () => {
+        const args = `?environment=QA`
+        const response = await request(app)
+            .get('/metric/' + domainId + args)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(200)
+            
+        // Response validation
+        expect(response.body).not.toBeNull()
+        response.body.forEach(e => {
+            expect(e.key).toEqual('KEY_2')
+        })
+    })
+
     test('METRIC_SUITE - Should NOT fetch records by unknown KEY', async () => {
         const args = `?key=UNKNOWN_KEY_2`
         const response = await request(app)
@@ -125,6 +139,20 @@ describe('Fetch metrics', () => {
         expect(response.body).not.toBeNull()
         response.body.forEach(e => {
             expect(moment(e.date).isSameOrBefore('2019-12-14 17:30:00')).toEqual(true)
+        })
+    })
+
+    test('METRIC_SUITE - Should fetch records by DATE AFTER/BEFORE', async () => {
+        const args = `?dateAfter=2019-12-14 16:00:00&dateBefore=2019-12-14 17:30:00`
+        const response = await request(app)
+            .get('/metric/' + domainId + args)
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(200)
+
+        // Response validation
+        expect(response.body).not.toBeNull()
+        response.body.forEach(e => {
+            expect(moment(e.date).isSameOrBefore('2019-12-14 17:00:00')).toEqual(true)
         })
     })
 

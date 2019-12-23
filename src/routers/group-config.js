@@ -14,20 +14,16 @@ router.post('/groupconfig/create', auth, masterPermission('create Group'), async
     })
 
     try {
-        const domain = await Domain.findById(req.body.domain).countDocuments()
+        const domain = await Domain.findById(req.body.domain)
 
-        if (domain === 0) {
+        if (!domain) {
             return res.status(404).send({ error: 'Domain not found' })
         }
 
-        try {
-            await groupconfig.save()
-            res.status(201).send(groupconfig)
-        } catch (e) {
-            res.status(400).send(e)
-        }
+        await groupconfig.save()
+        res.status(201).send(groupconfig)
     } catch (e) {
-        res.status(404).send({ error: 'Domain not found' })
+        res.status(500).send(e)
     }
 })
 
@@ -49,22 +45,18 @@ router.get('/groupconfig', auth, async (req, res) => {
             return res.status(404).send({ error: 'Domain not found' })
         }
 
-        try {
-            await domain.populate({
-                path: 'groupConfig',
-                options: {
-                    limit: parseInt(req.query.limit),
-                    skip: parseInt(req.query.skip),
-                    sort
-                }
-            }).execPopulate()
+        await domain.populate({
+            path: 'groupConfig',
+            options: {
+                limit: parseInt(req.query.limit),
+                skip: parseInt(req.query.skip),
+                sort
+            }
+        }).execPopulate()
 
-            res.send(domain.groupConfig)
-        } catch (e) {
-            res.status(500).send()
-        }
+        res.send(domain.groupConfig)
     } catch (e) {
-        res.status(404).send({ error: 'Domain not found' })
+        res.status(500).send()
     }
 })
 
@@ -78,7 +70,7 @@ router.get('/groupconfig/:id', auth, async (req, res) => {
 
         res.send(groupconfig)
     } catch (e) {
-        res.status(404).send({ error: 'Group not found' })
+        res.status(500).send()
     }
 })
 
@@ -87,12 +79,6 @@ router.get('/groupconfig/:id', auth, async (req, res) => {
 // GET /groupconfig/ID
 router.get('/groupconfig/history/:id', auth, async (req, res) => {
     const sort = {}
-
-    if (!req.params.id) {
-        return res.status(500).send({
-            error: 'Please, specify the \'groupconfig\' id'
-        })
-    }
 
     if (req.query.sortBy) {
         const parts = req.query.sortBy.split(':')
@@ -105,23 +91,20 @@ router.get('/groupconfig/history/:id', auth, async (req, res) => {
         if (!groupconfig) {
             return res.status(404).send()
         }
-        try {
-            await groupconfig.populate({
-                path: 'history',
-                select: 'oldValue newValue -_id',
-                options: {
-                    limit: parseInt(req.query.limit),
-                    skip: parseInt(req.query.skip),
-                    sort
-                }
-            }).execPopulate()
 
-            res.send(groupconfig.history)
-        } catch (e) {
-            res.status(400).send()
-        }
+        await groupconfig.populate({
+            path: 'history',
+            select: 'oldValue newValue -_id',
+            options: {
+                limit: parseInt(req.query.limit),
+                skip: parseInt(req.query.skip),
+                sort
+            }
+        }).execPopulate()
+
+        res.send(groupconfig.history)
     } catch (e) {
-        res.status(404).send()
+        res.status(500).send()
     }
 })
 
@@ -133,14 +116,10 @@ router.delete('/groupconfig/:id', auth, masterPermission('delete Group'), async 
             return res.status(404).send({ error: 'Group not found' })
         }
 
-        try {
-            await groupconfig.remove()
-            res.send(groupconfig)
-        } catch (e) {
-            res.status(500).send()
-        }
+        await groupconfig.remove()
+        res.send(groupconfig)
     } catch (e) {
-        res.status(404).send({ error: 'Group not found' })
+        res.status(500).send()
     }
 })
 
@@ -164,7 +143,7 @@ router.patch('/groupconfig/:id', auth, masterPermission('update Group'), async (
         await groupconfig.save()
         res.send(groupconfig)
     } catch (e) {
-        res.status(404).send({ error: 'Group not found' })
+        res.status(500).send()
     }
 })
 
@@ -182,7 +161,7 @@ router.patch('/groupconfig/updateStatus/:id', auth, masterPermission('update Gro
         await groupconfig.save()
         res.send(groupconfig)
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        res.status(500).send()
     }
 })
 

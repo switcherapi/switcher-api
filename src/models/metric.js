@@ -24,6 +24,10 @@ const metricSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    environment: {
+        type: String,
+        required: true
+    },
     domain: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -58,6 +62,7 @@ export function addMetrics(context, response) {
         result: response.result,
         reason: response.reason,
         group: response.group.name,
+        environment: context.environment,
         domain: response.domain._id,
         date: Date.now()
     })

@@ -58,6 +58,15 @@ describe('Testing Group insertion', () => {
             }).expect(404)
             
         expect(response.body.error).toBe('Domain not found')
+
+        await request(app)
+            .post('/groupconfig/create')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                name: 'New Group Config',
+                description: 'Description of my new Group Config',
+                domain: 'WRONG_ID_VALUE'
+            }).expect(500)
     })
 })
 
@@ -141,10 +150,39 @@ describe('Testing fetch Group info', () => {
             .send().expect(200)
     })
 
-    test('GROUP_SUITE - Should not found Group Config information by Id', async () => {
+    test('GROUP_SUITE - Should NOT get Group Config information by Id', async () => {
         await request(app)
-            .get('/groupconfig/' + 'NOTEXIST')
+            .get('/groupconfig/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(404)
+
+        await request(app)
+            .get('/groupconfig/INVALID_ID_VALUE')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(500)
+    })
+
+    test('GROUP_SUITE - Should NOT found Group Config information by Id', async () => {
+        await request(app)
+            .get('/groupconfig?domain=' + 'WRONG_ID_VALUE')
             .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .send().expect(500)
+
+        await request(app)
+            .get('/groupconfig?domain=' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .send().expect(404)
+    })
+
+    test('GROUP_SUITE - Should NOT delete Group Config by invalid Group Id', async () => {
+        await request(app)
+            .delete('/groupconfig/INVALID_ID_VALUE')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(500)
+
+        await request(app)
+            .delete('/groupconfig/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(404)
     })
 
@@ -224,11 +262,18 @@ describe('Testing update Group info', () => {
 
     test('GROUP_SUITE - Should NOT update an unknown Group Config', async () => {
         await request(app)
-        .patch('/groupconfig/UNKNOWN_GROUP_ID')
-        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
-        .send({
-            name: 'Updated Group Name'
-        }).expect(404)
+            .patch('/groupconfig/UNKNOWN_GROUP_ID')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                name: 'Updated Group Name'
+            }).expect(500)
+
+        await request(app)
+            .patch('/groupconfig/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                name: 'Updated Group Name'
+            }).expect(404)
     })
 
     test('GROUP_SUITE - Should update Group environment status - default', async () => {
@@ -246,6 +291,18 @@ describe('Testing update Group info', () => {
         // DB validation - verify status updated
         const group = await GroupConfig.findById(groupConfigId)
         expect(group.activated.get(EnvType.DEFAULT)).toEqual(false);
+    })
+
+    test('GROUP_SUITE - Should NOT list changes by invalid Group Id', async () => {
+        await request(app)
+            .get('/groupconfig/history/INVALID_ID_VALUE')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(500)
+
+        await request(app)
+            .get('/groupconfig/history/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(404)
     })
 
     test('GROUP_SUITE - Should record changes on history collection', async () => {
@@ -274,7 +331,7 @@ describe('Testing update Group info', () => {
             }).expect(200)
 
         response = await request(app)
-            .get('/groupconfig/history/' + groupId)
+            .get('/groupconfig/history/' + groupId + '?sortBy=createdAt:desc')
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(200)
 
@@ -350,13 +407,20 @@ describe('Testing envrionment status change #1', () => {
             }).expect(400);
     })
 
-    test('GROUP_SUITE - Should NOT update Group environment status - Group not fould', async () => {
+    test('GROUP_SUITE - Should NOT update Group environment status - Invalid Group Id', async () => {
         await request(app)
-            .patch('/groupconfig/updateStatus/FAKE_GROUP')
+            .patch('/groupconfig/updateStatus/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send({
                 default: false
-            }).expect(400);
+            }).expect(500);
+
+        await request(app)
+            .patch('/groupconfig/updateStatus/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                default: false
+            }).expect(404);
     })
 })
 

@@ -2,6 +2,7 @@ import express from 'express';
 import { Metric } from '../models/metric';
 import { check, validationResult } from 'express-validator';
 import { auth } from '../middleware/auth';
+import { EnvType } from '../models/environment';
 
 const router = new express.Router();
 
@@ -19,6 +20,8 @@ router.get('/metric/:id', [check('id').isMongoId()], auth, async (req, res) => {
 
     if (req.query.key) { args.key = req.query.key }
     if (req.query.group) { args.group = req.query.group }
+    if (req.query.environment) { args.environment = req.query.environment }
+    else { args.environment = EnvType.DEFAULT }
     if (req.query.component) { args.component = req.query.component }
     if (req.query.result) { args.result = req.query.result }
     if (req.query.dateBefore && !req.query.dateAfter) { 
@@ -33,18 +36,14 @@ router.get('/metric/:id', [check('id').isMongoId()], auth, async (req, res) => {
 
     try {
         const metrics = await Metric.find({ domain: req.params.id, ...args }, 
-            'key component entry result reason group date -_id', {
+            'key component entry result reason group environment date -_id', {
                 skip: parseInt(req.query.skip),
                 limit: parseInt(req.query.limit),
             }).sort(req.query.sortBy ? req.query.sortBy.replace(';', ' ') : 'date');
 
-        if (!metrics) {
-            return res.status(404).send();
-        }
-
         res.send(metrics)
     } catch (e) {
-        res.status(404).send();
+        res.status(500).send();
     }
 })
 
