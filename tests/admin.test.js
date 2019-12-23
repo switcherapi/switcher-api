@@ -44,6 +44,27 @@ describe('Testing Admin insertion', () => {
         })
     })
 
+    test('ADMIN_SUITE - Should NOT signup - invalid email format', async () => {
+        await request(app)
+            .post('/admin/signup')
+            .send({
+                name: 'Master Admin',
+                email: 'master_test123',
+                password: '12312312312'
+            }).expect(422)
+    })
+
+    test('ADMIN_SUITE - Should NOT create a new Admin - invalid email', async () => {
+        await request(app)
+            .post('/admin/create')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                name: 'Admin',
+                email: 'admin_test123',
+                password: '12312312312'
+            }).expect(422)
+    })
+
     test('ADMIN_SUITE - Should create a new Admin with Master credential', async () => {
         const responseLogin = await request(app)
             .post('/admin/login')
@@ -203,8 +224,19 @@ describe('Testing Admin login and fetch', () => {
                 name: 'Updated Name'
             })
             .expect(200)
+
         admin = await Admin.findById(adminAccountId)
         expect(admin.name).toEqual('Updated Name')
+    })
+
+    test('ADMIN_SUITE - Should NOT update/me admin fields', async () => {
+        await request(app)
+            .patch('/admin/me')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                _id: new mongoose.Types.ObjectId()
+            })
+            .expect(400)
     })
 
     test('ADMIN_SUITE - Should not update its own account by non-me patch URI', async () => {
@@ -226,7 +258,7 @@ describe('Testing Admin login and fetch', () => {
         expect(response.body.error).toEqual('Unable to modify your own params')
     })
 
-    test('ADMIN_SUITE - Should not update others account without Master Credential by non-me patch URI', async () => {
+    test('ADMIN_SUITE - Should NOT update others account without Master Credential by non-me patch URI', async () => {
         const responseLogin = await request(app)
             .post('/admin/login')
             .send({
@@ -243,6 +275,24 @@ describe('Testing Admin login and fetch', () => {
             .expect(400)
 
         expect(response.body.error).toEqual('Unable to update Admins without a Master Admin credential')
+    })
+
+    test('ADMIN_SUITE - Should NOT update by invalid account id', async () => {
+        await request(app)
+            .patch('/admin/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                name: 'Updated Name'
+            })
+            .expect(404)
+
+        await request(app)
+            .patch('/admin/INVALID_ID')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                name: 'Updated Name'
+            })
+            .expect(400)
     })
 
     test('ADMIN_SUITE - Should update valid admin by non-me patch URI', async () => {
@@ -403,6 +453,12 @@ describe('Testing Admin deletion', () => {
 
         await request(app)
             .delete('/admin/INVALID_ADMIN_ID')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send()
+            .expect(500)
+
+        await request(app)
+            .delete('/admin/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send()
             .expect(404)

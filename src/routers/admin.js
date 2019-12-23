@@ -121,14 +121,10 @@ router.delete('/admin/:id', auth, masterPermission('delete Admins'), async (req,
             return res.status(404).send()
         }
 
-        try {
-            await admin.remove()
-            res.send(admin)
-        } catch (e) {
-            return res.status(500).send()
-        }
+        await admin.remove()
+        res.send(admin)
     } catch (e) {
-        res.status(404).send()
+        return res.status(500).send()
     }
 })
 
@@ -155,21 +151,21 @@ router.patch('/admin/:id', auth, masterPermission('update Admins'), async (req, 
     const allowwedUpdates = ['name', 'email', 'password', 'active', 'master']
     const isValidOperation = updates.every((update) => allowwedUpdates.includes(update))
 
-    const admin = await Admin.findOne({ _id: req.params.id })
-
-    if (!admin) {
-        return res.status(404).send()
-    }
-
-    if (admin.id === req.admin.id) {
-        return res.status(400).send({ error: 'Unable to modify your own params' })
-    }
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates' })
-    }
-
     try {
+        const admin = await Admin.findOne({ _id: req.params.id })
+
+        if (!admin) {
+            return res.status(404).send()
+        }
+
+        if (admin.id === req.admin.id) {
+            return res.status(400).send({ error: 'Unable to modify your own params' })
+        }
+
+        if (!isValidOperation) {
+            return res.status(400).send({ error: 'Invalid updates' })
+        }
+
         updates.forEach((update) => admin[update] = req.body[update])
         await admin.save()
         res.send(admin)

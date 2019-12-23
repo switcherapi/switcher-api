@@ -505,7 +505,7 @@ describe('Testing environment status change #2', () => {
         expect(group.activated.get('QA1')).toEqual(true);
     })
 
-    test('STRATEGY_SUITE - Should remove records from history after deleting element', async () => {
+    test('GROUP_SUITE - Should remove records from history after deleting element', async () => {
         let history = await History.find({ elementId: groupConfigId })
         expect(history.length > 0).toEqual(true)
         await request(app)

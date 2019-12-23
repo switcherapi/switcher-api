@@ -108,6 +108,18 @@ describe('Testing fetch configuration info', () => {
         expect(response.body.length).toEqual(3)
     })
 
+    test('CONFIG_SUITE - Should NOT get Config information by invalid Group Id', async () => { 
+        await request(app)
+            .get('/config?group=' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(404)
+
+        await request(app)
+            .get('/config?group=INVALID_ID_VALUE')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(500)
+    })
+
     test('CONFIG_SUITE - Should get Config information by Id', async () => {
         let response = await request(app)
             .get('/config/' + configId1)
@@ -138,6 +150,11 @@ describe('Testing fetch configuration info', () => {
     test('CONFIG_SUITE - Should not found Config information by Id', async () => {
         await request(app)
             .get('/config/' + 'NOTEXIST')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(500)
+
+        await request(app)
+            .get('/config/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send().expect(404)
     })
@@ -426,6 +443,18 @@ describe('Testing Environment status change', () => {
         expect(history.length).toEqual(2)
     })
 
+    test('CONFIG_SUITE - Should NOT list changes by invalid Config Id', async () => {
+        await request(app)
+            .get('/config/history/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(404)
+
+        await request(app)
+            .get('/config/history/INVALID_ID_VALUE')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send().expect(500)
+    })
+
     test('CONFIG_SUITE - Should NOT remove Config environment status', async () => {
         // Creating QA3 Environment...
         await request(app)
@@ -512,7 +541,14 @@ describe('Testing component association', () => {
 
     test('CONFIG_SUITE - Should NOT associate component to a config - Config not found', async () => {
         await request(app)
-            .patch('/config/addComponent/NOW_I-AM-NOT-EXIST')
+            .patch('/config/addComponent/INVALID_ID_VALUE')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                component: "my-web-app-for-my-config"
+            }).expect(500)
+
+        await request(app)
+            .patch('/config/addComponent/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send({
                 component: "my-web-app-for-my-config"
@@ -530,7 +566,14 @@ describe('Testing component association', () => {
 
     test('CONFIG_SUITE - Should NOT desassociate component from a config - Config not found', async () => {
         await request(app)
-            .patch('/config/removeComponent/NOW_I-AM-NOT-EXIST')
+            .patch('/config/removeComponent/INVALID_ID_VALUE')
+            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .send({
+                component: "my-web-app-for-my-config"
+            }).expect(500)
+
+        await request(app)
+            .patch('/config/removeComponent/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
             .send({
                 component: "my-web-app-for-my-config"
@@ -550,7 +593,7 @@ describe('Testing component association', () => {
         expect(config.components.length).toEqual(0)
     })
 
-    test('STRATEGY_SUITE - Should remove records from history after deleting element', async () => {
+    test('CONFIG_SUITE - Should remove records from history after deleting element', async () => {
         let history = await History.find({ elementId: configId1 })
         expect(history.length > 0).toEqual(true)
         await request(app)

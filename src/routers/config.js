@@ -72,7 +72,7 @@ router.get('/config/:id', auth, async (req, res) => {
 
         res.send(config)
     } catch (e) {
-        res.status(404).send()
+        res.status(500).send()
     }
 })
 
@@ -81,12 +81,6 @@ router.get('/config/:id', auth, async (req, res) => {
 // GET /config/ID
 router.get('/config/history/:id', auth, async (req, res) => {
     const sort = {}
-
-    if (!req.params.id) {
-        return res.status(500).send({
-            error: 'Please, specify the \'config\' id'
-        })
-    }
 
     if (req.query.sortBy) {
         const parts = req.query.sortBy.split(':')
@@ -99,23 +93,20 @@ router.get('/config/history/:id', auth, async (req, res) => {
         if (!config) {
             return res.status(404).send()
         }
-        try {
-            await config.populate({
-                path: 'history',
-                select: 'oldValue newValue -_id',
-                options: {
-                    limit: parseInt(req.query.limit),
-                    skip: parseInt(req.query.skip),
-                    sort
-                }
-            }).execPopulate()
 
-            res.send(config.history)
-        } catch (e) {
-            res.status(400).send()
-        }
+        await config.populate({
+            path: 'history',
+            select: 'oldValue newValue -_id',
+            options: {
+                limit: parseInt(req.query.limit),
+                skip: parseInt(req.query.skip),
+                sort
+            }
+        }).execPopulate()
+
+        res.send(config.history)
     } catch (e) {
-        res.status(404).send()
+        res.status(500).send()
     }
 })
 
@@ -192,21 +183,17 @@ router.patch('/config/addComponent/:id', auth, async (req, res) => {
             return res.status(404).send()
         }
 
-        try {
-            const component = await Component.findOne({ name: req.body.component })
+        const component = await Component.findOne({ name: req.body.component })
 
-            if (!component) {
-                return res.status(404).send({ error: `Component ${req.body.component} not found` })
-            }
-
-            config.components.push(component.name)
-            await config.save()
-            res.send(config)
-        } catch (e) {
-            res.status(400).send({ error: e.message })
+        if (!component) {
+            return res.status(404).send({ error: `Component ${req.body.component} not found` })
         }
+
+        config.components.push(component.name)
+        await config.save()
+        res.send(config)
     } catch (e) {
-        res.status(404).send()
+        res.status(500).send()
     }
 })
 
@@ -218,21 +205,17 @@ router.patch('/config/removeComponent/:id', auth, masterPermission('remove Compo
             return res.status(404).send()
         }
 
-        try {
-            const component = await Component.findOne({ name: req.body.component })
+        const component = await Component.findOne({ name: req.body.component })
 
-            if (!component) {
-                return res.status(404).send({ error: `Component ${req.body.component} not found` })
-            }
-
-            config.components = config.components.filter(element => element !== req.body.component)
-            await config.save()
-            res.send(config)
-        } catch (e) {
-            res.status(400).send({ error: e.message })
+        if (!component) {
+            return res.status(404).send({ error: `Component ${req.body.component} not found` })
         }
+
+        config.components = config.components.filter(element => element !== req.body.component)
+        await config.save()
+        res.send(config)
     } catch (e) {
-        res.status(404).send()
+        res.status(500).send()
     }
 })
 
