@@ -2,13 +2,13 @@ import express from 'express';
 import Component from '../models/component';
 import GroupConfig from '../models/group-config';
 import Config from '../models/config';
-import { auth } from '../middleware/auth';
+import { auth, authRefresh } from '../middleware/auth';
 import { masterPermission, checkEnvironmentStatusChange } from '../middleware/validators';
 import { removeConfigStatus } from './common/index'
 
 const router = new express.Router()
 
-router.post('/config/create', auth, masterPermission('create Config'), async (req, res) => {
+router.post('/config/create', auth, authRefresh(), masterPermission('create Config'), async (req, res) => {
     try {
         const group = await GroupConfig.findById(req.body.group)
 
@@ -32,7 +32,7 @@ router.post('/config/create', auth, masterPermission('create Config'), async (re
 // GET /config?group=ID&limit=10&skip=20
 // GET /config?group=ID&sortBy=createdAt:desc
 // GET /config?group=ID
-router.get('/config', auth, async (req, res) => {
+router.get('/config', auth, authRefresh(), async (req, res) => {
     const sort = {}
 
     if (req.query.sortBy) {
@@ -62,7 +62,7 @@ router.get('/config', auth, async (req, res) => {
     }
 })
 
-router.get('/config/:id', auth, async (req, res) => {
+router.get('/config/:id', auth, authRefresh(), async (req, res) => {
     try {
         const config = await Config.findOne({ _id: req.params.id })
 
@@ -79,7 +79,7 @@ router.get('/config/:id', auth, async (req, res) => {
 // GET /config/ID?sortBy=createdAt:desc
 // GET /config/ID?limit=10&skip=20
 // GET /config/ID
-router.get('/config/history/:id', auth, async (req, res) => {
+router.get('/config/history/:id', auth, authRefresh(), async (req, res) => {
     const sort = {}
 
     if (req.query.sortBy) {
@@ -110,7 +110,7 @@ router.get('/config/history/:id', auth, async (req, res) => {
     }
 })
 
-router.delete('/config/:id', auth, masterPermission('delete Config'), async (req, res) => {
+router.delete('/config/:id', auth, authRefresh(), masterPermission('delete Config'), async (req, res) => {
     try {
         const config = await Config.findOne({ _id: req.params.id })
 
@@ -125,7 +125,7 @@ router.delete('/config/:id', auth, masterPermission('delete Config'), async (req
     }
 })
 
-router.patch('/config/:id', auth, masterPermission('update Config'), async (req, res) => {
+router.patch('/config/:id', auth, authRefresh(), masterPermission('update Config'), async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['key', 'description']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
@@ -149,7 +149,7 @@ router.patch('/config/:id', auth, masterPermission('update Config'), async (req,
     }
 })
 
-router.patch('/config/updateStatus/:id', auth, masterPermission('update Config Environment'), async (req, res) => {
+router.patch('/config/updateStatus/:id', auth, authRefresh(), masterPermission('update Config Environment'), async (req, res) => {
     try {
         const config = await Config.findOne({ _id: req.params.id })
         
@@ -167,7 +167,7 @@ router.patch('/config/updateStatus/:id', auth, masterPermission('update Config E
     }
 })
 
-router.patch('/config/removeStatus/:id', auth, masterPermission('update Config Environment'), async (req, res) => {
+router.patch('/config/removeStatus/:id', auth, authRefresh(), masterPermission('update Config Environment'), async (req, res) => {
     try {
         res.send(await removeConfigStatus(req.params.id, req.body.env))
     } catch (e) {
@@ -175,7 +175,7 @@ router.patch('/config/removeStatus/:id', auth, masterPermission('update Config E
     }
 })
 
-router.patch('/config/addComponent/:id', auth, async (req, res) => {
+router.patch('/config/addComponent/:id', auth, authRefresh(), async (req, res) => {
     try {
         const config = await Config.findOne({ _id: req.params.id })
             
@@ -197,7 +197,7 @@ router.patch('/config/addComponent/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/config/removeComponent/:id', auth, masterPermission('remove Component'), async (req, res) => {
+router.patch('/config/removeComponent/:id', auth, authRefresh(), masterPermission('remove Component'), async (req, res) => {
     try {
         const config = await Config.findOne({ _id: req.params.id })
             

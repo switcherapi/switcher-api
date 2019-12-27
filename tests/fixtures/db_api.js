@@ -19,6 +19,7 @@ export const adminMasterAccount = {
     password: '123123123123',
     master: true,
     active: true,
+    lastActivity: Date.now(),
     tokens: [{
         token: jwt.sign({
             _id: adminMasterAccountId
@@ -34,6 +35,7 @@ export const adminAccount = {
     password: 'asdasdasdasd',
     master: false,
     active: true,
+    lastActivity: Date.now(),
     tokens: [{
         token: jwt.sign({
             _id: adminAccountId

@@ -1,13 +1,13 @@
 import express from 'express';
 import Domain from '../models/domain';
 import GroupConfig from '../models/group-config';
-import { auth } from '../middleware/auth';
+import { auth, authRefresh } from '../middleware/auth';
 import { masterPermission, checkEnvironmentStatusChange } from '../middleware/validators';
 import { removeGroupStatus } from './common/index'
 
 const router = new express.Router()
 
-router.post('/groupconfig/create', auth, masterPermission('create Group'), async (req, res) => {
+router.post('/groupconfig/create', auth, authRefresh(), masterPermission('create Group'), async (req, res) => {
     const groupconfig = new GroupConfig({
         ...req.body,
         owner: req.admin._id
@@ -30,7 +30,7 @@ router.post('/groupconfig/create', auth, masterPermission('create Group'), async
 // GET /groupconfig?limit=10&skip=20
 // GET /groupconfig?sortBy=createdAt:desc
 // GET /groupconfig?domain=ID
-router.get('/groupconfig', auth, async (req, res) => {
+router.get('/groupconfig', auth, authRefresh(), async (req, res) => {
     const sort = {}
 
     if (req.query.sortBy) {
@@ -60,7 +60,7 @@ router.get('/groupconfig', auth, async (req, res) => {
     }
 })
 
-router.get('/groupconfig/:id', auth, async (req, res) => {
+router.get('/groupconfig/:id', auth, authRefresh(), async (req, res) => {
     try {
         const groupconfig = await GroupConfig.findOne({ _id: req.params.id })
 
@@ -77,7 +77,7 @@ router.get('/groupconfig/:id', auth, async (req, res) => {
 // GET /groupconfig/ID?sortBy=createdAt:desc
 // GET /groupconfig/ID?limit=10&skip=20
 // GET /groupconfig/ID
-router.get('/groupconfig/history/:id', auth, async (req, res) => {
+router.get('/groupconfig/history/:id', auth, authRefresh(), async (req, res) => {
     const sort = {}
 
     if (req.query.sortBy) {
@@ -108,7 +108,7 @@ router.get('/groupconfig/history/:id', auth, async (req, res) => {
     }
 })
 
-router.delete('/groupconfig/:id', auth, masterPermission('delete Group'), async (req, res) => {
+router.delete('/groupconfig/:id', auth, authRefresh(), masterPermission('delete Group'), async (req, res) => {
     try {
         const groupconfig = await GroupConfig.findOne({ _id: req.params.id })
 
@@ -123,7 +123,7 @@ router.delete('/groupconfig/:id', auth, masterPermission('delete Group'), async 
     }
 })
 
-router.patch('/groupconfig/:id', auth, masterPermission('update Group'), async (req, res) => {
+router.patch('/groupconfig/:id', auth, authRefresh(), masterPermission('update Group'), async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['name', 'description']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
@@ -147,7 +147,7 @@ router.patch('/groupconfig/:id', auth, masterPermission('update Group'), async (
     }
 })
 
-router.patch('/groupconfig/updateStatus/:id', auth, masterPermission('update Group Environment'), async (req, res) => {
+router.patch('/groupconfig/updateStatus/:id', auth, authRefresh(), masterPermission('update Group Environment'), async (req, res) => {
     try {
         const groupconfig = await GroupConfig.findOne({ _id: req.params.id })
         
@@ -165,7 +165,7 @@ router.patch('/groupconfig/updateStatus/:id', auth, masterPermission('update Gro
     }
 })
 
-router.patch('/groupconfig/removeStatus/:id', auth, masterPermission('update Group Environment'), async (req, res) => {
+router.patch('/groupconfig/removeStatus/:id', auth, authRefresh(), masterPermission('update Group Environment'), async (req, res) => {
     try {
         res.send(await removeGroupStatus(req.params.id, req.body.env))
     } catch (e) {

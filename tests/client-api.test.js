@@ -163,6 +163,32 @@ describe("Testing criteria [GraphQL] ", () => {
             })
     })
 
+    test('CLIENT_SUITE - Should return success on Flat view resolved by Config Key - Uncovered environment, should look to production', async () => {
+        const response = await request(app)
+            .post('/criteria/auth')
+            .set('switcher-api-key', `${apiKey}`)
+            .send({
+                domain: domainDocument.name,
+                component: component1.name,
+                environment: 'UNKNOWN ENVIRONMENT'
+            }).expect(200)
+
+        await request(app)
+            .post('/graphql')
+            .set('Authorization', `Bearer ${response.body.token}`)
+            .send({ query: `
+                {
+                    configuration(key: "${keyConfig}") {
+                        domain { name description activated }
+                        group { name description activated }
+                        config { key description activated }
+                        strategies { strategy activated operation values }
+                    }
+                }  
+            `})
+            .expect(200)
+    })
+
     test('CLIENT_SUITE - Should NOT return on Flat view resolved by an unknown Config Key', (done) => {
         request(app)
             .post('/graphql')

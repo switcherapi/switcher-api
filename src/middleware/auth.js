@@ -1,6 +1,7 @@
 "use strict";
 
 import jwt from 'jsonwebtoken';
+import moment from 'moment';
 import Admin from '../models/admin';
 import Domain from '../models/domain';
 import Component from '../models/component';
@@ -20,6 +21,31 @@ export async function auth(req, res, next) {
         next()
     } catch (e) {
         res.status(401).send({ error: 'Please authenticate.' })
+    }
+}
+
+export function authRefresh(update = true) {
+    return function (req, res, next) {
+        try {
+            const interval = process.env.JWT_ADMIN_TOKEN_RENEW_INTERVAL;
+            const activityLimit = moment(req.admin.lastActivity)
+                .add(interval.substring(0, interval.length - 1), interval.substring(interval.length - 1, interval.length));
+                
+            if (moment(activityLimit).isBefore(Date.now())) {
+                req.admin.tokens.splice(req.admin.tokens.indexOf(req.token), 1);
+                throw new Error();
+            } else {
+                req.admin.lastActivity = Date.now()
+            }
+    
+            next()
+        } catch (e) {
+            res.status(401).send({ error: 'Your session has expired. Please authenticate again.' })
+        } finally {
+            if (update) {
+                req.admin.save()
+            }
+        }
     }
 }
 

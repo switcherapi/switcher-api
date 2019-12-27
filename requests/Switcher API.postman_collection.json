@@ -317,6 +317,43 @@
 			"response": []
 		},
 		{
+			"name": "Admin - Refresh Me",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d588267a-effd-4e44-a189-c4366083197f",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/admin/refresh/me",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"refresh",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Admin - Delete Me",
 			"request": {
 				"method": "DELETE",
@@ -446,7 +483,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/environment/?domain=5deac6bc2d61a41fa0a84788",
+					"raw": "{{url}}/environment/?domain=5df166239194d613400a52e7",
 					"host": [
 						"{{url}}"
 					],
@@ -472,7 +509,7 @@
 						},
 						{
 							"key": "domain",
-							"value": "5deac6bc2d61a41fa0a84788"
+							"value": "5df166239194d613400a52e7"
 						}
 					]
 				}

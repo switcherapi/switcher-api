@@ -1,6 +1,6 @@
 import express from 'express';
 import Admin from '../models/admin';
-import { auth } from '../middleware/auth';
+import { auth, authRefresh } from '../middleware/auth';
 import { masterPermission } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
 
@@ -21,8 +21,9 @@ router.post('/admin/signup', [
     admin.master = true
 
     try {
-        await admin.save()
         const token = await admin.generateAuthToken()
+
+        await admin.save()
         res.status(201).send({ admin, token })
     } catch (e) {
         res.status(400).send(e)
@@ -33,7 +34,7 @@ router.post('/admin/create', [
     check('name').isLength({ min: 2 }),
     check('email').isEmail(),
     check('password').isLength({ min: 5 })
-], auth, masterPermission('create Admins'), async (req, res) => {
+], auth, authRefresh(false), masterPermission('create Admins'), async (req, res) => {
     
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -43,8 +44,9 @@ router.post('/admin/create', [
     const admin = new Admin(req.body)
 
     try {
-        await admin.save()
         const token = await admin.generateAuthToken()
+        
+        await admin.save()
         res.status(201).send({ admin, token })
     } catch (e) {
         res.status(400).send(e)
@@ -64,7 +66,7 @@ router.post('/admin/login', [
     }
 })
 
-router.post('/admin/logout', auth, async (req, res) => {
+router.post('/admin/logout', auth, authRefresh(false), async (req, res) => {
     try {
         req.admin.tokens = req.admin.tokens.filter((token) => {
             return token.token !== req.token
@@ -77,7 +79,7 @@ router.post('/admin/logout', auth, async (req, res) => {
     }
 })
 
-router.post('/admin/logoutAll', auth, async (req, res) => {
+router.post('/admin/logoutAll', auth, authRefresh(false), async (req, res) => {
     try {
         req.admin.tokens = []
         await req.admin.save()
@@ -87,7 +89,7 @@ router.post('/admin/logoutAll', auth, async (req, res) => {
     }
 })
 
-router.post('/admin/logoutOtherSessions', auth, async (req, res) => {
+router.post('/admin/logoutOtherSessions', auth, authRefresh(false), async (req, res) => {
     try {
         req.admin.tokens = req.admin.tokens.filter((token) => {
             return token.token === req.token
@@ -100,11 +102,15 @@ router.post('/admin/logoutOtherSessions', auth, async (req, res) => {
     }
 })
 
-router.get('/admin/me', auth, async (req, res) => {
+router.post('/admin/refresh/me', auth, authRefresh(), async (req, res) => {
+    res.status(200).send()
+})
+
+router.get('/admin/me', auth, authRefresh(), async (req, res) => {
     res.send(req.admin)
 })
 
-router.delete('/admin/me', auth, async (req, res) => {
+router.delete('/admin/me', auth, authRefresh(), async (req, res) => {
     try {
         await req.admin.remove()
         res.send(req.admin)
@@ -113,7 +119,7 @@ router.delete('/admin/me', auth, async (req, res) => {
     }
 })
 
-router.delete('/admin/:id', auth, masterPermission('delete Admins'), async (req, res) => {
+router.delete('/admin/:id', auth, authRefresh(), masterPermission('delete Admins'), async (req, res) => {
     try {
         const admin = await Admin.findById(req.params.id)
 
@@ -128,7 +134,7 @@ router.delete('/admin/:id', auth, masterPermission('delete Admins'), async (req,
     }
 })
 
-router.patch('/admin/me', auth, async (req, res) => {
+router.patch('/admin/me', auth, authRefresh(false), async (req, res) => {
     const updates = Object.keys(req.body)
     const allowwedUpdates = ['name', 'email', 'password']
     const isValidOperation = updates.every((update) => allowwedUpdates.includes(update))
@@ -146,7 +152,7 @@ router.patch('/admin/me', auth, async (req, res) => {
     }
 })
 
-router.patch('/admin/:id', auth, masterPermission('update Admins'), async (req, res) => {
+router.patch('/admin/:id', auth, authRefresh(false), masterPermission('update Admins'), async (req, res) => {
     const updates = Object.keys(req.body)
     const allowwedUpdates = ['name', 'email', 'password', 'active', 'master']
     const isValidOperation = updates.every((update) => allowwedUpdates.includes(update))

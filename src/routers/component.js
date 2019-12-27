@@ -1,12 +1,12 @@
 import express from 'express';
-import { auth } from '../middleware/auth';
+import { auth, authRefresh } from '../middleware/auth';
 import { masterPermission } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
 import Component from '../models/component';
 
 const router = new express.Router()
 
-router.post('/component/create', auth, [
+router.post('/component/create', auth, authRefresh(), [
     check('name').isLength({ min: 2, max: 50 }),
     check('description').isLength({ min: 2, max: 500 })
 ], masterPermission('create Components'), async (req, res) => {
@@ -31,7 +31,7 @@ router.post('/component/create', auth, [
 // GET /component?domain=ID&limit=10&skip=20
 // GET /component?domain=ID&sort=desc
 // GET /component?domain=ID
-router.get("/component", auth, async (req, res) => {
+router.get("/component", auth, authRefresh(), async (req, res) => {
     if (!req.query.domain) {
         return res.status(500).send({
             error: 'Please, specify the \'domain\' id'
@@ -55,7 +55,7 @@ router.get("/component", auth, async (req, res) => {
     }
 })
 
-router.get('/component/:id', auth, async (req, res) => {
+router.get('/component/:id', auth, authRefresh(), async (req, res) => {
     try {
         const component = await Component.findOne({ _id: req.params.id })
 
@@ -71,7 +71,7 @@ router.get('/component/:id', auth, async (req, res) => {
 
 router.patch('/component/:id', [
     check('description').isLength({ min: 5, max: 500 })
-], auth, async (req, res) => {
+], auth, authRefresh(), async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -100,7 +100,7 @@ router.patch('/component/:id', [
     }
 })
 
-router.delete('/component/:id', auth, masterPermission('delete Components'), async (req, res) => {
+router.delete('/component/:id', auth, authRefresh(), masterPermission('delete Components'), async (req, res) => {
     try {
         const component = await Component.findById(req.params.id)
         

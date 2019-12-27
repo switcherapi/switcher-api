@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
+import moment from 'moment';
 import app from '../src/app';
 import Admin from '../src/models/admin';
 import Domain from '../src/models/domain';
@@ -136,6 +137,62 @@ describe('Testing Admin insertion', () => {
             .send().expect(404)
 
         expect(response.body.error).toEqual('Operation not found')
+    })
+
+    test('ADMIN_SUITE - Should renew access', async () => {
+        let responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminAccount.email,
+                password: adminAccount.password
+            }).expect(200)
+
+        let admin = await Admin.findById(adminAccount._id)
+        const lastActivity = admin.lastActivity;
+        expect(lastActivity).not.toBeNull()
+
+        await request(app)
+            .post('/admin/refresh/me')
+            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .send().expect(200)
+
+        admin = await Admin.findById(adminAccount._id)
+        expect(admin.lastActivity).not.toBeNull()
+        expect(moment(lastActivity).isBefore(admin.lastActivity)).toBe(true)
+    })
+
+    test('ADMIN_SUITE - Should return token expired.', async () => {
+        let response = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminAccount.email,
+                password: adminAccount.password
+            }).expect(200)
+
+        let admin = await Admin.findById(adminAccount._id)
+        // Going back in time for a year ago
+        admin.lastActivity = moment(admin.lastActivity).add(-1, 'years').toDate();
+        await admin.save();
+
+        response = await request(app)
+            .post('/admin/refresh/me')
+            .set('Authorization', `Bearer ${response.body.token}`)
+            .send().expect(401)
+
+        expect(response.body.error).toEqual('Your session has expired. Please authenticate again.')
+
+        // After login, it should just renew
+        response = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminAccount.email,
+                password: adminAccount.password
+            }).expect(200)
+
+        await request(app)
+            .post('/admin/refresh/me')
+            .set('Authorization', `Bearer ${response.body.token}`)
+            .send().expect(200)
     })
 })
 

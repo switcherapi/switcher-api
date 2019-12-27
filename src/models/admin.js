@@ -44,6 +44,10 @@ const adminSchema = new mongoose.Schema({
         required: true,
         default: false
     },
+    lastActivity: {
+        type: Date,
+        required: true
+    },
     tokens: [{
         token: {
             type: String,
@@ -86,6 +90,7 @@ adminSchema.options.toJSON = {
         if (ret.updatedAt || ret.createdAt) {
             ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
             ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
+            ret.lastActivity = moment(ret.lastActivity).format('YYYY-MM-DD HH:mm:ss')
         }
         delete ret.password
         delete ret.tokens
@@ -98,6 +103,7 @@ adminSchema.methods.generateAuthToken = async function () {
     const token = jwt.sign(({ _id: admin.id.toString() }), process.env.JWT_SECRET)
 
     admin.tokens = admin.tokens.concat({ token })
+    admin.lastActivity = Date.now();
     await admin.save()
 
     return token

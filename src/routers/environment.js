@@ -3,7 +3,7 @@ import { Environment, EnvType } from '../models/environment';
 import GroupConfig from '../models/group-config';
 import Config from '../models/config';
 import { ConfigStrategy } from '../models/config-strategy';
-import { auth } from '../middleware/auth';
+import { auth, authRefresh } from '../middleware/auth';
 import { masterPermission } from '../middleware/validators';
 import { 
     removeDomainStatus,
@@ -14,7 +14,7 @@ import {
 
 const router = new express.Router()
 
-router.post('/environment/create', auth, masterPermission('create Environments'), async (req, res) => {
+router.post('/environment/create', auth, authRefresh(), masterPermission('create Environments'), async (req, res) => {
     const environment = new Environment({
         ...req.body, 
         owner: req.admin._id
@@ -31,7 +31,7 @@ router.post('/environment/create', auth, masterPermission('create Environments')
 // GET /environment?domain=ID&limit=10&skip=20
 // GET /environment?domain=ID&sort=desc
 // GET /environment?domain=ID
-router.get("/environment", auth, async (req, res) => {
+router.get("/environment", auth, authRefresh(), async (req, res) => {
     if (!req.query.domain) {
         return res.status(500).send({
             error: 'Please, specify the \'domain\' id'
@@ -55,7 +55,7 @@ router.get("/environment", auth, async (req, res) => {
     }
 })
 
-router.get('/environment/:id', auth, async (req, res) => {
+router.get('/environment/:id', auth, authRefresh(), async (req, res) => {
     try {
         const environment = await Environment.findOne({ _id: req.params.id })
 
@@ -69,7 +69,7 @@ router.get('/environment/:id', auth, async (req, res) => {
     }
 })
 
-router.delete('/environment/:id', auth, masterPermission('delete Environments'), async (req, res) => {
+router.delete('/environment/:id', auth, authRefresh(), masterPermission('delete Environments'), async (req, res) => {
     try {
         const environment = await Environment.findById(req.params.id)
 
@@ -92,7 +92,7 @@ router.delete('/environment/:id', auth, masterPermission('delete Environments'),
     }
 })
 
-router.patch('/environment/recover/:id', auth, masterPermission('recover Environments'), async (req, res) => {
+router.patch('/environment/recover/:id', auth, authRefresh(), masterPermission('recover Environments'), async (req, res) => {
     try {
         const environment = await Environment.findOne({ _id: req.params.id })
 
