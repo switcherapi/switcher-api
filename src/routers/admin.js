@@ -57,12 +57,17 @@ router.post('/admin/login', [
     check('email').isEmail(),
     check('password').isLength({ min: 5 })
 ], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
     try {
         const admin = await Admin.findByCredentials(req.body.email, req.body.password)
         const token = await admin.generateAuthToken()
         res.send({ admin, token })
     } catch (e) {
-        res.status(400).send()
+        res.status(401).send({ error: 'Invalid email/password' })
     }
 })
 

@@ -1,5 +1,6 @@
 import express from 'express';
 import expressGraphQL from 'express-graphql';
+import cors from 'cors';
 
 require('./db/mongoose')
 
@@ -18,6 +19,13 @@ import { appAuth } from './middleware/auth';
 const app = express()
 
 app.use(express.json())
+
+/**
+ * Cors configuration
+ */
+if (process.env.ENV === 'DEV') {
+    app.use(cors())
+}
 
 /**
  * API Routers

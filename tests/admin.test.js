@@ -217,7 +217,16 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 email: adminMasterAccount.email,
                 password: 'wrongpassword'
-            }).expect(400)
+            }).expect(401)
+    })
+
+    test('ADMIN_SUITE - Should not login with wrong email format', async () => {
+        await request(app)
+            .post('/admin/login')
+            .send({
+                email: 'notemail',
+                password: 'password'
+            }).expect(422)
     })
 
     test('ADMIN_SUITE - Should get profile for admin', async () => {
