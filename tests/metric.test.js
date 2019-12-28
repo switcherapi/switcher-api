@@ -4,7 +4,7 @@ import moment from 'moment';
 import app from '../src/app';
 import {
     setupDatabase,
-    adminMasterAccount,
+    adminMasterAccountToken,
     domainId
 } from './fixtures/db_metrics';
 
@@ -19,7 +19,7 @@ describe('Fetch metrics', () => {
     test('METRIC_SUITE - Should fetch all records from a specific Domain', async () => {
         const response = await request(app)
             .get('/metric/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         // Response validation
@@ -29,7 +29,7 @@ describe('Fetch metrics', () => {
     test('METRIC_SUITE - Should NOT fetch records from a unknown Domain - Not Domain Id', async () => {
         const response = await request(app)
             .get('/metric/UNKNOWN')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422)
     })
 
@@ -37,7 +37,7 @@ describe('Fetch metrics', () => {
         const args = `?key=KEY_2`
         const response = await request(app)
             .get('/metric/' + domainId + args)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
             
         // Response validation
@@ -51,7 +51,7 @@ describe('Fetch metrics', () => {
         const args = `?environment=QA`
         const response = await request(app)
             .get('/metric/' + domainId + args)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
             
         // Response validation
@@ -65,7 +65,7 @@ describe('Fetch metrics', () => {
         const args = `?key=UNKNOWN_KEY_2`
         const response = await request(app)
             .get('/metric/' + domainId + args)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
             
         // Response validation
@@ -76,7 +76,7 @@ describe('Fetch metrics', () => {
         const args = `?component=Component 1`
         const response = await request(app)
             .get('/metric/' + domainId + args)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
             
         // Response validation
@@ -90,7 +90,7 @@ describe('Fetch metrics', () => {
         const args = `?result=true`
         const response = await request(app)
             .get('/metric/' + domainId + args)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
             
         // Response validation
@@ -104,7 +104,7 @@ describe('Fetch metrics', () => {
         const args = `?group=GROUP 1`
         const response = await request(app)
             .get('/metric/' + domainId + args)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
             
         // Response validation
@@ -118,7 +118,7 @@ describe('Fetch metrics', () => {
         const args = `?dateAfter=2019-12-14 17:30:00`
         const response = await request(app)
             .get('/metric/' + domainId + args)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
             
         // Response validation
@@ -132,7 +132,7 @@ describe('Fetch metrics', () => {
         const args = `?dateBefore=2019-12-14 17:30:00`
         const response = await request(app)
             .get('/metric/' + domainId + args)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
             
         // Response validation
@@ -146,7 +146,7 @@ describe('Fetch metrics', () => {
         const args = `?dateAfter=2019-12-14 16:00:00&dateBefore=2019-12-14 17:30:00`
         const response = await request(app)
             .get('/metric/' + domainId + args)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         // Response validation
@@ -160,7 +160,7 @@ describe('Fetch metrics', () => {
         const args = `?limit=1`
         const response = await request(app)
             .get('/metric/' + domainId + args)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
             
         // Response validation
@@ -173,7 +173,7 @@ describe('Fetch metrics', () => {
     test('METRIC_SUITE - Should fetch records skiping', async () => {
         const responseCount = await request(app)
             .get('/metric/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         // Response validation
@@ -183,7 +183,7 @@ describe('Fetch metrics', () => {
         const args = `?skip=1`
         const response = await request(app)
             .get('/metric/' + domainId + args)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
             
         // Response validation

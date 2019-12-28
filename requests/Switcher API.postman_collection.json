@@ -14,7 +14,7 @@
 						"id": "bc8552fc-029b-432b-b090-dc2988741dca",
 						"exec": [
 							"if (pm.response.code === 201) {",
-							"    pm.environment.set('authToken', pm.response.json().token)",
+							"    pm.environment.set('authToken', pm.response.json().jwt.token)",
 							"}"
 						],
 						"type": "text/javascript"
@@ -65,7 +65,8 @@
 						"id": "bc8552fc-029b-432b-b090-dc2988741dca",
 						"exec": [
 							"if (pm.response.code === 201) {",
-							"    pm.environment.set('authToken', pm.response.json().token)",
+							"    pm.environment.set('authToken', pm.response.json().jwt.token)",
+							"    pm.environment.set('refreshToken', pm.response.json().jwt.refreshToken)",
 							"}"
 						],
 						"type": "text/javascript"
@@ -184,7 +185,8 @@
 						"id": "00421dc9-53f8-493b-ac1b-9b71e2f59a64",
 						"exec": [
 							"if (pm.response.code === 200) {",
-							"    pm.environment.set('authToken', pm.response.json().token)",
+							"    pm.environment.set('authToken', pm.response.json().jwt.token)",
+							"    pm.environment.set('refreshToken', pm.response.json().jwt.refreshToken)",
 							"}"
 						],
 						"type": "text/javascript"
@@ -245,42 +247,6 @@
 			"response": []
 		},
 		{
-			"name": "Admin - Logout ALL",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "{{url}}/admin/logoutAll",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"admin",
-						"logoutAll"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Admin - Logout Other Sessions",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "{{url}}/admin/logoutOtherSessions",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"admin",
-						"logoutOtherSessions"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Admin - Read",
 			"event": [
 				{
@@ -317,14 +283,17 @@
 			"response": []
 		},
 		{
-			"name": "Admin - Refresh Me",
+			"name": "Admin - Refresh Token",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "d588267a-effd-4e44-a189-c4366083197f",
 						"exec": [
-							""
+							"if (pm.response.code === 200) {",
+							"    pm.environment.set('authToken', pm.response.json().token)",
+							"    pm.environment.set('refreshToken', pm.response.json().refreshToken)",
+							"}"
 						],
 						"type": "text/javascript"
 					}
@@ -337,8 +306,23 @@
 						"key": "Authorization",
 						"type": "text",
 						"value": "Bearer"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
 					}
 				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"refreshToken\": \"{{refreshToken}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "{{url}}/admin/refresh/me",
 					"host": [

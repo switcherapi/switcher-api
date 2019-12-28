@@ -1,13 +1,13 @@
 import express from 'express';
 import Domain from '../models/domain';
 import { Environment } from '../models/environment';
-import { auth, authRefresh } from '../middleware/auth';
+import { auth } from '../middleware/auth';
 import { masterPermission, checkEnvironmentStatusChange } from '../middleware/validators';
 import { removeDomainStatus } from './common/index'
 
 const router = new express.Router()
 
-router.get('/domain/generateApiKey/:domain/', auth, authRefresh(), masterPermission('generate API Key'), async (req, res) => {
+router.get('/domain/generateApiKey/:domain/', auth, masterPermission('generate API Key'), async (req, res) => {
     try {
         const domain = await Domain.findOne({ _id: req.params.domain })
 
@@ -23,7 +23,7 @@ router.get('/domain/generateApiKey/:domain/', auth, authRefresh(), masterPermiss
     }
 })
 
-router.post('/domain/create', auth, authRefresh(), masterPermission('create Domain'), async (req, res) => {
+router.post('/domain/create', auth, masterPermission('create Domain'), async (req, res) => {
     try {
         const domain = new Domain({
             ...req.body,
@@ -46,7 +46,7 @@ router.post('/domain/create', auth, authRefresh(), masterPermission('create Doma
 
 // GET /domain?limit=10&skip=20
 // GET /domain?sortBy=createdAt:desc
-router.get('/domain', auth, authRefresh(), async (req, res) => {
+router.get('/domain', auth, async (req, res) => {
     const sort = {}
 
     if (req.query.sortBy) {
@@ -69,7 +69,7 @@ router.get('/domain', auth, authRefresh(), async (req, res) => {
     }
 })
 
-router.get('/domain/:id', auth, authRefresh(), async (req, res) => {
+router.get('/domain/:id', auth, async (req, res) => {
     try {
         const domain = await Domain.findOne({ _id: req.params.id })
 
@@ -86,7 +86,7 @@ router.get('/domain/:id', auth, authRefresh(), async (req, res) => {
 // GET /domain/ID?sortBy=createdAt:desc
 // GET /domain/ID?limit=10&skip=20
 // GET /domain/ID
-router.get('/domain/history/:id', auth, authRefresh(), async (req, res) => {
+router.get('/domain/history/:id', auth, async (req, res) => {
     const sort = {}
 
     if (req.query.sortBy) {
@@ -120,7 +120,7 @@ router.get('/domain/history/:id', auth, authRefresh(), async (req, res) => {
     }
 })
 
-router.delete('/domain/:id', auth, authRefresh(), masterPermission('delete Domain'), async (req, res) => {
+router.delete('/domain/:id', auth, masterPermission('delete Domain'), async (req, res) => {
     try {
         const domain = await Domain.findOne({ _id: req.params.id })
 
@@ -135,7 +135,7 @@ router.delete('/domain/:id', auth, authRefresh(), masterPermission('delete Domai
     }
 })
 
-router.patch('/domain/:id', auth, authRefresh(), masterPermission('update Domain'), async (req, res) => {
+router.patch('/domain/:id', auth, masterPermission('update Domain'), async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['description']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
@@ -160,7 +160,7 @@ router.patch('/domain/:id', auth, authRefresh(), masterPermission('update Domain
     }
 })
 
-router.patch('/domain/updateStatus/:id', auth, authRefresh(), masterPermission('update Domain Environment'), async (req, res) => {
+router.patch('/domain/updateStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
     try {    
         const domain = await Domain.findOne({ _id: req.params.id })
 
@@ -182,7 +182,7 @@ router.patch('/domain/updateStatus/:id', auth, authRefresh(), masterPermission('
     }
 })
 
-router.patch('/domain/removeStatus/:id', auth, authRefresh(), masterPermission('update Domain Environment'), async (req, res) => {
+router.patch('/domain/removeStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
     try {
         res.send(await removeDomainStatus(req.params.id, req.body.env))
     } catch (e) {

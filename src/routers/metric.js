@@ -1,7 +1,7 @@
 import express from 'express';
 import { Metric } from '../models/metric';
 import { check, validationResult } from 'express-validator';
-import { auth, authRefresh } from '../middleware/auth';
+import { auth } from '../middleware/auth';
 import { EnvType } from '../models/environment';
 
 const router = new express.Router();
@@ -10,7 +10,7 @@ const router = new express.Router();
 // GET /metric/ID?sortBy=-date;key;component;result
 // GET /metric/ID?limit=10&skip=20
 // GET /metric/ID
-router.get('/metric/:id', [check('id').isMongoId()], auth, authRefresh(), async (req, res) => {
+router.get('/metric/:id', [check('id').isMongoId()], auth, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });

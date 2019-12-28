@@ -1,13 +1,20 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
-import moment from 'moment';
+import jwt from 'jsonwebtoken';
 import app from '../src/app';
 import Admin from '../src/models/admin';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
 import Config from '../src/models/config';
 import { ConfigStrategy } from '../src/models/config-strategy';
-import { setupDatabase, adminMasterAccountId, adminMasterAccount, adminAccountId, adminAccount } from './fixtures/db_api';
+import { 
+    setupDatabase, 
+    adminMasterAccountId, 
+    adminMasterAccount, 
+    adminAccountId, 
+    adminAccount, 
+    adminMasterAccountToken 
+} from './fixtures/db_api';
 
 afterAll(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -40,8 +47,7 @@ describe('Testing Admin insertion', () => {
                 email: 'master_test123@mail.com',
                 master: true,
                 active: true
-            },
-            token: admin.tokens[0].token
+            }
         })
     })
 
@@ -58,7 +64,7 @@ describe('Testing Admin insertion', () => {
     test('ADMIN_SUITE - Should NOT create a new Admin - invalid email', async () => {
         await request(app)
             .post('/admin/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'Admin',
                 email: 'admin_test123',
@@ -76,7 +82,7 @@ describe('Testing Admin insertion', () => {
 
         const response = await request(app)
             .post('/admin/create')
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 name: 'Admin',
                 email: 'admin_test123@mail.com',
@@ -97,8 +103,7 @@ describe('Testing Admin insertion', () => {
                 email: 'admin_test123@mail.com',
                 master: false,
                 active: true
-            },
-            token: admin.tokens[0].token
+            }
         })
     })
 
@@ -111,7 +116,7 @@ describe('Testing Admin insertion', () => {
             }).expect(200)
 
         await request(app).post('/admin/create')
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 name: 'Admin',
                 email: 'admin_test123@mail.com',
@@ -140,46 +145,99 @@ describe('Testing Admin insertion', () => {
     })
 
     test('ADMIN_SUITE - Should renew access', async () => {
-        let responseLogin = await request(app)
+        const responseLogin = await request(app)
             .post('/admin/login')
             .send({
                 email: adminAccount.email,
                 password: adminAccount.password
             }).expect(200)
 
+        const token = responseLogin.body.jwt.token
+        const refreshToken = responseLogin.body.jwt.refreshToken
+
+        expect(token).not.toBeNull()
+        expect(refreshToken).not.toBeNull()
+
+        //DB validation
         let admin = await Admin.findById(adminAccount._id)
-        const lastActivity = admin.lastActivity;
-        expect(lastActivity).not.toBeNull()
+        expect(admin.token).toEqual(refreshToken)
 
-        await request(app)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const responseRefresh = await request(app)
             .post('/admin/refresh/me')
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
-            .send().expect(200)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send({
+                refreshToken
+            }).expect(200)
 
+        expect(responseRefresh.body.token).not.toBeNull()
+        expect(responseRefresh.body.refreshToken).not.toBeNull()
+        expect(responseRefresh.body.token).not.toEqual(token)
+        expect(responseRefresh.body.refreshToken).not.toEqual(refreshToken)
+
+        //DB validation
         admin = await Admin.findById(adminAccount._id)
-        expect(admin.lastActivity).not.toBeNull()
-        expect(moment(lastActivity).isBefore(admin.lastActivity)).toBe(true)
+        expect(admin.token).toEqual(responseRefresh.body.refreshToken)
     })
 
-    test('ADMIN_SUITE - Should return token expired.', async () => {
-        let response = await request(app)
+    test('ADMIN_SUITE - Should NOT renew access - using the same refreshToken', async () => {
+        const responseLogin = await request(app)
             .post('/admin/login')
             .send({
                 email: adminAccount.email,
                 password: adminAccount.password
             }).expect(200)
 
-        let admin = await Admin.findById(adminAccount._id)
-        // Going back in time for a year ago
-        admin.lastActivity = moment(admin.lastActivity).add(-1, 'years').toDate();
-        await admin.save();
+        const token = responseLogin.body.jwt.token
+        const refreshToken = responseLogin.body.jwt.refreshToken
 
-        response = await request(app)
+        expect(token).not.toBeNull()
+        expect(refreshToken).not.toBeNull()
+
+        let responseRefresh = await request(app)
             .post('/admin/refresh/me')
-            .set('Authorization', `Bearer ${response.body.token}`)
-            .send().expect(401)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send({
+                refreshToken
+            }).expect(200)
 
-        expect(response.body.error).toEqual('Your session has expired. Please authenticate again.')
+        responseRefresh = await request(app)
+            .post('/admin/refresh/me')
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send({
+                refreshToken
+            }).expect(401)
+
+        expect(responseRefresh.body.error).toEqual('Unable to refresh token.')
+    })
+
+    test('ADMIN_SUITE - Should NOT renew access - invalid Token', async () => {
+        const responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminAccount.email,
+                password: adminAccount.password
+            }).expect(200)
+
+        const refreshToken = responseLogin.body.jwt.refreshToken
+
+        let responseRefresh = await request(app)
+            .post('/admin/refresh/me')
+            .set('Authorization', `Bearer INVALID_TOKEN`)
+            .send({
+                refreshToken
+            }).expect(401)
+
+        expect(responseRefresh.body.error).toEqual('Unable to refresh token.')
+    })
+
+    test('ADMIN_SUITE - Should return token expired', async () => {
+        const tempToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET, { expiresIn: '0s' })
+
+        let response = await request(app)
+            .get('/admin/me')
+            .set('Authorization', `Bearer ${tempToken}`)
+            .send().expect(401)
 
         // After login, it should just renew
         response = await request(app)
@@ -190,8 +248,8 @@ describe('Testing Admin insertion', () => {
             }).expect(200)
 
         await request(app)
-            .post('/admin/refresh/me')
-            .set('Authorization', `Bearer ${response.body.token}`)
+            .get('/admin/me')
+            .set('Authorization', `Bearer ${response.body.jwt.token}`)
             .send().expect(200)
     })
 })
@@ -208,7 +266,7 @@ describe('Testing Admin login and fetch', () => {
             }).expect(200)
 
         const admin = await Admin.findById(adminAccountId)
-        expect(response.body.token).toBe(admin.tokens[1].token)
+        expect(response.body.jwt.refreshToken).toBe(admin.token)
     })
 
     test('ADMIN_SUITE - Should not login non-existent admin', async () => {
@@ -239,7 +297,7 @@ describe('Testing Admin login and fetch', () => {
 
         const response = await request(app)
             .get('/admin/me')
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
             .expect(200)
 
@@ -267,7 +325,7 @@ describe('Testing Admin login and fetch', () => {
 
         await request(app)
             .patch('/admin/me')
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 name: 'Updated Name'
             })
@@ -285,7 +343,7 @@ describe('Testing Admin login and fetch', () => {
 
         await request(app)
             .patch('/admin/me')
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 name: 'Updated Name'
             })
@@ -298,7 +356,7 @@ describe('Testing Admin login and fetch', () => {
     test('ADMIN_SUITE - Should NOT update/me admin fields', async () => {
         await request(app)
             .patch('/admin/me')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 _id: new mongoose.Types.ObjectId()
             })
@@ -315,7 +373,7 @@ describe('Testing Admin login and fetch', () => {
 
         const response = await request(app)
             .patch('/admin/' + adminMasterAccountId)
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 name: 'Updated Name'
             })
@@ -334,7 +392,7 @@ describe('Testing Admin login and fetch', () => {
 
         const response = await request(app)
             .patch('/admin/' + adminMasterAccountId)
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 name: 'Updated Name'
             })
@@ -346,7 +404,7 @@ describe('Testing Admin login and fetch', () => {
     test('ADMIN_SUITE - Should NOT update by invalid account id', async () => {
         await request(app)
             .patch('/admin/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'Updated Name'
             })
@@ -354,7 +412,7 @@ describe('Testing Admin login and fetch', () => {
 
         await request(app)
             .patch('/admin/INVALID_ID')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'Updated Name'
             })
@@ -371,7 +429,7 @@ describe('Testing Admin login and fetch', () => {
 
         await request(app)
             .patch('/admin/' + adminAccountId)
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 name: 'Updated Name'
             })
@@ -391,79 +449,17 @@ describe('Testing Admin login and fetch', () => {
 
         await request(app)
             .post('/admin/logout')
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
             .expect(200)
 
         const admin = await Admin.findById(adminMasterAccountId)
-        const expected = [ responseLogin.body.token ];
-        expect(admin.tokens).toEqual(expect.not.arrayContaining(expected))
+        expect(admin.token).toBeNull()
     })
 })
 
 describe('Testing Domain logout', () => {
     beforeAll(setupDatabase)
-
-    test('ADMIN_SUITE - Should logout other sessions for a valid admin', async () => {
-        const firstToken = adminMasterAccount.tokens[0].token
-
-        await request(app)
-            .post('/admin/login')
-            .send({
-                email: adminMasterAccount.email,
-                password: adminMasterAccount.password
-            }).expect(200)
-
-        await request(app)
-            .post('/admin/login')
-            .send({
-                email: adminMasterAccount.email,
-                password: adminMasterAccount.password
-            }).expect(200)
-
-        // DB validate - tokens per session generated logins
-        const adminBefore = await Admin.findById(adminMasterAccountId).select('tokens.token')
-        expect(adminBefore.tokens.length).toEqual(3)
-
-        await request(app)
-            .post('/admin/logoutOtherSessions')
-            .set('Authorization', `Bearer ${firstToken}`)
-            .send()
-            .expect(200)
-    })
-
-    test('ADMIN_SUITE - Should logout all sessions for a valid admin', async () => {
-        const firstToken = adminMasterAccount.tokens[0].token
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        await request(app)
-            .post('/admin/login')
-            .send({
-                email: adminMasterAccount.email,
-                password: adminMasterAccount.password
-            }).expect(200)
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        await request(app)
-            .post('/admin/login')
-            .send({
-                email: adminMasterAccount.email,
-                password: adminMasterAccount.password
-            }).expect(200)
-
-        // DB validate - tokens per session generated logins
-        const adminBefore = await Admin.findById(adminMasterAccountId).select('tokens.token')
-        expect(adminBefore.tokens.length > 2).toEqual(true)
-
-        await request(app)
-            .post('/admin/logoutAll')
-            .set('Authorization', `Bearer ${firstToken}`)
-            .send()
-            .expect(200)
-
-        const adminAfter = await Admin.findById(adminMasterAccountId)
-        expect(adminAfter.tokens.length).toEqual(0)
-    })
 
     test('ADMIN_SUITE - Should delete/me account for admin', async () => {
         const responseLogin = await request(app)
@@ -475,7 +471,7 @@ describe('Testing Domain logout', () => {
 
         await request(app)
             .delete('/admin/me')
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
             .expect(200)
 
@@ -511,7 +507,7 @@ describe('Testing Admin deletion', () => {
 
         const response = await request(app)
             .delete('/admin/' + adminMasterAccountId)
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
             .expect(400)
 
@@ -519,13 +515,13 @@ describe('Testing Admin deletion', () => {
 
         await request(app)
             .delete('/admin/INVALID_ADMIN_ID')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send()
             .expect(500)
 
         await request(app)
             .delete('/admin/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send()
             .expect(404)
     })
@@ -553,7 +549,7 @@ describe('Testing Admin deletion', () => {
 
         await request(app)
             .delete('/admin/' + adminMasterAccountId)
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
             .expect(200)
 

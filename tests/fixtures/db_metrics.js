@@ -1,23 +1,19 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import { Metric } from '../../src/models/metric';
 import Admin from '../../src/models/admin';
 import { EnvType } from '../../src/models/environment';
 
 export const adminMasterAccountId = new mongoose.Types.ObjectId()
+export const adminMasterAccountToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET)
 export const adminMasterAccount = {
     _id: adminMasterAccountId,
     name: 'Metric Admin',
     email: 'metric@admin.com',
     password: '123123123123',
     master: true,
-    active: true,
-    lastActivity: Date.now(),
-    tokens: [{
-        token: jwt.sign({
-            _id: adminMasterAccountId
-        }, process.env.JWT_SECRET)
-    }]
+    active: true
 }
 
 export const domainId = new mongoose.Types.ObjectId()
@@ -85,7 +81,10 @@ export const setupDatabase = async () => {
     await Metric.deleteMany()
     await Admin.deleteMany()
 
+    const refreshTokenMaster = await bcrypt.hash(adminMasterAccountToken, 8)
+    adminMasterAccount.token = refreshTokenMaster;
     await new Admin(adminMasterAccount).save()
+
     await new Metric(entry1).save()
     await new Metric(entry2).save()
     await new Metric(entry3).save()

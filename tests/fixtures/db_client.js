@@ -12,19 +12,14 @@ import { Environment, EnvType } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
 
 export const adminMasterAccountId = new mongoose.Types.ObjectId()
+export const adminMasterAccountToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET)
 export const adminMasterAccount = {
     _id: adminMasterAccountId,
     name: 'Master Admin',
     email: 'master@mail.com',
     password: '123123123123',
     master: true,
-    active: true,
-    lastActivity: Date.now(),
-    tokens: [{
-        token: jwt.sign({
-            _id: adminMasterAccountId
-        }, process.env.JWT_SECRET)
-    }]
+    active: true
 }
 
 export let apiKey = undefined
@@ -162,7 +157,10 @@ export const setupDatabase = async () => {
     await History.deleteMany()
     await Metric.deleteMany()
 
+    const refreshTokenMaster = await bcrypt.hash(adminMasterAccountToken, 8)
+    adminMasterAccount.token = refreshTokenMaster;
     await new Admin(adminMasterAccount).save()
+
     await new Environment(environment1).save()
     await new Environment(environment2).save()
 

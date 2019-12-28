@@ -4,8 +4,8 @@ import app from '../src/app';
 import Component from '../src/models/component';
 import { 
     setupDatabase,
-    adminMasterAccount,
-    adminAccount,
+    adminMasterAccountToken,
+    adminAccountToken,
     domainId
  } from './fixtures/db_api';
 
@@ -20,7 +20,7 @@ describe('Insertion tests', () => {
     test('COMPONENT_SUITE - Should create a new Component', async () => {
         const response = await request(app)
             .post('/component/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'my-web-app',
                 description: 'This is my Web App using this wonderful API',
@@ -38,7 +38,7 @@ describe('Insertion tests', () => {
     test('COMPONENT_SUITE - Should NOT create a new Component - Permission denied', async () => {
         await request(app)
             .post('/component/create')
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 name: 'my-web-app',
                 description: 'This is my Web App using this wonderful API',
@@ -49,7 +49,7 @@ describe('Insertion tests', () => {
     test('COMPONENT_SUITE - Should NOT create a new Component - Component already exist', async () => {
         const response = await request(app)
             .post('/component/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'my-web-app',
                 description: 'This is my Web App using this wonderful API',
@@ -62,7 +62,7 @@ describe('Insertion tests', () => {
     test('COMPONENT_SUITE - Should NOT create a new Component - Domain not found', async () => {
         await request(app)
             .post('/component/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'my-web-app',
                 description: 'This is my Web App using this wonderful API',
@@ -78,7 +78,7 @@ describe('Reading tests', () => {
     beforeAll(async () => {
         const response = await request(app)
             .post('/component/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'COMPONENT_1',
                 description: 'Component 1 for reading test',
@@ -91,7 +91,7 @@ describe('Reading tests', () => {
     test('COMPONENT_SUITE - Should read all Components from a Domain', async () => {
         const response = await request(app)
             .get('/component?domain=' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body[0].name).toBe('COMPONENT_1')
@@ -100,7 +100,7 @@ describe('Reading tests', () => {
     test('COMPONENT_SUITE - Should read one single Component', async () => {
         const response = await request(app)
             .get('/component/' + component1Id)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body.name).toBe('COMPONENT_1')
@@ -109,7 +109,7 @@ describe('Reading tests', () => {
     test('COMPONENT_SUITE - Should NOT read Component - Not found', async () => {
         const response = await request(app)
             .get('/component/NOT_FOUND')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
     })
 })
@@ -120,7 +120,7 @@ describe('Updating tests', () => {
     test('COMPONENT_SUITE - Should update a Component', async () => {
         let response = await request(app)
             .post('/component/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'my-web-app-to-be-updated',
                 description: 'This is my Web App using this wonderful API',
@@ -133,7 +133,7 @@ describe('Updating tests', () => {
 
         response = await request(app)
             .patch('/component/' + response.body._id)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Wow, this is my updated description'
             }).expect(200)
@@ -146,7 +146,7 @@ describe('Updating tests', () => {
     test('COMPONENT_SUITE - Should NOT update a Component - Invalid field', async () => {
         let response = await request(app)
             .post('/component/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'my-web-app-to-not-be-updated',
                 description: 'This is my Web App using this wonderful API',
@@ -159,7 +159,7 @@ describe('Updating tests', () => {
 
         response = await request(app)
             .patch('/component/' + response.body._id)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'cannot-update-it-so-sad'
             }).expect(422)
@@ -173,7 +173,7 @@ describe('Deletion tests', () => {
     test('COMPONENT_SUITE - Should delete a Component', async () => {
         let response = await request(app)
             .post('/component/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'my-web-app-to-be-deleted',
                 description: 'This is my Web App using this wonderful API',
@@ -182,7 +182,7 @@ describe('Deletion tests', () => {
 
         response = await request(app)
             .delete('/component/' + response.body._id)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         // DB validation - document deleted
@@ -193,7 +193,7 @@ describe('Deletion tests', () => {
     test('COMPONENT_SUITE - Should NOT delete a Component - Permission denied', async () => {
         let response = await request(app)
             .post('/component/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'my-web-app-to-not-be-deleted',
                 description: 'This is my Web App using this wonderful API',
@@ -202,7 +202,7 @@ describe('Deletion tests', () => {
 
         await request(app)
             .delete('/component/' + response.body._id)
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(400)
     })
 })

@@ -8,8 +8,8 @@ import Config from '../src/models/config';
 import { ConfigStrategy } from '../src/models/config-strategy';
 import { 
     setupDatabase,
-    adminMasterAccount,
-    adminAccount,
+    adminMasterAccountToken,
+    adminAccountToken,
     environment1,
     environment1Id,
     domainId,
@@ -29,7 +29,7 @@ describe('Insertion tests', () => {
     test('ENV_SUITE - Should create a new Environment', async () => {
         const response = await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA',
                 domain: domainId
@@ -46,7 +46,7 @@ describe('Insertion tests', () => {
     test('ENV_SUITE - Should NOT create a new Environment - Permission denied', async () => {
         await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 name: 'QA',
                 domain: domainId
@@ -56,7 +56,7 @@ describe('Insertion tests', () => {
     test('ENV_SUITE - Should NOT create a new Environment - Environment already exist', async () => {
         const response = await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: EnvType.DEFAULT,
                 domain: domainId
@@ -68,7 +68,7 @@ describe('Insertion tests', () => {
     test('ENV_SUITE - Should NOT create a new Environment - Domain not found', async () => {
         await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'DEV',
                 domain: 'FAKE_DOMAIN'
@@ -80,7 +80,7 @@ describe('Reading tests', () => {
     test('ENV_SUITE - Should read all Environments from a Domain', async () => {
         const response = await request(app)
             .get('/environment?domain=' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         const defaultEnv = response.body.filter(env => env.name === EnvType.DEFAULT)
@@ -90,7 +90,7 @@ describe('Reading tests', () => {
     test('ENV_SUITE - Should read one single Environment', async () => {
         const response = await request(app)
             .get('/environment/' + environment1Id)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body.name).toBe(EnvType.DEFAULT)
@@ -99,7 +99,7 @@ describe('Reading tests', () => {
     test('ENV_SUITE - Should NOT read Environment - Not found', async () => {
         const response = await request(app)
             .get('/environment/NOT_FOUND')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
     })
 })
@@ -110,7 +110,7 @@ describe('Deletion tests', () => {
     test('ENV_SUITE - Should delete an Environment', async () => {
         let response = await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA',
                 domain: domainId
@@ -118,7 +118,7 @@ describe('Deletion tests', () => {
 
         response = await request(app)
             .delete('/environment/' + response.body._id)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         // DB validation - document deleted
@@ -129,7 +129,7 @@ describe('Deletion tests', () => {
     test('ENV_SUITE - Should NOT delete an Environment - default', async () => {
         const response = await request(app)
             .delete('/environment/' + environment1._id)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(400)
 
         expect(response.body.error).toBe(`Unable to delete this environment`)
@@ -142,7 +142,7 @@ describe('Deletion tests', () => {
     test('ENV_SUITE - Should NOT delete an Environment - Permission denied', async () => {
         let response = await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA',
                 domain: domainId
@@ -150,7 +150,7 @@ describe('Deletion tests', () => {
 
         await request(app)
             .delete('/environment/' + response.body._id)
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(400)
     })
 
@@ -160,7 +160,7 @@ describe('Deletion tests', () => {
 
         let response = await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: envName,
                 domain: domainId
@@ -170,28 +170,28 @@ describe('Deletion tests', () => {
 
         await request(app)
             .patch('/domain/updateStatus/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 [`${envName}`]: true
             }).expect(200);
 
         await request(app)
             .patch('/groupconfig/updateStatus/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 [`${envName}`]: true
             }).expect(200);
 
         await request(app)
             .patch('/config/updateStatus/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 [`${envName}`]: true
             }).expect(200);
 
         await request(app)
             .patch('/configstrategy/updateStatus/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 [`${envName}`]: true
             }).expect(200);
@@ -214,7 +214,7 @@ describe('Deletion tests', () => {
 
         await request(app)
             .patch('/environment/recover/' + envId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         domain = await Domain.findById(domainId)

@@ -7,7 +7,7 @@ import Config from '../src/models/config';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../src/models/config-strategy';
 import { 
     setupDatabase,
-    adminMasterAccount,
+    adminMasterAccountToken,
     apiKey,
     keyConfig,
     configId,
@@ -808,7 +808,7 @@ describe("Testing criteria [REST] ", () => {
 
         const responseNewApiKey = await request(app)
             .get('/domain/generateApiKey/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(201)
 
         const secondResponse = await request(app)

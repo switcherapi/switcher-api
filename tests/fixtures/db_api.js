@@ -12,35 +12,25 @@ import { EnvType, Environment } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
 
 export const adminMasterAccountId = new mongoose.Types.ObjectId()
+export const adminMasterAccountToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET)
 export const adminMasterAccount = {
     _id: adminMasterAccountId,
     name: 'Master Admin',
     email: 'master@mail.com',
     password: '123123123123',
     master: true,
-    active: true,
-    lastActivity: Date.now(),
-    tokens: [{
-        token: jwt.sign({
-            _id: adminMasterAccountId
-        }, process.env.JWT_SECRET)
-    }]
+    active: true
 }
 
 export const adminAccountId = new mongoose.Types.ObjectId()
+export const adminAccountToken = jwt.sign({ _id: adminAccountId }, process.env.JWT_SECRET)
 export const adminAccount = {
     _id: adminAccountId,
     name: 'Admin',
     email: 'admin@mail.com',
     password: 'asdasdasdasd',
     master: false,
-    active: true,
-    lastActivity: Date.now(),
-    tokens: [{
-        token: jwt.sign({
-            _id: adminAccountId
-        }, process.env.JWT_SECRET)
-    }]
+    active: true
 }
 
 export const domainId = new mongoose.Types.ObjectId()
@@ -116,8 +106,14 @@ export const setupDatabase = async () => {
     await History.deleteMany()
     await Metric.deleteMany()
 
+    const refreshTokenMaster = await bcrypt.hash(adminMasterAccountToken, 8)
+    adminMasterAccount.token = refreshTokenMaster;
     await new Admin(adminMasterAccount).save()
+
+    const refreshToken = await bcrypt.hash(adminAccountToken, 8)
+    adminAccount.token = refreshToken;
     await new Admin(adminAccount).save()
+
     await new Environment(environment1).save()
 
     const apiKey = await bcrypt.hash(domainDocument._id + 'Domain', 8)

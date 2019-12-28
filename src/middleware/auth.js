@@ -1,7 +1,7 @@
 "use strict";
 
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import moment from 'moment';
 import Admin from '../models/admin';
 import Domain from '../models/domain';
 import Component from '../models/component';
@@ -10,7 +10,7 @@ export async function auth(req, res, next) {
     try {
         const token = req.header('Authorization').replace('Bearer ', '')
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const admin = await Admin.findOne({ _id: decoded._id, 'tokens.token': token })
+        const admin = await Admin.findOne({ _id: decoded._id })
 
         if (!admin || !admin.active) {
             throw new Error()
@@ -24,28 +24,28 @@ export async function auth(req, res, next) {
     }
 }
 
-export function authRefresh(update = true) {
-    return function (req, res, next) {
-        try {
-            const interval = process.env.JWT_ADMIN_TOKEN_RENEW_INTERVAL;
-            const activityLimit = moment(req.admin.lastActivity)
-                .add(interval.substring(0, interval.length - 1), interval.substring(interval.length - 1, interval.length));
-                
-            if (moment(activityLimit).isBefore(Date.now())) {
-                req.admin.tokens.splice(req.admin.tokens.indexOf(req.token), 1);
-                throw new Error();
-            } else {
-                req.admin.lastActivity = Date.now()
-            }
-    
-            next()
-        } catch (e) {
-            res.status(401).send({ error: 'Your session has expired. Please authenticate again.' })
-        } finally {
-            if (update) {
-                req.admin.save()
-            }
+export async function authRefreshToken(req, res, next) {
+    try {
+        const token = req.header('Authorization').replace('Bearer ', '')
+        const refreshToken = req.body.refreshToken;
+        
+        const isMatch = await bcrypt.compare(token, refreshToken)
+        if (!isMatch) {
+            throw new Error()
         }
+
+        const decoded = await jwt.decode(token)
+        const admin = await Admin.findOne({ _id: decoded._id, token: refreshToken })
+
+        if (!admin || !admin.active) {
+            throw new Error()
+        }
+
+        const newTokenPair = await admin.generateAuthToken()
+        req.jwt = newTokenPair
+        next()
+    } catch (e) {
+        res.status(401).send({ error: 'Unable to refresh token.' })
     }
 }
 

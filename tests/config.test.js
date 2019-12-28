@@ -11,8 +11,8 @@ import { ConfigStrategy } from '../src/models/config-strategy';
 import { 
     setupDatabase,
     adminMasterAccountId,
-    adminMasterAccount,
-    adminAccount,
+    adminMasterAccountToken,
+    adminAccountToken,
     domainId,
     groupConfigId,
     configId1,
@@ -32,7 +32,7 @@ describe('Testing configuration insertion', () => {
     test('CONFIG_SUITE - Should create a new Config', async () => {
         const response = await request(app)
             .post('/config/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 key: 'NEW_CONFIG',
                 description: 'Description of my new Config',
@@ -50,7 +50,7 @@ describe('Testing configuration insertion', () => {
     test('CONFIG_SUITE - Should NOT create a new Config - with wrong group config Id', async () => {
         const response = await request(app)
             .post('/config/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 key: 'NEW_CONFIG',
                 description: 'Description of my new Config',
@@ -61,7 +61,7 @@ describe('Testing configuration insertion', () => {
 
         await request(app)
             .post('/config/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 key: 'NEW_CONFIG',
                 description: 'Description of my new Config',
@@ -76,7 +76,7 @@ describe('Testing fetch configuration info', () => {
     test('CONFIG_SUITE - Should get Config information', async () => {
         let response = await request(app)
             .get('/config?group=' + groupConfigId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(2)
@@ -89,7 +89,7 @@ describe('Testing fetch configuration info', () => {
         // Adding new Config
         response = await request(app)
             .post('/config/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 key: 'NEW_CONFIG123',
                 description: 'Description of my new Config',
@@ -102,7 +102,7 @@ describe('Testing fetch configuration info', () => {
 
         response = await request(app)
             .get('/config?group=' + groupConfigId + '&sortBy=createdAt:desc')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(3)
@@ -111,19 +111,19 @@ describe('Testing fetch configuration info', () => {
     test('CONFIG_SUITE - Should NOT get Config information by invalid Group Id', async () => { 
         await request(app)
             .get('/config?group=' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
 
         await request(app)
             .get('/config?group=INVALID_ID_VALUE')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500)
     })
 
     test('CONFIG_SUITE - Should get Config information by Id', async () => {
         let response = await request(app)
             .get('/config/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(String(response.body._id)).toEqual(String(config1Document._id))
@@ -134,7 +134,7 @@ describe('Testing fetch configuration info', () => {
         // Adding new Config
         response = await request(app)
             .post('/config/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 key: 'NEW_CONFIG456',
                 description: 'Description of my new Config',
@@ -143,19 +143,19 @@ describe('Testing fetch configuration info', () => {
 
         response = await request(app)
             .get('/config/' + response.body._id)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
     })
 
     test('CONFIG_SUITE - Should not found Config information by Id', async () => {
         await request(app)
             .get('/config/' + 'NOTEXIST')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500)
 
         await request(app)
             .get('/config/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
     })
 })
@@ -166,12 +166,12 @@ describe('Testing configuration deletion', () => {
     test('CONFIG_SUITE - Should NOT delete Config - Wrong and bad Id', async () => {
         await request(app)
             .delete('/config/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
 
         await request(app)
             .delete('/config/WRONG_ID_VALUE')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500)
     })
 
@@ -194,7 +194,7 @@ describe('Testing configuration deletion', () => {
 
         await request(app)
             .delete('/config/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         const admin = await Admin.findById(adminMasterAccountId)
@@ -228,7 +228,7 @@ describe('Testing update info', () => {
 
         await request(app)
             .patch('/config/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 key: 'NEWKEY',
                 description: 'New description'
@@ -244,7 +244,7 @@ describe('Testing update info', () => {
     test('CONFIG_SUITE - Should NOT update Config info', async () => {
         await request(app)
             .patch('/config/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 activated: false,
                 owner: 'I_SHOULD_NOT_UPDATE_THIS'
@@ -252,14 +252,14 @@ describe('Testing update info', () => {
 
         await request(app)
             .patch('/config/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
             }).expect(404)
 
         await request(app)
             .patch('/config/WRONG_ID_VALUE')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
             }).expect(500)
@@ -270,7 +270,7 @@ describe('Testing update info', () => {
 
         const response = await request(app)
             .patch('/config/updateStatus/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(200);
@@ -293,7 +293,7 @@ describe('Testing Environment status change', () => {
         // Creating QA Environment...
         await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA',
                 domain: domainId
@@ -301,7 +301,7 @@ describe('Testing Environment status change', () => {
 
         const response = await request(app)
             .patch('/config/updateStatus/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA: true
             }).expect(200);
@@ -316,7 +316,7 @@ describe('Testing Environment status change', () => {
         // Inactivating QA. Default environment should stay activated
         await request(app)
             .patch('/config/updateStatus/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA: false
             }).expect(200);
@@ -329,7 +329,7 @@ describe('Testing Environment status change', () => {
     test('CONFIG_SUITE - Should NOT update Config environment status - Permission denied', async () => {
         await request(app)
             .patch('/config/updateStatus/' + configId1)
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 default: false
             }).expect(400);
@@ -338,14 +338,14 @@ describe('Testing Environment status change', () => {
     test('CONFIG_SUITE - Should NOT update Config environment status - Config not fould', async () => {
         await request(app)
             .patch('/config/updateStatus/FAKE_CONFIG')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(400);
 
         await request(app)
             .patch('/config/updateStatus/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(404);
@@ -354,7 +354,7 @@ describe('Testing Environment status change', () => {
     test('CONFIG_SUITE - Should NOT update Config environment status - Unknown environment name', async () => {
         const response = await request(app)
             .patch('/config/updateStatus/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 UNKNOWN_ENVIRONMENT: false
             }).expect(400);
@@ -366,7 +366,7 @@ describe('Testing Environment status change', () => {
         // Creating QA1 Environment...
         await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA1',
                 domain: domainId
@@ -374,7 +374,7 @@ describe('Testing Environment status change', () => {
         
         await request(app)
             .patch('/config/updateStatus/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA1: true
             }).expect(200);
@@ -384,7 +384,7 @@ describe('Testing Environment status change', () => {
 
         await request(app)
             .patch('/config/removeStatus/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA1'
             }).expect(200);
@@ -397,7 +397,7 @@ describe('Testing Environment status change', () => {
     test('CONFIG_SUITE - Should record changes on history collection', async () => {
         let response = await request(app)
             .post('/config/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 key: 'TEST_HIST_RECORD',
                 description: 'Description of my new Config',
@@ -407,21 +407,21 @@ describe('Testing Environment status change', () => {
         const configId = response.body._id
         response = await request(app)
                 .get('/config/history/' + configId)
-                .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+                .set('Authorization', `Bearer ${adminMasterAccountToken}`)
                 .send().expect(200)
         
         expect(response.body).toEqual([])
 
         await request(app)
             .patch('/config/' + configId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
             }).expect(200)
 
         response = await request(app)
             .get('/config/history/' + configId + '?sortBy=createdAt:desc')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body).not.toEqual([])
@@ -433,7 +433,7 @@ describe('Testing Environment status change', () => {
 
         await request(app)
             .patch('/config/updateStatus/' + configId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(200);
@@ -446,12 +446,12 @@ describe('Testing Environment status change', () => {
     test('CONFIG_SUITE - Should NOT list changes by invalid Config Id', async () => {
         await request(app)
             .get('/config/history/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
 
         await request(app)
             .get('/config/history/INVALID_ID_VALUE')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500)
     })
 
@@ -459,7 +459,7 @@ describe('Testing Environment status change', () => {
         // Creating QA3 Environment...
         await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA3',
                 domain: domainId
@@ -467,7 +467,7 @@ describe('Testing Environment status change', () => {
 
         await request(app)
             .patch('/config/updateStatus/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA3: true
             }).expect(200);
@@ -475,7 +475,7 @@ describe('Testing Environment status change', () => {
         // default environment cannot be removed
         await request(app)
             .patch('/config/removeStatus/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: EnvType.DEFAULT
             }).expect(400);
@@ -483,7 +483,7 @@ describe('Testing Environment status change', () => {
         // QA3 environment cannot be removed without permission
         await request(app)
             .patch('/config/removeStatus/' + configId1)
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 env: 'QA3'
             }).expect(400);
@@ -491,7 +491,7 @@ describe('Testing Environment status change', () => {
         // Config does not exist
         await request(app)
             .patch('/config/removeStatus/FAKE_CONFIG')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA3'
             }).expect(400);
@@ -506,7 +506,7 @@ describe('Testing component association', () => {
     beforeAll(async () => {
         await request(app)
             .post('/component/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'my-web-app-for-my-config',
                 description: 'This is my Web App using this wonderful API',
@@ -517,7 +517,7 @@ describe('Testing component association', () => {
     test('CONFIG_SUITE - Should associate component to a config', async () => {
         await request(app)
             .patch('/config/addComponent/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: "my-web-app-for-my-config"
             }).expect(200)
@@ -531,7 +531,7 @@ describe('Testing component association', () => {
     test('CONFIG_SUITE - Should NOT associate component to a config - Component not found', async () => {
         const response = await request(app)
             .patch('/config/addComponent/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: "i-do-not-exist"
             }).expect(404)
@@ -542,14 +542,14 @@ describe('Testing component association', () => {
     test('CONFIG_SUITE - Should NOT associate component to a config - Config not found', async () => {
         await request(app)
             .patch('/config/addComponent/INVALID_ID_VALUE')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: "my-web-app-for-my-config"
             }).expect(500)
 
         await request(app)
             .patch('/config/addComponent/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: "my-web-app-for-my-config"
             }).expect(404)
@@ -558,7 +558,7 @@ describe('Testing component association', () => {
     test('CONFIG_SUITE - Should NOT desassociate component from a config - Component not found', async () => {
         await request(app)
             .patch('/config/removeComponent/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: "i-do-not-exist"
             }).expect(404)
@@ -567,14 +567,14 @@ describe('Testing component association', () => {
     test('CONFIG_SUITE - Should NOT desassociate component from a config - Config not found', async () => {
         await request(app)
             .patch('/config/removeComponent/INVALID_ID_VALUE')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: "my-web-app-for-my-config"
             }).expect(500)
 
         await request(app)
             .patch('/config/removeComponent/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: "my-web-app-for-my-config"
             }).expect(404)
@@ -583,7 +583,7 @@ describe('Testing component association', () => {
     test('CONFIG_SUITE - Should desassociate component from a config', async () => {
         await request(app)
             .patch('/config/removeComponent/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: "my-web-app-for-my-config"
             }).expect(200)
@@ -598,7 +598,7 @@ describe('Testing component association', () => {
         expect(history.length > 0).toEqual(true)
         await request(app)
             .delete('/config/' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         history = await History.find({ elementId: configId1 })

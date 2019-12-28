@@ -12,7 +12,9 @@ import { EnvType, Environment } from '../src/models/environment';
 import { 
     setupDatabase,
     adminMasterAccountId,
+    adminMasterAccountToken,
     adminMasterAccount,
+    adminAccountToken,
     adminAccount,
     domainDocument,
     domainId,
@@ -34,7 +36,7 @@ describe('Testing Domain insertion', () => {
     test('DOMAIN_SUITE - Should create a new Domain', async () => {
         const response = await request(app)
             .post('/domain/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'New Domain',
                 description: 'Description of my new Domain'
@@ -58,7 +60,7 @@ describe('Testing Domain insertion', () => {
 
         const response = await request(app)
             .post('/domain/create')
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 name: 'New Domain',
                 description: 'Description of my new Domain'
@@ -70,7 +72,7 @@ describe('Testing Domain insertion', () => {
     test('DOMAIN_SUITE - Should generate a valid API Key for a Domain', async () => {
         const response = await request(app)
             .get('/domain/generateApiKey/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(201)
 
         expect(response.body.apiKey).not.toBeNull()
@@ -90,19 +92,19 @@ describe('Testing Domain insertion', () => {
 
         await request(app)
             .get('/domain/generateApiKey/' + domainId)
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send().expect(400)
     })
 
     test('DOMAIN_SUITE - Should NOT generate an API Key for an inexistent Domain', async () => {
         await request(app)
             .get('/domain/generateApiKey/INVALID_DOMAIN_ID')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(400)
 
         await request(app)
             .get('/domain/generateApiKey/5dd05cfa98adc4285457e29a')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
     })
 })
@@ -113,7 +115,7 @@ describe('Testing fect Domain info', () => {
     test('DOMAIN_SUITE - Should get Domain information', async () => {
         let response = await request(app)
             .get('/domain')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(1)
@@ -126,7 +128,7 @@ describe('Testing fect Domain info', () => {
         // Adding new Domain
         response = await request(app)
             .post('/domain/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'My New Domain',
                 description: 'Description of my new Domain'
@@ -138,14 +140,14 @@ describe('Testing fect Domain info', () => {
 
         response = await request(app)
             .get('/domain?sortBy=createdAt:desc')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(2)
 
         response = await request(app)
             .get('/domain?limit=1')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(1)
@@ -154,7 +156,7 @@ describe('Testing fect Domain info', () => {
     test('DOMAIN_SUITE - Should get Domain information by Id', async () => {
         let response = await request(app)
             .get('/domain/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(String(response.body._id)).toEqual(String(domainDocument._id))
@@ -165,7 +167,7 @@ describe('Testing fect Domain info', () => {
         // Adding new Domain
         response = await request(app)
             .post('/domain/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'New Domain 2',
                 description: 'Description of my new Domain 2'
@@ -173,19 +175,19 @@ describe('Testing fect Domain info', () => {
 
         response = await request(app)
             .get('/domain/' + response.body.domain._id)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
     })
 
     test('DOMAIN_SUITE - Should NOT found Domain information by Id', async () => {
         await request(app)
             .get('/domain/' + domainId + 'NOTEXIST')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
 
         await request(app)
             .get('/domain/5dd05cfa98adc4285457e29a')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
     })
 
@@ -218,7 +220,7 @@ describe('Testing fect Domain info', () => {
         
         await request(app)
             .delete('/domain/' + domainId)
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send().expect(200)
 
         const admin = await Admin.findById(adminMasterAccountId)
@@ -254,17 +256,17 @@ describe('Testing fect Domain info', () => {
 
         await request(app)
             .delete('/domain/' + domainId)
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send().expect(400)
 
         await request(app)
             .delete('/domain/5dd05cfa98adc4285457e29a')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
 
         await request(app)
             .delete('/domain/INVALID_DOMAIN_ID')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500)
     })
 })
@@ -280,7 +282,7 @@ describe('Testing update Domain info', () => {
 
         await request(app)
             .patch('/domain/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description updated'
             }).expect(200)
@@ -298,14 +300,14 @@ describe('Testing update Domain info', () => {
     test('DOMAIN_SUITE - Should NOT update Domain info', async () => {
         await request(app)
             .patch('/domain/UNKNOWN_DOMAIN_ID')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description updated'
             }).expect(500)
 
         await request(app)
             .patch('/domain/5dd05cfa98adc4285457e29a')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description updated'
             }).expect(404)
@@ -314,7 +316,7 @@ describe('Testing update Domain info', () => {
     test('DOMAIN_SUITE - Should NOT update Domain name', async () => {
         await request(app)
             .patch('/domain/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'New Domain name'
             }).expect(400)
@@ -331,7 +333,7 @@ describe('Testing update Domain info', () => {
         await new Promise(resolve => setTimeout(resolve, 1000));
         await request(app)
             .patch('/domain/' + domainId)
-            .set('Authorization', `Bearer ${responseLogin.body.token}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 description: 'Description updated'
             }).expect(400)
@@ -342,7 +344,7 @@ describe('Testing update Domain info', () => {
 
         const response = await request(app)
             .patch('/domain/updateStatus/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(200);
@@ -357,14 +359,14 @@ describe('Testing update Domain info', () => {
     test('DOMAIN_SUITE - Should NOT update environment status given an unknown Domain ID ', async () => {
         await request(app)
             .patch('/domain/updateStatus/UNKNOWN_DOMAIN_ID')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(500);
 
         await request(app)
             .patch('/domain/updateStatus/5dd05cfa98adc4285457e29a')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(404);
@@ -373,7 +375,7 @@ describe('Testing update Domain info', () => {
     test('DOMAIN_SUITE - Should NOT update environment status given an unknown environment name', async () => {
         const response = await request(app)
             .patch('/domain/updateStatus/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 UNKNWON_ENV_NAME: false
             }).expect(400);
@@ -384,7 +386,7 @@ describe('Testing update Domain info', () => {
     test('DOMAIN_SUITE - Should record changes on history collection', async () => {
         let response = await request(app)
             .post('/domain/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'New Domain Record',
                 description: 'Description of my new Domain'
@@ -393,21 +395,21 @@ describe('Testing update Domain info', () => {
         const id = response.body.domain._id
         response = await request(app)
                 .get('/domain/history/' + id)
-                .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+                .set('Authorization', `Bearer ${adminMasterAccountToken}`)
                 .send().expect(200)
         
         expect(response.body).toEqual([])
 
         await request(app)
             .patch('/domain/' + id)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
             }).expect(200)
 
         response = await request(app)
             .get('/domain/history/' + id + '?sortBy=createdAt:desc')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body).not.toEqual([])
@@ -419,7 +421,7 @@ describe('Testing update Domain info', () => {
 
         await request(app)
             .patch('/domain/updateStatus/' + id)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(200);
@@ -440,7 +442,7 @@ describe('Testing environment configurations', () => {
         // Creating QA Environment...
         await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA',
                 domain: domainId
@@ -451,7 +453,7 @@ describe('Testing environment configurations', () => {
 
         const response = await request(app)
             .patch('/domain/updateStatus/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA: true
             }).expect(200);
@@ -471,7 +473,7 @@ describe('Testing environment configurations', () => {
         // Inactivating QA. Default environment should stay activated
         await request(app)
             .patch('/domain/updateStatus/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA: false
             }).expect(200);
@@ -484,7 +486,7 @@ describe('Testing environment configurations', () => {
     test('DOMAIN_SUITE - Should NOT update Domain environment status - Permission denied', async () => {
         await request(app)
             .patch('/domain/updateStatus/' + domainId)
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 default: false
             }).expect(400);
@@ -494,7 +496,7 @@ describe('Testing environment configurations', () => {
         // Creating QA Environment...
         await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA1',
                 domain: domainId
@@ -502,7 +504,7 @@ describe('Testing environment configurations', () => {
         
         await request(app)
             .patch('/domain/updateStatus/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA1: true
             }).expect(200);
@@ -512,7 +514,7 @@ describe('Testing environment configurations', () => {
 
         await request(app)
             .patch('/domain/removeStatus/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA1'
             }).expect(200);
@@ -526,7 +528,7 @@ describe('Testing environment configurations', () => {
         // Creating QA3 Environment...
         await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA3',
                 domain: domainId
@@ -534,7 +536,7 @@ describe('Testing environment configurations', () => {
 
         await request(app)
             .patch('/domain/updateStatus/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA3: true
             }).expect(200);
@@ -542,7 +544,7 @@ describe('Testing environment configurations', () => {
         // default environment cannot be removed
         await request(app)
             .patch('/domain/removeStatus/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: EnvType.DEFAULT
             }).expect(400);
@@ -550,7 +552,7 @@ describe('Testing environment configurations', () => {
         // QA3 environment cannot be removed without permission
         await request(app)
             .patch('/domain/removeStatus/' + domainId)
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 env: 'QA3'
             }).expect(400);
@@ -558,7 +560,7 @@ describe('Testing environment configurations', () => {
         // Domain does not exist
         await request(app)
             .patch('/domain/removeStatus/FAKE_DOMAIN')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA3'
             }).expect(400);

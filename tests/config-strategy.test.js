@@ -11,8 +11,8 @@ import { ConfigStrategy, StrategiesType, OperationsType, strategyRequirements } 
 import { 
     setupDatabase,
     adminMasterAccountId,
-    adminMasterAccount,
-    adminAccount,
+    adminMasterAccountToken,
+    adminAccountToken,
     domainId,
     groupConfigId,
     configId1,
@@ -32,7 +32,7 @@ describe('Testing strategy creation #1', () => {
     test('STRATEGY_SUITE - Should create a new Config Strategy', async () => {
         const response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.NETWORK,
@@ -53,7 +53,7 @@ describe('Testing strategy creation #1', () => {
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Config not found', async () => {
         const response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.NETWORK,
@@ -69,7 +69,7 @@ describe('Testing strategy creation #1', () => {
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Environment not found', async () => {
         const response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.NETWORK,
@@ -85,7 +85,7 @@ describe('Testing strategy creation #1', () => {
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Duplicated Strategy at the same configuration', async () => {
         const response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.VALUE,
@@ -101,7 +101,7 @@ describe('Testing strategy creation #1', () => {
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Wrong operation and strategies', async () => {
         await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: 'WRONG_STRATEGY',
@@ -112,7 +112,7 @@ describe('Testing strategy creation #1', () => {
 
         await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.NETWORK,
@@ -134,7 +134,7 @@ describe('Testing strategy creation #2', () => {
 
         let response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.VALUE,
@@ -149,7 +149,7 @@ describe('Testing strategy creation #2', () => {
         ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.EXIST)[0]);
         response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.VALUE,
@@ -167,7 +167,7 @@ describe('Testing strategy creation #2', () => {
 
         response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.NETWORK,
@@ -185,7 +185,7 @@ describe('Testing strategy creation #2', () => {
 
         response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.TIME,
@@ -201,7 +201,7 @@ describe('Testing strategy creation #2', () => {
 
         response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.TIME,
@@ -217,7 +217,7 @@ describe('Testing strategy creation #2', () => {
 
         response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.TIME,
@@ -235,7 +235,7 @@ describe('Testing strategy creation #2', () => {
 
         response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.DATE,
@@ -251,7 +251,7 @@ describe('Testing strategy creation #2', () => {
 
         response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.DATE,
@@ -267,7 +267,7 @@ describe('Testing strategy creation #2', () => {
 
         response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.DATE,
@@ -288,7 +288,7 @@ describe('Testing reading strategies #1', () => {
     test('STRATEGY_SUITE - Should get Config Strategy information', async () => {
         let response = await request(app)
             .get('/configstrategy?config=' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(1)
@@ -302,7 +302,7 @@ describe('Testing reading strategies #1', () => {
         // Adding new Config Strategy
         response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.NETWORK,
@@ -318,7 +318,7 @@ describe('Testing reading strategies #1', () => {
 
         response = await request(app)
             .get('/configstrategy?config=' + configId1)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(2)
@@ -327,12 +327,12 @@ describe('Testing reading strategies #1', () => {
     test('STRATEGY_SUITE - Should NOT get Config Strategy information - Invalid Config Id', async () => {
         await request(app)
             .get('/configstrategy?config=' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
 
         await request(app)
             .get('/configstrategy?config=INVALID_ID_VALUE')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500)
     })
 })
@@ -343,7 +343,7 @@ describe('Testing reading strategies #2', () => {
     test('STRATEGY_SUITE - Should get Config Strategy information by Id', async () => {
         let response = await request(app)
             .get('/configstrategy/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(String(response.body._id)).toEqual(String(configStrategyDocument._id))
@@ -355,7 +355,7 @@ describe('Testing reading strategies #2', () => {
         // Adding new Config Strategy
         response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.NETWORK,
@@ -367,19 +367,19 @@ describe('Testing reading strategies #2', () => {
 
         response = await request(app)
             .get('/configstrategy/' + response.body._id)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
     })
 
     test('STRATEGY_SUITE - Should not found Config Strategy information by Id', async () => {
         await request(app)
             .get('/configstrategy/INVALID_ID_VALUE')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500)
 
         await request(app)
             .get('/configstrategy/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
     })
 
@@ -402,7 +402,7 @@ describe('Testing reading strategies #2', () => {
 
         await request(app)
             .delete('/configstrategy/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         const admin = await Admin.findById(adminMasterAccountId)
@@ -428,12 +428,12 @@ describe('Testing reading strategies #2', () => {
     test('STRATEGY_SUITE - Should NOT delete Config Strategy', async () => {
         await request(app)
             .delete('/configstrategy/INVALID_ID')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500)
 
         await request(app)
             .delete('/configstrategy/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
     })
 })
@@ -448,7 +448,7 @@ describe('Testing update strategies #1', () => {
 
         await request(app)
             .patch('/configstrategy/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
             }).expect(200)
@@ -462,7 +462,7 @@ describe('Testing update strategies #1', () => {
     test('STRATEGY_SUITE - Should NOT update Config Strategy info', async () => {
         await request(app)
             .patch('/configstrategy/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 activated: false,
                 config: 'I_SHOULD_NOT_UPDATE_THIS'
@@ -472,14 +472,14 @@ describe('Testing update strategies #1', () => {
     test('STRATEGY_SUITE - Should NOT update by invalid Config Strategy Id', async () => {
         await request(app)
             .patch('/configstrategy/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description',
             }).expect(404)
 
         await request(app)
             .patch('/configstrategy/INVALID_ID')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description',
             }).expect(400)
@@ -488,7 +488,7 @@ describe('Testing update strategies #1', () => {
     test('STRATEGY_SUITE - Should record changes on history collection', async () => {
         let response = await request(app)
             .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.DATE,
@@ -501,21 +501,21 @@ describe('Testing update strategies #1', () => {
         const strategyId = response.body._id
         response = await request(app)
                 .get('/configstrategy/history/' + strategyId)
-                .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+                .set('Authorization', `Bearer ${adminMasterAccountToken}`)
                 .send().expect(200)
         
         expect(response.body).toEqual([])
 
         await request(app)
             .patch('/configstrategy/' + strategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
             }).expect(200)
 
         response = await request(app)
             .get('/configstrategy/history/' + strategyId + '?sortBy=createdAt:desc')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body).not.toEqual([])
@@ -527,7 +527,7 @@ describe('Testing update strategies #1', () => {
 
         await request(app)
             .patch('/configstrategy/updateStatus/' + strategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(200);
@@ -540,19 +540,19 @@ describe('Testing update strategies #1', () => {
     test('STRATEGY_SUITE - Should NOT list changes by invalid Strategy Id', async () => {
         await request(app)
             .get('/configstrategy/history/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
 
         await request(app)
             .get('/configstrategy/history/INVALID_ID_VALUE')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500)
     })
 
     test('STRATEGY_SUITE - Should NOT return a specific strategy requirements', async () => {
         let response = await request(app)
             .get('/configstrategy/req/NON_EXISTENT_VALIDATION')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
         
         expect(response.body.error).toEqual('Strategy \'NON_EXISTENT_VALIDATION\' not found')
@@ -561,7 +561,7 @@ describe('Testing update strategies #1', () => {
     test('STRATEGY_SUITE - Should add new value to Strategy values', async () => {
         let response = await request(app)
             .patch('/configstrategy/addval/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'USER_4'
             }).expect(200)
@@ -577,7 +577,7 @@ describe('Testing update strategies #1', () => {
     test('STRATEGY_SUITE - Should NOT add new value to Strategy values', async () => {
         let response = await request(app)
             .patch('/configstrategy/addval/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'USER_3'
             }).expect(400)
@@ -586,7 +586,7 @@ describe('Testing update strategies #1', () => {
 
         response = await request(app)
             .patch('/configstrategy/addval/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 not_valid_attribute: 'USER_3'
             }).expect(400);
@@ -595,21 +595,21 @@ describe('Testing update strategies #1', () => {
 
         response = await request(app)
             .patch('/configstrategy/addval/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(400);
 
         expect(response.body.error).toEqual('The attribute \'value\' must be assigned');
 
         await request(app)
             .patch('/configstrategy/addval/INVALID_STRATEGY_ID')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'USER_3'
             }).expect(400);
 
             await request(app)
                 .patch('/configstrategy/addval/' + new mongoose.Types.ObjectId())
-                .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+                .set('Authorization', `Bearer ${adminMasterAccountToken}`)
                 .send({
                     value: 'USER_3'
                 }).expect(404);
@@ -618,7 +618,7 @@ describe('Testing update strategies #1', () => {
     test('STRATEGY_SUITE - Should update a value inside Strategy values', async () => {
         let response = await request(app)
             .patch('/configstrategy/updateval/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 oldvalue: 'USER_3',
                 newvalue: 'USER_THREE'
@@ -642,7 +642,7 @@ describe('Testing update strategies #2', () => {
     test('STRATEGY_SUITE - Should NOT update a value inside Strategy values', async () => {
         await request(app)
             .patch('/configstrategy/updateval/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 oldvalue: 'USER_3',
                 newvalue: 'USER_2'
@@ -650,7 +650,7 @@ describe('Testing update strategies #2', () => {
 
         let response = await request(app)
             .patch('/configstrategy/updateval/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 oldvalue: 'USER_3',
                 newvalue: 'USER_2'
@@ -660,7 +660,7 @@ describe('Testing update strategies #2', () => {
 
         response = await request(app)
             .patch('/configstrategy/updateval/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 old: 'USER_3',
                 new: 'USER_2'
@@ -670,7 +670,7 @@ describe('Testing update strategies #2', () => {
 
         response = await request(app)
             .patch('/configstrategy/updateval/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 oldvalue: 'USER_3333333',
                 newvalue: 'USER_5'
@@ -680,7 +680,7 @@ describe('Testing update strategies #2', () => {
 
         response = await request(app)
             .patch('/configstrategy/updateval/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(400)
 
         expect(response.body.error).toEqual('Attributes \'oldvalue\' and \'newvalue\' must be assigned');
@@ -692,7 +692,7 @@ describe('Testing update strategies #2', () => {
 
         let response = await request(app)
             .patch('/configstrategy/removeval/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'USER_3'
             }).expect(200)
@@ -708,14 +708,14 @@ describe('Testing update strategies #2', () => {
     test('STRATEGY_SUITE - Should NOT remove a value from an invalid Strategy', async () => {
         await request(app)
             .patch('/configstrategy/removeval/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'USER_3'
             }).expect(404)
 
         await request(app)
             .patch('/configstrategy/removeval/INVALID_ID')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'USER_3'
             }).expect(400)
@@ -724,7 +724,7 @@ describe('Testing update strategies #2', () => {
     test('STRATEGY_SUITE - Should NOT remove a value from Strategy values', async () => {
         let response = await request(app)
             .patch('/configstrategy/removeval/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'USER_44444'
             }).expect(404)
@@ -733,7 +733,7 @@ describe('Testing update strategies #2', () => {
 
         response = await request(app)
             .patch('/configstrategy/removeval/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 val: 'USER_3'
             }).expect(400)
@@ -742,7 +742,7 @@ describe('Testing update strategies #2', () => {
 
         response = await request(app)
             .patch('/configstrategy/removeval/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(400)
 
         expect(response.body.error).toEqual('The attribute \'value\' must be assigned');
@@ -755,21 +755,21 @@ describe('Testing fetch strategies', () => {
     test('STRATEGY_SUITE - Should fetch all values from a specific Strategy', async () => {
         let response = await request(app)
             .get('/configstrategy/values/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body).toEqual(configStrategyDocument.values);
 
         response = await request(app)
             .get('/configstrategy/values/' + configStrategyId + '?limit=2')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body).toEqual(configStrategyDocument.values.slice(0,2));
 
         response = await request(app)
             .get('/configstrategy/values/' + configStrategyId + '?skip=1')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body).toEqual(configStrategyDocument.values.slice(1,configStrategyDocument.values.length));
@@ -778,12 +778,12 @@ describe('Testing fetch strategies', () => {
     test('STRATEGY_SUITE - Should NOT fetch values from Strategy', async () => {
         await request(app)
             .get('/configstrategy/values/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
 
         await request(app)
             .get('/configstrategy/values/INVALID_ID')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500)
     })
 
@@ -792,7 +792,7 @@ describe('Testing fetch strategies', () => {
 
         const response = await request(app)
             .patch('/configstrategy/updateStatus/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(200);
@@ -816,7 +816,7 @@ describe('Scenario: creating QA environment after innactivate PRD switch', () =>
         // Creating QA Environment...
         await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA',
                 domain: domainId
@@ -824,7 +824,7 @@ describe('Scenario: creating QA environment after innactivate PRD switch', () =>
 
         const response = await request(app)
             .patch('/configstrategy/updateStatus/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA: true
             }).expect(200);
@@ -839,7 +839,7 @@ describe('Scenario: creating QA environment after innactivate PRD switch', () =>
         // Inactivating QA. Default environment should stay activated
         await request(app)
             .patch('/configstrategy/updateStatus/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA: false
             }).expect(200);
@@ -852,7 +852,7 @@ describe('Scenario: creating QA environment after innactivate PRD switch', () =>
     test('STRATEGY_SUITE - Should NOT update Strategy environment status - Permission denied', async () => {
         await request(app)
             .patch('/configstrategy/updateStatus/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 default: false
             }).expect(400);
@@ -861,14 +861,14 @@ describe('Scenario: creating QA environment after innactivate PRD switch', () =>
     test('STRATEGY_SUITE - Should NOT update Strategy environment status - Strategy not fould', async () => {
         await request(app)
             .patch('/configstrategy/updateStatus/INVALID_ID')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(400);
 
         await request(app)
             .patch('/configstrategy/updateStatus/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(404);
@@ -878,7 +878,7 @@ describe('Scenario: creating QA environment after innactivate PRD switch', () =>
         // Creating QA6 Environment...
         await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA6',
                 domain: domainId
@@ -886,7 +886,7 @@ describe('Scenario: creating QA environment after innactivate PRD switch', () =>
         
         await request(app)
             .patch('/configstrategy/updateStatus/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA6: true
             }).expect(200);
@@ -896,7 +896,7 @@ describe('Scenario: creating QA environment after innactivate PRD switch', () =>
 
         await request(app)
             .patch('/configstrategy/removeStatus/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA6'
             }).expect(200);
@@ -914,7 +914,7 @@ describe('Scenario: default environment being deleted', () => {
         // Creating QA Environment...
         await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA',
                 domain: domainId
@@ -922,7 +922,7 @@ describe('Scenario: default environment being deleted', () => {
 
         await request(app)
             .patch('/configstrategy/updateStatus/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA: true
             }).expect(200);
@@ -930,7 +930,7 @@ describe('Scenario: default environment being deleted', () => {
         // default environment can be removed...
         await request(app)
             .patch('/configstrategy/removeStatus/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: EnvType.DEFAULT
             }).expect(200);
@@ -938,7 +938,7 @@ describe('Scenario: default environment being deleted', () => {
         // ... but at least one environment should be activate
         const response = await request(app)
             .patch('/configstrategy/removeStatus/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA'
             }).expect(400);
@@ -948,7 +948,7 @@ describe('Scenario: default environment being deleted', () => {
         // QA environment cannot be removed without permission
         await request(app)
             .patch('/configstrategy/removeStatus/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 env: 'QA'
             }).expect(400);
@@ -956,7 +956,7 @@ describe('Scenario: default environment being deleted', () => {
         // Strategy does not exist
         await request(app)
             .patch('/configstrategy/removeStatus/FAKE_STRATEGY')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA'
             }).expect(400);
@@ -971,7 +971,7 @@ describe('Scenario: default environment being deleted', () => {
         expect(history.length > 0).toEqual(true)
         await request(app)
             .delete('/configstrategy/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         history = await History.find({ elementId: configStrategyId })

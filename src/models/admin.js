@@ -44,16 +44,9 @@ const adminSchema = new mongoose.Schema({
         required: true,
         default: false
     },
-    lastActivity: {
-        type: Date,
-        required: true
+    token: {
+        type: String
     },
-    tokens: [{
-        token: {
-            type: String,
-            required: true
-        }
-    }],
 }, {
     timestamps: true
 })
@@ -90,23 +83,30 @@ adminSchema.options.toJSON = {
         if (ret.updatedAt || ret.createdAt) {
             ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
             ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
-            ret.lastActivity = moment(ret.lastActivity).format('YYYY-MM-DD HH:mm:ss')
         }
         delete ret.password
-        delete ret.tokens
+        delete ret.token
         return ret
     }
 }
 
 adminSchema.methods.generateAuthToken = async function () {
     const admin = this
-    const token = jwt.sign(({ _id: admin.id.toString() }), process.env.JWT_SECRET)
 
-    admin.tokens = admin.tokens.concat({ token })
-    admin.lastActivity = Date.now();
+    const options = {
+        expiresIn: process.env.JWT_CLIENT_TOKEN_EXP_TIME
+    };
+
+    const token = jwt.sign(({ _id: admin.id.toString() }), process.env.JWT_SECRET, options)
+    const refreshToken = await bcrypt.hash(token, 8)
+
+    admin.token = refreshToken;
     await admin.save()
 
-    return token
+    return {
+        token,
+        refreshToken
+    }
 }
 
 adminSchema.statics.findByCredentials = async (email, password) => {

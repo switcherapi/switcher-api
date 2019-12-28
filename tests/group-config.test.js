@@ -11,8 +11,8 @@ import { ConfigStrategy } from '../src/models/config-strategy';
 import { 
     setupDatabase,
     adminMasterAccountId,
-    adminMasterAccount,
-    adminAccount,
+    adminMasterAccountToken,
+    adminAccountToken,
     domainId,
     groupConfigId,
     groupConfigDocument,
@@ -32,7 +32,7 @@ describe('Testing Group insertion', () => {
     test('GROUP_SUITE - Should create a new Group Config', async () => {
         const response = await request(app)
             .post('/groupconfig/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'New Group Config',
                 description: 'Description of my new Group Config',
@@ -50,7 +50,7 @@ describe('Testing Group insertion', () => {
     test('GROUP_SUITE - Should not create a new Group Config - with wrong domain Id', async () => {
         const response = await request(app)
             .post('/groupconfig/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'New Group Config',
                 description: 'Description of my new Group Config',
@@ -61,7 +61,7 @@ describe('Testing Group insertion', () => {
 
         await request(app)
             .post('/groupconfig/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'New Group Config',
                 description: 'Description of my new Group Config',
@@ -76,7 +76,7 @@ describe('Testing fetch Group info', () => {
     test('GROUP_SUITE - Should get Group Config information', async () => {
         let response = await request(app)
             .get('/groupconfig?domain=' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(1)
@@ -89,7 +89,7 @@ describe('Testing fetch Group info', () => {
         // Adding new Group Config
         response = await request(app)
             .post('/groupconfig/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'New Group Config 2',
                 description: 'Description of my new Group Config 2',
@@ -102,7 +102,7 @@ describe('Testing fetch Group info', () => {
 
         response = await request(app)
             .get('/groupconfig?domain=' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(2)
@@ -110,14 +110,14 @@ describe('Testing fetch Group info', () => {
         // Query filter tests
         response = await request(app)
             .get('/groupconfig?domain=' + domainId + '&limit=1')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(1)
 
         response = await request(app)
             .get('/groupconfig?domain=' + domainId + '&sortBy=createdAt:desc')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body.length).toEqual(2)
@@ -126,7 +126,7 @@ describe('Testing fetch Group info', () => {
     test('GROUP_SUITE - Should get Group Config information by Id', async () => {
         let response = await request(app)
             .get('/groupconfig/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(String(response.body._id)).toEqual(String(groupConfigDocument._id))
@@ -137,7 +137,7 @@ describe('Testing fetch Group info', () => {
         // Adding new Group Config
         response = await request(app)
             .post('/groupconfig/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'New Group Config 3',
                 description: 'Description of my new Group Config 3',
@@ -146,43 +146,43 @@ describe('Testing fetch Group info', () => {
 
         response = await request(app)
             .get('/groupconfig/' + response.body._id)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
     })
 
     test('GROUP_SUITE - Should NOT get Group Config information by Id', async () => {
         await request(app)
             .get('/groupconfig/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
 
         await request(app)
             .get('/groupconfig/INVALID_ID_VALUE')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500)
     })
 
     test('GROUP_SUITE - Should NOT found Group Config information by Id', async () => {
         await request(app)
             .get('/groupconfig?domain=' + 'WRONG_ID_VALUE')
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(500)
 
         await request(app)
             .get('/groupconfig?domain=' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(404)
     })
 
     test('GROUP_SUITE - Should NOT delete Group Config by invalid Group Id', async () => {
         await request(app)
             .delete('/groupconfig/INVALID_ID_VALUE')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500)
 
         await request(app)
             .delete('/groupconfig/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
     })
 
@@ -205,7 +205,7 @@ describe('Testing fetch Group info', () => {
 
         await request(app)
             .delete('/groupconfig/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         const admin = await Admin.findById(adminMasterAccountId)
@@ -239,7 +239,7 @@ describe('Testing update Group info', () => {
 
         await request(app)
             .patch('/groupconfig/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'Updated Group Name'
             }).expect(200)
@@ -253,7 +253,7 @@ describe('Testing update Group info', () => {
     test('GROUP_SUITE - Should NOT update Group Config info', async () => {
         await request(app)
         .patch('/groupconfig/' + groupConfigId)
-        .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+        .set('Authorization', `Bearer ${adminMasterAccountToken}`)
         .send({
             name: 'Updated Group Name',
             owner: 'I_SHOULD_NOT_UPDATE_THIS'
@@ -263,14 +263,14 @@ describe('Testing update Group info', () => {
     test('GROUP_SUITE - Should NOT update an unknown Group Config', async () => {
         await request(app)
             .patch('/groupconfig/UNKNOWN_GROUP_ID')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'Updated Group Name'
             }).expect(500)
 
         await request(app)
             .patch('/groupconfig/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'Updated Group Name'
             }).expect(404)
@@ -281,7 +281,7 @@ describe('Testing update Group info', () => {
 
         const response = await request(app)
             .patch('/groupconfig/updateStatus/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(200);
@@ -296,19 +296,19 @@ describe('Testing update Group info', () => {
     test('GROUP_SUITE - Should NOT list changes by invalid Group Id', async () => {
         await request(app)
             .get('/groupconfig/history/INVALID_ID_VALUE')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500)
 
         await request(app)
             .get('/groupconfig/history/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
     })
 
     test('GROUP_SUITE - Should record changes on history collection', async () => {
         let response = await request(app)
             .post('/groupconfig/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'Group Record Test',
                 description: 'Description of my new Group Config',
@@ -318,21 +318,21 @@ describe('Testing update Group info', () => {
         const groupId = response.body._id
         response = await request(app)
                 .get('/groupconfig/history/' + groupId)
-                .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+                .set('Authorization', `Bearer ${adminMasterAccountToken}`)
                 .send().expect(200)
         
         expect(response.body).toEqual([])
 
         await request(app)
             .patch('/groupconfig/' + groupId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
             }).expect(200)
 
         response = await request(app)
             .get('/groupconfig/history/' + groupId + '?sortBy=createdAt:desc')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         expect(response.body).not.toEqual([])
@@ -344,7 +344,7 @@ describe('Testing update Group info', () => {
 
         await request(app)
             .patch('/groupconfig/updateStatus/' + groupId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(200);
@@ -365,7 +365,7 @@ describe('Testing envrionment status change #1', () => {
         // Creating QA Environment...
         await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA',
                 domain: domainId
@@ -373,7 +373,7 @@ describe('Testing envrionment status change #1', () => {
 
         const response = await request(app)
             .patch('/groupconfig/updateStatus/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA: true
             }).expect(200);
@@ -388,7 +388,7 @@ describe('Testing envrionment status change #1', () => {
         // Inactivating QA. Default environment should stay activated
         await request(app)
             .patch('/groupconfig/updateStatus/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA: false
             }).expect(200);
@@ -401,7 +401,7 @@ describe('Testing envrionment status change #1', () => {
     test('GROUP_SUITE - Should NOT update Group environment status - Permission denied', async () => {
         await request(app)
             .patch('/groupconfig/updateStatus/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 default: false
             }).expect(400);
@@ -410,14 +410,14 @@ describe('Testing envrionment status change #1', () => {
     test('GROUP_SUITE - Should NOT update Group environment status - Invalid Group Id', async () => {
         await request(app)
             .patch('/groupconfig/updateStatus/INVALID_ID_VALUE')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(500);
 
         await request(app)
             .patch('/groupconfig/updateStatus/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(404);
@@ -431,7 +431,7 @@ describe('Testing environment status change #2', () => {
         // Creating QA Environment...
         await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA',
                 domain: domainId
@@ -439,7 +439,7 @@ describe('Testing environment status change #2', () => {
         
         await request(app)
             .patch('/groupconfig/updateStatus/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA: true
             }).expect(200);
@@ -449,7 +449,7 @@ describe('Testing environment status change #2', () => {
 
         await request(app)
             .patch('/groupconfig/removeStatus/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA'
             }).expect(200);
@@ -463,7 +463,7 @@ describe('Testing environment status change #2', () => {
         // Creating QA1 Environment...
         await request(app)
             .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'QA1',
                 domain: domainId
@@ -471,7 +471,7 @@ describe('Testing environment status change #2', () => {
 
         await request(app)
             .patch('/groupconfig/updateStatus/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA1: true
             }).expect(200);
@@ -479,7 +479,7 @@ describe('Testing environment status change #2', () => {
         // default environment cannot be removed
         await request(app)
             .patch('/groupconfig/removeStatus/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: EnvType.DEFAULT
             }).expect(400);
@@ -487,7 +487,7 @@ describe('Testing environment status change #2', () => {
         // QA1 environment cannot be removed without permission
         await request(app)
             .patch('/groupconfig/removeStatus/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 env: 'QA1'
             }).expect(400);
@@ -495,7 +495,7 @@ describe('Testing environment status change #2', () => {
         // Group does not exist
         await request(app)
             .patch('/groupconfig/removeStatus/FAKE_GROUP')
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA1'
             }).expect(400);
@@ -510,7 +510,7 @@ describe('Testing environment status change #2', () => {
         expect(history.length > 0).toEqual(true)
         await request(app)
             .delete('/groupconfig/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminMasterAccount.tokens[0].token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
         history = await History.find({ elementId: groupConfigId })
