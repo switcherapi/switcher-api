@@ -94,7 +94,7 @@ adminSchema.methods.generateAuthToken = async function () {
     const admin = this
 
     const options = {
-        expiresIn: process.env.JWT_CLIENT_TOKEN_EXP_TIME
+        expiresIn: process.env.JWT_ADMIN_TOKEN_RENEW_INTERVAL
     };
 
     const token = jwt.sign(({ _id: admin.id.toString() }), process.env.JWT_SECRET, options)
