@@ -43,7 +43,7 @@ describe('Insertion tests', () => {
                 name: 'my-web-app',
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
-            }).expect(400)
+            }).expect(401)
     })
 
     test('COMPONENT_SUITE - Should NOT create a new Component - Component already exist', async () => {
@@ -203,6 +203,6 @@ describe('Deletion tests', () => {
         await request(app)
             .delete('/component/' + response.body._id)
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send().expect(400)
+            .send().expect(401)
     })
 })

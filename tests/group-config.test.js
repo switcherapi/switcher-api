@@ -404,7 +404,7 @@ describe('Testing envrionment status change #1', () => {
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 default: false
-            }).expect(400);
+            }).expect(401);
     })
 
     test('GROUP_SUITE - Should NOT update Group environment status - Invalid Group Id', async () => {
@@ -490,7 +490,7 @@ describe('Testing environment status change #2', () => {
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 env: 'QA1'
-            }).expect(400);
+            }).expect(401);
 
         // Group does not exist
         await request(app)

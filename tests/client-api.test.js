@@ -855,4 +855,15 @@ describe("Testing criteria [REST] ", () => {
             .expect(200)
         
     })
+
+    test('CLIENT_SUITE - Should NOT return due to invalid API key provided', async () => {
+        await request(app)
+            .post('/criteria/auth')
+            .set('switcher-api-key', `INVALID_API_KEY`)
+            .send({
+                domain: domainDocument.name,
+                component: component1.name,
+                environment: EnvType.DEFAULT
+            }).expect(401)
+    })
 })

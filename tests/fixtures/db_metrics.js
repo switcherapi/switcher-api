@@ -81,7 +81,7 @@ export const setupDatabase = async () => {
     await Metric.deleteMany()
     await Admin.deleteMany()
 
-    const refreshTokenMaster = await bcrypt.hash(adminMasterAccountToken, 8)
+    const refreshTokenMaster = await bcrypt.hash(adminMasterAccountToken.split('.')[2], 8)
     adminMasterAccount.token = refreshTokenMaster;
     await new Admin(adminMasterAccount).save()
 

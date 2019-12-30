@@ -855,7 +855,7 @@ describe('Scenario: creating QA environment after innactivate PRD switch', () =>
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 default: false
-            }).expect(400);
+            }).expect(401);
     })
 
     test('STRATEGY_SUITE - Should NOT update Strategy environment status - Strategy not fould', async () => {
@@ -951,7 +951,7 @@ describe('Scenario: default environment being deleted', () => {
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 env: 'QA'
-            }).expect(400);
+            }).expect(401);
 
         // Strategy does not exist
         await request(app)

@@ -332,7 +332,7 @@ describe('Testing Environment status change', () => {
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 default: false
-            }).expect(400);
+            }).expect(401);
     })
 
     test('CONFIG_SUITE - Should NOT update Config environment status - Config not fould', async () => {
@@ -486,7 +486,7 @@ describe('Testing Environment status change', () => {
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 env: 'QA3'
-            }).expect(400);
+            }).expect(401);
 
         // Config does not exist
         await request(app)

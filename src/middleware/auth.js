@@ -16,6 +16,11 @@ export async function auth(req, res, next) {
             throw new Error()
         }
 
+        const isMatch = await bcrypt.compare(token.split('.')[2], admin.token)
+        if (!isMatch) {
+            throw new Error()
+        }
+
         req.token = token
         req.admin = admin
         next()
@@ -29,7 +34,7 @@ export async function authRefreshToken(req, res, next) {
         const token = req.header('Authorization').replace('Bearer ', '')
         const refreshToken = req.body.refreshToken;
         
-        const isMatch = await bcrypt.compare(token, refreshToken)
+        const isMatch = await bcrypt.compare(token.split('.')[2], refreshToken)
         if (!isMatch) {
             throw new Error()
         }
@@ -74,10 +79,6 @@ export async function appGenerateCredentials(req, res, next) {
     try {
         const key = req.header('switcher-api-key')
         const domain = await Domain.findByCredentials(req.body.domain, key)
-
-        if (!domain) {
-            throw new Error()
-        }
 
         const { name } = await Component.findOne({ name: req.body.component })
 

@@ -98,7 +98,7 @@ adminSchema.methods.generateAuthToken = async function () {
     };
 
     const token = jwt.sign(({ _id: admin.id.toString() }), process.env.JWT_SECRET, options)
-    const refreshToken = await bcrypt.hash(token, 8)
+    const refreshToken = await bcrypt.hash(token.split('.')[2], 8)
 
     admin.token = refreshToken;
     await admin.save()

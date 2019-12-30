@@ -50,7 +50,7 @@ describe('Insertion tests', () => {
             .send({
                 name: 'QA',
                 domain: domainId
-            }).expect(400)
+            }).expect(401)
     })
 
     test('ENV_SUITE - Should NOT create a new Environment - Environment already exist', async () => {
@@ -151,7 +151,7 @@ describe('Deletion tests', () => {
         await request(app)
             .delete('/environment/' + response.body._id)
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send().expect(400)
+            .send().expect(401)
     })
 
     test('ENV_SUITE - Should recover an Environment', async () => {

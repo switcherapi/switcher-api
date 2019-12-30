@@ -5,7 +5,7 @@ export const masterPermission = function (action) {
     return function (req, res, next) {
 
         if (!req.admin.master) {
-            return res.status(400).send({
+            return res.status(401).send({
                 error: `Unable to ${action} without a Master Admin credential`
             })
         }

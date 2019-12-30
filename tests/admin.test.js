@@ -121,7 +121,7 @@ describe('Testing Admin insertion', () => {
                 name: 'Admin',
                 email: 'admin_test123@mail.com',
                 password: '12312312312'
-            }).expect(400)
+            }).expect(401)
     })
 
     test('ADMIN_SUITE - Should login Master Admin', async () => {
@@ -209,6 +209,47 @@ describe('Testing Admin insertion', () => {
             }).expect(401)
 
         expect(responseRefresh.body.error).toEqual('Unable to refresh token.')
+    })
+
+    test('ADMIN_SUITE - Should lost credentials if logged multiple times', async () => {
+        let responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminAccount.email,
+                password: adminAccount.password
+            }).expect(200)
+        
+        const firstToken = responseLogin.body.jwt.token;
+
+        await request(app)
+            .get('/admin/me')
+            .set('Authorization', `Bearer ${firstToken}`)
+            .send().expect(200)
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Logging again will make lost older sessions credentials
+        responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminAccount.email,
+                password: adminAccount.password
+            }).expect(200)
+
+        const secondRefreshToken = responseLogin.body.jwt.refreshToken;
+
+        await request(app)
+            .get('/admin/me')
+            .set('Authorization', `Bearer ${firstToken}`)
+            .send().expect(401)
+        
+        // Refreshing should not work as well
+        await request(app)
+            .post('/admin/refresh/me')
+            .set('Authorization', `Bearer ${firstToken}`)
+            .send({
+                refreshToken: secondRefreshToken
+            }).expect(401)
     })
 
     test('ADMIN_SUITE - Should NOT renew access - invalid Token', async () => {
@@ -354,9 +395,16 @@ describe('Testing Admin login and fetch', () => {
     })
 
     test('ADMIN_SUITE - Should NOT update/me admin fields', async () => {
+        const responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminMasterAccount.email,
+                password: adminMasterAccount.password
+            }).expect(200)
+
         await request(app)
             .patch('/admin/me')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 _id: new mongoose.Types.ObjectId()
             })
@@ -396,15 +444,22 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 name: 'Updated Name'
             })
-            .expect(400)
+            .expect(401)
 
         expect(response.body.error).toEqual('Unable to update Admins without a Master Admin credential')
     })
 
     test('ADMIN_SUITE - Should NOT update by invalid account id', async () => {
+        const responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminMasterAccount.email,
+                password: adminMasterAccount.password
+            }).expect(200)
+
         await request(app)
             .patch('/admin/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 name: 'Updated Name'
             })
@@ -412,7 +467,7 @@ describe('Testing Admin login and fetch', () => {
 
         await request(app)
             .patch('/admin/INVALID_ID')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 name: 'Updated Name'
             })
@@ -509,7 +564,7 @@ describe('Testing Admin deletion', () => {
             .delete('/admin/' + adminMasterAccountId)
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
-            .expect(400)
+            .expect(401)
 
             expect(response.body.error).toEqual('Unable to delete Admins without a Master Admin credential')
 
