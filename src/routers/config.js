@@ -3,7 +3,7 @@ import Component from '../models/component';
 import GroupConfig from '../models/group-config';
 import Config from '../models/config';
 import { auth } from '../middleware/auth';
-import { masterPermission, checkEnvironmentStatusChange } from '../middleware/validators';
+import { masterPermission, checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { removeConfigStatus } from './common/index'
 
 const router = new express.Router()
@@ -125,15 +125,8 @@ router.delete('/config/:id', auth, masterPermission('delete Config'), async (req
     }
 })
 
-router.patch('/config/:id', auth, masterPermission('update Config'), async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['key', 'description']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates' })
-    }
-
+router.patch('/config/:id', auth, masterPermission('update Config'), 
+    verifyInputUpdateParameters(['key', 'description']), async (req, res) => {
     try {
         const config = await Config.findOne({ _id: req.params.id })
  
@@ -141,7 +134,7 @@ router.patch('/config/:id', auth, masterPermission('update Config'), async (req,
             return res.status(404).send()
         }
 
-        updates.forEach((update) => config[update] = req.body[update])
+        req.updates.forEach((update) => config[update] = req.body[update])
         await config.save()
         res.send(config)
     } catch (e) {

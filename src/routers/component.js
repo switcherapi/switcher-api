@@ -1,6 +1,6 @@
 import express from 'express';
 import { auth } from '../middleware/auth';
-import { masterPermission } from '../middleware/validators';
+import { masterPermission, verifyInputUpdateParameters } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
 import Component from '../models/component';
 
@@ -71,18 +71,10 @@ router.get('/component/:id', auth, async (req, res) => {
 
 router.patch('/component/:id', [
     check('description').isLength({ min: 5, max: 500 })
-], auth, async (req, res) => {
+], auth, verifyInputUpdateParameters(['description']), async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
-    }
-
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['description']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates' })
     }
 
     try {
@@ -92,7 +84,7 @@ router.patch('/component/:id', [
             return res.status(404).send()
         }
 
-        updates.forEach((update) => component[update] = req.body[update])
+        req.updates.forEach((update) => component[update] = req.body[update])
         await component.save()
         res.send(component)
     } catch (e) {

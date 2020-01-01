@@ -159,7 +159,7 @@ const verifyIdentifiers = function(role, element, callback) {
             }
         }
     } else {
-        return callback(null, element);;
+        return callback(null, element);
     }
 
     callback(new Error('It was not possible to match the requiring element to the current role'), null);

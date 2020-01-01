@@ -3,6 +3,7 @@ import { auth } from '../middleware/auth';
 import { check, validationResult } from 'express-validator';
 import { Team, addDefaultRole } from '../models/team';
 import { Role, checkActionType } from '../models/role';
+import { verifyInputUpdateParameters } from '../middleware/validators';
 import Admin from '../models/admin';
 import Domain from '../models/domain';
 
@@ -82,15 +83,7 @@ router.get('/team/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/team/:id', auth, async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['name', 'active']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates' })
-    }
-
+router.patch('/team/:id', auth, verifyInputUpdateParameters(['name', 'active']), async (req, res) => {
     try {
         const team = await Team.findOne({ _id: req.params.id })
  
@@ -98,7 +91,7 @@ router.patch('/team/:id', auth, async (req, res) => {
             return res.status(404).send()
         }
 
-        updates.forEach((update) => team[update] = req.body[update])
+        req.updates.forEach((update) => team[update] = req.body[update])
         await team.save()
         res.send(team)
     } catch (e) {
@@ -121,15 +114,7 @@ router.delete('/team/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/team/member/add/:id', auth, async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['member']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid parameter' })
-    }
-
+router.patch('/team/member/add/:id', auth, verifyInputUpdateParameters(['member']), async (req, res) => {
     try {
         const team = await Team.findById(req.params.id)
         
@@ -156,15 +141,7 @@ router.patch('/team/member/add/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/team/member/remove/:id', auth, async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['member']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid parameter' })
-    }
-
+router.patch('/team/member/remove/:id', auth, verifyInputUpdateParameters(['member']), async (req, res) => {
     try {
         const team = await Team.findOne({ _id: req.params.id })
             
@@ -193,15 +170,7 @@ router.patch('/team/member/remove/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/team/role/add/:id', auth, async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['role']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid parameter' })
-    }
-
+router.patch('/team/role/add/:id', auth, verifyInputUpdateParameters(['role']), async (req, res) => {
     try {
         const team = await Team.findById(req.params.id)
         
@@ -227,15 +196,7 @@ router.patch('/team/role/add/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/team/role/remove/:id', auth, async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['role']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid parameter' })
-    }
-
+router.patch('/team/role/remove/:id', auth, verifyInputUpdateParameters(['role']), async (req, res) => {
     try {
         const team = await Team.findOne({ _id: req.params.id })
             

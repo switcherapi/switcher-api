@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { Role, ActionTypes, RouterTypes } from './role';
+import { Role, RouterTypes } from './role';
 import Admin from './admin';
 
 const teamSchema = new mongoose.Schema({

@@ -1,7 +1,7 @@
 import express from 'express';
 import Config from '../models/config';
 import { Environment } from '../models/environment';
-import { masterPermission, checkEnvironmentStatusChange } from '../middleware/validators';
+import { masterPermission, checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { ConfigStrategy, strategyRequirements } from '../models/config-strategy';
 import { auth } from '../middleware/auth';
 import { removeConfigStrategyStatus } from './common/index'
@@ -144,15 +144,8 @@ router.delete('/configstrategy/:id', auth, masterPermission('delete Strategy'), 
     }
 })
 
-router.patch('/configstrategy/:id', auth, masterPermission('update Strategy'), async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['description', 'values', 'operation']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates' })
-    }
-
+router.patch('/configstrategy/:id', auth, masterPermission('update Strategy'), 
+    verifyInputUpdateParameters(['description', 'values', 'operation']), async (req, res) => {
     try {
         const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
             
@@ -160,7 +153,7 @@ router.patch('/configstrategy/:id', auth, masterPermission('update Strategy'), a
             return res.status(404).send()
         }
 
-        updates.forEach((update) => configStrategy[update] = req.body[update])
+        req.updates.forEach((update) => configStrategy[update] = req.body[update])
         await configStrategy.save()
         res.send(configStrategy)
     } catch (e) {
@@ -168,15 +161,8 @@ router.patch('/configstrategy/:id', auth, masterPermission('update Strategy'), a
     }
 })
 
-router.patch('/configstrategy/addval/:id', auth, masterPermission('create Strategy values'), async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['value']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid parameter' })
-    }
-
+router.patch('/configstrategy/addval/:id', auth, masterPermission('create Strategy values'), 
+    verifyInputUpdateParameters(['value']), async (req, res) => {
     try {
         const configStrategy = await ConfigStrategy.findById(req.params.id)
         
@@ -203,15 +189,8 @@ router.patch('/configstrategy/addval/:id', auth, masterPermission('create Strate
     }
 })
 
-router.patch('/configstrategy/updateval/:id', auth, masterPermission('update Strategy values'), async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['oldvalue', 'newvalue']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid parameter' })
-    }
-
+router.patch('/configstrategy/updateval/:id', auth, masterPermission('update Strategy values'), 
+    verifyInputUpdateParameters(['oldvalue', 'newvalue']), async (req, res) => {
     try {
         const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
             
@@ -246,15 +225,8 @@ router.patch('/configstrategy/updateval/:id', auth, masterPermission('update Str
     }
 })
 
-router.patch('/configstrategy/removeval/:id', auth, masterPermission('remove Strategy values'), async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['value']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid parameter' })
-    }
-
+router.patch('/configstrategy/removeval/:id', auth, masterPermission('remove Strategy values'), 
+    verifyInputUpdateParameters(['value']),  async (req, res) => {
     try {
         const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
             

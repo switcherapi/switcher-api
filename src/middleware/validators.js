@@ -38,3 +38,17 @@ export async function checkEnvironmentStatusChange (req, res, domain) {
 
     return updates
 }
+
+export function verifyInputUpdateParameters(allowedUpdates) {
+    return function (req, res, next) {
+        const updates = Object.keys(req.body);
+        const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+
+        if (!isValidOperation) {
+            return res.status(400).send({ error: `Invalid update parameters` });
+        }
+
+        req.updates = updates;
+        next();
+    }
+}

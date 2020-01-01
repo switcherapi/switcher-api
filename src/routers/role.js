@@ -2,6 +2,7 @@ import express from 'express';
 import { auth } from '../middleware/auth';
 import { Role } from '../models/role';
 import { Team } from '../models/team';
+import { verifyInputUpdateParameters } from '../middleware/validators';
 
 const router = new express.Router()
 
@@ -55,15 +56,8 @@ router.get('/role/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/role/:id', auth, async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['action', 'active', 'router', 'identifiedBy']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates' })
-    }
-
+router.patch('/role/:id', auth, 
+    verifyInputUpdateParameters(['action', 'active', 'router', 'identifiedBy']), async (req, res) => {
     try {
         const role = await Role.findOne({ _id: req.params.id })
  
@@ -71,7 +65,7 @@ router.patch('/role/:id', auth, async (req, res) => {
             return res.status(404).send()
         }
 
-        updates.forEach((update) => role[update] = req.body[update])
+        req.updates.forEach((update) => role[update] = req.body[update])
         await role.save()
         res.send(role)
     } catch (e) {
@@ -101,15 +95,7 @@ router.delete('/role/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/role/value/add/:id', auth, async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['value']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid parameter' })
-    }
-
+router.patch('/role/value/add/:id', auth, verifyInputUpdateParameters(['value']), async (req, res) => {
     try {
         const role = await Role.findById(req.params.id)
         
@@ -134,15 +120,7 @@ router.patch('/role/value/add/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/role/value/remove/:id', auth, async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['value']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid parameter' })
-    }
-
+router.patch('/role/value/remove/:id', auth, verifyInputUpdateParameters(['value']), async (req, res) => {
     try {
         const role = await Role.findOne({ _id: req.params.id })
             

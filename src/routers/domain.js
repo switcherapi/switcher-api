@@ -2,7 +2,7 @@ import express from 'express';
 import Domain from '../models/domain';
 import { Environment } from '../models/environment';
 import { auth } from '../middleware/auth';
-import { masterPermission, checkEnvironmentStatusChange } from '../middleware/validators';
+import { masterPermission, checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { removeDomainStatus } from './common/index'
 
 const router = new express.Router()
@@ -135,15 +135,8 @@ router.delete('/domain/:id', auth, masterPermission('delete Domain'), async (req
     }
 })
 
-router.patch('/domain/:id', auth, masterPermission('update Domain'), async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['description']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates' })
-    }
-
+router.patch('/domain/:id', auth, masterPermission('update Domain'), 
+    verifyInputUpdateParameters(['description']), async (req, res) => {
     try {
         const domain = await Domain.findOne({ _id: req.params.id })
 
@@ -151,7 +144,7 @@ router.patch('/domain/:id', auth, masterPermission('update Domain'), async (req,
             return res.status(404).send()
         }
 
-        updates.forEach((update) => domain[update] = req.body[update])
+        req.updates.forEach((update) => domain[update] = req.body[update])
 
         await domain.save()
         res.send(domain)

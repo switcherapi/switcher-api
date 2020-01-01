@@ -2,7 +2,7 @@ import express from 'express';
 import Domain from '../models/domain';
 import GroupConfig from '../models/group-config';
 import { auth } from '../middleware/auth';
-import { masterPermission, checkEnvironmentStatusChange } from '../middleware/validators';
+import { masterPermission, checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { removeGroupStatus } from './common/index'
 
 const router = new express.Router()
@@ -123,15 +123,8 @@ router.delete('/groupconfig/:id', auth, masterPermission('delete Group'), async 
     }
 })
 
-router.patch('/groupconfig/:id', auth, masterPermission('update Group'), async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['name', 'description']
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates' })
-    }
-
+router.patch('/groupconfig/:id', auth, masterPermission('update Group'), 
+    verifyInputUpdateParameters(['name', 'description']), async (req, res) => {
     try {
         const groupconfig = await GroupConfig.findOne({ _id: req.params.id })
     
@@ -139,7 +132,7 @@ router.patch('/groupconfig/:id', auth, masterPermission('update Group'), async (
             return res.status(404).send({ error: 'Group not found' })
         }
 
-        updates.forEach((update) => groupconfig[update] = req.body[update])
+        req.updates.forEach((update) => groupconfig[update] = req.body[update])
         await groupconfig.save()
         res.send(groupconfig)
     } catch (e) {

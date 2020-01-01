@@ -1,7 +1,7 @@
 import express from 'express';
 import Admin from '../models/admin';
 import { auth, authRefreshToken } from '../middleware/auth';
-import { masterPermission } from '../middleware/validators';
+import { masterPermission, verifyInputUpdateParameters } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
 
 const router = new express.Router()
@@ -113,17 +113,9 @@ router.delete('/admin/:id', auth, masterPermission('delete Admins'), async (req,
     }
 })
 
-router.patch('/admin/me', auth, async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowwedUpdates = ['name', 'email', 'password']
-    const isValidOperation = updates.every((update) => allowwedUpdates.includes(update))
-
-    if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates' })
-    }
-
+router.patch('/admin/me', auth, verifyInputUpdateParameters(['name', 'email', 'password']), async (req, res) => {
     try {
-        updates.forEach((update) => req.admin[update] = req.body[update])
+        req.updates.forEach((update) => req.admin[update] = req.body[update])
         await req.admin.save()
         res.send(req.admin)
     } catch (e) {
@@ -131,11 +123,8 @@ router.patch('/admin/me', auth, async (req, res) => {
     }
 })
 
-router.patch('/admin/:id', auth, masterPermission('update Admins'), async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowwedUpdates = ['name', 'email', 'password', 'active', 'master']
-    const isValidOperation = updates.every((update) => allowwedUpdates.includes(update))
-
+router.patch('/admin/:id', auth, masterPermission('update Admins'), 
+    verifyInputUpdateParameters(['name', 'email', 'password', 'active', 'master']), async (req, res) => {
     try {
         const admin = await Admin.findOne({ _id: req.params.id })
 
@@ -147,11 +136,7 @@ router.patch('/admin/:id', auth, masterPermission('update Admins'), async (req, 
             return res.status(400).send({ error: 'Unable to modify your own params' })
         }
 
-        if (!isValidOperation) {
-            return res.status(400).send({ error: 'Invalid updates' })
-        }
-
-        updates.forEach((update) => admin[update] = req.body[update])
+        req.updates.forEach((update) => admin[update] = req.body[update])
         await admin.save()
         res.send(admin)
     } catch (e) {

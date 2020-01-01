@@ -161,8 +161,8 @@ describe('Updating tests', () => {
             .patch('/component/' + response.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                name: 'cannot-update-it-so-sad'
-            }).expect(422)
+                name: 'CANNOT_UPDATE'
+            }).expect(400)
 
     })
 })

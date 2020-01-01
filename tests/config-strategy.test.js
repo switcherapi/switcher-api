@@ -591,7 +591,7 @@ describe('Testing update strategies #1', () => {
                 not_valid_attribute: 'USER_3'
             }).expect(400);
 
-        expect(response.body.error).toEqual('Invalid parameter');
+        expect(response.body.error).toEqual('Invalid update parameters');
 
         response = await request(app)
             .patch('/configstrategy/addval/' + configStrategyId)
@@ -666,7 +666,7 @@ describe('Testing update strategies #2', () => {
                 new: 'USER_2'
             }).expect(400)
 
-        expect(response.body.error).toEqual('Invalid parameter');
+        expect(response.body.error).toEqual('Invalid update parameters');
 
         response = await request(app)
             .patch('/configstrategy/updateval/' + configStrategyId)
@@ -738,7 +738,7 @@ describe('Testing update strategies #2', () => {
                 val: 'USER_3'
             }).expect(400)
 
-        expect(response.body.error).toEqual('Invalid parameter');
+        expect(response.body.error).toEqual('Invalid update parameters');
 
         response = await request(app)
             .patch('/configstrategy/removeval/' + configStrategyId)
