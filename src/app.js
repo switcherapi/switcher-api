@@ -13,6 +13,8 @@ import groupConfigRouter from './routers/group-config';
 import configRouter from './routers/config';
 import configStrategyRouter from './routers/config-strategy';
 import metricRouter from './routers/metric';
+import teamRouter from './routers/team';
+import roleRouter from './routers/role';
 import schema from './client/schema';
 import { appAuth } from './middleware/auth';
 
@@ -39,6 +41,8 @@ app.use(groupConfigRouter)
 app.use(configRouter)
 app.use(configStrategyRouter)
 app.use(metricRouter)
+app.use(teamRouter)
+app.use(roleRouter)
 
 /**
  * Client API - GraphQL

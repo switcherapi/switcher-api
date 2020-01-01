@@ -2,7 +2,9 @@ import { Environment, EnvType } from '../../models/environment';
 import Domain from '../../models/domain';
 import GroupConfig from '../../models/group-config';
 import Config from '../../models/config';
+import { Team } from '../../models/team';
 import { ConfigStrategy } from '../../models/config-strategy';
+import { Role, ActionTypes, RouterTypes } from '../../models/role';
 
 async function checkEnvironmentStatusRemoval(domainId, environmentName, strategy = false) {
     const environment = await Environment.find({ domain: domainId }).select('name -_id')
@@ -85,3 +87,80 @@ export async function removeConfigStrategyStatus(strategyId, environmentName) {
         throw new Error(e.message)
     }
 }
+
+export async function verifyOwnership(admin, element, domain, action, routerType) {
+    try {
+        if (admin._id.equals(domain.owner)) {
+            return element;
+        }
+        
+        const teams = await Team.find({ _id: { $in: admin.teams }, domain: domain._id })
+        
+        if (admin.teams.length) {
+            for (var i = 0; i < teams.length; i++) {
+                if (teams[i].active) {
+                    await verifyRoles(teams[i], element, action, routerType, (err, data) => {
+                        if (err) throw err;
+                        element = data;
+                    });
+                } else {
+                    throw new Error('Team is not active to verify this operation');
+                }
+            }
+        } else {
+            throw new Error('It was not possible to find any team that allows you to proceed with this operation');
+        }
+
+        return element;
+    } catch (e) {
+        throw Error(e.message);
+    }
+}
+  
+const verifyRoles = async function(team, element, action, routerType, callback) {
+    const role = await Role.findOne({ 
+        _id: { $in: team.roles }, 
+        action, 
+        $or: [ 
+            { router: routerType }, 
+            { router: RouterTypes.ALL } 
+        ] 
+    });
+
+    if (role) {
+        if (role.active) {
+            if (action === ActionTypes.SELECT) {
+                verifyIdentifiers(role, element, (err, data) => {
+                    return callback(err, data);
+                });
+            } else {
+                return callback(null, element);
+            }
+        } else {
+            return callback(new Error('Role is not active to verify this operation'), null);
+        }
+    } else {
+        return callback(new Error('Role not found for this operation'), null);
+    }
+};
+
+const verifyIdentifiers = function(role, element, callback) {
+    if (role.identifiedBy) {
+        if (Array.isArray(element)) {
+            if (role.values.length) {
+                element = element.filter(child => role.values.includes(child[`${role.identifiedBy}`]));
+                if (element) {
+                    return callback(null, element);
+                }
+            }
+        } else {
+            if (role.values.includes(element[`${role.identifiedBy}`])) {
+                return callback(null, element);
+            }
+        }
+    } else {
+        return callback(null, element);;
+    }
+
+    callback(new Error('It was not possible to match the requiring element to the current role'), null);
+};

@@ -7,6 +7,8 @@ import GroupConfig from '../../src/models/group-config';
 import Config from '../../src/models/config';
 import Component from '../../src/models/component';
 import History from '../../src/models/history';
+import { Team } from '../../src/models/team';
+import { Role, ActionTypes, RouterTypes } from '../../src/models/role';
 import { Metric } from '../../src/models/metric';
 import { EnvType, Environment } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
@@ -40,6 +42,22 @@ export const domainDocument = {
     description: 'Test Domain',
     activated: new Map().set(EnvType.DEFAULT, true),
     owner: adminMasterAccountId
+}
+
+export const team1Id = new mongoose.Types.ObjectId()
+export const team1 = {
+    _id: team1Id,
+    domain: domainId,
+    name: 'Team 1',
+    active: true
+}
+
+export const role1Id = new mongoose.Types.ObjectId()
+export const role1 = {
+    _id: role1Id,
+    action: ActionTypes.SELECT,
+    active: true,
+    router: RouterTypes.GROUP
 }
 
 export const environment1Id = new mongoose.Types.ObjectId()
@@ -105,6 +123,8 @@ export const setupDatabase = async () => {
     await Component.deleteMany()
     await History.deleteMany()
     await Metric.deleteMany()
+    await Team.deleteMany()
+    await Role.deleteMany()
 
     const refreshTokenMaster = await bcrypt.hash(adminMasterAccountToken.split('.')[2], 8)
     adminMasterAccount.token = refreshTokenMaster;
@@ -125,4 +145,6 @@ export const setupDatabase = async () => {
     await new Config(config1Document).save()
     await new Config(config2Document).save()
     await new ConfigStrategy(configStrategyDocument).save()
+    await new Team(team1).save()
+    await new Role(role1).save()
 }

@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import GroupConfig from './group-config';
 import History from './history';
+import { Team } from './team';
 import { EnvType, Environment } from './environment';
 import { recordHistory } from './common/index'
 
@@ -67,6 +68,12 @@ domainSchema.virtual('history', {
     ref: 'History',
     localField: '_id',
     foreignField: 'elementId'
+})
+
+domainSchema.virtual('team', {
+    ref: 'Team',
+    localField: '_id',
+    foreignField: 'domain'
 })
 
 domainSchema.options.toJSON = {
@@ -133,6 +140,11 @@ domainSchema.pre('remove', async function (next) {
     const group = await GroupConfig.find({ domain: new ObjectId(domain._id) })
     if (group) {
         group.forEach(async (g) => await g.remove())
+    }
+
+    const team = await Team.find({ domain: new ObjectId(domain._id) })
+    if (team) {
+        team.forEach(async (e) => await e.remove())
     }
 
     const environment = await Environment.find({ domain: new ObjectId(domain._id) })

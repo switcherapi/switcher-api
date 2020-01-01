@@ -15,6 +15,7 @@ Main features:
 - You no longer only toggle code, but business features. You can set up your eco-system to share switchers between applications.
 - Cross environment. You are still working on your feature but want to keep the production environment safe from whatever change you make.
 - Parallel strategies for the same switcher. Your test environment does not have the same variable as production. You can set up different strategies for the same switcher for two different environments.
+- Create teams with different roles of access.
 - It keeps track of every configuration change.
 - Produce relevant metrics.
 - High-security flow using *OAuth 2.0* flow and different levels of credentials for administrators.
@@ -72,13 +73,13 @@ npm run test-admin
 ```
 
 # Hands-on testing
-Find attached into this repository some request samples (./requests). You just need to import to your Postman
+Find attached into this repository some request samples (./requests). You just need to import to Postman.
 
 {{url}} = endpoint from where you are running the API.
 
 All calls use **Bearer Token**. Remember to copy the jwt combination after signing up. It generates a expirable token and a refresh token.
 
-Once the token expires, a new one can be generate using: **{{url}}/admin/refresh/me**
+Once token expires, a new one can be generate using: **{{url}}/admin/refresh/me**
 
 **1) Create a master admin user.**
 - {{url}}/admin/signup [POST]

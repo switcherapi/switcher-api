@@ -737,6 +737,839 @@
 			"response": []
 		},
 		{
+			"name": "Team - Create",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"My Team 2\",\n\t\"domain\": \"5e0bbe269ad3100658ae2229\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/create",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"create"
+					],
+					"query": [
+						{
+							"key": "defaultActions",
+							"value": "SELECT,CREATE",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Team - Read",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/?domain=5e0bbe0d9ad3100658ae2228",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						""
+					],
+					"query": [
+						{
+							"key": "domain",
+							"value": "5e0bbe0d9ad3100658ae2228"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Team - Read Single",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/5e0bf0bab2ced93fb0b9111a",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"5e0bf0bab2ced93fb0b9111a"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Team - Update",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"active\": \"true\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/5e0bc0e1ac22583584aeb849",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"5e0bc0e1ac22583584aeb849"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Team - Delete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/5e0d10c21078a209b4215b7f",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"5e0d10c21078a209b4215b7f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Team - Add Member",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"member\": \"5e0bbe0d9ad3100658ae2228\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/member/add/5e0bf0bab2ced93fb0b9111a",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"member",
+						"add",
+						"5e0bf0bab2ced93fb0b9111a"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "5e0bbe0d9ad3100658ae2228",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Team - Remove Member",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"member\": \"5e0bbe0d9ad3100658ae2228\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/member/remove/5e0bf0bab2ced93fb0b9111a",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"member",
+						"remove",
+						"5e0bf0bab2ced93fb0b9111a"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Team - Add Role",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"role\": \"5e0bf449a5753d65c0794af3\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/role/add/5e0bf0bab2ced93fb0b9111a",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"role",
+						"add",
+						"5e0bf0bab2ced93fb0b9111a"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "5e0bbe0d9ad3100658ae2228",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Team - Remove Role",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"role\": \"5e0bf2a097f71351a0007ab7\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/role/remove/5e0bf0bab2ced93fb0b9111a",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"role",
+						"remove",
+						"5e0bf0bab2ced93fb0b9111a"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "5e0bbe0d9ad3100658ae2228",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Role - Create",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"action\": \"SELECT\",\n\t\"router\": \"CONFIG\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/role/create",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"role",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Role - Update",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"active\": \"true\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/role/5e0bf4a3a5753d65c0794af4",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"role",
+						"5e0bf4a3a5753d65c0794af4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Role - Read",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/role/?team=5e0bf0bab2ced93fb0b9111a",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"role",
+						""
+					],
+					"query": [
+						{
+							"key": "team",
+							"value": "5e0bf0bab2ced93fb0b9111a"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Role - Read Single",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/role/5e0bf449a5753d65c0794af3",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"role",
+						"5e0bf449a5753d65c0794af3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Role - Delete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/role/5e0bf4b5a5753d65c0794af6",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"role",
+						"5e0bf4b5a5753d65c0794af6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Role - Add Value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"value\": \"123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/role/value/add/5e0bf449a5753d65c0794af3",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"role",
+						"value",
+						"add",
+						"5e0bf449a5753d65c0794af3"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "5e0bbe0d9ad3100658ae2228",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Role - Remove Value",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"value\": \"123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/role/value/remove/5e0bf449a5753d65c0794af3",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"role",
+						"value",
+						"remove",
+						"5e0bf449a5753d65c0794af3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Domain - Create",
 			"event": [
 				{
@@ -828,14 +1661,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/domain/generateApiKey/5df166239194d613400a52e7",
+					"raw": "{{url}}/domain/generateApiKey/5e080381fcd19802c002eed7",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"domain",
 						"generateApiKey",
-						"5df166239194d613400a52e7"
+						"5e080381fcd19802c002eed7"
 					]
 				}
 			},
@@ -926,7 +1759,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"currency-api\",\n\t\"description\": \"Currency API\",\n\t\"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGQyMDdjMDFmNDhlODQyOGNjMWYwM2MiLCJpYXQiOjE1NzQwNDYxNDd9.4V__O_GHxOves1OdZAlj2OdNswM1H0YsXiIaUhbbmis\"\n}",
+					"raw": "{\n\t\"description\": \"Currency API\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -934,13 +1767,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/domain/5dd207c01f48e8428cc1f03c",
+					"raw": "{{url}}/domain/5e080381fcd19802c002eed7",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"domain",
-						"5dd207c01f48e8428cc1f03c"
+						"5e080381fcd19802c002eed7"
 					]
 				}
 			},
@@ -1055,13 +1888,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/domain/5dd05cfa98adc4285457e29a",
+					"raw": "{{url}}/domain/5e0bbe269ad3100658ae2229",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"domain",
-						"5dd05cfa98adc4285457e29a"
+						"5e0bbe269ad3100658ae2229"
 					],
 					"query": [
 						{
@@ -1241,7 +2074,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/groupconfig?sortBy=createdAt:asc&domain=5dd230991f11a7307c16452a",
+					"raw": "{{url}}/groupconfig?domain=5e0bbe269ad3100658ae2229",
 					"host": [
 						"{{url}}"
 					],
@@ -1251,7 +2084,8 @@
 					"query": [
 						{
 							"key": "sortBy",
-							"value": "createdAt:asc"
+							"value": "createdAt:asc",
+							"disabled": true
 						},
 						{
 							"key": "activated",
@@ -1270,7 +2104,7 @@
 						},
 						{
 							"key": "domain",
-							"value": "5dd230991f11a7307c16452a"
+							"value": "5e0bbe269ad3100658ae2229"
 						}
 					]
 				}
