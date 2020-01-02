@@ -4,10 +4,20 @@ import GroupConfig from '../models/group-config';
 import Config from '../models/config';
 import { auth } from '../middleware/auth';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeConfigStatus, verifyOwnership, responseException } from './common/index'
+import { removeConfigStatus, verifyOwnership, responseException, NotFoundError } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router()
+
+async function verifyAddComponentInput(configId, admin) {
+    const config = await Config.findById(configId)
+            
+    if (!config) {
+        throw new NotFoundError('Config not found')
+    }
+
+    return await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG)
+}
 
 router.post('/config/create', auth, async (req, res) => {
     try {
@@ -197,14 +207,7 @@ router.patch('/config/removeStatus/:id', auth, async (req, res) => {
 
 router.patch('/config/addComponent/:id', auth, async (req, res) => {
     try {
-        let config = await Config.findById(req.params.id)
-            
-        if (!config) {
-            return res.status(404).send()
-        }
-
-        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG)
-
+        const config = await verifyAddComponentInput(req.params.id, req.admin)
         const component = await Component.findOne({ name: req.body.component })
 
         if (!component) {
@@ -221,14 +224,7 @@ router.patch('/config/addComponent/:id', auth, async (req, res) => {
 
 router.patch('/config/removeComponent/:id', auth, async (req, res) => {
     try {
-        let config = await Config.findById(req.params.id)
-            
-        if (!config) {
-            return res.status(404).send()
-        }
-
-        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG)
-
+        const config = await verifyAddComponentInput(req.params.id, req.admin)
         const component = await Component.findOne({ name: req.body.component })
 
         if (!component) {

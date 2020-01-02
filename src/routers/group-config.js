@@ -3,10 +3,20 @@ import Domain from '../models/domain';
 import GroupConfig from '../models/group-config';
 import { auth } from '../middleware/auth';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeGroupStatus, verifyOwnership, responseException } from './common/index'
+import { removeGroupStatus, verifyOwnership, responseException, NotFoundError } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router()
+
+async function verifyGroupInput(groupId, admin) {
+    let groupconfig = await GroupConfig.findById(groupId)
+        
+    if (!groupconfig) {
+        throw new NotFoundError('GroupConfig does not exist')
+    }
+
+    return await verifyOwnership(admin, groupconfig, groupconfig.domain, ActionTypes.UPDATE, RouterTypes.GROUP)
+}
 
 router.post('/groupconfig/create', auth, async (req, res) => {
     let groupconfig = new GroupConfig({
@@ -141,13 +151,7 @@ router.delete('/groupconfig/:id', auth, async (req, res) => {
 router.patch('/groupconfig/:id', auth, 
     verifyInputUpdateParameters(['name', 'description']), async (req, res) => {
     try {
-        let groupconfig = await GroupConfig.findById(req.params.id)
-    
-        if (!groupconfig) {
-            return res.status(404).send({ error: 'Group not found' })
-        }
-
-        groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.UPDATE, RouterTypes.GROUP)
+        const groupconfig = await verifyGroupInput(req.params.id, req.admin)
 
         req.updates.forEach((update) => groupconfig[update] = req.body[update])
         await groupconfig.save()
@@ -159,13 +163,7 @@ router.patch('/groupconfig/:id', auth,
 
 router.patch('/groupconfig/updateStatus/:id', auth, async (req, res) => {
     try {
-        let groupconfig = await GroupConfig.findById(req.params.id)
-        
-        if (!groupconfig) {
-            return res.status(404).send({ error: 'GroupConfig does not exist'})
-        }
-
-        groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.UPDATE, RouterTypes.GROUP)
+        const groupconfig = await verifyGroupInput(req.params.id, req.admin)
 
         const updates = await checkEnvironmentStatusChange(req, res, groupconfig.domain)
         updates.forEach((update) => groupconfig.activated.set(update, req.body[update]))
@@ -178,13 +176,7 @@ router.patch('/groupconfig/updateStatus/:id', auth, async (req, res) => {
 
 router.patch('/groupconfig/removeStatus/:id', auth, async (req, res) => {
     try {
-        let groupconfig = await GroupConfig.findById(req.params.id)
-        
-        if (!groupconfig) {
-            return res.status(404).send({ error: 'GroupConfig does not exist'})
-        }
-
-        groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.UPDATE, RouterTypes.GROUP)
+        const groupconfig = await verifyGroupInput(req.params.id, req.admin)
 
         res.send(await removeGroupStatus(groupconfig, req.body.env))
     } catch (e) {
