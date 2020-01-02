@@ -4,11 +4,20 @@ import { check, validationResult } from 'express-validator';
 import { Team, addDefaultRole } from '../models/team';
 import { Role, checkActionType, ActionTypes, RouterTypes } from '../models/role';
 import { verifyInputUpdateParameters } from '../middleware/validators';
-import { verifyOwnership, PermissionError, NotFoundError, responseException } from './common/index';
+import { verifyOwnership, responseException, NotFoundError } from './common/index';
 import Admin from '../models/admin';
-import Domain from '../models/domain';
 
 const router = new express.Router()
+
+async function verifyRequestedTeam(teamId, admin, action) {
+    let team = await Team.findById(teamId)
+        
+    if (!team) {
+        throw new NotFoundError('Team not found')
+    }
+
+    return await verifyOwnership(admin, team, team.domain, action, RouterTypes.ADMIN);
+}
 
 router.post('/team/create', auth, [
     check('name').isLength({ min: 2, max: 50 })
@@ -70,14 +79,7 @@ router.get('/team', auth, async (req, res) => {
 
 router.get('/team/:id', auth, async (req, res) => {
     try {
-        let team = await Team.findById(req.params.id).lean()
-
-        if (!team) {
-            return res.status(404).send()
-        }
-
-        team = await verifyOwnership(req.admin, team, team.domain, ActionTypes.READ, RouterTypes.ADMIN)
-
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.READ)
         res.send(team)
     } catch (e) {
         responseException(res, e, 400)
@@ -86,14 +88,7 @@ router.get('/team/:id', auth, async (req, res) => {
 
 router.patch('/team/:id', auth, verifyInputUpdateParameters(['name', 'active']), async (req, res) => {
     try {
-        let team = await Team.findById(req.params.id)
- 
-        if (!team) {
-            return res.status(404).send()
-        }
-
-        team = await verifyOwnership(req.admin, team, team.domain, ActionTypes.UPDATE, RouterTypes.ADMIN)
-
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
         req.updates.forEach((update) => team[update] = req.body[update])
         await team.save()
         res.send(team)
@@ -104,14 +99,7 @@ router.patch('/team/:id', auth, verifyInputUpdateParameters(['name', 'active']),
 
 router.delete('/team/:id', auth, async (req, res) => {
     try {
-        let team = await Team.findById(req.params.id)
-
-        if (!team) {
-            return res.status(404).send()
-        }
-
-        team = await verifyOwnership(req.admin, team, team.domain, ActionTypes.DELETE, RouterTypes.ADMIN)
-
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.DELETE)
         await team.remove()
         res.send(team)
     } catch (e) {
@@ -121,13 +109,7 @@ router.delete('/team/:id', auth, async (req, res) => {
 
 router.patch('/team/member/add/:id', auth, verifyInputUpdateParameters(['member']), async (req, res) => {
     try {
-        let team = await Team.findById(req.params.id)
-        
-        if (!team) {
-            return res.status(404).send({ error: 'Team not found' })
-        }
-
-        team = await verifyOwnership(req.admin, team, team.domain, ActionTypes.UPDATE, RouterTypes.ADMIN)
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
 
         const member = req.body.member.trim()
         const admin = await Admin.findById(member);
@@ -150,13 +132,7 @@ router.patch('/team/member/add/:id', auth, verifyInputUpdateParameters(['member'
 
 router.patch('/team/member/remove/:id', auth, verifyInputUpdateParameters(['member']), async (req, res) => {
     try {
-        let team = await Team.findById(req.params.id)
-            
-        if (!team) {
-            return res.status(404).send({ error: 'Team not found' })
-        }
-
-        team = await verifyOwnership(req.admin, team, team.domain, ActionTypes.UPDATE, RouterTypes.ADMIN)
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
 
         const member = req.body.member.trim()
         const admin = await Admin.findById(member);
@@ -181,13 +157,7 @@ router.patch('/team/member/remove/:id', auth, verifyInputUpdateParameters(['memb
 
 router.patch('/team/role/add/:id', auth, verifyInputUpdateParameters(['role']), async (req, res) => {
     try {
-        let team = await Team.findById(req.params.id)
-        
-        if (!team) {
-            return res.status(404).send({ error: 'Team not found' })
-        }
-
-        team = await verifyOwnership(req.admin, team, team.domain, ActionTypes.UPDATE, RouterTypes.ADMIN)
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
 
         const role = await Role.findById(req.body.role)
         
@@ -209,13 +179,7 @@ router.patch('/team/role/add/:id', auth, verifyInputUpdateParameters(['role']), 
 
 router.patch('/team/role/remove/:id', auth, verifyInputUpdateParameters(['role']), async (req, res) => {
     try {
-        let team = await Team.findById(req.params.id)
-            
-        if (!team) {
-            return res.status(404).send({ error: 'Team not found' })
-        }
-
-        team = await verifyOwnership(req.admin, team, team.domain, ActionTypes.UPDATE, RouterTypes.ADMIN)
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
 
         const role = await Role.findById(req.body.role.trim())
         
