@@ -14,7 +14,6 @@ export const adminMasterAccount = {
     name: 'Owner Admin',
     email: 'owner@admin.com',
     password: '123123123123',
-    master: true,
     active: true
 }
 
@@ -70,7 +69,7 @@ export const role1 = {
 export const role2Id = new mongoose.Types.ObjectId()
 export const role2 = {
     _id: role2Id,
-    action: ActionTypes.SELECT,
+    action: ActionTypes.READ,
     active: true,
     router: RouterTypes.GROUP,
     identifiedBy: KeyTypes.NAME,
@@ -80,7 +79,7 @@ export const role2 = {
 export const role3Id = new mongoose.Types.ObjectId()
 export const role3 = {
     _id: role3Id,
-    action: ActionTypes.SELECT,
+    action: ActionTypes.READ,
     active: true,
     router: RouterTypes.CONFIG,
     identifiedBy: KeyTypes.KEY,
@@ -90,7 +89,7 @@ export const role3 = {
 export const role4Id = new mongoose.Types.ObjectId()
 export const role4 = {
     _id: role4Id,
-    action: ActionTypes.SELECT,
+    action: ActionTypes.READ,
     active: true,
     router: RouterTypes.ALL
 }
@@ -119,7 +118,6 @@ export const adminAccount = {
     name: 'Member Admin',
     email: 'member@admin.com',
     password: '123123123123',
-    master: true,
     active: true,
     teams: [team1Id]
 }
@@ -130,7 +128,6 @@ export const adminAccount2 = {
     name: 'Not Member Admin',
     email: 'not_member@admin.com',
     password: '123123123123',
-    master: true,
     active: true,
     teams: []
 }
@@ -141,7 +138,6 @@ export const adminAccount3 = {
     name: 'Member Admin 3',
     email: 'member3@admin.com',
     password: '123123123123',
-    master: true,
     active: true,
     teams: [team2Id]
 }

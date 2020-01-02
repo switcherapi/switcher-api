@@ -16,33 +16,18 @@ const adminSchema = new mongoose.Schema({
         unique: true,
         required: true,
         trim: true,
-        lowercase: true,
-        validate(value) {
-            if (!validator.isEmail(value)) {
-                throw new Error('Email is invalid')
-            }
-        }
+        lowercase: true
     },
     password: {
         type: String,
         required: true,
         minlength: 7,
-        trim: true,
-        validate(value) {
-            if (validator.contains(value.toLowerCase(), 'password')) {
-                throw new Error('Password contains the word password')
-            }
-        }
+        trim: true
     },
     active: {
         type: Boolean,
         required: true,
         default: true
-    },
-    master: {
-        type: Boolean,
-        required: true,
-        default: false
     },
     teams: [{
         type: mongoose.Schema.Types.ObjectId

@@ -3,12 +3,13 @@ import Component from '../models/component';
 import GroupConfig from '../models/group-config';
 import Config from '../models/config';
 import { auth } from '../middleware/auth';
-import { masterPermission, checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeConfigStatus } from './common/index'
+import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
+import { removeConfigStatus, verifyOwnership, responseException } from './common/index'
+import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router()
 
-router.post('/config/create', auth, masterPermission('create Config'), async (req, res) => {
+router.post('/config/create', auth, async (req, res) => {
     try {
         const group = await GroupConfig.findById(req.body.group)
 
@@ -16,16 +17,18 @@ router.post('/config/create', auth, masterPermission('create Config'), async (re
             return res.status(404).send({ error: 'Group Config not found' })
         }
     
-        const config = new Config({
+        let config = new Config({
             ...req.body,
             domain: group.domain,
             owner: req.admin._id
         })
 
+        config = await verifyOwnership(req.admin, config, group.domain, ActionTypes.CREATE, RouterTypes.CONFIG)
+
         await config.save()
         res.status(201).send(config)
     } catch (e) {
-        res.status(400).send(e)
+        responseException(res, e, 400)
     }
 })
 
@@ -56,23 +59,29 @@ router.get('/config', auth, async (req, res) => {
             }
         }).execPopulate()
 
-        res.send(groupConfig.config)
+        let configs = groupConfig.config
+
+        configs = await verifyOwnership(req.admin, configs, groupConfig.domain, ActionTypes.READ, RouterTypes.CONFIG)
+
+        res.send(configs)
     } catch (e) {
-        res.status(500).send()
+        responseException(res, e, 500)
     }
 })
 
 router.get('/config/:id', auth, async (req, res) => {
     try {
-        const config = await Config.findOne({ _id: req.params.id })
+        let config = await Config.findById(req.params.id)
 
         if (!config) {
             return res.status(404).send()
         }
 
+        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG)
+
         res.send(config)
     } catch (e) {
-        res.status(500).send()
+        responseException(res, e, 500)
     }
 })
 
@@ -88,7 +97,7 @@ router.get('/config/history/:id', auth, async (req, res) => {
     }
 
     try {
-        const config = await Config.findOne({ _id: req.params.id })
+        const config = await Config.findById(req.params.id)
 
         if (!config) {
             return res.status(404).send()
@@ -104,51 +113,61 @@ router.get('/config/history/:id', auth, async (req, res) => {
             }
         }).execPopulate()
 
-        res.send(config.history)
+        let history = config.history;
+
+        history = await verifyOwnership(req.admin, history, config.domain, ActionTypes.READ, RouterTypes.CONFIG)
+
+        res.send(history)
     } catch (e) {
-        res.status(500).send()
+        responseException(res, e, 500)
     }
 })
 
-router.delete('/config/:id', auth, masterPermission('delete Config'), async (req, res) => {
+router.delete('/config/:id', auth, async (req, res) => {
     try {
-        const config = await Config.findOne({ _id: req.params.id })
+        let config = await Config.findById(req.params.id)
 
         if (!config) {
             return res.status(404).send()
         }
 
+        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG)
+
         await config.remove()
         res.send(config)
     } catch (e) {
-        res.status(500).send()
+        responseException(res, e, 500)
     }
 })
 
-router.patch('/config/:id', auth, masterPermission('update Config'), 
+router.patch('/config/:id', auth,
     verifyInputUpdateParameters(['key', 'description']), async (req, res) => {
     try {
-        const config = await Config.findOne({ _id: req.params.id })
+        let config = await Config.findById(req.params.id)
  
         if (!config) {
             return res.status(404).send()
         }
 
+        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG)
+
         req.updates.forEach((update) => config[update] = req.body[update])
         await config.save()
         res.send(config)
     } catch (e) {
-        res.status(500).send(e)
+        responseException(res, e, 500)
     }
 })
 
-router.patch('/config/updateStatus/:id', auth, masterPermission('update Config Environment'), async (req, res) => {
+router.patch('/config/updateStatus/:id', auth, async (req, res) => {
     try {
-        const config = await Config.findOne({ _id: req.params.id })
+        let config = await Config.findById(req.params.id)
         
         if (!config) {
-            return res.status(404).send()
+            return res.status(404).send({ error: 'Config does not exist'})
         }
+
+        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG)
 
         const updates = await checkEnvironmentStatusChange(req, res, config.domain)
         
@@ -156,25 +175,35 @@ router.patch('/config/updateStatus/:id', auth, masterPermission('update Config E
         await config.save()
         res.send(config)
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        responseException(res, e, 400)
     }
 })
 
-router.patch('/config/removeStatus/:id', auth, masterPermission('update Config Environment'), async (req, res) => {
+router.patch('/config/removeStatus/:id', auth, async (req, res) => {
     try {
-        res.send(await removeConfigStatus(req.params.id, req.body.env))
+        let config = await Config.findById(req.params.id)
+
+        if (!config) {
+            return res.status(404).send({ error: 'Config does not exist'})
+        }
+
+        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG)
+
+        res.send(await removeConfigStatus(config, req.body.env))
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        responseException(res, e, 400)
     }
 })
 
 router.patch('/config/addComponent/:id', auth, async (req, res) => {
     try {
-        const config = await Config.findOne({ _id: req.params.id })
+        let config = await Config.findById(req.params.id)
             
         if (!config) {
             return res.status(404).send()
         }
+
+        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG)
 
         const component = await Component.findOne({ name: req.body.component })
 
@@ -186,17 +215,19 @@ router.patch('/config/addComponent/:id', auth, async (req, res) => {
         await config.save()
         res.send(config)
     } catch (e) {
-        res.status(500).send()
+        responseException(res, e, 500)
     }
 })
 
-router.patch('/config/removeComponent/:id', auth, masterPermission('remove Component'), async (req, res) => {
+router.patch('/config/removeComponent/:id', auth, async (req, res) => {
     try {
-        const config = await Config.findOne({ _id: req.params.id })
+        let config = await Config.findById(req.params.id)
             
         if (!config) {
             return res.status(404).send()
         }
+
+        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG)
 
         const component = await Component.findOne({ name: req.body.component })
 
@@ -208,7 +239,7 @@ router.patch('/config/removeComponent/:id', auth, masterPermission('remove Compo
         await config.save()
         res.send(config)
     } catch (e) {
-        res.status(500).send()
+        responseException(res, e, 500)
     }
 })
 

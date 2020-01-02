@@ -398,15 +398,6 @@ describe('Testing envrionment status change #1', () => {
         expect(group.activated.get('QA')).toEqual(false);
     })
 
-    test('GROUP_SUITE - Should NOT update Group environment status - Permission denied', async () => {
-        await request(app)
-            .patch('/groupconfig/updateStatus/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send({
-                default: false
-            }).expect(401);
-    })
-
     test('GROUP_SUITE - Should NOT update Group environment status - Invalid Group Id', async () => {
         await request(app)
             .patch('/groupconfig/updateStatus/INVALID_ID_VALUE')
@@ -483,14 +474,6 @@ describe('Testing environment status change #2', () => {
             .send({
                 env: EnvType.DEFAULT
             }).expect(400);
-        
-        // QA1 environment cannot be removed without permission
-        await request(app)
-            .patch('/groupconfig/removeStatus/' + groupConfigId)
-            .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send({
-                env: 'QA1'
-            }).expect(401);
 
         // Group does not exist
         await request(app)

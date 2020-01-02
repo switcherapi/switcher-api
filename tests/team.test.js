@@ -40,9 +40,9 @@ describe('Insertion tests', () => {
         expect(response.body.name).toBe('My Team')
     })
 
-    test('TEAM_SUITE - Should create a new Team - With default select and create permission', async () => {
+    test('TEAM_SUITE - Should create a new Team - With default read and create permission', async () => {
         const response = await request(app)
-            .post('/team/create/?defaultActions=SELECT,CREATE')
+            .post('/team/create/?defaultActions=READ,CREATE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'My Team 2',
@@ -84,7 +84,7 @@ describe('Insertion tests', () => {
             .send({
                 name: 'My Team',
                 domain: 'INVALID_ID'
-            }).expect(400)
+            }).expect(404)
     })
 
     test('TEAM_SUITE - Should NOT create a new Team - Name is missing', async () => {

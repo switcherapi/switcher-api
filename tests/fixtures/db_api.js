@@ -20,7 +20,6 @@ export const adminMasterAccount = {
     name: 'Master Admin',
     email: 'master@mail.com',
     password: '123123123123',
-    master: true,
     active: true
 }
 
@@ -31,7 +30,6 @@ export const adminAccount = {
     name: 'Admin',
     email: 'admin@mail.com',
     password: 'asdasdasdasd',
-    master: false,
     active: true
 }
 
@@ -55,7 +53,7 @@ export const team1 = {
 export const role1Id = new mongoose.Types.ObjectId()
 export const role1 = {
     _id: role1Id,
-    action: ActionTypes.SELECT,
+    action: ActionTypes.READ,
     active: true,
     router: RouterTypes.GROUP
 }
@@ -113,6 +111,47 @@ export const configStrategyDocument = {
     domain: domainId
 }
 
+export const roleAll1Id = new mongoose.Types.ObjectId()
+export const roleAll1 = {
+    _id: roleAll1Id,
+    action: ActionTypes.CREATE,
+    active: true,
+    router: RouterTypes.ALL
+}
+
+export const roleAll2Id = new mongoose.Types.ObjectId()
+export const roleAll2 = {
+    _id: roleAll2Id,
+    action: ActionTypes.READ,
+    active: true,
+    router: RouterTypes.ALL
+}
+
+export const roleAll3Id = new mongoose.Types.ObjectId()
+export const roleAll3 = {
+    _id: roleAll3Id,
+    action: ActionTypes.UPDATE,
+    active: true,
+    router: RouterTypes.ALL
+}
+
+export const roleAll4Id = new mongoose.Types.ObjectId()
+export const roleAll4 = {
+    _id: roleAll4Id,
+    action: ActionTypes.DELETE,
+    active: true,
+    router: RouterTypes.ALL
+}
+
+export const teamId = new mongoose.Types.ObjectId()
+export const team = {
+    _id: teamId,
+    domain: domainId,
+    name: 'Team',
+    active: true,
+    roles: [roleAll1Id, roleAll2Id, roleAll3Id, roleAll4Id]
+}
+
 export const setupDatabase = async () => {
     await ConfigStrategy.deleteMany()
     await Config.deleteMany()
@@ -146,5 +185,10 @@ export const setupDatabase = async () => {
     await new Config(config2Document).save()
     await new ConfigStrategy(configStrategyDocument).save()
     await new Team(team1).save()
+    await new Team(team).save()
     await new Role(role1).save()
+    await new Role(roleAll1).save()
+    await new Role(roleAll2).save()
+    await new Role(roleAll3).save()
+    await new Role(roleAll4).save()
 }

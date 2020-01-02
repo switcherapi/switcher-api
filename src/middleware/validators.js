@@ -1,18 +1,6 @@
 import Config from '../models/config';
 import { Environment } from '../models/environment';
 
-export const masterPermission = function (action) {
-    return function (req, res, next) {
-
-        if (!req.admin.master) {
-            return res.status(401).send({
-                error: `Unable to ${action} without a Master Admin credential`
-            })
-        }
-        next();
-    }
-}
-
 export async function checkConfig(req, res, next) {
 
     const config = await Config.findOne({ key: req.query.key }).lean()

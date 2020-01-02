@@ -18,7 +18,6 @@ export const adminMasterAccount = {
     name: 'Master Admin',
     email: 'master@mail.com',
     password: '123123123123',
-    master: true,
     active: true
 }
 

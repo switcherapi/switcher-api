@@ -72,7 +72,7 @@ describe('Insertion tests', () => {
             .send({
                 name: 'DEV',
                 domain: 'FAKE_DOMAIN'
-            }).expect(400)
+            }).expect(404)
     })
 })
 
@@ -100,7 +100,7 @@ describe('Reading tests', () => {
         const response = await request(app)
             .get('/environment/NOT_FOUND')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(400)
     })
 })
 
@@ -137,6 +137,20 @@ describe('Deletion tests', () => {
         // DB validation - document deleted
         const environment = await Environment.findById(environment1._id)
         expect(environment).not.toBeNull()
+    })
+
+    test('ENV_SUITE - Should NOT delete an Environment - Invalid Env Id', async () => {
+        await request(app)
+            .delete('/environment/INVALID_ID')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(400)
+    })
+
+    test('ENV_SUITE - Should NOT delete an Environment - Env not found', async () => {
+        await request(app)
+            .delete('/environment/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404)
     })
 
     test('ENV_SUITE - Should NOT delete an Environment - Permission denied', async () => {
@@ -232,5 +246,19 @@ describe('Deletion tests', () => {
         strategy = await ConfigStrategy.findById(configStrategyId)
         expect(strategy.activated.get(EnvType.DEFAULT)).toEqual(true);
         expect(strategy.activated.get(envName)).toEqual(undefined);
+    })
+
+    test('ENV_SUITE - Should NOT recover an Environment - Invalid Env Id', async () => {
+        await request(app)
+            .patch('/environment/recover/INVALID_ID')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(400)
+    })
+
+    test('ENV_SUITE - Should NOT recover an Environment - Env not found', async () => {
+        await request(app)
+            .patch('/environment/recover/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404)
     })
 })

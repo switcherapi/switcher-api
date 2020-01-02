@@ -326,15 +326,6 @@ describe('Testing Environment status change', () => {
         expect(config.activated.get('QA')).toEqual(false);
     })
 
-    test('CONFIG_SUITE - Should NOT update Config environment status - Permission denied', async () => {
-        await request(app)
-            .patch('/config/updateStatus/' + configId1)
-            .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send({
-                default: false
-            }).expect(401);
-    })
-
     test('CONFIG_SUITE - Should NOT update Config environment status - Config not fould', async () => {
         await request(app)
             .patch('/config/updateStatus/FAKE_CONFIG')
@@ -479,22 +470,22 @@ describe('Testing Environment status change', () => {
             .send({
                 env: EnvType.DEFAULT
             }).expect(400);
-        
-        // QA3 environment cannot be removed without permission
-        await request(app)
-            .patch('/config/removeStatus/' + configId1)
-            .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send({
-                env: 'QA3'
-            }).expect(401);
 
-        // Config does not exist
+        // Invalid config Id
         await request(app)
             .patch('/config/removeStatus/FAKE_CONFIG')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA3'
             }).expect(400);
+
+        // Config does not exist
+        await request(app)
+            .patch('/config/removeStatus/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                env: 'QA3'
+            }).expect(404);
 
         const config = await Config.findById(configId1)
         expect(config.activated.get(EnvType.DEFAULT)).toEqual(true);

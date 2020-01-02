@@ -1,7 +1,7 @@
 import express from 'express';
 import Admin from '../models/admin';
 import { auth, authRefreshToken } from '../middleware/auth';
-import { masterPermission, verifyInputUpdateParameters } from '../middleware/validators';
+import { verifyInputUpdateParameters } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
 
 const router = new express.Router()
@@ -11,31 +11,6 @@ router.post('/admin/signup', [
     check('email').isEmail(),
     check('password').isLength({ min: 5 })
 ], async (req, res) => {
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
-
-    const admin = new Admin(req.body)
-    admin.master = true
-
-    try {
-        const jwt = await admin.generateAuthToken()
-
-        await admin.save()
-        res.status(201).send({ admin, jwt })
-    } catch (e) {
-        res.status(400).send(e)
-    }
-})
-
-router.post('/admin/create', [
-    check('name').isLength({ min: 2 }),
-    check('email').isEmail(),
-    check('password').isLength({ min: 5 })
-], auth, masterPermission('create Admins'), async (req, res) => {
-    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -45,7 +20,7 @@ router.post('/admin/create', [
 
     try {
         const jwt = await admin.generateAuthToken()
-        
+
         await admin.save()
         res.status(201).send({ admin, jwt })
     } catch (e) {
@@ -72,13 +47,9 @@ router.post('/admin/login', [
 })
 
 router.post('/admin/logout', auth, async (req, res) => {
-    try {
-        req.admin.token = null;
-        await req.admin.save()
-        res.send()
-    } catch (e) {
-        res.status(500).send()
-    }
+    req.admin.token = null;
+    await req.admin.save()
+    res.send()
 })
 
 router.post('/admin/refresh/me', authRefreshToken, async (req, res) => {
@@ -90,58 +61,14 @@ router.get('/admin/me', auth, async (req, res) => {
 })
 
 router.delete('/admin/me', auth, async (req, res) => {
-    try {
-        await req.admin.remove()
-        res.send(req.admin)
-    } catch (e) {
-        res.status(500).send()
-    }
-})
-
-router.delete('/admin/:id', auth, masterPermission('delete Admins'), async (req, res) => {
-    try {
-        const admin = await Admin.findById(req.params.id)
-
-        if (!admin) {
-            return res.status(404).send()
-        }
-
-        await admin.remove()
-        res.send(admin)
-    } catch (e) {
-        return res.status(500).send()
-    }
+    await req.admin.remove()
+    res.send(req.admin)
 })
 
 router.patch('/admin/me', auth, verifyInputUpdateParameters(['name', 'email', 'password']), async (req, res) => {
-    try {
-        req.updates.forEach((update) => req.admin[update] = req.body[update])
-        await req.admin.save()
-        res.send(req.admin)
-    } catch (e) {
-        res.status(400).send(e)
-    }
-})
-
-router.patch('/admin/:id', auth, masterPermission('update Admins'), 
-    verifyInputUpdateParameters(['name', 'email', 'password', 'active', 'master']), async (req, res) => {
-    try {
-        const admin = await Admin.findOne({ _id: req.params.id })
-
-        if (!admin) {
-            return res.status(404).send()
-        }
-
-        if (admin.id === req.admin.id) {
-            return res.status(400).send({ error: 'Unable to modify your own params' })
-        }
-
-        req.updates.forEach((update) => admin[update] = req.body[update])
-        await admin.save()
-        res.send(admin)
-    } catch (e) {
-        res.status(400).send(e)
-    }
+    req.updates.forEach((update) => req.admin[update] = req.body[update])
+    await req.admin.save()
+    res.send(req.admin)
 })
 
 export default router;

@@ -35,17 +35,6 @@ describe('Insertion tests', () => {
         expect(response.body.name).toBe('my-web-app')
     })
 
-    test('COMPONENT_SUITE - Should NOT create a new Component - Permission denied', async () => {
-        await request(app)
-            .post('/component/create')
-            .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send({
-                name: 'my-web-app',
-                description: 'This is my Web App using this wonderful API',
-                domain: domainId
-            }).expect(401)
-    })
-
     test('COMPONENT_SUITE - Should NOT create a new Component - Component already exist', async () => {
         const response = await request(app)
             .post('/component/create')
@@ -68,6 +57,17 @@ describe('Insertion tests', () => {
                 description: 'This is my Web App using this wonderful API',
                 domain: 'FAKE_DOMAIN'
             }).expect(400)
+    })
+
+    test('COMPONENT_SUITE - Should NOT create a new Component - Name too short', async () => {
+        await request(app)
+            .post('/component/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'C',
+                description: 'This is my Web App using this wonderful API',
+                domain: domainId
+            }).expect(422)
     })
 })
 
@@ -106,11 +106,32 @@ describe('Reading tests', () => {
         expect(response.body.name).toBe('COMPONENT_1')
     })
 
-    test('COMPONENT_SUITE - Should NOT read Component - Not found', async () => {
-        const response = await request(app)
+    test('COMPONENT_SUITE - Should NOT read Component - Invalid Id', async () => {
+        await request(app)
             .get('/component/NOT_FOUND')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(400)
+    })
+
+    test('COMPONENT_SUITE - Should NOT read Component - Not found', async () => {
+        await request(app)
+            .get('/component/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
+    })
+
+    test('COMPONENT_SUITE - Should NOT read Component - Invalid Domain Id', async () => {
+        await request(app)
+            .get('/component?domain=INVALID_ID')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(500)
+    })
+
+    test('COMPONENT_SUITE - Should NOT read Component - Domain Id not specified', async () => {
+        await request(app)
+            .get('/component?domain=')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(400)
     })
 })
 
@@ -163,6 +184,49 @@ describe('Updating tests', () => {
             .send({
                 name: 'CANNOT_UPDATE'
             }).expect(400)
+    })
+
+    test('COMPONENT_SUITE - Should NOT update a Component - Description too short', async () => {
+        const response = await request(app)
+            .post('/component/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'Component Name Here',
+                description: 'This is my Web App using this wonderful API',
+                domain: domainId
+            }).expect(201)
+
+        await request(app)
+            .patch('/component/' + response.body._id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                description: 'Hi'
+            }).expect(422)
+    })
+
+    test('COMPONENT_SUITE - Should NOT update a Component - Invalid Component Id/Not found', async () => {
+        await request(app)
+            .post('/component/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'Cannot Update This',
+                description: 'This is my Web App using this wonderful API',
+                domain: domainId
+            }).expect(201)
+
+        await request(app)
+            .patch('/component/INVALID_ID')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                description: 'Wow, this should be my updated description, only not'
+            }).expect(400)
+
+        await request(app)
+            .patch('/component/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                description: 'Wow, this should be my updated description, only not'
+            }).expect(404)
 
     })
 })
@@ -190,19 +254,25 @@ describe('Deletion tests', () => {
         expect(component).toBeNull()
     })
 
-    test('COMPONENT_SUITE - Should NOT delete a Component - Permission denied', async () => {
+    test('COMPONENT_SUITE - Should NOT delete a Component - Invalid Component Id/Not found', async () => {
         let response = await request(app)
             .post('/component/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                name: 'my-web-app-to-not-be-deleted',
+                name: 'Cannot Delete This',
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
             }).expect(201)
 
         await request(app)
-            .delete('/component/' + response.body._id)
-            .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send().expect(401)
+            .delete('/component/INVALID_ID')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(400)
+
+        await request(app)
+            .delete('/component/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404)
     })
+
 })

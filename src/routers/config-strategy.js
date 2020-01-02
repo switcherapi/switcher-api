@@ -1,14 +1,15 @@
 import express from 'express';
 import Config from '../models/config';
 import { Environment } from '../models/environment';
-import { masterPermission, checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
+import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { ConfigStrategy, strategyRequirements } from '../models/config-strategy';
 import { auth } from '../middleware/auth';
-import { removeConfigStrategyStatus } from './common/index'
+import { removeConfigStrategyStatus, verifyOwnership, responseException } from './common/index';
+import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router()
 
-router.post('/configstrategy/create', auth, masterPermission('create Strategy'), async (req, res) => {
+router.post('/configstrategy/create', auth, async (req, res) => {
     try {
         const config = await Config.findById(req.body.config)
 
@@ -26,17 +27,19 @@ router.post('/configstrategy/create', auth, masterPermission('create Strategy'),
             return res.status(400).send({ error: 'Environment does not exist' })
         }
 
-        const configStrategy = new ConfigStrategy({
+        let configStrategy = new ConfigStrategy({
             ...req.body,
             activated: new Map().set(environment.name, true),
             domain: config.domain,
             owner: req.admin._id
         })
 
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.CREATE, RouterTypes.STRATEGY);
+
         await configStrategy.save()
         res.status(201).send(configStrategy)
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        responseException(res, e, 400)
     }
 })
 
@@ -66,23 +69,30 @@ router.get('/configstrategy', auth, async (req, res) => {
                 sort
             }
         }).execPopulate()
-        res.send(config.configStrategy)
+
+        let configStrategies = config.configStrategy;
+
+        configStrategies = await verifyOwnership(req.admin, configStrategies, config.domain, ActionTypes.READ, RouterTypes.STRATEGY)
+
+        res.send(configStrategies)
     } catch (e) {
-        res.status(500).send()
+        responseException(res, e, 500)
     }
 })
 
 router.get('/configstrategy/:id', auth, async (req, res) => {
     try {
-        const configStrategy = await ConfigStrategy.findById(req.params.id)
+        let configStrategy = await ConfigStrategy.findById(req.params.id)
 
         if (!configStrategy) {
             return res.status(404).send()
         }
 
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY)
+
         res.send(configStrategy)
     } catch (e) {
-        res.status(500).send()
+        responseException(res, e, 500)
     }
 })
 
@@ -114,9 +124,13 @@ router.get('/configstrategy/history/:id', auth, async (req, res) => {
             }
         }).execPopulate()
 
-        res.send(configStrategy.history)
+        let history = configStrategy.history;
+
+        history = await verifyOwnership(req.admin, history, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY)
+
+        res.send(history)
     } catch (e) {
-        res.status(500).send()
+        responseException(res, e, 500)
     }
 })
 
@@ -125,46 +139,50 @@ router.get('/configstrategy/req/:strategy', auth, (req, res) => {
         const result = strategyRequirements(req.params.strategy, res)
         res.send(result)
     } catch (e) {
-        res.status(500).send()
+        responseException(res, e, 500)
     }
 })
 
-router.delete('/configstrategy/:id', auth, masterPermission('delete Strategy'), async (req, res) => {
+router.delete('/configstrategy/:id', auth, async (req, res) => {
     try {
-        const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
+        let configStrategy = await ConfigStrategy.findById(req.params.id)
 
         if (!configStrategy) {
             return res.status(404).send()
         }
 
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.DELETE, RouterTypes.STRATEGY)
+
         await configStrategy.remove()
         res.send(configStrategy)
     } catch (e) {
-        res.status(500).send()
+        responseException(res, e, 500)
     }
 })
 
-router.patch('/configstrategy/:id', auth, masterPermission('update Strategy'), 
+router.patch('/configstrategy/:id', auth, 
     verifyInputUpdateParameters(['description', 'values', 'operation']), async (req, res) => {
     try {
-        const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
+        let configStrategy = await ConfigStrategy.findById(req.params.id)
             
         if (!configStrategy) {
             return res.status(404).send()
         }
 
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
+
         req.updates.forEach((update) => configStrategy[update] = req.body[update])
         await configStrategy.save()
         res.send(configStrategy)
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        responseException(res, e, 400)
     }
 })
 
-router.patch('/configstrategy/addval/:id', auth, masterPermission('create Strategy values'), 
+router.patch('/configstrategy/addval/:id', auth,
     verifyInputUpdateParameters(['value']), async (req, res) => {
     try {
-        const configStrategy = await ConfigStrategy.findById(req.params.id)
+        let configStrategy = await ConfigStrategy.findById(req.params.id)
         
         if (!configStrategy) {
             return res.status(404).send()
@@ -181,18 +199,20 @@ router.patch('/configstrategy/addval/:id', auth, masterPermission('create Strate
             return res.status(400).send({ error: `Value '${value}' already exist` })
         }
 
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
+
         configStrategy.values.push(value)
         await configStrategy.save()
         res.send(configStrategy)
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        responseException(res, e, 400)
     }
 })
 
-router.patch('/configstrategy/updateval/:id', auth, masterPermission('update Strategy values'), 
+router.patch('/configstrategy/updateval/:id', auth,
     verifyInputUpdateParameters(['oldvalue', 'newvalue']), async (req, res) => {
     try {
-        const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
+        let configStrategy = await ConfigStrategy.findById(req.params.id)
             
         if (!configStrategy) {
             return res.status(404).send()
@@ -216,19 +236,21 @@ router.patch('/configstrategy/updateval/:id', auth, masterPermission('update Str
             return res.status(400).send({ error: `Value '${newvalue}' already exist` })
         }
 
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
+
         configStrategy.values.splice(indexOldValue)
         configStrategy.values.push(newvalue)
         await configStrategy.save()
         res.send(configStrategy)
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        responseException(res, e, 400)
     }
 })
 
-router.patch('/configstrategy/removeval/:id', auth, masterPermission('remove Strategy values'), 
+router.patch('/configstrategy/removeval/:id', auth,
     verifyInputUpdateParameters(['value']),  async (req, res) => {
     try {
-        const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
+        let configStrategy = await ConfigStrategy.findById(req.params.id)
             
         if (!configStrategy) {
             return res.status(404).send()
@@ -245,11 +267,13 @@ router.patch('/configstrategy/removeval/:id', auth, masterPermission('remove Str
             return res.status(404).send({ error: `Value '${value}' does not exist` })
         }
 
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
+
         configStrategy.values.splice(indexValue)
         await configStrategy.save()
         res.send(configStrategy)
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        responseException(res, e, 400)
     }
 })
 
@@ -257,7 +281,7 @@ router.patch('/configstrategy/removeval/:id', auth, masterPermission('remove Str
 // GET /configstrategy/values:id?limit=10&skip=20
 router.get('/configstrategy/values/:id', auth, async (req, res) => {
     try {
-        const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
+        const configStrategy = await ConfigStrategy.findById(req.params.id)
 
         if (!configStrategy) {
             return res.status(404).send() 
@@ -274,19 +298,23 @@ router.get('/configstrategy/values/:id', auth, async (req, res) => {
             values = values.slice(req.query.skip, values.length)
         }
 
+        values = await verifyOwnership(req.admin, values, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY)
+
         res.send(values)
     } catch (e) {
-        res.status(500).send()
+        responseException(res, e, 500)
     }
 })
 
-router.patch('/configstrategy/updateStatus/:id', auth, masterPermission('update Strategy Environment'), async (req, res) => {
+router.patch('/configstrategy/updateStatus/:id', auth, async (req, res) => {
     try {
-        const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
+        let configStrategy = await ConfigStrategy.findById(req.params.id)
         
         if (!configStrategy) {
-            return res.status(404).send()
+            return res.status(404).send({ error: 'Strategy does not exist'})
         }
+
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
 
         const updates = await checkEnvironmentStatusChange(req, res, configStrategy.domain)
         
@@ -294,15 +322,23 @@ router.patch('/configstrategy/updateStatus/:id', auth, masterPermission('update 
         await configStrategy.save()
         res.send(configStrategy)
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        responseException(res, e, 400)
     }
 })
 
-router.patch('/configstrategy/removeStatus/:id', auth, masterPermission('update Strategy Environment'), async (req, res) => {
+router.patch('/configstrategy/removeStatus/:id', auth, async (req, res) => {
     try {
-        res.send(await removeConfigStrategyStatus(req.params.id, req.body.env))
+        let configStrategy = await ConfigStrategy.findById(req.params.id)
+        
+        if (!configStrategy) {
+            return res.status(404).send({ error: 'Strategy does not exist'})
+        }
+
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
+
+        res.send(await removeConfigStrategyStatus(configStrategy, req.body.env))
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        responseException(res, e, 400)
     }
 })
 

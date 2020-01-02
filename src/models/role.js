@@ -2,14 +2,14 @@ import mongoose from 'mongoose';
 
 export const ActionTypes = Object.freeze({
     CREATE: 'CREATE',
-    REMOVE: 'REMOVE',
+    READ: 'READ',
     UPDATE: 'UPDATE',
-    DELETE: 'DELETE',
-    SELECT: 'SELECT'
+    DELETE: 'DELETE'
 });
 
 export const RouterTypes = Object.freeze({
     ALL: 'ALL',
+    ADMIN: 'ADMIN',
     DOMAIN: 'DOMAIN',
     GROUP: 'GROUP',
     CONFIG: 'CONFIG',

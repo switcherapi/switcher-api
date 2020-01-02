@@ -20,24 +20,20 @@ router.post('/criteria', appAuth, checkConfig, async (req, res) => {
 
         const response = await resolveCriteria(req.config, context, 'values description strategy operation activated -_id')
 
-        if (response) {
-            delete response.domain
-            delete response.group
+        delete response.domain
+        delete response.group
 
-            if (!req.query.showReason) {
-                delete response.reason
-            }
-
-            if (!req.query.showStrategy) {
-                delete response.strategies
-            }
-
-            res.send(response)
-        } else {
-            res.status(500).send({ error: 'Something went wrong while executing the criteria validation' })
+        if (!req.query.showReason) {
+            delete response.reason
         }
+
+        if (!req.query.showStrategy) {
+            delete response.strategies
+        }
+
+        res.send(response)
     } catch (e) {
-        res.status(500).send()
+        res.status(500).send({ error: e.message })
     }
 })
 
@@ -46,7 +42,7 @@ router.post('/criteria/auth', appGenerateCredentials, async (req, res) => {
         const { exp } = jwt.decode(req.token)
         res.send({ token: req.token, exp })
     } catch (e) {
-        res.status(400).send()
+        res.status(400).send({ error: e.message })
     }
 })
 

@@ -17,15 +17,9 @@ async function checkEnvironmentStatusRemoval(domainId, environmentName, strategy
     }
 }
 
-export async function removeDomainStatus(domainId, environmentName) {
+export async function removeDomainStatus(domain, environmentName) {
     try {
-        await checkEnvironmentStatusRemoval(domainId, environmentName)
-        const domain = await Domain.findOne({ _id: domainId })
-        
-        if (!domain) {
-            throw new Error('Domain does not exist')
-        }
-
+        await checkEnvironmentStatusRemoval(domain._id, environmentName)
         domain.activated.delete(environmentName)
         return await domain.save()
     } catch (e) {
@@ -33,14 +27,8 @@ export async function removeDomainStatus(domainId, environmentName) {
     }
 }
 
-export async function removeGroupStatus(groupId, environmentName) {
+export async function removeGroupStatus(groupconfig, environmentName) {
     try {
-        const groupconfig = await GroupConfig.findOne({ _id: groupId })
-        
-        if (!groupconfig) {
-            throw new Error('GroupConfig does not exist')
-        }
-
         await checkEnvironmentStatusRemoval(groupconfig.domain, environmentName)
 
         groupconfig.activated.delete(environmentName)
@@ -50,14 +38,8 @@ export async function removeGroupStatus(groupId, environmentName) {
     }
 }
 
-export async function removeConfigStatus(configId, environmentName) {
+export async function removeConfigStatus(config, environmentName) {
     try {
-        const config = await Config.findOne({ _id: configId })
-        
-        if (!config) {
-            throw new Error('Config does not exist')
-        }
-
         await checkEnvironmentStatusRemoval(config.domain, environmentName)
 
         config.activated.delete(environmentName)
@@ -67,14 +49,8 @@ export async function removeConfigStatus(configId, environmentName) {
     }
 }
 
-export async function removeConfigStrategyStatus(strategyId, environmentName) {
+export async function removeConfigStrategyStatus(configStrategy, environmentName) {
     try {
-        const configStrategy = await ConfigStrategy.findOne({ _id: strategyId })
-        
-        if (!configStrategy) {
-            throw new Error('Strategy does not exist')
-        }
-
         await checkEnvironmentStatusRemoval(configStrategy.domain, environmentName, true)
 
         if (configStrategy.activated.size === 1) {
@@ -88,8 +64,14 @@ export async function removeConfigStrategyStatus(strategyId, environmentName) {
     }
 }
 
-export async function verifyOwnership(admin, element, domain, action, routerType) {
+export async function verifyOwnership(admin, element, domainId, action, routerType) {
     try {
+        const domain = await Domain.findById(domainId)
+
+        if (!domain) {
+            throw new NotFoundError('Domain not found');
+        }
+
         if (admin._id.equals(domain.owner)) {
             return element;
         }
@@ -99,25 +81,22 @@ export async function verifyOwnership(admin, element, domain, action, routerType
         if (admin.teams.length) {
             for (var i = 0; i < teams.length; i++) {
                 if (teams[i].active) {
-                    await verifyRoles(teams[i], element, action, routerType, (err, data) => {
-                        if (err) throw err;
-                        element = data;
-                    });
+                    element = await verifyRoles(teams[i], element, action, routerType);
                 } else {
-                    throw new Error('Team is not active to verify this operation');
+                    throw new PermissionError('Team is not active to verify this operation');
                 }
             }
         } else {
-            throw new Error('It was not possible to find any team that allows you to proceed with this operation');
+            throw new PermissionError('It was not possible to find any team that allows you to proceed with this operation');
         }
 
-        return element;
-    } catch (e) {
-        throw Error(e.message);
+        return  element;
+    } catch (err) {
+        throw err;
     }
 }
   
-const verifyRoles = async function(team, element, action, routerType, callback) {
+async function verifyRoles(team, element, action, routerType) {
     const role = await Role.findOne({ 
         _id: { $in: team.roles }, 
         action, 
@@ -129,38 +108,61 @@ const verifyRoles = async function(team, element, action, routerType, callback) 
 
     if (role) {
         if (role.active) {
-            if (action === ActionTypes.SELECT) {
-                verifyIdentifiers(role, element, (err, data) => {
-                    return callback(err, data);
-                });
+            if (action === ActionTypes.READ) {
+                return verifyIdentifiers(role, element);
             } else {
-                return callback(null, element);
+                return element;
             }
         } else {
-            return callback(new Error('Role is not active to verify this operation'), null);
+            throw new PermissionError('Role is not active to verify this operation');
         }
     } else {
-        return callback(new Error('Role not found for this operation'), null);
+        throw new PermissionError('Role not found for this operation');
     }
 };
 
-const verifyIdentifiers = function(role, element, callback) {
+function verifyIdentifiers(role, element) {
     if (role.identifiedBy) {
         if (Array.isArray(element)) {
             if (role.values.length) {
                 element = element.filter(child => role.values.includes(child[`${role.identifiedBy}`]));
                 if (element) {
-                    return callback(null, element);
+                    return element;
                 }
             }
         } else {
             if (role.values.includes(element[`${role.identifiedBy}`])) {
-                return callback(null, element);
+                return element;
             }
         }
     } else {
-        return callback(null, element);
+        return element;
     }
-
-    callback(new Error('It was not possible to match the requiring element to the current role'), null);
+    throw new PermissionError('It was not possible to match the requiring element to the current role');
 };
+
+export class PermissionError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = this.constructor.name;
+        Error.captureStackTrace(this, this.constructor);
+    }
+}
+
+export class NotFoundError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = this.constructor.name;
+        Error.captureStackTrace(this, this.constructor);
+    }
+}
+
+export function responseException(res, err, code) {
+    if (err instanceof PermissionError) {
+        res.status(401).send({ error: err.message })
+    } else if (err instanceof NotFoundError) {
+        res.status(404).send({ error: err.message })
+    } else {
+        res.status(code).send({ error: err.message })
+    }
+}

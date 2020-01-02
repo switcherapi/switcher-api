@@ -52,7 +52,7 @@ describe('Success tests', () => {
                 adminMasterAccount, 
                 domainDocument, 
                 domainDocument, 
-                ActionTypes.SELECT, 
+                ActionTypes.READ, 
                 RouterTypes.DOMAIN)
 
             expect(element._id).toEqual(domainDocument._id)
@@ -67,7 +67,7 @@ describe('Success tests', () => {
                 adminAccount, 
                 groupConfig2Document, 
                 domainDocument, 
-                ActionTypes.SELECT, 
+                ActionTypes.READ, 
                 RouterTypes.GROUP)
 
             expect(element._id).toEqual(groupConfig2Document._id)
@@ -85,7 +85,7 @@ describe('Success tests', () => {
                 adminAccount, 
                 groups, 
                 domainDocument, 
-                ActionTypes.SELECT, 
+                ActionTypes.READ, 
                 RouterTypes.GROUP)
 
             expect(element.length).toEqual(1)
@@ -110,7 +110,7 @@ describe('Success tests', () => {
     })
 
     test('UNIT_TEAM_ROLE_SUITE - Should allow access - Member has permission to select config', async () => {
-        await changeRoleAction(role1Id, ActionTypes.SELECT);
+        await changeRoleAction(role1Id, ActionTypes.READ);
         await changeRoleAction(role3Id, ActionTypes.UPDATE);
         
         try {
@@ -118,7 +118,7 @@ describe('Success tests', () => {
                 adminAccount, 
                 configDocument, 
                 domainDocument, 
-                ActionTypes.SELECT, 
+                ActionTypes.READ, 
                 RouterTypes.CONFIG)
 
             expect(element).toMatchObject(configDocument)
@@ -126,7 +126,7 @@ describe('Success tests', () => {
             expect(e).toBeNull();
         } finally {
             await changeRoleAction(role1Id, ActionTypes.DELETE);
-            await changeRoleAction(role3Id, ActionTypes.SELECT);
+            await changeRoleAction(role3Id, ActionTypes.READ);
         }
     })
 
@@ -136,7 +136,7 @@ describe('Success tests', () => {
                 adminAccount3, 
                 groupConfig2Document, 
                 domainDocument, 
-                ActionTypes.SELECT, 
+                ActionTypes.READ, 
                 RouterTypes.GROUP)
 
             expect(element._id).toEqual(groupConfig2Document._id)
@@ -145,7 +145,7 @@ describe('Success tests', () => {
                 adminAccount3, 
                 domainDocument, 
                 domainDocument, 
-                ActionTypes.SELECT, 
+                ActionTypes.READ, 
                 RouterTypes.DOMAIN)
 
             expect(element._id).toEqual(domainDocument._id)
@@ -154,7 +154,7 @@ describe('Success tests', () => {
                 adminAccount3, 
                 configDocument, 
                 domainDocument, 
-                ActionTypes.SELECT, 
+                ActionTypes.READ, 
                 RouterTypes.CONFIG)
 
             expect(element._id).toEqual(configDocument._id)
@@ -166,7 +166,7 @@ describe('Success tests', () => {
                 adminAccount3, 
                 groups, 
                 domainDocument, 
-                ActionTypes.SELECT, 
+                ActionTypes.READ, 
                 RouterTypes.GROUP)
 
             expect(element.length).toEqual(2)
@@ -187,7 +187,7 @@ describe('Error tests', () => {
                 adminAccount, 
                 groupConfig2Document, 
                 domainDocument, 
-                ActionTypes.SELECT, 
+                ActionTypes.READ, 
                 RouterTypes.GROUP)
 
             expect(element).toBeNull();
@@ -219,7 +219,7 @@ describe('Error tests', () => {
                 adminAccount, 
                 configDocument, 
                 domainDocument, 
-                ActionTypes.SELECT, 
+                ActionTypes.READ, 
                 RouterTypes.CONFIG)
 
             expect(element).toBeNull();
@@ -234,7 +234,7 @@ describe('Error tests', () => {
                 adminAccount2, 
                 domainDocument, 
                 domainDocument, 
-                ActionTypes.SELECT, 
+                ActionTypes.READ, 
                 RouterTypes.DOMAIN)
 
             expect(element).toBeNull();
@@ -251,7 +251,7 @@ describe('Error tests', () => {
                 adminAccount, 
                 groupConfig2Document, 
                 domainDocument, 
-                ActionTypes.SELECT, 
+                ActionTypes.READ, 
                 RouterTypes.GROUP)
 
                 expect(element).toBeNull();

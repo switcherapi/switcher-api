@@ -50,23 +50,13 @@ describe('Testing Domain insertion', () => {
         expect(response.body.domain.name).toBe('New Domain')
     })
 
-    test('DOMAIN_SUITE - Should NOT create a new Domain - with no Master credential', async () => {
-        const responseLogin = await request(app)
-            .post('/admin/login')
-            .send({
-                email: adminAccount.email,
-                password: adminAccount.password
-            }).expect(200)
-
+    test('DOMAIN_SUITE - Should NOT create a new Domain - Missing required params', async () => {
         const response = await request(app)
             .post('/domain/create')
-            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                name: 'New Domain',
                 description: 'Description of my new Domain'
-            }).expect(401)
-
-        expect(response.body.error).toEqual('Unable to create Domain without a Master Admin credential')
+            }).expect(400)
     })
 
     test('DOMAIN_SUITE - Should generate a valid API Key for a Domain', async () => {
@@ -80,20 +70,6 @@ describe('Testing Domain insertion', () => {
         const domain = await Domain.findById(domainId).lean()
         const isMatch = await bcrypt.compare(response.body.apiKey, domain.apihash)
         expect(isMatch).toEqual(true)
-    })
-
-    test('DOMAIN_SUITE - Should NOT generate an API Key for a Domain - No Master Admin credential', async () => {
-        const responseLogin = await request(app)
-            .post('/admin/login')
-            .send({
-                email: adminAccount.email,
-                password: adminAccount.password
-            }).expect(200)
-
-        await request(app)
-            .get('/domain/generateApiKey/' + domainId)
-            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
-            .send().expect(401)
     })
 
     test('DOMAIN_SUITE - Should NOT generate an API Key for an inexistent Domain', async () => {
@@ -183,7 +159,7 @@ describe('Testing fect Domain info', () => {
         await request(app)
             .get('/domain/' + domainId + 'NOTEXIST')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(400)
 
         await request(app)
             .get('/domain/5dd05cfa98adc4285457e29a')
@@ -248,18 +224,6 @@ describe('Testing fect Domain info', () => {
 
     test('DOMAIN_SUITE - Should NOT delete Domain', async () => {
         let responseLogin = await request(app)
-            .post('/admin/login')
-            .send({
-                email: adminAccount.email,
-                password: adminAccount.password
-            }).expect(200)
-
-        await request(app)
-            .delete('/domain/' + domainId)
-            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
-            .send().expect(401)
-
-        responseLogin = await request(app)
             .post('/admin/login')
             .send({
                 email: adminMasterAccount.email,
@@ -329,23 +293,6 @@ describe('Testing update Domain info', () => {
             }).expect(400)
     })
 
-    test('DOMAIN_SUITE - Should NOT update Domain info without Master credential', async () => {
-        const responseLogin = await request(app)
-            .post('/admin/login')
-            .send({
-                email: adminAccount.email,
-                password: adminAccount.password
-            }).expect(200)
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        await request(app)
-            .patch('/domain/' + domainId)
-            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
-            .send({
-                description: 'Description updated'
-            }).expect(401)
-    })
-
     test('DOMAIN_SUITE - Should update Domain environment status - default', async () => {
         expect(domainDocument.activated.get(EnvType.DEFAULT)).toEqual(true);
 
@@ -369,7 +316,7 @@ describe('Testing update Domain info', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
-            }).expect(500);
+            }).expect(400);
 
         await request(app)
             .patch('/domain/updateStatus/5dd05cfa98adc4285457e29a')
@@ -388,6 +335,20 @@ describe('Testing update Domain info', () => {
             }).expect(400);
         
         expect(response.body.error).toEqual('Invalid updates');
+    })
+
+    test('DOMAIN_SUITE - Should NOT read changes on history collection - Invalid Domain Id', async () => {
+        await request(app)
+            .get('/domain/history/INVALID_ID')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(400)
+    })
+
+    test('DOMAIN_SUITE - Should NOT read changes on history collection - Domain not found', async () => {
+        await request(app)
+            .get('/domain/history/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404)
     })
 
     test('DOMAIN_SUITE - Should record changes on history collection', async () => {
@@ -490,15 +451,6 @@ describe('Testing environment configurations', () => {
         expect(domain.activated.get('QA')).toEqual(false);
     })
 
-    test('DOMAIN_SUITE - Should NOT update Domain environment status - Permission denied', async () => {
-        await request(app)
-            .patch('/domain/updateStatus/' + domainId)
-            .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send({
-                default: false
-            }).expect(401);
-    })
-
     test('DOMAIN_SUITE - Should remove Domain environment status', async () => {
         // Creating QA Environment...
         await request(app)
@@ -555,22 +507,22 @@ describe('Testing environment configurations', () => {
             .send({
                 env: EnvType.DEFAULT
             }).expect(400);
-        
-        // QA3 environment cannot be removed without permission
-        await request(app)
-            .patch('/domain/removeStatus/' + domainId)
-            .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send({
-                env: 'QA3'
-            }).expect(401);
 
-        // Domain does not exist
+        // Invalid Domain Id
         await request(app)
             .patch('/domain/removeStatus/FAKE_DOMAIN')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA3'
             }).expect(400);
+
+        // Domain does not exist
+        await request(app)
+            .patch('/domain/removeStatus/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                env: 'QA3'
+            }).expect(404);
 
         const domain = await Domain.findById(domainId)
         expect(domain.activated.get(EnvType.DEFAULT)).toEqual(true);

@@ -31,36 +31,36 @@ Main features:
 
 ```
 {
-    "dev": {
-        "PORT": "3000",
-        "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-dev",
-        "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
-        "JWT_ADMIN_TOKEN_RENEW_INTERVAL": "5m",
-        "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
-        "MAX_EXIST_STRATEGYOPERATION": 100,
-        "HISTORY_ACTIVATED": true,
-        "METRICS_ACTIVATED": true
-    },
-    "prod": {
-        "PORT": "3000",
-        "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-prd",
-        "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
-        "JWT_ADMIN_TOKEN_RENEW_INTERVAL": "5m",
-        "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
-        "MAX_EXIST_STRATEGYOPERATION": 100,
-        "HISTORY_ACTIVATED": false,
-        "METRICS_ACTIVATED": true
-    },
-    "test": {
-        "PORT": "3000",
-        "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-test",
-        "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
-        "JWT_ADMIN_TOKEN_RENEW_INTERVAL": "5m",
-        "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
-        "MAX_EXIST_STRATEGYOPERATION": 100,
-        "HISTORY_ACTIVATED": true,
-        "METRICS_ACTIVATED": true
-    }
+  "dev": {
+    "PORT": "3000",
+    "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-dev",
+    "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
+    "JWT_ADMIN_TOKEN_RENEW_INTERVAL": "5m",
+    "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
+    "MAX_EXIST_STRATEGYOPERATION": 100,
+    "HISTORY_ACTIVATED": true,
+    "METRICS_ACTIVATED": true
+  },
+  "prod": {
+    "PORT": "3000",
+    "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-prd",
+    "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
+    "JWT_ADMIN_TOKEN_RENEW_INTERVAL": "5m",
+    "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
+    "MAX_EXIST_STRATEGYOPERATION": 100,
+    "HISTORY_ACTIVATED": false,
+    "METRICS_ACTIVATED": true
+  },
+  "test": {
+    "PORT": "3000",
+    "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-test",
+    "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
+    "JWT_ADMIN_TOKEN_RENEW_INTERVAL": "5m",
+    "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
+    "MAX_EXIST_STRATEGYOPERATION": 100,
+    "HISTORY_ACTIVATED": true,
+    "METRICS_ACTIVATED": true
+  }
 }
 ```
 
@@ -85,9 +85,9 @@ Once token expires, a new one can be generate using: **{{url}}/admin/refresh/me*
 - {{url}}/admin/signup [POST]
 ```json
 {
-	"name": "Master User",
-	"email": "mail@gmail.com",
-	"password": "12312312312"
+  "name": "Switcher User",
+  "email": "mail@gmail.com",
+  "password": "123123123"
 }
 ```
 *copy from the response the generated token to use in conjunction with the next steps.*
@@ -96,8 +96,8 @@ Once token expires, a new one can be generate using: **{{url}}/admin/refresh/me*
 - {{url}}/domain/create [POST]
 ```json
 {
-    "name": "MyCompany Solutions",
-    "description": "Your company/business description here"
+  "name": "MyCompany Solutions",
+  "description": "Your company/business description here"
 }
 ```
 *copy from the response the domain _id for the next step.*
@@ -108,9 +108,9 @@ Once token expires, a new one can be generate using: **{{url}}/admin/refresh/me*
 - {{url}}/component/create [POST]
 ```json
 {
-	"name": "MyApp 2.0",
-	"description": "My application description",
-	"domain": "5df166239194d613400a52e7"
+  "name": "MyApp 2.0",
+  "description": "My application description",
+  "domain": "5df166239194d613400a52e7"
 }
 ```
 
@@ -118,9 +118,9 @@ Once token expires, a new one can be generate using: **{{url}}/admin/refresh/me*
 - {{url}}/groupconfig/create [POST]
 ```json
 {
-	"name": "Project New Feature",
-	"description": "This project will rocket investments found",
-	"domain": "5df166239194d613400a52e7"
+  "name": "Project New Feature",
+  "description": "This project will rocket investments found",
+  "domain": "5df166239194d613400a52e7"
 }
 ```
 *copy from the response the group _id for the next step.*
@@ -129,9 +129,9 @@ Once token expires, a new one can be generate using: **{{url}}/admin/refresh/me*
 - {{url}}/config/create
 ```json
 {
-	"key": "NEW_FEATURE",
-	"description": "Call my new page",
-	"group": "5df166429194d613400a52ea"
+  "key": "NEW_FEATURE",
+  "description": "Call my new page",
+  "group": "5df166429194d613400a52ea"
 }
 ```
 *copy from the response the config _id for the next optional step.*
@@ -140,12 +140,12 @@ Once token expires, a new one can be generate using: **{{url}}/admin/refresh/me*
 - {{url}}/configstrategy/create
 ```json
 {
-    "description": "Users allowed to use this new feature",
-    "strategy": "VALUE_VALIDATION",
-    "values": ["Victoria", "John", "Julia", "Mark", "Roger"],
-    "operation": "EXIST",
-    "config": "5df1664d9194d613400a52eb",
-    "env": "default"
+  "description": "Users allowed to use this new feature",
+  "strategy": "VALUE_VALIDATION",
+  "values": ["Victoria", "John", "Julia", "Mark", "Roger"],
+  "operation": "EXIST",
+  "config": "5df1664d9194d613400a52eb",
+  "env": "default"
 }
 ```
 - Field 'env' is only available to set up on strategy creation since its values might not be the same in production environment.
@@ -164,9 +164,9 @@ Let's use your configuration. Do you still have the API Key generated when you h
     * Value: {{YOUR API KEY HERE}}
 ```json
 {
-	"domain": "MyCompany Solutions",
-	"component": "MyApp 2.0",
-	"environment": "default"
+   "domain": "MyCompany Solutions",
+   "component": "MyApp 2.0",
+   "environment": "default"
 }
 ```
 *copy from the response your token.*
@@ -176,10 +176,10 @@ Let's use your configuration. Do you still have the API Key generated when you h
 {{url}}/criteria?key=NEW_FEATURE [GET]
 ```json
 {
-	"entry": [
-		{
-			"strategy": "VALUE_VALIDATION",
-			"input": "Victoria"
-		}]
+  "entry": [
+    {
+      "strategy": "VALUE_VALIDATION",
+      "input": "Victoria"
+    }]
 }
 ```

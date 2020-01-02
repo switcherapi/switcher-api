@@ -44,7 +44,7 @@ router.get('/role', auth, async (req, res) => {
 
 router.get('/role/:id', auth, async (req, res) => {
     try {
-        const role = await Role.findOne({ _id: req.params.id }).lean()
+        const role = await Role.findById(req.params.id).lean()
 
         if (!role) {
             return res.status(404).send()
@@ -59,7 +59,7 @@ router.get('/role/:id', auth, async (req, res) => {
 router.patch('/role/:id', auth, 
     verifyInputUpdateParameters(['action', 'active', 'router', 'identifiedBy']), async (req, res) => {
     try {
-        const role = await Role.findOne({ _id: req.params.id })
+        const role = await Role.findById(req.params.id)
  
         if (!role) {
             return res.status(404).send()
@@ -122,7 +122,7 @@ router.patch('/role/value/add/:id', auth, verifyInputUpdateParameters(['value'])
 
 router.patch('/role/value/remove/:id', auth, verifyInputUpdateParameters(['value']), async (req, res) => {
     try {
-        const role = await Role.findOne({ _id: req.params.id })
+        const role = await Role.findById(req.params.id)
             
         if (!role) {
             return res.status(404).send({ error: 'Role not found' })

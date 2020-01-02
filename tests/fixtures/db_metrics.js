@@ -12,7 +12,6 @@ export const adminMasterAccount = {
     name: 'Metric Admin',
     email: 'metric@admin.com',
     password: '123123123123',
-    master: true,
     active: true
 }
 

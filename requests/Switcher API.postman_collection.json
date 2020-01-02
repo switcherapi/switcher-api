@@ -57,58 +57,6 @@
 			"response": []
 		},
 		{
-			"name": "Admin - Create",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "bc8552fc-029b-432b-b090-dc2988741dca",
-						"exec": [
-							"if (pm.response.code === 201) {",
-							"    pm.environment.set('authToken', pm.response.json().jwt.token)",
-							"    pm.environment.set('refreshToken', pm.response.json().jwt.refreshToken)",
-							"}"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"name\": \"John\",\n\t\"email\": \"john@gmail.com\",\n\t\"password\": \"12312312312\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{url}}/admin/create",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"admin",
-						"create"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Admin - Update Me",
 			"request": {
 				"method": "PATCH",
@@ -137,40 +85,6 @@
 					"path": [
 						"admin",
 						"me"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Admin - Update",
-			"request": {
-				"method": "PATCH",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"active\": \"true\",\n\t\"master\": \"true\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{url}}/admin/5dd20630d02f4a21d4e5f2ba",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"admin",
-						"5dd20630d02f4a21d4e5f2ba"
 					]
 				}
 			},
@@ -350,24 +264,6 @@
 					"path": [
 						"admin",
 						"me"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Admin - Delete",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "{{url}}/admin/5dd83521be2907222c95db8c",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"admin",
-						"5dd83521be2907222c95db8c"
 					]
 				}
 			},

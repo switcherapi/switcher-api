@@ -2,30 +2,33 @@ import express from 'express';
 import Domain from '../models/domain';
 import { Environment } from '../models/environment';
 import { auth } from '../middleware/auth';
-import { masterPermission, checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeDomainStatus } from './common/index'
+import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
+import { removeDomainStatus, verifyOwnership, responseException } from './common/index'
+import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router()
 
-router.get('/domain/generateApiKey/:domain/', auth, masterPermission('generate API Key'), async (req, res) => {
+router.get('/domain/generateApiKey/:domain/', auth, async (req, res) => {
     try {
-        const domain = await Domain.findOne({ _id: req.params.domain })
+        let domain = await Domain.findById(req.params.domain)
 
         if (!domain) {
             return res.status(404).send()
         }
 
+        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
+
         const apiKey = await domain.generateApiKey();
         
         res.status(201).send({ apiKey })
     } catch (e) {
-        res.status(400).send(e)
+        responseException(res, e, 400)
     }
 })
 
-router.post('/domain/create', auth, masterPermission('create Domain'), async (req, res) => {
+router.post('/domain/create', auth, async (req, res) => {
     try {
-        const domain = new Domain({
+        let domain = new Domain({
             ...req.body,
             owner: req.admin._id
         });
@@ -71,15 +74,17 @@ router.get('/domain', auth, async (req, res) => {
 
 router.get('/domain/:id', auth, async (req, res) => {
     try {
-        const domain = await Domain.findOne({ _id: req.params.id })
+        let domain = await Domain.findById(req.params.id)
 
         if (!domain) {
             return res.status(404).send()
         }
 
+        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN)
+        
         res.send(domain)
     } catch (e) {
-        res.status(404).send()
+        responseException(res, e, 400)
     }
 })
 
@@ -95,91 +100,100 @@ router.get('/domain/history/:id', auth, async (req, res) => {
     }
 
     try {
-        const domain = await Domain.findOne({ _id: req.params.id })
+        const domain = await Domain.findById(req.params.id)
 
         if (!domain) {
             return res.status(404).send()
         }
-        try {
-            await domain.populate({
-                path: 'history',
-                select: 'oldValue newValue -_id',
-                options: {
-                    limit: parseInt(req.query.limit),
-                    skip: parseInt(req.query.skip),
-                    sort
-                }
-            }).execPopulate()
+        await domain.populate({
+            path: 'history',
+            select: 'oldValue newValue -_id',
+            options: {
+                limit: parseInt(req.query.limit),
+                skip: parseInt(req.query.skip),
+                sort
+            }
+        }).execPopulate()
 
-            res.send(domain.history)
-        } catch (e) {
-            res.status(400).send()
-        }
+        let history = domain.history;
+
+        history = await verifyOwnership(req.admin, history, domain._id, ActionTypes.READ, RouterTypes.DOMAIN)
+
+        res.send(history)
     } catch (e) {
-        res.status(404).send()
+        responseException(res, e, 400)
     }
 })
 
-router.delete('/domain/:id', auth, masterPermission('delete Domain'), async (req, res) => {
+router.delete('/domain/:id', auth, async (req, res) => {
     try {
-        const domain = await Domain.findOne({ _id: req.params.id })
+        let domain = await Domain.findById(req.params.id)
 
         if (!domain) {
             return res.status(404).send()
         }
+
+        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.DELETE, RouterTypes.DOMAIN)
 
         await domain.remove()
         res.send(domain)
     } catch (e) {
-        res.status(500).send()
+        responseException(res, e, 500)
     }
 })
 
-router.patch('/domain/:id', auth, masterPermission('update Domain'), 
+router.patch('/domain/:id', auth,
     verifyInputUpdateParameters(['description']), async (req, res) => {
     try {
-        const domain = await Domain.findOne({ _id: req.params.id })
+        let domain = await Domain.findById(req.params.id)
 
         if (!domain) {
             return res.status(404).send()
         }
 
-        req.updates.forEach((update) => domain[update] = req.body[update])
+        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
 
+        req.updates.forEach((update) => domain[update] = req.body[update])
         await domain.save()
         res.send(domain)
     } catch (e) {
-        return res.status(500).send()
+        responseException(res, e, 500)
     }
 })
 
-router.patch('/domain/updateStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
-    try {    
-        const domain = await Domain.findOne({ _id: req.params.id })
+router.patch('/domain/updateStatus/:id', auth, async (req, res) => {
+    try {
+        let domain = await Domain.findById(req.params.id)
 
         if (!domain) {
-            return res.status(404).send()
+            return res.status(404).send({ error: 'Domain does not exist' })
         }
 
-        try {
-            const updates = await checkEnvironmentStatusChange(req, res, req.params.id)
+        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
 
-            updates.forEach((update) => domain.activated.set(update, req.body[update]))
-            await domain.save()
-            res.send(domain)
-        } catch (e) {
-            res.status(400).send({ error: e.message })
-        }
+        const updates = await checkEnvironmentStatusChange(req, res, req.params.id)
+
+        updates.forEach((update) => domain.activated.set(update, req.body[update]))
+        await domain.save()
+        res.send(domain)
     } catch (e) {
-        return res.status(500).send()
+        responseException(res, e, 400)
     }
 })
 
-router.patch('/domain/removeStatus/:id', auth, masterPermission('update Domain Environment'), async (req, res) => {
+router.patch('/domain/removeStatus/:id', auth, async (req, res) => {
     try {
-        res.send(await removeDomainStatus(req.params.id, req.body.env))
+        let domain = await Domain.findById(req.params.id)
+        
+        if (!domain) {
+            return res.status(404).send({ error: 'Domain does not exist' })
+        }
+
+        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
+
+        res.send(await removeDomainStatus(domain, req.body.env))
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        responseException(res, e, 400)
     }
 })
 

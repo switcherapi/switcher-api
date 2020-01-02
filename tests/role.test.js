@@ -23,7 +23,7 @@ describe('Insertion tests', () => {
             .post('/role/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                action: ActionTypes.SELECT,
+                action: ActionTypes.READ,
                 router: RouterTypes.GROUP
             }).expect(201)
 
@@ -32,7 +32,7 @@ describe('Insertion tests', () => {
         expect(role).not.toBeNull()
 
         // Response validation
-        expect(response.body.action).toBe(ActionTypes.SELECT)
+        expect(response.body.action).toBe(ActionTypes.READ)
     })
 
     test('ROLE_SUITE - Should NOT create a new Role - Missing required parameter', async () => {
@@ -40,7 +40,7 @@ describe('Insertion tests', () => {
             .post('/role/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                action: ActionTypes.SELECT
+                action: ActionTypes.READ
             }).expect(400)
     })
 })
@@ -174,7 +174,7 @@ describe('Deletion tests', () => {
             .post('/role/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                action: ActionTypes.SELECT,
+                action: ActionTypes.READ,
                 router: RouterTypes.GROUP
             }).expect(201)
 
