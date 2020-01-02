@@ -4,10 +4,24 @@ import { Environment } from '../models/environment';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { ConfigStrategy, strategyRequirements } from '../models/config-strategy';
 import { auth } from '../middleware/auth';
-import { removeConfigStrategyStatus, verifyOwnership, responseException } from './common/index';
+import { removeConfigStrategyStatus, verifyOwnership, responseException, NotFoundError } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router()
+
+async function verifyStrategyValueInput(strategyId, value) {
+    const configStrategy = await ConfigStrategy.findById(strategyId)
+            
+    if (!configStrategy) {
+        throw new NotFoundError('Strategy not found')
+    }
+
+    if (!value) {
+        throw new Error('The attribute \'value\' must be assigned')
+    }
+
+    return configStrategy
+}
 
 router.post('/configstrategy/create', auth, async (req, res) => {
     try {
@@ -182,15 +196,7 @@ router.patch('/configstrategy/:id', auth,
 router.patch('/configstrategy/addval/:id', auth,
     verifyInputUpdateParameters(['value']), async (req, res) => {
     try {
-        let configStrategy = await ConfigStrategy.findById(req.params.id)
-        
-        if (!configStrategy) {
-            return res.status(404).send()
-        }
-
-        if (!req.body.value) {
-            return res.status(400).send({ error: 'The attribute \'value\' must be assigned' })
-        }
+        let configStrategy = await verifyStrategyValueInput(req.params.id, req.body.value)
 
         const value = req.body.value.trim()
         const foundExistingOne = configStrategy.values.find((element) => element === value)
@@ -250,15 +256,7 @@ router.patch('/configstrategy/updateval/:id', auth,
 router.patch('/configstrategy/removeval/:id', auth,
     verifyInputUpdateParameters(['value']),  async (req, res) => {
     try {
-        let configStrategy = await ConfigStrategy.findById(req.params.id)
-            
-        if (!configStrategy) {
-            return res.status(404).send()
-        }
-
-        if (!req.body.value) {
-            return res.status(400).send({ error: 'The attribute \'value\' must be assigned' })
-        }
+        let configStrategy = await verifyStrategyValueInput(req.params.id, req.body.value)
 
         const value = req.body.value.trim()
         const indexValue = configStrategy.values.indexOf(value)

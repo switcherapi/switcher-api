@@ -3,8 +3,23 @@ import { auth } from '../middleware/auth';
 import { Role } from '../models/role';
 import { Team } from '../models/team';
 import { verifyInputUpdateParameters } from '../middleware/validators';
+import { NotFoundError, responseException } from './common';
 
 const router = new express.Router()
+
+async function verifyRoleValueInput(roleId, value) {
+    const role = await Role.findById(roleId)
+            
+    if (!role) {
+        throw new NotFoundError('Role not found');
+    }
+
+    if (!value) {
+        throw new Error('The attribute \'value\' must be assigned')
+    }
+
+    return role;
+}
 
 router.post('/role/create', auth, async (req, res) => {
     const role = new Role({
@@ -97,15 +112,7 @@ router.delete('/role/:id', auth, async (req, res) => {
 
 router.patch('/role/value/add/:id', auth, verifyInputUpdateParameters(['value']), async (req, res) => {
     try {
-        const role = await Role.findById(req.params.id)
-        
-        if (!role) {
-            return res.status(404).send({ error: 'Role not found' })
-        }
-
-        if (!req.body.value) {
-            return res.status(400).send({ error: 'The attribute \'value\' must be assigned' })
-        }
+        const role = await verifyRoleValueInput(req.params.id, req.body.value)
 
         const value = req.body.value.trim()
         if (role.values.includes(value)) {
@@ -116,21 +123,13 @@ router.patch('/role/value/add/:id', auth, verifyInputUpdateParameters(['value'])
         await role.save()
         res.send(role)
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        responseException(res, e, 400)
     }
 })
 
 router.patch('/role/value/remove/:id', auth, verifyInputUpdateParameters(['value']), async (req, res) => {
     try {
-        const role = await Role.findById(req.params.id)
-            
-        if (!role) {
-            return res.status(404).send({ error: 'Role not found' })
-        }
-
-        if (!req.body.value) {
-            return res.status(400).send({ error: 'The attribute \'value\' must be assigned' })
-        }
+        const role = await verifyRoleValueInput(req.params.id, req.body.value)
 
         const value = req.body.value.trim()
         const indexValue = role.values.indexOf(value)
@@ -143,7 +142,7 @@ router.patch('/role/value/remove/:id', auth, verifyInputUpdateParameters(['value
         await role.save()
         res.send(role)
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        responseException(res, e, 400)
     }
 })
 
