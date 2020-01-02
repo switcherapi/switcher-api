@@ -1,9 +1,6 @@
 import { Environment, EnvType } from '../../models/environment';
 import Domain from '../../models/domain';
-import GroupConfig from '../../models/group-config';
-import Config from '../../models/config';
 import { Team } from '../../models/team';
-import { ConfigStrategy } from '../../models/config-strategy';
 import { Role, ActionTypes, RouterTypes } from '../../models/role';
 
 async function checkEnvironmentStatusRemoval(domainId, environmentName, strategy = false) {
@@ -65,35 +62,31 @@ export async function removeConfigStrategyStatus(configStrategy, environmentName
 }
 
 export async function verifyOwnership(admin, element, domainId, action, routerType) {
-    try {
-        const domain = await Domain.findById(domainId)
+    const domain = await Domain.findById(domainId)
 
-        if (!domain) {
-            throw new NotFoundError('Domain not found');
-        }
-
-        if (admin._id.equals(domain.owner)) {
-            return element;
-        }
-        
-        const teams = await Team.find({ _id: { $in: admin.teams }, domain: domain._id })
-        
-        if (admin.teams.length) {
-            for (var i = 0; i < teams.length; i++) {
-                if (teams[i].active) {
-                    element = await verifyRoles(teams[i], element, action, routerType);
-                } else {
-                    throw new PermissionError('Team is not active to verify this operation');
-                }
-            }
-        } else {
-            throw new PermissionError('It was not possible to find any team that allows you to proceed with this operation');
-        }
-
-        return  element;
-    } catch (err) {
-        throw err;
+    if (!domain) {
+        throw new NotFoundError('Domain not found');
     }
+
+    if (admin._id.equals(domain.owner)) {
+        return element;
+    }
+    
+    const teams = await Team.find({ _id: { $in: admin.teams }, domain: domain._id })
+    
+    if (admin.teams.length) {
+        for (var i = 0; i < teams.length; i++) {
+            if (teams[i].active) {
+                element = await verifyRoles(teams[i], element, action, routerType);
+            } else {
+                throw new PermissionError('Team is not active to verify this operation');
+            }
+        }
+    } else {
+        throw new PermissionError('It was not possible to find any team that allows you to proceed with this operation');
+    }
+
+    return  element;
 }
   
 async function verifyRoles(team, element, action, routerType) {
@@ -119,7 +112,7 @@ async function verifyRoles(team, element, action, routerType) {
     } else {
         throw new PermissionError('Role not found for this operation');
     }
-};
+}
 
 function verifyIdentifiers(role, element) {
     if (role.identifiedBy) {
@@ -139,7 +132,7 @@ function verifyIdentifiers(role, element) {
         return element;
     }
     throw new PermissionError('It was not possible to match the requiring element to the current role');
-};
+}
 
 export class PermissionError extends Error {
     constructor(message) {

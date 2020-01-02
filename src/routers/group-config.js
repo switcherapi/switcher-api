@@ -125,7 +125,7 @@ router.get('/groupconfig/history/:id', auth, async (req, res) => {
 
         history = await verifyOwnership(req.admin, history, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP)
 
-        res.send(groupconfig.history)
+        res.send(history)
     } catch (e) {
         responseException(res, e, 500)
     }
