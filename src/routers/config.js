@@ -208,13 +208,17 @@ router.patch('/config/removeStatus/:id', auth, async (req, res) => {
 router.patch('/config/addComponent/:id', auth, async (req, res) => {
     try {
         const config = await verifyAddComponentInput(req.params.id, req.admin)
-        const component = await Component.findOne({ name: req.body.component })
+        const component = await Component.findById(req.body.component)
 
         if (!component) {
-            return res.status(404).send({ error: `Component ${req.body.component} not found` })
+            return res.status(404).send({ error: `Component not found` })
         }
 
-        config.components.push(component.name)
+        if (config.components.includes(component._id)) {
+            return res.status(400).send({ error:  `Component ${component.name} already exists` })
+        }
+
+        config.components.push(component._id)
         await config.save()
         res.send(config)
     } catch (e) {
@@ -225,13 +229,14 @@ router.patch('/config/addComponent/:id', auth, async (req, res) => {
 router.patch('/config/removeComponent/:id', auth, async (req, res) => {
     try {
         const config = await verifyAddComponentInput(req.params.id, req.admin)
-        const component = await Component.findOne({ name: req.body.component })
+        const component = await Component.findById(req.body.component)
 
         if (!component) {
-            return res.status(404).send({ error: `Component ${req.body.component} not found` })
+            return res.status(404).send({ error: `Component not found` })
         }
 
-        config.components = config.components.filter(element => element !== req.body.component)
+        const indexComponent = config.components.indexOf(req.body.component)
+        config.components.splice(indexComponent)
         await config.save()
         res.send(config)
     } catch (e) {

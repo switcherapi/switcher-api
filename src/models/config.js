@@ -24,8 +24,7 @@ const configSchema = new mongoose.Schema({
         default: new Map().set(EnvType.DEFAULT, true)
     },
     components: [{
-        type: String,
-        trim: true
+        type: mongoose.Schema.Types.ObjectId
     }],
     group: {
         type: mongoose.Schema.Types.ObjectId,

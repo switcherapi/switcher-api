@@ -506,17 +506,25 @@ describe('Testing component association', () => {
     })
 
     test('CONFIG_SUITE - Should associate component to a config', async () => {
+        const responseComponent = await request(app)
+            .post('/component/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'NewComponent',
+                description: 'Description of my component',
+                domain: domainId
+            }).expect(201)
+
         await request(app)
             .patch('/config/addComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                component: "my-web-app-for-my-config"
+                component: responseComponent.body._id
             }).expect(200)
 
         // DB validation - document updated
         const config = await Config.findById(configId1)
-        const component = config.components.filter(element => element === 'my-web-app-for-my-config')
-        expect(component[0]).toBe('my-web-app-for-my-config')
+        expect(config.components.includes(responseComponent.body._id)).toBe(true)
     })
 
     test('CONFIG_SUITE - Should NOT associate component to a config - Component not found', async () => {
@@ -524,10 +532,37 @@ describe('Testing component association', () => {
             .patch('/config/addComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                component: "i-do-not-exist"
+                component: new mongoose.Types.ObjectId()
             }).expect(404)
         
-        expect(response.body.error).toBe('Component i-do-not-exist not found')
+        expect(response.body.error).toBe('Component not found')
+    })
+
+    test('CONFIG_SUITE - Should NOT associate component to a config - Component already exists', async () => {
+        const responseComponent = await request(app)
+            .post('/component/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'NewComponent Added 2x',
+                description: 'Description of my component',
+                domain: domainId
+            }).expect(201)
+
+        await request(app)
+            .patch('/config/addComponent/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                component: responseComponent.body._id
+            }).expect(200)
+
+        const responseAdd = await request(app)
+            .patch('/config/addComponent/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                component: responseComponent.body._id
+            }).expect(400)
+        
+        expect(responseAdd.body.error).toBe('Component NewComponent Added 2x already exists')
     })
 
     test('CONFIG_SUITE - Should NOT associate component to a config - Config not found', async () => {
@@ -535,14 +570,14 @@ describe('Testing component association', () => {
             .patch('/config/addComponent/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                component: "my-web-app-for-my-config"
+                component: new mongoose.Types.ObjectId()
             }).expect(500)
 
         await request(app)
             .patch('/config/addComponent/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                component: "my-web-app-for-my-config"
+                component: new mongoose.Types.ObjectId()
             }).expect(404)
     })
 
@@ -551,7 +586,7 @@ describe('Testing component association', () => {
             .patch('/config/removeComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                component: "i-do-not-exist"
+                component: new mongoose.Types.ObjectId()
             }).expect(404)
     })
 
@@ -560,28 +595,44 @@ describe('Testing component association', () => {
             .patch('/config/removeComponent/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                component: "my-web-app-for-my-config"
+                component: new mongoose.Types.ObjectId()
             }).expect(500)
 
         await request(app)
             .patch('/config/removeComponent/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                component: "my-web-app-for-my-config"
+                component: new mongoose.Types.ObjectId()
             }).expect(404)
     })
 
     test('CONFIG_SUITE - Should desassociate component from a config', async () => {
+        const responseComponent = await request(app)
+            .post('/component/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'Will be removed later',
+                description: 'Will be removed later',
+                domain: domainId
+            }).expect(201)
+
+        await request(app)
+            .patch('/config/addComponent/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                component: responseComponent.body._id
+            }).expect(200)
+
         await request(app)
             .patch('/config/removeComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                component: "my-web-app-for-my-config"
+                component: responseComponent.body._id
             }).expect(200)
 
         // DB validation - document updated
         const config = await Config.findById(configId1)
-        expect(config.components.length).toEqual(0)
+        expect(config.components.includes(responseComponent.body._id)).toEqual(false)
     })
 
     test('CONFIG_SUITE - Should remove records from history after deleting element', async () => {

@@ -36,7 +36,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Roger\",\n\t\"email\": \"mail@gmail.com\",\n\t\"password\": \"12312312312\"\n}",
+					"raw": "{\n\t\"name\": \"Roger\",\n\t\"email\": \"mail@mail.com\",\n\t\"password\": \"123123123\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -122,7 +122,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"email\": \"mail@gmail.com\",\n\t\"password\": \"12312312312\"\n}",
+					"raw": "{\n\t\"email\": \"mail@mail.com\",\n\t\"password\": \"123123123\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -465,7 +465,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Android\",\n\t\"description\": \"Operational system\",\n\t\"domain\": \"5df166239194d613400a52e7\"\n}",
+					"raw": "{\n\t\"name\": \"Android\",\n\t\"description\": \"Operational system\",\n\t\"domain\": \"5e0ece606f4f994eac9007ae\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1493,7 +1493,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"currency-api\",\n\t\"description\": \"Currency API\"\n}",
+					"raw": "{\n\t\"name\": \"My Domain\",\n\t\"description\": \"Doamin description\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1840,7 +1840,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Rollout 2030\",\n\t\"description\": \"Changes that will be applied during the rollout\",\n\t\"domain\": \"5df166239194d613400a52e7\"\n}",
+					"raw": "{\n\t\"name\": \"Project 2\",\n\t\"description\": \"Project #2 description\",\n\t\"domain\": \"5e0ece606f4f994eac9007ae\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1970,7 +1970,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/groupconfig?domain=5e0bbe269ad3100658ae2229",
+					"raw": "{{url}}/groupconfig?domain=5e0ece606f4f994eac9007ae",
 					"host": [
 						"{{url}}"
 					],
@@ -2000,7 +2000,7 @@
 						},
 						{
 							"key": "domain",
-							"value": "5e0bbe269ad3100658ae2229"
+							"value": "5e0ece606f4f994eac9007ae"
 						}
 					]
 				}
@@ -2110,7 +2110,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"key\": \"FF2FOR2030\",\n\t\"description\": \"Feature Flag\",\n\t\"group\": \"5df166429194d613400a52ea\"\n}",
+					"raw": "{\n\t\"key\": \"FEATURE2020\",\n\t\"description\": \"Feature #22020 description\",\n\t\"group\": \"5e0ece9e6f4f994eac9007b1\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2248,7 +2248,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"component\": \"Android\"\n}",
+					"raw": "{\n\t\"component\": \"5e0ecf7d6f4f994eac9007b6\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2256,14 +2256,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/config/addComponent/5deac6e42d61a41fa0a8478b",
+					"raw": "{{url}}/config/addComponent/5e0eceb66f4f994eac9007b2",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"config",
 						"addComponent",
-						"5deac6e42d61a41fa0a8478b"
+						"5e0eceb66f4f994eac9007b2"
 					]
 				}
 			},
@@ -2283,7 +2283,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"component\": \"Windows\"\n}",
+					"raw": "{\n\t\"component\": \"5e0eceb66f4f994eac9007b2\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2310,7 +2310,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/config?group=5df166359194d613400a52e9",
+					"raw": "{{url}}/config?group=5e0ece916f4f994eac9007b0",
 					"host": [
 						"{{url}}"
 					],
@@ -2335,7 +2335,7 @@
 						},
 						{
 							"key": "group",
-							"value": "5df166359194d613400a52e9"
+							"value": "5e0ece916f4f994eac9007b0"
 						}
 					]
 				}
@@ -2404,7 +2404,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"description\": \"Rollout IP addressess\",\n    \"strategy\": \"NETWORK_VALIDATION\",\n    \"values\": [\"10.0.0.3/24\"],\n    \"operation\": \"EXIST\",\n    \"config\": \"5df1664d9194d613400a52eb\",\n    \"env\": \"default\"\n}",
+					"raw": "{\n    \"description\": \"Allowed IP address\",\n    \"strategy\": \"NETWORK_VALIDATION\",\n    \"values\": [\"10.0.0.3/24\"],\n    \"operation\": \"EXIST\",\n    \"config\": \"5e0ecebe6f4f994eac9007b3\",\n    \"env\": \"default\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"

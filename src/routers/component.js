@@ -28,6 +28,7 @@ router.post('/component/create', auth, [
         await component.save()
         res.status(201).send(component)
     } catch (e) {
+        console.log(e)
         responseException(res, e, 400);
     }
 })
