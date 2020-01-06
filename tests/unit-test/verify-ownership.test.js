@@ -3,7 +3,7 @@ import app from '../../src/app';
 import GroupConfig from '../../src/models/group-config';
 import { Team } from '../../src/models/team';
 import { Role, ActionTypes, RouterTypes } from '../../src/models/role';
-import { verifyOwnership } from '../../src/routers/common/index';
+import { verifyOwnership, PermissionError } from '../../src/routers/common/index';
 import { 
     setupDatabase, 
     adminMasterAccount,
@@ -192,7 +192,7 @@ describe('Error tests', () => {
 
             expect(element).toBeNull();
         } catch (e) {
-            expect(e).toEqual(new Error('Role is not active to verify this operation'))
+            expect(e).toEqual(new PermissionError(`Role not found for this operation: '${ActionTypes.READ}' - '${RouterTypes.GROUP}'`))
         } finally {
             await changeRoleStatus(role2Id, true)
         }
@@ -209,7 +209,7 @@ describe('Error tests', () => {
 
             expect(element).toBeNull();
         } catch (e) {
-            expect(e).toEqual(new Error('Role not found for this operation'))
+            expect(e).toEqual(new PermissionError(`Role not found for this operation: '${ActionTypes.CREATE}' - '${RouterTypes.GROUP}'`))
         }
     })
 

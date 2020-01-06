@@ -16,7 +16,7 @@ import metricRouter from './routers/metric';
 import teamRouter from './routers/team';
 import roleRouter from './routers/role';
 import schema from './client/schema';
-import { appAuth } from './middleware/auth';
+import { appAuth, auth } from './middleware/auth';
 
 const app = express()
 
@@ -48,6 +48,14 @@ app.use(roleRouter)
  * Client API - GraphQL
  */
 app.use('/graphql', appAuth, expressGraphQL({
+    schema,
+    graphiql: true
+}))
+
+/**
+ * Client API - GraphQL
+ */
+app.use('/adm-graphql', auth, expressGraphQL({
     schema,
     graphiql: true
 }))

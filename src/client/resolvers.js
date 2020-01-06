@@ -4,72 +4,118 @@ import GroupConfig from '../models/group-config';
 import Config from '../models/config';
 import { addMetrics } from '../models/metric';
 import { ConfigStrategy, processOperation } from '../models/config-strategy';
+import { ActionTypes, RouterTypes } from '../models/role';
+import { verifyOwnership } from '../routers/common/index'
 
-export async function resolveConfigStrategy(source, _id, strategy, operation, activated, environment) {
+export function resolveEnvStatus(source) {
+    const key = Object.keys(source.activated);
+    var arrStatus = [];
+
+    key.forEach(k => {
+        arrStatus.push({
+            env: k,
+            value: source.activated[`${k}`]
+        })
+    })
+
+    return arrStatus
+}
+
+export async function resolveConfigStrategy(source, _id, strategy, operation, activated, context) {
     const args = {}
 
     if (_id) { args._id = _id }
     if (strategy) { args.strategy = strategy }
     if (operation) { args.operation = operation }
-    if (activated !== undefined) { 
-        args.activated = { [`${environment}`]: activated }
+    
+    let strategies = await ConfigStrategy.find({ config: source._id, ...args }).lean()
+
+    if (activated !== undefined) {
+        strategies = strategies.filter(strategy => strategy.activated[`${context.environment}`] === activated)
     }
 
-    return await ConfigStrategy.find({ config: source._id, ...args }).lean()
+    try {
+        if (context.admin) {
+            let parentConfig = await Config.findById(source._id)
+            strategies = await verifyOwnership(context.admin, strategies, parentConfig.domain, ActionTypes.READ, RouterTypes.STRATEGY);
+        }
+    } catch (e) {
+        return null;
+    }
+
+    return strategies;
 }
 
-export async function resolveConfig(source, _id, key, activated, environment) {
+export async function resolveConfig(source, _id, key, activated, context) {
     const args = {}
 
     if (_id) { args._id = _id }
     if (key) { args.key = key }
-    if (activated !== undefined) { 
-        args.activated = { [`${environment}`]: activated }
+
+    let configs = await Config.find({ group: source._id, ...args }).lean()
+
+    if (activated !== undefined) {
+        configs = configs.filter(config => config.activated[`${context.environment}`] === activated)
     }
 
-    return await Config.find({ group: source._id, ...args }).lean()
+    try {
+        if (context.admin) {
+            let parentGroup = await GroupConfig.findById(source._id)
+            configs = await verifyOwnership(context.admin, configs, parentGroup.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
+        }
+    } catch (e) {
+        return null;
+    }
+
+    return configs
 }
 
-export async function resolveGroupConfig(source, _id, name, activated, environment) {
+export async function resolveGroupConfig(source, _id, name, activated, context) {
     const args = {}
 
     if (_id) { args._id = _id }
     if (name) { args.name = name }
-    if (activated !== undefined) { 
-        args.activated = { [`${environment}`]: activated }
+
+    let groups = await GroupConfig.find({ domain: source._id, ...args }).lean()
+
+    if (activated !== undefined) {
+        groups = groups.filter(group => group.activated[`${context.environment}`] === activated)
     }
 
-    return await GroupConfig.find({ domain: source._id, ...args }).lean()
+    try {
+        if (context.admin) {
+            groups = await verifyOwnership(context.admin, groups, source._id, ActionTypes.READ, RouterTypes.GROUP, true);
+        }
+    } catch (e) {
+        return null;
+    }
+
+    return groups
 }
 
-export async function resolveDomain(_id, name, activated, environment) {
+export async function resolveDomain(_id, name, activated, context) {
     const args = {}
 
     if (_id) { args._id = _id }
     if (name) { args.name = name }
-    if (activated !== undefined) { 
-        args.activated = { [`${environment}`]: activated }
+
+    let domain = await Domain.findOne({ ...args }).lean()
+
+    if (activated !== undefined) {
+        if (domain.activated[`${context.environment}`] !== activated) {
+            return null;
+        }
     }
 
-    return await Domain.findOne({ ...args }).lean()
-}
-
-export async function resolveFlatConfigurationByConfig(key) {
-    const config = await Config.find({ key }).lean();
-    if (config.length > 0) {
-        return { config }
-    } else {
-        return undefined;
+    try {
+        if (context.admin) {
+            domain = await verifyOwnership(context.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN, true);
+        }
+    } catch (e) {
+        return null;
     }
-}
 
-export async function resolveFlatConfigurationTypeByGroup(groupConfig) {
-    const group = await GroupConfig.find({ name: groupConfig }).lean();
-    if (group.length > 0) {
-        return { group }
-    } else {
-        return undefined;
-    }
+    return domain
 }
 
 async function checkGroup(configId) {

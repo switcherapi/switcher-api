@@ -10,6 +10,8 @@ import History from '../../src/models/history';
 import { Metric } from '../../src/models/metric';
 import { Environment, EnvType } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
+import { ActionTypes, RouterTypes, Role } from '../../src/models/role';
+import { Team } from '../../src/models/team';
 
 export const adminMasterAccountId = new mongoose.Types.ObjectId()
 export const adminMasterAccountToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET)
@@ -18,6 +20,16 @@ export const adminMasterAccount = {
     name: 'Master Admin',
     email: 'master@mail.com',
     password: '123123123123',
+    active: true
+}
+
+export const adminAccountId = new mongoose.Types.ObjectId()
+export const adminAccountToken = jwt.sign({ _id: adminAccountId }, process.env.JWT_SECRET)
+export const adminAccount = {
+    _id: adminAccountId,
+    name: 'Admin',
+    email: 'admin@mail.com',
+    password: 'asdasdasdasd',
     active: true
 }
 
@@ -145,6 +157,23 @@ export const component1 = {
     owner: adminMasterAccountId
 }
 
+export const roleConfigsId = new mongoose.Types.ObjectId()
+export const roleConfigs = {
+    _id: roleConfigsId,
+    action: ActionTypes.READ,
+    active: true,
+    router: RouterTypes.CONFIG
+}
+
+export const teamId = new mongoose.Types.ObjectId()
+export const team = {
+    _id: teamId,
+    domain: domainId,
+    name: 'Team Dev',
+    active: true,
+    roles: [roleConfigsId]
+}
+
 export const setupDatabase = async () => {
     await ConfigStrategy.deleteMany()
     await Config.deleteMany()
@@ -155,10 +184,17 @@ export const setupDatabase = async () => {
     await Component.deleteMany()
     await History.deleteMany()
     await Metric.deleteMany()
+    await Team.deleteMany()
+    await Role.deleteMany()
 
     const refreshTokenMaster = await bcrypt.hash(adminMasterAccountToken.split('.')[2], 8)
     adminMasterAccount.token = refreshTokenMaster;
     await new Admin(adminMasterAccount).save()
+
+    const refreshToken = await bcrypt.hash(adminAccountToken.split('.')[2], 8)
+    adminAccount.token = refreshToken;
+    adminAccount.teams = [teamId];
+    await new Admin(adminAccount).save()
 
     await new Environment(environment1).save()
     await new Environment(environment2).save()
@@ -167,7 +203,10 @@ export const setupDatabase = async () => {
     const hash = await bcrypt.hash(apiKey, 8)
     domainDocument.apihash = hash
     await new Domain(domainDocument).save()
-    
+
+    await new Team(team).save()
+    await new Role(roleConfigs).save()
+
     await new GroupConfig(groupConfigDocument).save()
     await new Config(configDocument).save()
     await new Config(configPrdQADocument).save()

@@ -1,13 +1,26 @@
-import { resolveConfigStrategy, resolveConfig, resolveGroupConfig } from './resolvers';
+import { resolveConfigStrategy, resolveConfig, resolveGroupConfig, resolveEnvStatus } from './resolvers';
 import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean } from 'graphql';
-import GroupConfig from '../models/group-config';
-import { ConfigStrategy } from '../models/config-strategy';
 import { EnvType } from '../models/environment';
-import Config from '../models/config';
+import { resolveFlatDomain, resolveFlatGroupConfig, resolveFlatConfig, resolveFlatConfigStrategy } from './configuration-resolvers';
+
+const envStatus = new GraphQLObjectType({
+    name: 'EnvStatus',
+    fields: {
+        env: { 
+            type: GraphQLString
+        },
+        value: { 
+            type: GraphQLBoolean
+         }
+    }
+});
 
 export const strategyType = new GraphQLObjectType({
     name: 'Strategy',
     fields: {
+        _id: {
+            type: GraphQLString
+        },
         strategy: {
             type: GraphQLString
         },
@@ -16,6 +29,12 @@ export const strategyType = new GraphQLObjectType({
             resolve: (source, args, { environment }) => {
                 return source.activated[`${environment}`] === undefined ? 
                     source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`]
+            }
+        },
+        statusByEnv: {
+            type: GraphQLList(envStatus),
+            resolve: (source) => {
+                return resolveEnvStatus(source)
             }
         },
         operation: {
@@ -30,6 +49,9 @@ export const strategyType = new GraphQLObjectType({
 export const configType = new GraphQLObjectType({
     name: 'Config',
     fields: {
+        _id: {
+            type: GraphQLString
+        },
         key: {
             type: GraphQLString
         },
@@ -41,6 +63,12 @@ export const configType = new GraphQLObjectType({
             resolve: (source, args, { environment }) => {
                 return source.activated[`${environment}`] === undefined ? 
                     source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`]
+            }
+        },
+        statusByEnv: {
+            type: GraphQLList(envStatus),
+            resolve: (source) => {
+                return resolveEnvStatus(source)
             }
         },
         strategies: {
@@ -63,8 +91,8 @@ export const configType = new GraphQLObjectType({
                     }
                 }
             },
-            resolve: async (source, { _id, strategy, operation, activated }, { environment }) => {
-                return await resolveConfigStrategy(source, _id, strategy, operation, activated, environment);
+            resolve: async (source, { _id, strategy, operation, activated }, context) => {
+                return await resolveConfigStrategy(source, _id, strategy, operation, activated, context);
             }
         },
         components: {
@@ -76,6 +104,9 @@ export const configType = new GraphQLObjectType({
 export const groupConfigType = new GraphQLObjectType({
     name: 'Group',
     fields: {
+        _id: {
+            type: GraphQLString
+        },
         name: {
             type: GraphQLString
         },
@@ -87,6 +118,12 @@ export const groupConfigType = new GraphQLObjectType({
             resolve: (source, args, { environment }) => {
                 return source.activated[`${environment}`] === undefined ? 
                     source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`]
+            }
+        },
+        statusByEnv: {
+            type: GraphQLList(envStatus),
+            resolve: (source) => {
+                return resolveEnvStatus(source)
             }
         },
         config: {
@@ -106,8 +143,8 @@ export const groupConfigType = new GraphQLObjectType({
                     }
                 }
             },
-            resolve: async (source, { _id, key, activated }, { environment }) => {
-                return await resolveConfig(source, _id, key, activated, environment);
+            resolve: async (source, { _id, key, activated }, context) => {
+                return await resolveConfig(source, _id, key, activated, context);
             }
         }
     }
@@ -116,6 +153,9 @@ export const groupConfigType = new GraphQLObjectType({
 export const domainType = new GraphQLObjectType({
     name: 'Domain',
     fields: {
+        _id: {
+            type: GraphQLString
+        },
         name: {
             type: GraphQLString
         },
@@ -127,6 +167,12 @@ export const domainType = new GraphQLObjectType({
             resolve: (source, args, { environment }) => {
                 return source.activated[`${environment}`] === undefined ? 
                     source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`]
+            }
+        },
+        statusByEnv: {
+            type: GraphQLList(envStatus),
+            resolve: (source) => {
+                return resolveEnvStatus(source)
             }
         },
         group: {
@@ -146,8 +192,8 @@ export const domainType = new GraphQLObjectType({
                     }
                 }
             },
-            resolve: async (source, { _id, name, activated }, { environment }) => {
-                return await resolveGroupConfig(source, _id, name, activated, environment);
+            resolve: async (source, { _id, name, activated }, context) => {
+                return await resolveGroupConfig(source, _id, name, activated, context);
             }
         }
     }
@@ -158,36 +204,26 @@ export const flatConfigurationType = new GraphQLObjectType({
     fields: {
         domain: {
             type: domainType,
-            resolve: (source, args, { domain }) => {
-                return domain
+            resolve: async (source, args, context) => {
+                return resolveFlatDomain(source, context)
             }
         },
         group: {
             type: new GraphQLList(groupConfigType),
-            resolve: async (source, args) => {
-                if (source.config) {
-                    return await GroupConfig.find({ _id: source.config[0].group }).lean()
-                } else if (source.group) {
-                    return source.group
-                }
+            resolve: async (source, args, context) => {
+                return resolveFlatGroupConfig(source, context)
             }
         },
         config: {
             type: new GraphQLList(configType),
-            resolve: async (source, args) => {
-                if (source.config) {
-                    return source.config
-                } else if (source.group) {
-                    return await Config.find({ group: source.group[0]._id }).lean()
-                }
+            resolve: async (source, args, context) => {
+                return resolveFlatConfig(source, context)
             }
         },
         strategies: {
             type: new GraphQLList(strategyType),
-            resolve: async (source, args) => {
-                if (source.config) {
-                    return await ConfigStrategy.find({ config: source.config[0]._id }).lean()
-                }
+            resolve: async (source, args, context) => {
+                return resolveFlatConfigStrategy(source, context)
             }
         }
     }

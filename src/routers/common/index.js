@@ -61,7 +61,7 @@ export async function removeConfigStrategyStatus(configStrategy, environmentName
     }
 }
 
-export async function verifyOwnership(admin, element, domainId, action, routerType) {
+export async function verifyOwnership(admin, element, domainId, action, routerType, cascade = false) {
     const domain = await Domain.findById(domainId)
 
     if (!domain) {
@@ -77,7 +77,11 @@ export async function verifyOwnership(admin, element, domainId, action, routerTy
     if (admin.teams.length) {
         for (var i = 0; i < teams.length; i++) {
             if (teams[i].active) {
-                element = await verifyRoles(teams[i], element, action, routerType);
+                if (cascade) {
+                    element = await verifyRolesCascade(teams[i], element, action, routerType);
+                } else {
+                    element = await verifyRoles(teams[i], element, action, routerType);
+                }
             } else {
                 throw new PermissionError('Team is not active to verify this operation');
             }
@@ -90,9 +94,10 @@ export async function verifyOwnership(admin, element, domainId, action, routerTy
 }
   
 async function verifyRoles(team, element, action, routerType) {
-    const role = await Role.findOne({ 
+    const role = await Role.findOne({
         _id: { $in: team.roles }, 
-        action, 
+        action,
+        active: true,
         $or: [ 
             { router: routerType }, 
             { router: RouterTypes.ALL } 
@@ -100,17 +105,51 @@ async function verifyRoles(team, element, action, routerType) {
     });
 
     if (role) {
-        if (role.active) {
-            if (action === ActionTypes.READ) {
-                return verifyIdentifiers(role, element);
-            } else {
-                return element;
-            }
+        if (action === ActionTypes.READ) {
+            return verifyIdentifiers(role, element);
         } else {
-            throw new PermissionError('Role is not active to verify this operation');
+            return element;
         }
     } else {
-        throw new PermissionError('Role not found for this operation');
+        throw new PermissionError(`Role not found for this operation: '${action}' - '${routerType}'`);
+    }
+}
+
+async function verifyRolesCascade(team, element, action, routerType) {
+    let orStatement = []
+    if (routerType === RouterTypes.DOMAIN) {
+        orStatement = [
+            { router: routerType },
+            { router: RouterTypes.GROUP },
+            { router: RouterTypes.CONFIG },
+            { router: RouterTypes.STRATEGY },
+            { router: RouterTypes.ALL }
+        ]
+    } else if (routerType === RouterTypes.GROUP) {
+        orStatement = [
+            { router: routerType },
+            { router: RouterTypes.CONFIG },
+            { router: RouterTypes.STRATEGY },
+            { router: RouterTypes.ALL }
+        ]
+    } else if (routerType === RouterTypes.CONFIG) {
+        orStatement = [
+            { router: routerType },
+            { router: RouterTypes.STRATEGY },
+            { router: RouterTypes.ALL }
+        ]
+    }
+
+    const foundRole = await Role.findOne({
+        _id: { $in: team.roles }, 
+        action,
+        active: true,
+        identifiedBy: undefined,
+        $or: orStatement
+    });
+
+    if (foundRole) {
+        return element;
     }
 }
 
