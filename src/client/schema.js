@@ -12,10 +12,10 @@ const queryType = new GraphQLObjectType({
             type: criteriaType,
             args: {
                 key: {
-                    type: new GraphQLNonNull(GraphQLString)
+                    type: GraphQLNonNull(GraphQLString)
                 },
                 entry: {
-                    type: new GraphQLList(strategyInputType)
+                    type: GraphQLList(strategyInputType)
                 },
                 bypassMetric: {
                     type: GraphQLBoolean

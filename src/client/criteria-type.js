@@ -7,10 +7,10 @@ export const strategyInputType = new GraphQLInputObjectType({
     name: 'StrategyInput',
     fields: {
         strategy: {
-            type: new GraphQLNonNull(GraphQLString)
+            type: GraphQLNonNull(GraphQLString)
         },
         input: {
-            type: new GraphQLNonNull(GraphQLString)
+            type: GraphQLNonNull(GraphQLString)
         }
     }
 })
@@ -31,7 +31,7 @@ export const responseType = new GraphQLObjectType({
             type: groupConfigType
         },
         strategies: {
-            type: new GraphQLList(strategyType)
+            type: GraphQLList(strategyType)
         }
     }
 })

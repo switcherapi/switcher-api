@@ -72,7 +72,7 @@ export const configType = new GraphQLObjectType({
             }
         },
         strategies: {
-            type: new GraphQLList(strategyType),
+            type: GraphQLList(strategyType),
             args: {
                 _id: {
                     type: GraphQLString
@@ -96,7 +96,7 @@ export const configType = new GraphQLObjectType({
             }
         },
         components: {
-            type: new GraphQLList(GraphQLString)
+            type: GraphQLList(GraphQLString)
         }
     }
 })
@@ -127,7 +127,7 @@ export const groupConfigType = new GraphQLObjectType({
             }
         },
         config: {
-            type: new GraphQLList(configType),
+            type: GraphQLList(configType),
             args: {
                 _id: {
                     type: GraphQLString
@@ -176,7 +176,7 @@ export const domainType = new GraphQLObjectType({
             }
         },
         group: {
-            type: new GraphQLList(groupConfigType),
+            type: GraphQLList(groupConfigType),
             args: {
                 _id: {
                     type: GraphQLString
@@ -209,19 +209,19 @@ export const flatConfigurationType = new GraphQLObjectType({
             }
         },
         group: {
-            type: new GraphQLList(groupConfigType),
+            type: GraphQLList(groupConfigType),
             resolve: async (source, args, context) => {
                 return resolveFlatGroupConfig(source, context)
             }
         },
         config: {
-            type: new GraphQLList(configType),
+            type: GraphQLList(configType),
             resolve: async (source, args, context) => {
                 return resolveFlatConfig(source, context)
             }
         },
         strategies: {
-            type: new GraphQLList(strategyType),
+            type: GraphQLList(strategyType),
             resolve: async (source, args, context) => {
                 return resolveFlatConfigStrategy(source, context)
             }
