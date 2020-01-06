@@ -31,7 +31,7 @@ export async function resolveConfigStrategy(source, _id, strategy, operation, ac
     let strategies = await ConfigStrategy.find({ config: source._id, ...args }).lean()
 
     if (activated !== undefined) {
-        strategies = strategies.filter(strategy => strategy.activated[`${context.environment}`] === activated)
+        strategies = strategies.filter(s => s.activated[`${context.environment}`] === activated)
     }
 
     try {

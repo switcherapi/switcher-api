@@ -41,7 +41,7 @@ export const strategyType = new GraphQLObjectType({
             type: GraphQLString
         },
         values: {
-            type: new GraphQLList(GraphQLString)
+            type: GraphQLList(GraphQLString)
         }
     }
 })
