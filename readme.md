@@ -3,7 +3,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/petruki/switcher-api/badge.svg?branch=master)](https://coveralls.io/github/petruki/switcher-api?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-![Switcher API: Cloud-based Feature Flag API](https://github.com/petruki/switcher-api/blob/master/images/switcherapi.png)
+![Switcher API: Cloud-based Feature Flag API](https://github.com/petruki/switcherapi-assets/blob/master/logo/switcherapi_grey.png)
 
 # Requirements  
 - MongoDB
