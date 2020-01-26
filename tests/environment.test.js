@@ -5,7 +5,7 @@ import { Environment, EnvType } from '../src/models/environment';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
 import Config from '../src/models/config';
-import { ConfigStrategy } from '../src/models/config-strategy';
+import { ConfigStrategy, StrategiesType, OperationsType } from '../src/models/config-strategy';
 import { 
     setupDatabase,
     adminMasterAccountToken,
@@ -203,12 +203,18 @@ describe('Deletion tests', () => {
                 [`${envName}`]: true
             }).expect(200);
 
-        await request(app)
-            .patch('/configstrategy/updateStatus/' + configStrategyId)
+        // Creates strategy for the environment test
+        const strategyEnv = await request(app)
+            .post('/configstrategy/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                [`${envName}`]: true
-            }).expect(200);
+                description: 'Description of my new Config Strategy',
+                strategy: StrategiesType.TIME,
+                operation: OperationsType.GREATER,
+                values: ['10:30'],
+                config: configId1,
+                env: envName
+            }).expect(201)
 
         let domain = await Domain.findById(domainId)
         expect(domain.activated.get(EnvType.DEFAULT)).toEqual(true);
@@ -222,8 +228,7 @@ describe('Deletion tests', () => {
         expect(config.activated.get(EnvType.DEFAULT)).toEqual(true);
         expect(config.activated.get(envName)).toEqual(true);
 
-        let strategy = await ConfigStrategy.findById(configStrategyId)
-        expect(strategy.activated.get(EnvType.DEFAULT)).toEqual(true);
+        let strategy = await ConfigStrategy.findById(strategyEnv.body._id)
         expect(strategy.activated.get(envName)).toEqual(true);
 
         await request(app)
@@ -243,9 +248,8 @@ describe('Deletion tests', () => {
         expect(config.activated.get(EnvType.DEFAULT)).toEqual(true);
         expect(config.activated.get(envName)).toEqual(undefined);
 
-        strategy = await ConfigStrategy.findById(configStrategyId)
-        expect(strategy.activated.get(EnvType.DEFAULT)).toEqual(true);
-        expect(strategy.activated.get(envName)).toEqual(undefined);
+        strategy = await ConfigStrategy.findById(strategyEnv.body._id)
+        expect(strategy).toBeNull();
     })
 
     test('ENV_SUITE - Should NOT recover an Environment - Invalid Env Id', async () => {

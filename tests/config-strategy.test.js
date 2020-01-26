@@ -95,7 +95,7 @@ describe('Testing strategy creation #1', () => {
                 env: EnvType.DEFAULT
             }).expect(400)
 
-        expect(response.body.error).toBe(`Unable to complete the operation. Strategy '${StrategiesType.VALUE}' already exist for this configuration`)
+        expect(response.body.error).toBe(`Unable to complete the operation. Strategy '${StrategiesType.VALUE}' already exist for this configuration and environment`)
     })
 
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Wrong operation and strategies', async () => {
@@ -816,13 +816,10 @@ describe('Testing fetch strategies', () => {
 
 })
 
-describe('Scenario: creating QA environment after innactivate PRD switch', () => {
+describe('Scenario: creating QA environment and modifying its status', () => {
     beforeAll(setupDatabase)
 
     test('STRATEGY_SUITE - Should update Strategy environment status - QA', async () => {
-        // QA Environment still does not exist
-        expect(configStrategyDocument.activated.get('QA')).toEqual(undefined);
-
         // Creating QA Environment...
         await request(app)
             .post('/environment/create')
@@ -832,8 +829,20 @@ describe('Scenario: creating QA environment after innactivate PRD switch', () =>
                 domain: domainId
             }).expect(201)
 
+        const newStrategy = await request(app)
+            .post('/configstrategy/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                description: 'Description of my new Config Strategy',
+                strategy: StrategiesType.NETWORK,
+                operation: OperationsType.EQUAL,
+                values: ['192.168.0.1/16'],
+                config: configId2,
+                env: 'QA'
+            }).expect(201)
+
         const response = await request(app)
-            .patch('/configstrategy/updateStatus/' + configStrategyId)
+            .patch('/configstrategy/updateStatus/' + newStrategy.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA: true
@@ -842,20 +851,18 @@ describe('Scenario: creating QA environment after innactivate PRD switch', () =>
         expect(response.body.activated['QA']).toEqual(true);
 
         // DB validation - verify status updated
-        let strategy = await ConfigStrategy.findById(configStrategyId)
-        expect(strategy.activated.get(EnvType.DEFAULT)).toEqual(true);
+        let strategy = await ConfigStrategy.findById(newStrategy.body._id)
         expect(strategy.activated.get('QA')).toEqual(true);
 
         // Inactivating QA. Default environment should stay activated
         await request(app)
-            .patch('/configstrategy/updateStatus/' + configStrategyId)
+            .patch('/configstrategy/updateStatus/' + newStrategy.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA: false
             }).expect(200);
 
-        strategy = await ConfigStrategy.findById(configStrategyId)
-        expect(strategy.activated.get(EnvType.DEFAULT)).toEqual(true);
+        strategy = await ConfigStrategy.findById(newStrategy.body._id)
         expect(strategy.activated.get('QA')).toEqual(false);
     })
 
@@ -875,108 +882,26 @@ describe('Scenario: creating QA environment after innactivate PRD switch', () =>
             }).expect(404);
     })
 
-    test('STRATEGY_SUITE - Should remove Strategy environment status', async () => {
-        // Creating QA6 Environment...
-        await request(app)
-            .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                name: 'QA6',
-                domain: domainId
-            }).expect(201)
-        
-        await request(app)
+    test('STRATEGY_SUITE - Should NOT update Strategy environment status - More than one environemnt', async () => {
+        const response = await request(app)
             .patch('/configstrategy/updateStatus/' + configStrategyId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                QA6: true
-            }).expect(200);
+                default: false,
+                QA: true
+            }).expect(400);
 
-        let strategy = await ConfigStrategy.findById(configStrategyId)
-        expect(strategy.activated.get('QA6')).toEqual(true);
-
-        await request(app)
-            .patch('/configstrategy/removeStatus/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                env: 'QA6'
-            }).expect(200);
-
-        // DB validation - verify status updated
-        strategy = await ConfigStrategy.findById(configStrategyId)
-        expect(strategy.activated.get('QA6')).toEqual(undefined);
+        expect(response.body.error).toEqual('You can only update one environment at time');
     })
-})
 
-describe('Scenario: default environment being deleted', () => {
-    beforeAll(setupDatabase)
-
-    test('STRATEGY_SUITE - Should NOT remove Strategy environment status', async () => {
-        // Creating QA Environment...
-        await request(app)
-            .post('/environment/create')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                name: 'QA',
-                domain: domainId
-            }).expect(201)
-
-        await request(app)
+    test('STRATEGY_SUITE - Should NOT update Strategy environment status - Stragey does not exist on a specific environment', async () => {
+        const response = await request(app)
             .patch('/configstrategy/updateStatus/' + configStrategyId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA: true
-            }).expect(200);
-
-        // default environment can be removed...
-        await request(app)
-            .patch('/configstrategy/removeStatus/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                env: EnvType.DEFAULT
-            }).expect(200);
-
-        // ... but at least one environment should be activate
-        const response = await request(app)
-            .patch('/configstrategy/removeStatus/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                env: 'QA'
-            }).expect(400);
-
-        expect(response.body.error).toEqual('Invalid operation. One environment status must be saved');
-
-        // Invalid Strategy Id
-        await request(app)
-            .patch('/configstrategy/removeStatus/FAKE_STRATEGY')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                env: 'QA'
-            }).expect(400);
-
-        // Strategy does not exist
-        await request(app)
-            .patch('/configstrategy/removeStatus/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                env: 'QA'
             }).expect(404);
 
-        const strategy = await ConfigStrategy.findById(configStrategyId)
-        expect(strategy.activated.get(EnvType.DEFAULT)).toEqual(undefined);
-        expect(strategy.activated.get('QA')).toEqual(true);
+        expect(response.body.error).toEqual('Strategy does not exist on this environment');
     })
-
-    test('STRATEGY_SUITE - Should remove records from history after deleting element', async () => {
-        let history = await History.find({ elementId: configStrategyId })
-        expect(history.length > 0).toEqual(true)
-        await request(app)
-            .delete('/configstrategy/' + configStrategyId)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
-
-        history = await History.find({ elementId: configStrategyId })
-        expect(history.length).toEqual(0)
-    })
-
 })

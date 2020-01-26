@@ -46,20 +46,21 @@ export async function removeConfigStatus(config, environmentName) {
     }
 }
 
-export async function removeConfigStrategyStatus(configStrategy, environmentName) {
-    try {
-        await checkEnvironmentStatusRemoval(configStrategy.domain, environmentName, true)
+// Deprecated since strategies should contain only one environment configured
+// export async function removeConfigStrategyStatus(configStrategy, environmentName) {
+//     try {
+//         await checkEnvironmentStatusRemoval(configStrategy.domain, environmentName, true)
 
-        if (configStrategy.activated.size === 1) {
-            throw new Error('Invalid operation. One environment status must be saved')
-        }
+//         if (configStrategy.activated.size === 1) {
+//             throw new Error('Invalid operation. One environment status must be saved')
+//         }
 
-        configStrategy.activated.delete(environmentName)
-        return await configStrategy.save()
-    } catch (e) {
-        throw new Error(e.message)
-    }
-}
+//         configStrategy.activated.delete(environmentName)
+//         return await configStrategy.save()
+//     } catch (e) {
+//         throw new Error(e.message)
+//     }
+// }
 
 export async function verifyOwnership(admin, element, domainId, action, routerType, cascade = false) {
     const domain = await Domain.findById(domainId)
