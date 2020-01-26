@@ -3,6 +3,7 @@ import Admin from '../models/admin';
 import { auth, authRefreshToken } from '../middleware/auth';
 import { verifyInputUpdateParameters } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
+import { responseException } from './common';
 
 const router = new express.Router()
 
@@ -58,6 +59,20 @@ router.post('/admin/refresh/me', authRefreshToken, async (req, res) => {
 
 router.get('/admin/me', auth, async (req, res) => {
     res.send(req.admin)
+})
+
+router.get('/admin/:id', auth, async (req, res) => {
+    try {
+        let admin = await Admin.findById(req.params.id)
+
+        if (!admin) {
+            return res.status(404).send()
+        }
+        
+        res.send(admin)
+    } catch (e) {
+        responseException(res, e, 400)
+    }
 })
 
 router.delete('/admin/me', auth, async (req, res) => {

@@ -1,10 +1,10 @@
 import express from 'express';
 import Config from '../models/config';
-import { Environment } from '../models/environment';
+import { Environment, EnvType } from '../models/environment';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { ConfigStrategy, strategyRequirements } from '../models/config-strategy';
 import { auth } from '../middleware/auth';
-import { removeConfigStrategyStatus, verifyOwnership, responseException, NotFoundError } from './common/index';
+import { verifyOwnership, responseException, NotFoundError } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router()
@@ -59,7 +59,7 @@ router.post('/configstrategy/create', auth, async (req, res) => {
 
 // GET /configstrategy?limit=10&skip=20
 // GET /configstrategy?sortBy=createdAt:desc
-// GET /configstrategy?config=ID
+// GET /configstrategy?config=ID&env=QA
 router.get('/configstrategy', auth, async (req, res) => {
     const sort = {}
 
@@ -83,8 +83,9 @@ router.get('/configstrategy', auth, async (req, res) => {
                 sort
             }
         }).execPopulate()
-
-        let configStrategies = config.configStrategy;
+        
+        let configStrategies = config.configStrategy.filter(
+            elements => elements.activated.get(req.query.env ? req.query.env : EnvType.DEFAULT) != undefined);
 
         configStrategies = await verifyOwnership(req.admin, configStrategies, config.domain, ActionTypes.READ, RouterTypes.STRATEGY)
 
@@ -306,17 +307,25 @@ router.get('/configstrategy/values/:id', auth, async (req, res) => {
 
 router.patch('/configstrategy/updateStatus/:id', auth, async (req, res) => {
     try {
+        let updates = Object.keys(req.body)
+
+        if (updates.length > 1) {
+            return res.status(400).send({ error: `You can only update one environment at time` })
+        }
+
         let configStrategy = await ConfigStrategy.findById(req.params.id)
-        
         if (!configStrategy) {
             return res.status(404).send({ error: 'Strategy does not exist'})
         }
 
+        updates = await checkEnvironmentStatusChange(req, res, configStrategy.domain)
+        if (configStrategy.activated.get(updates[0]) === undefined) {
+            return res.status(404).send({ error: 'Strategy does not exist on this environment'})
+        }
+
         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
 
-        const updates = await checkEnvironmentStatusChange(req, res, configStrategy.domain)
-        
-        updates.forEach((update) => configStrategy.activated.set(update, req.body[update]))
+        configStrategy.activated.set(updates[0], req.body[updates[0]])
         await configStrategy.save()
         res.send(configStrategy)
     } catch (e) {
@@ -324,20 +333,21 @@ router.patch('/configstrategy/updateStatus/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/configstrategy/removeStatus/:id', auth, async (req, res) => {
-    try {
-        let configStrategy = await ConfigStrategy.findById(req.params.id)
+// Deprecated since strategies should contain only one environment configured
+// router.patch('/configstrategy/removeStatus/:id', auth, async (req, res) => {
+//     try {
+//         let configStrategy = await ConfigStrategy.findById(req.params.id)
         
-        if (!configStrategy) {
-            return res.status(404).send({ error: 'Strategy does not exist'})
-        }
+//         if (!configStrategy) {
+//             return res.status(404).send({ error: 'Strategy does not exist'})
+//         }
 
-        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
+//         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
 
-        res.send(await removeConfigStrategyStatus(configStrategy, req.body.env))
-    } catch (e) {
-        responseException(res, e, 400)
-    }
-})
+//         res.send(await removeConfigStrategyStatus(configStrategy, req.body.env))
+//     } catch (e) {
+//         responseException(res, e, 400)
+//     }
+// })
 
 export default router;

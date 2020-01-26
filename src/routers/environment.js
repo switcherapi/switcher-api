@@ -9,7 +9,6 @@ import {
     removeDomainStatus,
     removeGroupStatus,
     removeConfigStatus,
-    removeConfigStrategyStatus,
     verifyOwnership,
     responseException
 } from './common/index'
@@ -109,12 +108,10 @@ router.patch('/environment/recover/:id', auth, async (req, res) => {
 
         environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.UPDATE, RouterTypes.ENVIRONMENT)
 
-        const strategies = await ConfigStrategy.find({ domain: environment.domain })
-        if (strategies.length) {
-            strategies.forEach(async function(strategy) {
-                await removeConfigStrategyStatus(strategy, environment.name)
-            })
-        }
+        await ConfigStrategy.deleteMany({ domain: environment.domain, $or: [ 
+            { activated: { [`${environment.name}`]: true } }, 
+            { activated: { [`${environment.name}`]: false } } 
+        ] })
 
         const configs = await Config.find({ domain: environment.domain })
         if (configs.length) {

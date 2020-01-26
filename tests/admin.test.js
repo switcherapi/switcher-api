@@ -3,17 +3,12 @@ import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import app from '../src/app';
 import Admin from '../src/models/admin';
-import Domain from '../src/models/domain';
-import GroupConfig from '../src/models/group-config';
-import Config from '../src/models/config';
-import { ConfigStrategy } from '../src/models/config-strategy';
 import { 
     setupDatabase, 
     adminMasterAccountId, 
     adminMasterAccount, 
     adminAccountId, 
-    adminAccount, 
-    adminMasterAccountToken 
+    adminAccount
 } from './fixtures/db_api';
 
 afterAll(async () => {
@@ -277,6 +272,55 @@ describe('Testing Admin login and fetch', () => {
         // Response validation
         expect(response.body.name).toBe(adminMasterAccount.name)
         expect(response.body.email).toBe(adminMasterAccount.email)
+    })
+
+    test('ADMIN_SUITE - Should get admin profile given an Admin ID', async () => {
+        const responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminMasterAccount.email,
+                password: adminMasterAccount.password
+            }).expect(200)
+
+        const response = await request(app)
+            .get('/admin/' + adminAccountId)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send()
+            .expect(200)
+
+        // Response validation
+        expect(response.body.name).toBe(adminAccount.name)
+        expect(response.body.email).toBe(adminAccount.email)
+    })
+
+    test('ADMIN_SUITE - Should NOT get admin profile given an wrong Admin ID', async () => {
+        const responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminMasterAccount.email,
+                password: adminMasterAccount.password
+            }).expect(200)
+
+        await request(app)
+            .get('/admin/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send()
+            .expect(404)
+    })
+
+    test('ADMIN_SUITE - Should NOT get admin profile given an invalid Admin ID', async () => {
+        const responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminMasterAccount.email,
+                password: adminMasterAccount.password
+            }).expect(200)
+
+        await request(app)
+            .get('/admin/INVALID_ID')
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send()
+            .expect(400)
     })
 
     test('ADMIN_SUITE - Should not get profile for unauthenticated admin', async () => {

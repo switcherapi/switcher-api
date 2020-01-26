@@ -23,8 +23,9 @@ Main features:
 - High-security flow using *OAuth 2.0* flow and different levels of credentials for administrators.
 - Client URIs exposed in **REST** and **GraphQL**.
 - Generate a snapshot from your domain/environment to use with the offline mode of your Switcher Client.  
- - **NodeJs lib**: (https://github.com/petruki/switcher-client-master)
+ - **JavaScript lib**: (https://github.com/petruki/switcher-client-master)
  - **Java lib**: (https://github.com/petruki/switcher-client)
+ - **Switcher Management**: (https://github.com/petruki/switcher-management)
 
 # Configuration
 1) npm install
@@ -185,3 +186,8 @@ Let's use your configuration. Do you still have the API Key generated when you h
     }]
 }
 ```
+
+## Donation
+Donations for cookies and pizza are extremely welcomed.
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9FKW64V67RKXW&source=url)

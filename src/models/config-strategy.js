@@ -26,7 +26,7 @@ const StrategyRequirementDefinition = [
         strategy: StrategiesType.NETWORK,
         operations: [OperationsType.EXIST, OperationsType.NOT_EXIST],
         format: '10.0.0.0/24 (CIDR) or 10.0.0.1 (IPv4 address)',
-        validator: '^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$'
+        validator: '^([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/([0-9]|[1-2][0-9]|3[0-2]))?$'
     },
     {
         strategy: StrategiesType.VALUE,
@@ -212,7 +212,7 @@ async function recordStrategyHistory(strategyConfig, modifiedField) {
 
 async function existStrategy(strategyConfig) {
     if (strategyConfig.__v === undefined) {
-        const foundStrategy = await ConfigStrategy.find({ config: strategyConfig.config, strategy: strategyConfig.strategy })
+        const foundStrategy = await ConfigStrategy.find({ config: strategyConfig.config, strategy: strategyConfig.strategy, activated: strategyConfig.activated })
         return foundStrategy.length > 0
     }
     return false
@@ -300,7 +300,7 @@ configStrategySchema.pre('save', async function (next) {
 
     // Verify if strategy already exist
     if (await existStrategy(strategyConfig)) {
-        const err = new Error(`Unable to complete the operation. Strategy '${strategy}' already exist for this configuration`)
+        const err = new Error(`Unable to complete the operation. Strategy '${strategy}' already exist for this configuration and environment`)
         return next(err);
     }
 

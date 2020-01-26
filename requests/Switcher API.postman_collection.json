@@ -197,6 +197,42 @@
 			"response": []
 		},
 		{
+			"name": "Admin - Read Single",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d588267a-effd-4e44-a189-c4366083197f",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/admin/5e0ece2b6f4f994eac9007ad",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"5e0ece2b6f4f994eac9007ad"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Admin - Refresh Token",
 			"event": [
 				{
@@ -1874,7 +1910,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Rollout 2020\",\n\t\"description\": \"Changes that will be applied during the rollout\",\n\t\"activated\": \"true\"\n}",
+					"raw": "{\n\t\"name\": \"Rollout 2020\",\n\t\"description\": \"Changes that will be applied during the rollout\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2144,7 +2180,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"key\": \"FF2FOR2021\",\n\t\"description\": \"Feature Flag\",\n\t\"activated\": \"true\"\n}",
+					"raw": "{\n\t\"key\": \"FF2FOR2021\",\n\t\"description\": \"Feature Flag\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2611,7 +2647,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"default\": true,\n\t\"QA\": false\n}",
+					"raw": "{\n\t\"default\": false\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2619,14 +2655,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/configstrategy/updateStatus/5df1668d9194d613400a52ee",
+					"raw": "{{url}}/configstrategy/updateStatus/5e2b7f09b91d810cd037424b",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"configstrategy",
 						"updateStatus",
-						"5df1668d9194d613400a52ee"
+						"5e2b7f09b91d810cd037424b"
 					]
 				}
 			},
@@ -2673,7 +2709,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/configstrategy?sortBy=createdAt:asc&config=5df1664d9194d613400a52eb",
+					"raw": "{{url}}/configstrategy?env=QA&config=5e0ecebe6f4f994eac9007b3",
 					"host": [
 						"{{url}}"
 					],
@@ -2683,12 +2719,12 @@
 					"query": [
 						{
 							"key": "sortBy",
-							"value": "createdAt:asc"
+							"value": "createdAt:asc",
+							"disabled": true
 						},
 						{
-							"key": "activated",
-							"value": "true",
-							"disabled": true
+							"key": "env",
+							"value": "QA"
 						},
 						{
 							"key": "limit",
@@ -2702,7 +2738,7 @@
 						},
 						{
 							"key": "config",
-							"value": "5df1664d9194d613400a52eb"
+							"value": "5e0ecebe6f4f994eac9007b3"
 						}
 					]
 				}
