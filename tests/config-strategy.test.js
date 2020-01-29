@@ -558,6 +558,15 @@ describe('Testing update strategies #1', () => {
         expect(response.body.error).toEqual('Strategy \'NON_EXISTENT_VALIDATION\' not found')
     })
 
+    test('STRATEGY_SUITE - Should return a list of strategies available', async () => {
+        let response = await request(app)
+            .get('/configstrategy/spec/strategies')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200)
+        
+        expect(response.body.strategiesAvailable.length).not.toEqual(0)
+    })
+
     test('STRATEGY_SUITE - Should add new value to Strategy values', async () => {
         let response = await request(app)
             .patch('/configstrategy/addval/' + configStrategyId)
@@ -771,7 +780,7 @@ describe('Testing fetch strategies', () => {
         expect(response.body).toEqual(configStrategyDocument.values);
 
         response = await request(app)
-            .get('/configstrategy/values/' + configStrategyId + '?limit=2')
+            .get('/configstrategy/values/' + configStrategyId + '?limit=2&sort=true')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 

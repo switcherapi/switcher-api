@@ -6,8 +6,10 @@ import {
     setupDatabase,
     adminMasterAccountToken,
     adminAccountToken,
-    domainId
+    domainId,
+    configId1
  } from './fixtures/db_api';
+import Config from '../src/models/config';
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -243,6 +245,17 @@ describe('Deletion tests', () => {
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
             }).expect(201)
+
+        //Adding component to a Config. It should be removed after deleting
+        await request(app)
+            .patch('/config/addComponent/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                component: response.body._id
+            }).expect(200)
+
+        const configsToRemoveFrom = await Config.find({ components: { $in: [response.body._id] } });
+        expect(configsToRemoveFrom[0]._id).toEqual(configId1)
 
         response = await request(app)
             .delete('/component/' + response.body._id)

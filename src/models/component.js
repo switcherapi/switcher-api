@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
+import Config from './config';
 
 const componentSchema = new mongoose.Schema({
     name: {
@@ -54,6 +55,19 @@ componentSchema.pre('validate', async function (next) {
         const err = new Error(`Unable to complete the operation. Component '${component.name}' already exist for this Domain`)
         next(err);
     }
+
+    next()
+})
+
+componentSchema.pre('remove', async function (next) {
+    const component = this
+    
+    const configsToRemoveFrom = await Config.find({ components: { $in: [component._id] } });
+    configsToRemoveFrom.forEach(config => {
+        const indexValue = config.components.indexOf(component._id);
+        config.components.splice(indexValue);
+        config.save();
+    })
 
     next()
 })

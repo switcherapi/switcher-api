@@ -122,7 +122,7 @@ describe('Testing fetch configuration info', () => {
 
     test('CONFIG_SUITE - Should get Config information by Id', async () => {
         let response = await request(app)
-            .get('/config/' + configId1)
+            .get('/config/' + configId1 + '?resolveComponents=true')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 

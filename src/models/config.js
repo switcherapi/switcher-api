@@ -51,6 +51,12 @@ configSchema.virtual('history', {
     foreignField: 'elementId'
 })
 
+configSchema.virtual('component_list', {
+    ref: 'Component',
+    localField: 'components',
+    foreignField: '_id'
+})
+
 configSchema.options.toJSON = {
     getters: true,
     virtuals: true,
@@ -59,6 +65,11 @@ configSchema.options.toJSON = {
         if (ret.updatedAt || ret.createdAt) {
             ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
             ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
+        }
+        
+        if (ret.component_list) {
+            ret.components = ret.component_list
+            delete ret.component_list
         }
         return ret
     }
