@@ -16,6 +16,31 @@ import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router()
 
+async function removeEnvironmentFromElements(environment) {
+    await ConfigStrategy.deleteMany({ domain: environment.domain, $or: [ 
+        { activated: { [`${environment.name}`]: true } }, 
+        { activated: { [`${environment.name}`]: false } } 
+    ] })
+
+    const configs = await Config.find({ domain: environment.domain })
+    if (configs.length) {
+        configs.forEach(async function(config) {
+            await removeConfigStatus(config, environment.name)
+        })
+    }
+
+    const groupConfigs = await GroupConfig.find({ domain: environment.domain })
+    if (groupConfigs.length) {
+        groupConfigs.forEach(async function(group) {
+            await removeGroupStatus(group, environment.name)
+        })
+    }
+
+    const domain = await Domain.findById(environment.domain)
+    
+    await removeDomainStatus(domain, environment.name)
+}
+
 router.post('/environment/create', auth, async (req, res) => {
     let environment = new Environment({
         ...req.body, 
@@ -91,6 +116,8 @@ router.delete('/environment/:id', auth, async (req, res) => {
 
         environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.DELETE, RouterTypes.ENVIRONMENT)
 
+        await removeEnvironmentFromElements(environment)
+        
         await environment.remove()
         res.send(environment)
     } catch (e) {
@@ -108,28 +135,7 @@ router.patch('/environment/recover/:id', auth, async (req, res) => {
 
         environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.UPDATE, RouterTypes.ENVIRONMENT)
 
-        await ConfigStrategy.deleteMany({ domain: environment.domain, $or: [ 
-            { activated: { [`${environment.name}`]: true } }, 
-            { activated: { [`${environment.name}`]: false } } 
-        ] })
-
-        const configs = await Config.find({ domain: environment.domain })
-        if (configs.length) {
-            configs.forEach(async function(config) {
-                await removeConfigStatus(config, environment.name)
-            })
-        }
-
-        const groupConfigs = await GroupConfig.find({ domain: environment.domain })
-        if (groupConfigs.length) {
-            groupConfigs.forEach(async function(group) {
-                await removeGroupStatus(group, environment.name)
-            })
-        }
-
-        const domain = await Domain.findById(environment.domain)
-        
-        await removeDomainStatus(domain, environment.name)
+        await removeEnvironmentFromElements(environment)
 
         res.send({ message: `Environment '${environment.name}' recovered` })
     } catch (e) {

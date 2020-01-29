@@ -79,6 +79,7 @@ router.get('/config', auth, async (req, res) => {
     }
 })
 
+// GET /config/ID?resolveComponents=true
 router.get('/config/:id', auth, async (req, res) => {
     try {
         let config = await Config.findById(req.params.id)
@@ -88,6 +89,10 @@ router.get('/config/:id', auth, async (req, res) => {
         }
 
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG)
+
+        if (req.query.resolveComponents) {
+            await config.populate({ path: 'component_list' }).execPopulate()
+        }
 
         res.send(config)
     } catch (e) {

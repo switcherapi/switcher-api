@@ -2,7 +2,7 @@ import express from 'express';
 import Config from '../models/config';
 import { Environment, EnvType } from '../models/environment';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { ConfigStrategy, strategyRequirements } from '../models/config-strategy';
+import { ConfigStrategy, strategyRequirements, StrategiesType } from '../models/config-strategy';
 import { auth } from '../middleware/auth';
 import { verifyOwnership, responseException, NotFoundError } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
@@ -156,6 +156,12 @@ router.get('/configstrategy/req/:strategy', auth, (req, res) => {
     } catch (e) {
         responseException(res, e, 500)
     }
+})
+
+router.get('/configstrategy/spec/strategies', auth, (req, res) => {
+    res.send({
+        strategiesAvailable: Object.values(StrategiesType)
+    })
 })
 
 router.delete('/configstrategy/:id', auth, async (req, res) => {
