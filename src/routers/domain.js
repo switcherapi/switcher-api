@@ -17,6 +17,7 @@ router.get('/domain/generateApiKey/:domain/', auth, async (req, res) => {
         }
 
         domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
+        domain.updatedBy = req.admin.email
 
         const apiKey = await domain.generateApiKey();
         
@@ -88,7 +89,7 @@ router.get('/domain/:id', auth, async (req, res) => {
     }
 })
 
-// GET /domain/ID?sortBy=createdAt:desc
+// GET /domain/ID?sortBy=date:desc
 // GET /domain/ID?limit=10&skip=20
 // GET /domain/ID
 router.get('/domain/history/:id', auth, async (req, res) => {
@@ -96,7 +97,7 @@ router.get('/domain/history/:id', auth, async (req, res) => {
 
     if (req.query.sortBy) {
         const parts = req.query.sortBy.split(':')
-        sort[`${parts[0]}.${parts[1]}`] = parts[2] === 'desc' ? -1 : 1
+        sort[`${parts[0]}`] = parts[1] === 'desc' ? -1 : 1
     }
 
     try {
@@ -107,7 +108,7 @@ router.get('/domain/history/:id', auth, async (req, res) => {
         }
         await domain.populate({
             path: 'history',
-            select: 'oldValue newValue -_id',
+            select: 'oldValue newValue updatedBy date -_id',
             options: {
                 limit: parseInt(req.query.limit),
                 skip: parseInt(req.query.skip),
@@ -152,7 +153,8 @@ router.patch('/domain/:id', auth,
         }
 
         domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
-
+        domain.updatedBy = req.admin.email
+        
         req.updates.forEach((update) => domain[update] = req.body[update])
         await domain.save()
         res.send(domain)
@@ -170,6 +172,7 @@ router.patch('/domain/updateStatus/:id', auth, async (req, res) => {
         }
 
         domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
+        domain.updatedBy = req.admin.email
 
         const updates = await checkEnvironmentStatusChange(req, res, req.params.id)
 
@@ -190,7 +193,8 @@ router.patch('/domain/removeStatus/:id', auth, async (req, res) => {
         }
 
         domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
-
+        domain.updatedBy = req.admin.email
+        
         res.send(await removeDomainStatus(domain, req.body.env))
     } catch (e) {
         responseException(res, e, 400)

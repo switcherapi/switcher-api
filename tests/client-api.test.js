@@ -20,29 +20,34 @@ import {
     component1
 } from './fixtures/db_client';
 import { EnvType } from '../src/models/environment';
+import { adminMasterAccountId } from './fixtures/db_api';
 
 const changeStrategy = async (strategyId, newOperation, status, environment) => {
     const strategy = await ConfigStrategy.findById(strategyId)
     strategy.operation = newOperation ? newOperation : strategy.operation
     strategy.activated.set(environment, status !== undefined ? status : strategy.activated.get(environment))
+    strategy.updatedBy = adminMasterAccountId
     await strategy.save()
 }
 
 const changeConfigStatus = async (configId, status, environment) => {
     const config = await Config.findById(configId)
     config.activated.set(environment, status !== undefined ? status : config.activated.get(environment))
+    config.updatedBy = adminMasterAccountId
     await config.save()
 }
 
 const changeGroupConfigStatus = async (groupConfigId, status, environment) => {
     const groupConfig = await GroupConfig.findById(groupConfigId)
     groupConfig.activated.set(environment, status !== undefined ? status : groupConfig.activated.get(environment))
+    groupConfig.updatedBy = adminMasterAccountId
     await groupConfig.save()
 }
 
 const changeDomainStatus = async (domainId, status, environment) => {
     const domain = await Domain.findById(domainId)
     domain.activated.set(environment, status !== undefined ? status : domain.activated.get(environment))
+    domain.updatedBy = adminMasterAccountId
     await domain.save()
 }
 

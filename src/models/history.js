@@ -14,6 +14,14 @@ const historySchema = new mongoose.Schema({
     newValue: {
         type: Map,
         required: true
+    },
+    updatedBy: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: Date,
+        required: true
     }
 })
 
@@ -22,9 +30,7 @@ historySchema.options.toJSON = {
     virtuals: true,
     minimize: false,
     transform: function (doc, ret, options) {
-        ret.oldValue.updatedAt = moment(ret.oldValue.updatedAt).format('YYYY-MM-DD HH:mm:ss')
-        ret.newValue.updatedAt = moment(ret.newValue.updatedAt).format('YYYY-MM-DD HH:mm:ss')
-        ret.date = moment(ret.newValue.updatedAt).format('YYYY-MM-DD HH:mm:ss')
+        ret.date = moment(ret.date).format('YYYY-MM-DD HH:mm:ss')
         if (!ret.id) {
             delete ret.id
         }

@@ -527,6 +527,72 @@ describe('Testing component association', () => {
         expect(config.components.includes(responseComponent.body._id)).toBe(true)
     })
 
+    test('CONFIG_SUITE - Should associate multiple components to a config', async () => {
+        const responseComponent1 = await request(app)
+            .post('/component/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'NewComponent1',
+                description: 'Description of my component 1',
+                domain: domainId
+            }).expect(201)
+
+        const responseComponent2 = await request(app)
+            .post('/component/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'NewComponent2',
+                description: 'Description of my component 2',
+                domain: domainId
+            }).expect(201)
+
+        await request(app)
+            .patch('/config/updateComponents/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                components: [
+                    responseComponent1.body._id,
+                    responseComponent2.body._id
+                ]
+            }).expect(200)
+
+        // DB validation - document updated
+        const config = await Config.findById(configId1)
+        expect(config.components.length >= 2).toBe(true)
+    })
+
+    test('CONFIG_SUITE - Should NOT associate multiple components to a config - One does not exist', async () => {
+        const responseComponent1 = await request(app)
+            .post('/component/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'LonelyComponent',
+                description: 'Description of my component',
+                domain: domainId
+            }).expect(201)
+
+        const responseUpdate = await request(app)
+            .patch('/config/updateComponents/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                components: [
+                    responseComponent1.body._id,
+                    new mongoose.Types.ObjectId()
+                ]
+            }).expect(404)
+
+        expect(responseUpdate.body.error).toEqual('One or more component was not found');
+    })
+
+    test('CONFIG_SUITE - Should NOT associate multiple components to a config - Wrong Config Id', async () => {
+        await request(app)
+            .patch('/config/updateComponents/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                components: [ new mongoose.Types.ObjectId() ]
+            }).expect(404)
+    })
+
     test('CONFIG_SUITE - Should NOT associate component to a config - Component not found', async () => {
         const response = await request(app)
             .patch('/config/addComponent/' + configId1)

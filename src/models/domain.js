@@ -31,6 +31,9 @@ const domainSchema = new mongoose.Schema({
         required: true,
         ref: 'Admin'
     },
+    updatedBy: {
+        type: String
+    },
     apihash: {
         type: String,
         required: true,

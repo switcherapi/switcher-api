@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import Component from '../models/component';
 import GroupConfig from '../models/group-config';
 import Config from '../models/config';
@@ -100,7 +101,7 @@ router.get('/config/:id', auth, async (req, res) => {
     }
 })
 
-// GET /config/ID?sortBy=createdAt:desc
+// GET /config/ID?sortBy=date:desc
 // GET /config/ID?limit=10&skip=20
 // GET /config/ID
 router.get('/config/history/:id', auth, async (req, res) => {
@@ -108,7 +109,7 @@ router.get('/config/history/:id', auth, async (req, res) => {
 
     if (req.query.sortBy) {
         const parts = req.query.sortBy.split(':')
-        sort[`${parts[0]}.${parts[1]}`] = parts[2] === 'desc' ? -1 : 1
+        sort[`${parts[0]}`] = parts[1] === 'desc' ? -1 : 1
     }
 
     try {
@@ -120,7 +121,7 @@ router.get('/config/history/:id', auth, async (req, res) => {
 
         await config.populate({
             path: 'history',
-            select: 'oldValue newValue -_id',
+            select: 'oldValue newValue updatedBy date -_id',
             options: {
                 limit: parseInt(req.query.limit),
                 skip: parseInt(req.query.skip),
@@ -165,6 +166,7 @@ router.patch('/config/:id', auth,
         }
 
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG)
+        config.updatedBy = req.admin.email
 
         req.updates.forEach((update) => config[update] = req.body[update])
         await config.save()
@@ -183,6 +185,7 @@ router.patch('/config/updateStatus/:id', auth, async (req, res) => {
         }
 
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG)
+        config.updatedBy = req.admin.email
 
         const updates = await checkEnvironmentStatusChange(req, res, config.domain)
         
@@ -203,6 +206,7 @@ router.patch('/config/removeStatus/:id', auth, async (req, res) => {
         }
 
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG)
+        config.updatedBy = req.admin.email
 
         res.send(await removeConfigStatus(config, req.body.env))
     } catch (e) {
@@ -223,6 +227,7 @@ router.patch('/config/addComponent/:id', auth, async (req, res) => {
             return res.status(400).send({ error:  `Component ${component.name} already exists` })
         }
 
+        config.updatedBy = req.admin.email
         config.components.push(component._id)
         await config.save()
         res.send(config)
@@ -240,12 +245,32 @@ router.patch('/config/removeComponent/:id', auth, async (req, res) => {
             return res.status(404).send({ error: `Component not found` })
         }
 
+        config.updatedBy = req.admin.email
         const indexComponent = config.components.indexOf(req.body.component)
         config.components.splice(indexComponent)
         await config.save()
         res.send(config)
     } catch (e) {
         responseException(res, e, 500)
+    }
+})
+
+router.patch('/config/updateComponents/:id', auth, async (req, res) => {
+    try {
+        const config = await verifyAddComponentInput(req.params.id, req.admin)
+        const componentIds = req.body.components.map(component => mongoose.Types.ObjectId(component))
+        const components = await Component.find({ _id: { $in: componentIds } })
+
+        if (components.length != req.body.components.length) {
+            return res.status(404).send({ error: `One or more component was not found` })
+        }
+
+        config.updatedBy = req.admin.email
+        config.components = componentIds
+        await config.save()
+        res.send(config)
+    } catch (e) {
+        responseException(res, e, 400)
     }
 })
 

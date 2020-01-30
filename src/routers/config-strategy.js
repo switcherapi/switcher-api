@@ -111,7 +111,7 @@ router.get('/configstrategy/:id', auth, async (req, res) => {
     }
 })
 
-// GET /configstrategy/ID?sortBy=createdAt:desc
+// GET /configstrategy/ID?sortBy=date:desc
 // GET /configstrategy/ID?limit=10&skip=20
 // GET /configstrategy/ID
 router.get('/configstrategy/history/:id', auth, async (req, res) => {
@@ -119,7 +119,7 @@ router.get('/configstrategy/history/:id', auth, async (req, res) => {
 
     if (req.query.sortBy) {
         const parts = req.query.sortBy.split(':')
-        sort[`${parts[0]}.${parts[1]}`] = parts[2] === 'desc' ? -1 : 1
+        sort[`${parts[0]}`] = parts[1] === 'desc' ? -1 : 1
     }
 
     try {
@@ -131,7 +131,7 @@ router.get('/configstrategy/history/:id', auth, async (req, res) => {
 
         await configStrategy.populate({
             path: 'history',
-            select: 'oldValue newValue -_id',
+            select: 'oldValue newValue updatedBy date -_id',
             options: {
                 limit: parseInt(req.query.limit),
                 skip: parseInt(req.query.skip),
@@ -191,7 +191,8 @@ router.patch('/configstrategy/:id', auth,
         }
 
         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
-
+        configStrategy.updatedBy = req.admin.email
+        
         req.updates.forEach((update) => configStrategy[update] = req.body[update])
         await configStrategy.save()
         res.send(configStrategy)
@@ -213,6 +214,7 @@ router.patch('/configstrategy/addval/:id', auth,
         }
 
         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
+        configStrategy.updatedBy = req.admin.email
 
         configStrategy.values.push(value)
         await configStrategy.save()
@@ -250,6 +252,7 @@ router.patch('/configstrategy/updateval/:id', auth,
         }
 
         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
+        configStrategy.updatedBy = req.admin.email
 
         configStrategy.values.splice(indexOldValue)
         configStrategy.values.push(newvalue)
@@ -273,6 +276,7 @@ router.patch('/configstrategy/removeval/:id', auth,
         }
 
         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
+        configStrategy.updatedBy = req.admin.email
 
         configStrategy.values.splice(indexValue)
         await configStrategy.save()
@@ -330,7 +334,8 @@ router.patch('/configstrategy/updateStatus/:id', auth, async (req, res) => {
         }
 
         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
-
+        configStrategy.updatedBy = req.admin.email
+        
         configStrategy.activated.set(updates[0], req.body[updates[0]])
         await configStrategy.save()
         res.send(configStrategy)

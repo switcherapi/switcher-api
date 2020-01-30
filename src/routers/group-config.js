@@ -93,7 +93,7 @@ router.get('/groupconfig/:id', auth, async (req, res) => {
     }
 })
 
-// GET /groupconfig/ID?sortBy=createdAt:desc
+// GET /groupconfig/ID?sortBy=date:desc
 // GET /groupconfig/ID?limit=10&skip=20
 // GET /groupconfig/ID
 router.get('/groupconfig/history/:id', auth, async (req, res) => {
@@ -101,7 +101,7 @@ router.get('/groupconfig/history/:id', auth, async (req, res) => {
 
     if (req.query.sortBy) {
         const parts = req.query.sortBy.split(':')
-        sort[`${parts[0]}.${parts[1]}`] = parts[2] === 'desc' ? -1 : 1
+        sort[`${parts[0]}`] = parts[1] === 'desc' ? -1 : 1
     }
 
     try {
@@ -113,7 +113,7 @@ router.get('/groupconfig/history/:id', auth, async (req, res) => {
 
         await groupconfig.populate({
             path: 'history',
-            select: 'oldValue newValue -_id',
+            select: 'oldValue newValue updatedBy date -_id',
             options: {
                 limit: parseInt(req.query.limit),
                 skip: parseInt(req.query.skip),
@@ -152,6 +152,7 @@ router.patch('/groupconfig/:id', auth,
     verifyInputUpdateParameters(['name', 'description']), async (req, res) => {
     try {
         const groupconfig = await verifyGroupInput(req.params.id, req.admin)
+        groupconfig.updatedBy = req.admin.email
 
         req.updates.forEach((update) => groupconfig[update] = req.body[update])
         await groupconfig.save()
@@ -164,6 +165,7 @@ router.patch('/groupconfig/:id', auth,
 router.patch('/groupconfig/updateStatus/:id', auth, async (req, res) => {
     try {
         const groupconfig = await verifyGroupInput(req.params.id, req.admin)
+        groupconfig.updatedBy = req.admin.email
 
         const updates = await checkEnvironmentStatusChange(req, res, groupconfig.domain)
         updates.forEach((update) => groupconfig.activated.set(update, req.body[update]))
@@ -177,6 +179,7 @@ router.patch('/groupconfig/updateStatus/:id', auth, async (req, res) => {
 router.patch('/groupconfig/removeStatus/:id', auth, async (req, res) => {
     try {
         const groupconfig = await verifyGroupInput(req.params.id, req.admin)
+        groupconfig.updatedBy = req.admin.email
 
         res.send(await removeGroupStatus(groupconfig, req.body.env))
     } catch (e) {
