@@ -165,7 +165,7 @@ domainSchema.pre('remove', async function (next) {
 
 async function recordDomainHistory(domain, modifiedField) {
     if (domain.__v !== undefined && modifiedField.length) {
-        const oldDomain = await Domain.findById(domain._id).select(modifiedField);
+        const oldDomain = await Domain.findById(domain._id);
         recordHistory(modifiedField, oldDomain, domain)
     }
 }

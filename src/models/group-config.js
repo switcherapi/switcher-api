@@ -61,7 +61,7 @@ groupConfigSchema.options.toJSON = {
 
 async function recordGroupHistory(group, modifiedField) {
     if (group.__v !== undefined && modifiedField.length) {
-        const oldGroup = await GroupConfig.findById(group._id).select(modifiedField);
+        const oldGroup = await GroupConfig.findById(group._id);
         recordHistory(modifiedField, oldGroup, group)
     }
 }
