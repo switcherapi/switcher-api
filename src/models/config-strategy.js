@@ -205,7 +205,7 @@ function processDate(operation, input, values) {
 
 async function recordStrategyHistory(strategyConfig, modifiedField) {
     if (strategyConfig.__v !== undefined && modifiedField.length) {
-        const oldStrategy = await ConfigStrategy.findById(strategyConfig._id).select(modifiedField);
+        const oldStrategy = await ConfigStrategy.findById(strategyConfig._id);
         recordHistory(modifiedField, oldStrategy, strategyConfig)
     }
 }

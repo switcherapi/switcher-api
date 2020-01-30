@@ -80,7 +80,7 @@ configSchema.options.toJSON = {
 
 async function recordConfigHistory(config, modifiedField) {
     if (config.__v !== undefined && modifiedField.length) {
-        const oldConfig = await Config.findById(config._id).select(modifiedField);
+        const oldConfig = await Config.findById(config._id);
         recordHistory(modifiedField, oldConfig, config)
     }
 }
