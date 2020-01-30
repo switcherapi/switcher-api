@@ -580,7 +580,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/component/?domain=5deac6bc2d61a41fa0a84788",
+					"raw": "{{url}}/component/?domain=5e0ece606f4f994eac9007ae",
 					"host": [
 						"{{url}}"
 					],
@@ -606,7 +606,7 @@
 						},
 						{
 							"key": "domain",
-							"value": "5deac6bc2d61a41fa0a84788"
+							"value": "5e0ece606f4f994eac9007ae"
 						}
 					]
 				}
@@ -1691,7 +1691,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"description\": \"Currency API\"\n}",
+					"raw": "{\n\t\"description\": \"Technology solutions - Test 1\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1699,13 +1699,13 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/domain/5e080381fcd19802c002eed7",
+					"raw": "{{url}}/domain/5e0ece606f4f994eac9007ae",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"domain",
-						"5e080381fcd19802c002eed7"
+						"5e0ece606f4f994eac9007ae"
 					]
 				}
 			},
@@ -1837,6 +1837,45 @@
 						{
 							"key": "skip",
 							"value": "2",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Domain - Read Hsitory",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/domain/history/5e0ece606f4f994eac9007ae?sortBy=oldValue:updatedAt:desc&limit=5",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"domain",
+						"history",
+						"5e0ece606f4f994eac9007ae"
+					],
+					"query": [
+						{
+							"key": "sortBy",
+							"value": "oldValue:updatedAt:desc"
+						},
+						{
+							"key": "sortBy",
+							"value": "newValue:updatedAt:desc",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "5"
+						},
+						{
+							"key": "skip",
+							"value": "100",
 							"disabled": true
 						}
 					]
@@ -2306,6 +2345,41 @@
 			"response": []
 		},
 		{
+			"name": "Config - Update Components",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"components\": [\n\t\t\"5e0ecf7d6f4f994eac9007b6\",\n\t\t\"5e30f18d8db9c44460d22771\"\n\t]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/config/updateComponents/5e0eceb66f4f994eac9007b2",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"config",
+						"updateComponents",
+						"5e0eceb66f4f994eac9007b2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Config - Remove Component",
 			"request": {
 				"method": "PATCH",
@@ -2384,24 +2458,18 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/config/5df166619194d613400a52ec",
+					"raw": "{{url}}/config/5e0eceb66f4f994eac9007b2?resolveComponents=true",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"config",
-						"5df166619194d613400a52ec"
+						"5e0eceb66f4f994eac9007b2"
 					],
 					"query": [
 						{
-							"key": "key",
-							"value": "5dd06217fd3f1e403806db30",
-							"disabled": true
-						},
-						{
-							"key": "skip",
-							"value": "2",
-							"disabled": true
+							"key": "resolveComponents",
+							"value": "true"
 						}
 					]
 				}
@@ -2820,6 +2888,26 @@
 						"configstrategy",
 						"req",
 						"TIME_VALIDATION"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigStrategy - Read Strategies",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/configstrategy/spec/strategies/",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"spec",
+						"strategies",
+						""
 					]
 				}
 			},

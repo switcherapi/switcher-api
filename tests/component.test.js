@@ -166,46 +166,6 @@ describe('Updating tests', () => {
         expect(component.description).toBe('Wow, this is my updated description')
     })
 
-    test('COMPONENT_SUITE - Should NOT update a Component - Invalid field', async () => {
-        let response = await request(app)
-            .post('/component/create')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                name: 'my-web-app-to-not-be-updated',
-                description: 'This is my Web App using this wonderful API',
-                domain: domainId
-            }).expect(201)
-
-        // DB validation - document created
-        let component = await Component.findById(response.body._id)
-        expect(component.name).toBe('my-web-app-to-not-be-updated')
-
-        response = await request(app)
-            .patch('/component/' + response.body._id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                name: 'CANNOT_UPDATE'
-            }).expect(400)
-    })
-
-    test('COMPONENT_SUITE - Should NOT update a Component - Description too short', async () => {
-        const response = await request(app)
-            .post('/component/create')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                name: 'Component Name Here',
-                description: 'This is my Web App using this wonderful API',
-                domain: domainId
-            }).expect(201)
-
-        await request(app)
-            .patch('/component/' + response.body._id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                description: 'Hi'
-            }).expect(422)
-    })
-
     test('COMPONENT_SUITE - Should NOT update a Component - Invalid Component Id/Not found', async () => {
         await request(app)
             .post('/component/create')

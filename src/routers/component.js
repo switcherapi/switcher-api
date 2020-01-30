@@ -77,9 +77,7 @@ router.get('/component/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/component/:id', [
-    check('description').isLength({ min: 5, max: 500 })
-], auth, verifyInputUpdateParameters(['description']), async (req, res) => {
+router.patch('/component/:id', auth, verifyInputUpdateParameters(['name', 'description']), async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
