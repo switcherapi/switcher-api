@@ -122,7 +122,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"email\": \"mail@mail.com\",\n\t\"password\": \"123123123\"\n}",
+					"raw": "{\r\n\t\"email\": \"mail@mail.com\",\r\n\t\"password\": \"123123123\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -676,9 +676,7 @@
 					"script": {
 						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
-							"if (pm.response.code === 201) {",
-							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
-							"}"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -819,13 +817,19 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/team/5e0bf0bab2ced93fb0b9111a",
+					"raw": "{{url}}/team/5e10eda73a649463a8ef3751?resolveMembers=true",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"team",
-						"5e0bf0bab2ced93fb0b9111a"
+						"5e10eda73a649463a8ef3751"
+					],
+					"query": [
+						{
+							"key": "resolveMembers",
+							"value": "true"
+						}
 					]
 				}
 			},
@@ -951,7 +955,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"member\": \"5e0bbe0d9ad3100658ae2228\"\n}",
+					"raw": "{\n\t\"member\": \"5e35d5820cceed52b012ef26\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -959,7 +963,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/team/member/add/5e0bf0bab2ced93fb0b9111a",
+					"raw": "{{url}}/team/member/add/5e35d60f0cceed52b012ef28",
 					"host": [
 						"{{url}}"
 					],
@@ -967,7 +971,7 @@
 						"team",
 						"member",
 						"add",
-						"5e0bf0bab2ced93fb0b9111a"
+						"5e35d60f0cceed52b012ef28"
 					],
 					"query": [
 						{
@@ -1058,7 +1062,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"role\": \"5e0bf449a5753d65c0794af3\"\n}",
+					"raw": "{\n\t\"role\": \"5e35cb6bd5027a30749ecd28\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1066,7 +1070,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/team/role/add/5e0bf0bab2ced93fb0b9111a",
+					"raw": "{{url}}/team/role/add/5e35d60f0cceed52b012ef28",
 					"host": [
 						"{{url}}"
 					],
@@ -1074,7 +1078,7 @@
 						"team",
 						"role",
 						"add",
-						"5e0bf0bab2ced93fb0b9111a"
+						"5e35d60f0cceed52b012ef28"
 					],
 					"query": [
 						{
@@ -1095,9 +1099,7 @@
 					"script": {
 						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
-							"if (pm.response.code === 201) {",
-							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
-							"}"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -1152,9 +1154,7 @@
 					"script": {
 						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
-							"if (pm.response.code === 201) {",
-							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
-							"}"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -1172,7 +1172,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"action\": \"SELECT\",\n\t\"router\": \"CONFIG\"\n}",
+					"raw": "{\n\t\"action\": \"READ\",\n\t\"router\": \"SWITCHER\",\n\t\"identifiedBy\": \"key\",\n\t\"values\": [\"TEST\", \"TEST2\"]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1180,13 +1180,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/role/create",
+					"raw": "{{url}}/role/create/5e35d60f0cceed52b012ef28",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"role",
-						"create"
+						"create",
+						"5e35d60f0cceed52b012ef28"
 					]
 				}
 			},
@@ -1248,9 +1249,7 @@
 					"script": {
 						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
-							"if (pm.response.code === 201) {",
-							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
-							"}"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -1279,7 +1278,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/role/?team=5e0bf0bab2ced93fb0b9111a",
+					"raw": "{{url}}/role/?team=5e10eda73a649463a8ef3751",
 					"host": [
 						"{{url}}"
 					],
@@ -1290,7 +1289,7 @@
 					"query": [
 						{
 							"key": "team",
-							"value": "5e0bf0bab2ced93fb0b9111a"
+							"value": "5e10eda73a649463a8ef3751"
 						}
 					]
 				}
@@ -1305,9 +1304,7 @@
 					"script": {
 						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
-							"if (pm.response.code === 201) {",
-							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
-							"}"
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -1343,6 +1340,155 @@
 					"path": [
 						"role",
 						"5e0bf449a5753d65c0794af3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Role - Read Routers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/role/routers",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"role",
+						"routers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Role - Read Actions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/role/actions",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"role",
+						"actions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Role - Read Keys By Router",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/role/spec/router/STRATEGY",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"role",
+						"spec",
+						"router",
+						"STRATEGY"
 					]
 				}
 			},

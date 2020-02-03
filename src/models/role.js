@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 export const ActionTypes = Object.freeze({
+    ALL: 'ALL',
     CREATE: 'CREATE',
     READ: 'READ',
     UPDATE: 'UPDATE',
@@ -12,7 +13,7 @@ export const RouterTypes = Object.freeze({
     ADMIN: 'ADMIN',
     DOMAIN: 'DOMAIN',
     GROUP: 'GROUP',
-    CONFIG: 'CONFIG',
+    CONFIG: 'SWITCHER',
     STRATEGY: 'STRATEGY',
     COMPONENT: 'COMPONENT',
     ENVIRONMENT: 'ENVIRONMENT'
@@ -24,6 +25,41 @@ export const KeyTypes = Object.freeze({
     KEY: 'key',
     ID: 'id'
 });
+
+const RouterKeySpec = [
+    {
+        router: RouterTypes.DOMAIN,
+        key: KeyTypes.NAME
+    },
+    {
+        router: RouterTypes.GROUP,
+        key: KeyTypes.NAME
+    },
+    {
+        router: RouterTypes.CONFIG,
+        key: KeyTypes.KEY
+    },
+    {
+        router: RouterTypes.STRATEGY,
+        key: KeyTypes.STRATEGY
+    }
+];
+
+export function getKeysByRouter(router, res) {
+    const foundRouterSpec = Object.values(RouterKeySpec).find(routerSpec => routerSpec.router === router)
+
+    if (!foundRouterSpec) {
+        return res.status(404)
+            .send({
+                error: `Router '${router}' not found`,
+                tip: `You might want one of these: ${Object.values(RouterTypes)}`
+        })
+    }
+
+    return {
+        key: foundRouterSpec.key
+    }
+}
 
 const roleSchema = new mongoose.Schema({
     action: {

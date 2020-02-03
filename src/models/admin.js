@@ -125,11 +125,11 @@ adminSchema.pre('save', async function (next) {
 adminSchema.pre('remove', async function (next) {
     var ObjectId = (require('mongoose').Types.ObjectId);
 
-    const admin = this
-    const domain = await Domain.find({ owner: new ObjectId(admin._id) })
+    const admin = this;
+    const domains = await Domain.find({ owner: new ObjectId(admin._id) })
 
-    if (domain) {
-        domain.forEach(async (d) => await d.remove())
+    if (domains) {
+        domains.forEach(async (domain) => await domain.remove())
     }
 
     next()

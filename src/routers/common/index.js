@@ -46,7 +46,7 @@ export async function removeConfigStatus(config, environmentName) {
     }
 }
 
-// Deprecated since strategies should contain only one environment configured
+// Deprecated since strategies should contain only one configured environment
 // export async function removeConfigStrategyStatus(configStrategy, environmentName) {
 //     try {
 //         await checkEnvironmentStatusRemoval(configStrategy.domain, environmentName, true)
@@ -97,12 +97,9 @@ export async function verifyOwnership(admin, element, domainId, action, routerTy
 async function verifyRoles(team, element, action, routerType) {
     const role = await Role.findOne({
         _id: { $in: team.roles }, 
-        action,
+        action: { $in: [action, ActionTypes.ALL] },
         active: true,
-        $or: [ 
-            { router: routerType }, 
-            { router: RouterTypes.ALL } 
-        ] 
+        router: { $in: [routerType, RouterTypes.ALL] }
     });
 
     if (role) {

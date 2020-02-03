@@ -42,14 +42,6 @@ export const domainDocument = {
     owner: adminMasterAccountId
 }
 
-export const team1Id = new mongoose.Types.ObjectId()
-export const team1 = {
-    _id: team1Id,
-    domain: domainId,
-    name: 'Team 1',
-    active: true
-}
-
 export const role1Id = new mongoose.Types.ObjectId()
 export const role1 = {
     _id: role1Id,
@@ -150,6 +142,15 @@ export const team = {
     name: 'Team',
     active: true,
     roles: [roleAll1Id, roleAll2Id, roleAll3Id, roleAll4Id]
+}
+
+export const team1Id = new mongoose.Types.ObjectId()
+export const team1 = {
+    _id: team1Id,
+    domain: domainId,
+    name: 'Team 1',
+    active: true,
+    roles: [role1Id]
 }
 
 export const setupDatabase = async () => {

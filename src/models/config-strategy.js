@@ -3,6 +3,7 @@ import History from './history';
 import { recordHistory } from './common/index';
 import moment from 'moment';
 import IPCIDR from 'ip-cidr';
+import { NotFoundError } from '../routers/common';
 
 export const StrategiesType = Object.freeze({
     NETWORK: 'NETWORK_VALIDATION',
@@ -93,15 +94,11 @@ export function validateStrategyValue(strategy, value) {
     return true
 }
 
-export function strategyRequirements(strategy, res) {
+export function strategyRequirements(strategy) {
     const foundStrategy = Object.values(StrategiesType).find(element => element === strategy)
 
     if (!foundStrategy) {
-        return res.status(404)
-            .send({
-                error: `Strategy '${strategy}' not found`,
-                tip: `You might want one of these: ${Object.values(StrategiesType)}`
-        })
+        throw new NotFoundError(`Strategy '${strategy}' not found. Please, try using: ${Object.values(StrategiesType)}`)
     }
 
     const operationsAvailable = StrategyRequirementDefinition.find(element => element.strategy === foundStrategy)

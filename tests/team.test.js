@@ -12,7 +12,8 @@ import {
     role1Id,
     team1,
     role1,
-    adminMasterAccountId
+    adminMasterAccountId,
+    adminMasterAccount
  } from './fixtures/db_api';
 
 afterAll(async () => { 
@@ -38,6 +39,15 @@ describe('Insertion tests', () => {
 
         // Response validation
         expect(response.body.name).toBe('My Team')
+
+        //Should NOT create team with same name
+        await request(app)
+            .post('/team/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'My Team',
+                domain: domainId
+            }).expect(400)
     })
 
     test('TEAM_SUITE - Should create a new Team - With default read and create permission', async () => {
@@ -106,7 +116,7 @@ describe('Reading tests', () => {
             .post('/team/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                name: 'My Team',
+                name: 'My Team - Reading Tests',
                 domain: domainId
             }).expect(201)
 
@@ -119,7 +129,8 @@ describe('Reading tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
-        expect(response.body[0].name).toBe('My Team')
+        const teamFound = response.body.map(team => team.name)
+        expect(teamFound.includes('My Team - Reading Tests')).toEqual(true)
     })
 
     test('TEAM_SUITE - Should NOT read all Teams from a Domain - Invalid domain Id', async () => {
@@ -131,11 +142,11 @@ describe('Reading tests', () => {
 
     test('TEAM_SUITE - Should read one single Team', async () => {
         const response = await request(app)
-            .get('/team/' + teamId)
+            .get('/team/' + teamId + '?resolveMembers=true')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
-        expect(response.body.name).toBe('My Team')
+        expect(response.body.name).toBe('My Team - Reading Tests')
     })
 
     test('TEAM_SUITE - Should NOT read Team - Not found', async () => {
@@ -273,6 +284,56 @@ describe('Updating team members tests', () => {
         expect(admin.teams[0]).toEqual(team1._id)
     })
 
+    test('TEAM_SUITE - Should invite an user', async () => {
+        await request(app)
+            .patch('/team/member/invite/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                email: adminMasterAccount.email
+            }).expect(200)
+
+        // DB validation
+        let admin = await Admin.findById(adminMasterAccountId)
+        expect(admin.teams.includes(team1._id)).toEqual(true)
+
+        // Should NOT invite, already added
+        await request(app)
+            .patch('/team/member/invite/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                email: adminMasterAccount.email
+            }).expect(400)
+
+        await request(app)
+            .patch('/team/member/remove/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                member: adminMasterAccountId
+            }).expect(200)
+
+        // DB validation
+        admin = await Admin.findById(adminMasterAccountId)
+        expect(admin.teams.includes(team1._id)).toEqual(false)
+    })
+
+    test('TEAM_SUITE - Should NOT invite an user - Not found', async () => {
+        await request(app)
+            .patch('/team/member/invite/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                email: 'random.email@email.com'
+            }).expect(404)
+    })
+
+    test('TEAM_SUITE - Should NOT invite an user - Invalid Team ID', async () => {
+        await request(app)
+            .patch('/team/member/invite/INVALID_ID')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                email: adminMasterAccount.email
+            }).expect(400)
+    })
+
     test('TEAM_SUITE - Should NOT add a team member - Team not found', async () => {
         await request(app)
             .patch('/team/member/add/' + new mongoose.Types.ObjectId())
@@ -375,64 +436,6 @@ describe('Updating team members tests', () => {
 
 describe('Updating team roles tests', () => {
     beforeAll(setupDatabase)
-
-    test('TEAM_SUITE - Should add a new role', async () => {
-        await request(app)
-            .patch('/team/role/add/' + team1Id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                role: role1Id
-            }).expect(200)
-
-        // DB validation
-        const team = await Team.findById(team1Id)
-        expect(team.roles[0]).toEqual(role1._id)
-    })
-
-    test('TEAM_SUITE - Should NOT add a new role - Team not found', async () => {
-        await request(app)
-            .patch('/team/role/add/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                role: role1Id
-            }).expect(404)
-    })
-
-    test('TEAM_SUITE - Should NOT add a new role - Invalid Team Id', async () => {
-        await request(app)
-            .patch('/team/role/add/INVALID_ID')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                role: role1Id
-            }).expect(400)
-    })
-
-    test('TEAM_SUITE - Should NOT add a new role - Invalid parameter', async () => {
-        await request(app)
-            .patch('/team/role/add/' + team1Id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                member: role1Id
-            }).expect(400)
-    })
-
-    test('TEAM_SUITE - Should NOT add a new role - Role not found', async () => {
-        await request(app)
-            .patch('/team/role/add/' + team1Id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                role: new mongoose.Types.ObjectId()
-            }).expect(404)
-    })
-
-    test('TEAM_SUITE - Should NOT add a new role - Role already added', async () => {
-        await request(app)
-            .patch('/team/role/add/' + team1Id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                role: role1Id
-            }).expect(400)
-    })
 
     test('TEAM_SUITE - Should NOT remove a role - Team not found', async () => {
         await request(app)
