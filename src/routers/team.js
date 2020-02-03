@@ -80,6 +80,11 @@ router.get('/team', auth, async (req, res) => {
 router.get('/team/:id', auth, async (req, res) => {
     try {
         const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.READ)
+
+        if (req.query.resolveMembers) {
+            await team.populate({ path: 'members_list' }).execPopulate()
+        }
+
         res.send(team)
     } catch (e) {
         responseException(res, e, 400)
@@ -107,6 +112,32 @@ router.delete('/team/:id', auth, async (req, res) => {
     }
 })
 
+router.patch('/team/member/invite/:id', auth, verifyInputUpdateParameters(['email']), async (req, res) => {
+    try {
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
+
+        const email = req.body.email.trim()
+        const admin = await Admin.findOne({ email });
+
+        if (!admin) {
+            return res.status(404).send({ error: 'User not found' })
+        }
+
+        if (admin.teams.includes(team._id)) {
+            return res.status(400).send({ error: `User '${admin.name}' already joined in '${team.name}'` })
+        }
+
+        //TODO: Temporary add to the team. Must add to a list to add late
+        team.members.push(admin._id)
+        admin.teams.push(team._id)
+        await team.save()
+        await admin.save()
+        res.send(admin)
+    } catch (e) {
+        responseException(res, e, 400)
+    }
+})
+
 router.patch('/team/member/add/:id', auth, verifyInputUpdateParameters(['member']), async (req, res) => {
     try {
         const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
@@ -115,14 +146,16 @@ router.patch('/team/member/add/:id', auth, verifyInputUpdateParameters(['member'
         const admin = await Admin.findById(member);
 
         if (!admin) {
-            return res.status(404).send({ error: 'Member not found' })
+            return res.status(404).send({ error: 'User not found' })
         }
 
         if (admin.teams.includes(team._id)) {
-            return res.status(400).send({ error: `Member '${admin.name}' already joined in '${team.name}'` })
+            return res.status(400).send({ error: `User '${admin.name}' already joined in '${team.name}'` })
         }
 
-        admin.teams.push(team._id);
+        team.members.push(admin._id)
+        admin.teams.push(team._id)
+        await team.save()
         await admin.save()
         res.send(admin)
     } catch (e) {
@@ -141,37 +174,18 @@ router.patch('/team/member/remove/:id', auth, verifyInputUpdateParameters(['memb
             return res.status(404).send({ error: 'Member not found' })
         }
 
-        const indexTeam = admin.teams.indexOf(team._id)
-
+        let indexTeam = admin.teams.indexOf(team._id)
         if (indexTeam < 0) {
             return res.status(404).send({ error: `Member '${admin.name}' does not belong to '${team.name}'` })
         }
 
         admin.teams.splice(indexTeam)
+        indexTeam = team.members.indexOf(team._id)
+        team.members.splice(indexTeam)
+
+        await team.save()
         await admin.save()
         res.send(admin)
-    } catch (e) {
-        responseException(res, e, 400)
-    }
-})
-
-router.patch('/team/role/add/:id', auth, verifyInputUpdateParameters(['role']), async (req, res) => {
-    try {
-        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
-
-        const role = await Role.findById(req.body.role)
-        
-        if (!role) {
-            return res.status(404).send({ error: 'Role not found' })
-        }
-        
-        if (team.roles.includes(role._id)) {
-            return res.status(400).send({ error: `Role '${role._id}' already exist` })
-        }
-
-        team.roles.push(role._id)
-        await team.save()
-        res.send(team)
     } catch (e) {
         responseException(res, e, 400)
     }
@@ -180,7 +194,6 @@ router.patch('/team/role/add/:id', auth, verifyInputUpdateParameters(['role']), 
 router.patch('/team/role/remove/:id', auth, verifyInputUpdateParameters(['role']), async (req, res) => {
     try {
         const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
-
         const role = await Role.findById(req.body.role.trim())
         
         if (!role) {
@@ -188,10 +201,6 @@ router.patch('/team/role/remove/:id', auth, verifyInputUpdateParameters(['role']
         }
 
         const indexRoles = team.roles.indexOf(role._id)
-
-        if (indexRoles < 0) {
-            return res.status(404).send({ error: `Role '${role._id}' does not exist` })
-        }
 
         await Role.deleteOne({ _id: req.body.role });
         team.roles.splice(indexRoles)

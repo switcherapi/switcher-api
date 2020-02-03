@@ -549,13 +549,22 @@ describe('Testing update strategies #1', () => {
             .send().expect(500)
     })
 
+    test('STRATEGY_SUITE - Should return a specific strategy requirements', async () => {
+        let response = await request(app)
+            .get('/configstrategy/req/' + StrategiesType.NETWORK)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200)
+
+        expect(response.body.strategy).toEqual(StrategiesType.NETWORK)
+    })
+
     test('STRATEGY_SUITE - Should NOT return a specific strategy requirements', async () => {
         let response = await request(app)
-            .get('/configstrategy/req/NON_EXISTENT_VALIDATION')
+            .get('/configstrategy/req/WHO_AM_I_VALIDATION')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
         
-        expect(response.body.error).toEqual('Strategy \'NON_EXISTENT_VALIDATION\' not found')
+        expect(response.body.error).toEqual(`Strategy 'WHO_AM_I_VALIDATION' not found. Please, try using: ${Object.values(StrategiesType)}`)
     })
 
     test('STRATEGY_SUITE - Should return a list of strategies available', async () => {

@@ -178,4 +178,4 @@ domainSchema.pre('save', async function (next) {
 
 const Domain = mongoose.model('Domain', domainSchema)
 
-module.exports = Domain
+export default Domain;

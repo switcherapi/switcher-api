@@ -151,8 +151,9 @@ router.get('/configstrategy/history/:id', auth, async (req, res) => {
 
 router.get('/configstrategy/req/:strategy', auth, (req, res) => {
     try {
-        const result = strategyRequirements(req.params.strategy, res)
-        res.send(result)
+        const result = strategyRequirements(req.params.strategy)
+        if (result.strategy)
+            res.send(result)
     } catch (e) {
         responseException(res, e, 500)
     }

@@ -2,12 +2,13 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import app from '../src/app';
 import { Team } from '../src/models/team';
-import { Role, ActionTypes, RouterTypes } from '../src/models/role';
+import { Role, ActionTypes, RouterTypes, KeyTypes } from '../src/models/role';
 import { 
     setupDatabase,
     adminMasterAccountToken,
     team1Id,
-    role1Id
+    role1Id,
+    team1
  } from './fixtures/db_api';
 
 afterAll(async () => { 
@@ -20,7 +21,7 @@ describe('Insertion tests', () => {
 
     test('ROLE_SUITE - Should create a new Role', async () => {
         const response = await request(app)
-            .post('/role/create')
+            .post('/role/create/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 action: ActionTypes.READ,
@@ -37,11 +38,21 @@ describe('Insertion tests', () => {
 
     test('ROLE_SUITE - Should NOT create a new Role - Missing required parameter', async () => {
         await request(app)
-            .post('/role/create')
+            .post('/role/create/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 action: ActionTypes.READ
             }).expect(400)
+    })
+
+    test('ROLE_SUITE - Should NOT create a new Role - Team not found', async () => {
+        await request(app)
+            .post('/role/create/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                action: ActionTypes.READ,
+                router: RouterTypes.STRATEGY
+            }).expect(404)
     })
 })
 
@@ -51,7 +62,7 @@ describe('Reading tests', () => {
 
     beforeAll(async () => {
         const response = await request(app)
-            .post('/role/create')
+            .post('/role/create/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 action: ActionTypes.DELETE,
@@ -62,19 +73,13 @@ describe('Reading tests', () => {
     })
 
     test('ROLE_SUITE - Should read all Roles from a Team', async () => {
-        await request(app)
-            .patch('/team/role/add/' + team1Id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                role: roleId
-            }).expect(200)
-
         const response = await request(app)
             .get('/role?team=' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
-        expect(response.body[0].action).toBe(ActionTypes.DELETE)
+        const foundRole = response.body.filter(role => role.action === ActionTypes.DELETE)
+        expect(foundRole[0].action).toBe(ActionTypes.DELETE)
     })
 
     test('ROLE_SUITE - Should NOT read all Roles from a Domain - Invalid team Id', async () => {
@@ -120,6 +125,41 @@ describe('Reading tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404)
     })
+
+    test('ROLE_SUITE - Should get all available routers', async () => {
+        const response = await request(app)
+            .get('/role/routers')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200)
+
+        expect(response.body.routersAvailable).toEqual(Object.values(RouterTypes))
+    })
+
+    test('ROLE_SUITE - Should get the router specification that contain its key', async () => {
+        const response = await request(app)
+            .get('/role/spec/router/' + RouterTypes.DOMAIN)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200)
+
+        expect(response.body.key).toEqual(KeyTypes.NAME)
+    })
+
+    test('ROLE_SUITE - Should NOT get the router specification', async () => {
+        await request(app)
+            .get('/role/spec/router/' + RouterTypes.ADMIN)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404)
+    })
+
+    test('ROLE_SUITE - Should get all available actions', async () => {
+        const response = await request(app)
+            .get('/role/actions')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200)
+
+        expect(response.body.actionsAvailable).toEqual(Object.values(ActionTypes))
+    })
+    
 })
 
 describe('Updating tests', () => {
@@ -171,19 +211,12 @@ describe('Deletion tests', () => {
 
     test('ROLE_SUITE - Should delete a Role', async () => {
         let response = await request(app)
-            .post('/role/create')
+            .post('/role/create/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 action: ActionTypes.READ,
                 router: RouterTypes.GROUP
             }).expect(201)
-
-        await request(app)
-            .patch('/team/role/add/' + team1Id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                role: response.body._id
-            }).expect(200)
 
         // DB validation
         let team = await Team.findById(team1Id)
@@ -233,6 +266,31 @@ describe('Updating role values tests', () => {
         expect(role.values[0]).toEqual('NEW VALUE')
     })
 
+    test('ROLE_SUITE - Should update values from a role', async () => {
+        await request(app)
+            .patch('/role/updateValues/' + role1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                values: ['NEW VALUE 1', 'OLD VALUE']
+            }).expect(200)
+
+        // DB validation
+        let role = await Role.findById(role1Id)
+        expect(role.values.includes('NEW VALUE 1')).toEqual(true)
+        expect(role.values.includes('OLD VALUE')).toEqual(true)
+
+        await request(app)
+            .patch('/role/updateValues/' + role1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                values: ['NEW VALUE']
+            }).expect(200)
+
+        role = await Role.findById(role1Id)
+        expect(role.values.includes('NEW VALUE')).toEqual(true)
+        expect(role.values.includes('OLD VALUE')).toEqual(false)
+    })
+
     test('ROLE_SUITE - Should NOT add a value - Role not found', async () => {
         await request(app)
             .patch('/role/value/add/' + new mongoose.Types.ObjectId())
@@ -273,6 +331,24 @@ describe('Updating role values tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 values: ['NEW']
+            }).expect(400)
+    })
+
+    test('ROLE_SUITE - Should NOT update values from a role - Invalid ID', async () => {
+        await request(app)
+            .patch('/role/updateValues/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                values: ['NEW VALUE 1', 'OLD VALUE']
+            }).expect(404)
+    })
+
+    test('ROLE_SUITE - Should NOT update values from a role - Wrong ID', async () => {
+        await request(app)
+            .patch('/role/updateValues/INVALID_ID')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                values: ['NEW VALUE 1', 'OLD VALUE']
             }).expect(400)
     })
     

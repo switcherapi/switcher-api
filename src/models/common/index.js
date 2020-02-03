@@ -6,7 +6,7 @@ export async function recordHistory(modifiedField, oldDocument, newDocument) {
 
     modifiedField.forEach(field => {
         if (!ignoredFields.includes(field) && !field.startsWith('activated.')) {
-            oldValues.set(field, oldDocument[`${field}`]);
+            oldValues.set(field, extractValue(oldDocument[`${field}`]));
         }
     });
 
@@ -16,7 +16,7 @@ export async function recordHistory(modifiedField, oldDocument, newDocument) {
             if (JSON.stringify(oldValues.get(field)) === JSON.stringify(newDocument[`${field}`])) {
                 oldValues.delete(field);
             } else {
-                newValues.set(field, newDocument[`${field}`]);
+                newValues.set(field, extractValue(newDocument[`${field}`]));
             }
         }
     });
@@ -32,4 +32,14 @@ export async function recordHistory(modifiedField, oldDocument, newDocument) {
     if (newValues.size > 0 && process.env.HISTORY_ACTIVATED === 'true') {
         await history.save();
     }
+}
+
+function extractValue(element) {
+    if (Array.isArray(element)) {
+        return element.map(val => {
+            return val.name ? val.name : val.key ? val.key : val;
+        });
+    }
+
+    return element;
 }
