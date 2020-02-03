@@ -19,6 +19,21 @@ async function verifyRequestedTeam(teamId, admin, action) {
     return await verifyOwnership(admin, team, team.domain, action, RouterTypes.ADMIN);
 }
 
+async function addMemberToTeam(admin, team) {
+    if (!admin) {
+        throw new NotFoundError('User not found')
+    }
+
+    if (admin.teams.includes(team._id)) {
+        throw new Error(`User '${admin.name}' already joined in '${team.name}'`)
+    }
+
+    team.members.push(admin._id)
+    admin.teams.push(team._id)
+    await team.save()
+    await admin.save()
+}
+
 router.post('/team/create', auth, [
     check('name').isLength({ min: 2, max: 50 })
 ], async (req, res) => {
@@ -119,19 +134,8 @@ router.patch('/team/member/invite/:id', auth, verifyInputUpdateParameters(['emai
         const email = req.body.email.trim()
         const admin = await Admin.findOne({ email });
 
-        if (!admin) {
-            return res.status(404).send({ error: 'User not found' })
-        }
-
-        if (admin.teams.includes(team._id)) {
-            return res.status(400).send({ error: `User '${admin.name}' already joined in '${team.name}'` })
-        }
-
-        //TODO: Temporary add to the team. Must add to a list to add late
-        team.members.push(admin._id)
-        admin.teams.push(team._id)
-        await team.save()
-        await admin.save()
+        // TODO: Create invitation document
+        await addMemberToTeam(admin, team)
         res.send(admin)
     } catch (e) {
         responseException(res, e, 400)
@@ -145,18 +149,7 @@ router.patch('/team/member/add/:id', auth, verifyInputUpdateParameters(['member'
         const member = req.body.member.trim()
         const admin = await Admin.findById(member);
 
-        if (!admin) {
-            return res.status(404).send({ error: 'User not found' })
-        }
-
-        if (admin.teams.includes(team._id)) {
-            return res.status(400).send({ error: `User '${admin.name}' already joined in '${team.name}'` })
-        }
-
-        team.members.push(admin._id)
-        admin.teams.push(team._id)
-        await team.save()
-        await admin.save()
+        await addMemberToTeam(admin, team)
         res.send(admin)
     } catch (e) {
         responseException(res, e, 400)

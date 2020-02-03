@@ -62,7 +62,7 @@ router.get('/role/routers', auth, (req, res) => {
 
 router.get('/role/spec/router/:router', auth, (req, res) => {
     try {
-        const result = getKeysByRouter(req.params.router, res)
+        const result = getKeysByRouter(req.params.router)
         res.send(result)
     } catch (e) {
         responseException(res, e, 500)
