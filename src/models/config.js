@@ -69,6 +69,10 @@ configSchema.options.toJSON = {
             ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
             ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
         }
+
+        if (!ret.id) {
+            delete ret.id
+        }
         
         if (ret.component_list) {
             ret.components = ret.component_list

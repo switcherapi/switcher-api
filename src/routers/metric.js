@@ -3,8 +3,56 @@ import { Metric } from '../models/metric';
 import { check, validationResult } from 'express-validator';
 import { auth } from '../middleware/auth';
 import { EnvType } from '../models/environment';
+import Config from '../models/config';
+import { groupCount, groupByDate, verifyOwnership, responseException } from './common/index';
+import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router();
+
+function getStatistics(metrics, dateGroupPattern) {
+    const results = metrics.filter(metric => metric.result)
+
+    const reasonsFromMetrics = metrics.map(metric => metric.reason);
+    const reasonsGrouped = groupCount(reasonsFromMetrics, 'reason');
+
+    const switcherFromMetrics = metrics.map(metric => metric.config.key);
+    const switchersGrouped = groupCount(switcherFromMetrics, 'switcher');
+
+    const componentsFromMetrics = metrics.map(metric => metric.component);
+    const componentsGrouped = groupCount(componentsFromMetrics, 'component');
+
+    switchersGrouped.forEach(switcher => {
+        const switcherMetrics = metrics.filter(metric => metric.config.key === switcher.switcher);
+        const positiveMetrics = switcherMetrics.filter(switcherM => switcherM.result);
+        
+        switcher.positive = positiveMetrics.length;
+        switcher.negative = switcherMetrics.length - positiveMetrics.length;
+
+        //Date Pattern: YYYY-MM-DD HH:mm
+        if (dateGroupPattern) {
+            const switchersByDateTimeMetrics = groupByDate(metrics, ['config', 'key'], switcher.switcher, dateGroupPattern);
+            switcher.dateTimeStatistics = switchersByDateTimeMetrics;
+        }
+    });
+
+    componentsGrouped.forEach(component => {
+        const componentMetrics = metrics.filter(metric => metric.component === component.component);
+        const positiveMetrics = componentMetrics.filter(componentM => componentM.result);
+        component.positive = positiveMetrics.length;
+        component.negative = componentMetrics.length - positiveMetrics.length;
+    });
+    
+    return {
+        total: metrics.length,
+        positive: results.length,
+        negative: metrics.length - results.length,
+        date_from: metrics.length ? metrics[0].date : undefined,
+        date_to: metrics.length ? metrics[metrics.length - 1].date : undefined,
+        reasons: reasonsGrouped,
+        switchers: switchersGrouped,
+        components: componentsGrouped
+    }
+}
 
 // GET /metric/ID??key=&component=&result=&group=&dateBefore=&dateAfter=
 // GET /metric/ID?sortBy=-date;key;component;result
@@ -17,8 +65,17 @@ router.get('/metric/:id', [check('id').isMongoId()], auth, async (req, res) => {
     }
 
     const args = {}
+    let dateGroupPattern = 'YYYY-MM'
 
-    if (req.query.key) { args.key = req.query.key }
+    if (req.query.key) { 
+        const config = await Config.findOne({ key: req.query.key })
+        if (config) {
+            args.config = config._id
+            dateGroupPattern = req.query.dateGroupPattern ? req.query.dateGroupPattern : dateGroupPattern;
+        } else {
+            return res.send()
+        }
+    }
     if (req.query.group) { args.group = req.query.group }
     if (req.query.environment) { args.environment = req.query.environment }
     else { args.environment = EnvType.DEFAULT }
@@ -36,14 +93,34 @@ router.get('/metric/:id', [check('id').isMongoId()], auth, async (req, res) => {
 
     try {
         const metrics = await Metric.find({ domain: req.params.id, ...args }, 
-            'key component entry result reason group environment date -_id', {
+            'config component entry result reason group environment date -_id', {
                 skip: parseInt(req.query.skip),
                 limit: parseInt(req.query.limit),
-            }).sort(req.query.sortBy ? req.query.sortBy.replace(';', ' ') : 'date');
+            }).sort(req.query.sortBy ? req.query.sortBy.replace(';', ' ') : 'date')
+            .populate({ path: 'config', select: 'key -_id' }).exec();
 
-        res.send(metrics)
+        res.send({
+            statistics: getStatistics(metrics, dateGroupPattern),
+            data: metrics
+        })
     } catch (e) {
-        res.status(500).send();
+        responseException(res, e, 500);
+    }
+})
+
+router.delete('/metric/:id', auth, async (req, res) => {
+    try {
+        let config = await Config.findById(req.params.id)
+        if (!config) {
+            return res.status(404).send()
+        }
+
+        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG)
+
+        await Metric.deleteMany({ config: config._id })
+        res.send({ message: 'Switcher metrics deleted' });
+    } catch (e) {
+        responseException(res, e, 500);
     }
 })
 
