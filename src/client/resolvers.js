@@ -130,7 +130,7 @@ async function checkConfigStrategies (configId, strategyFilter) {
 }
 
 export async function resolveCriteria(config, context, strategyFilter) {
-    context.key = config.key
+    context.config_id = config._id
     const environment = context.environment
     
     const group = await checkGroup(config._id)

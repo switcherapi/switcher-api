@@ -122,7 +122,7 @@ Once token expires, a new one can be generate using: **{{url}}/admin/refresh/me*
 ```json
 {
   "name": "Project New Feature",
-  "description": "This project will rocket investments found",
+  "description": "My new Project features",
   "domain": "5df166239194d613400a52e7"
 }
 ```

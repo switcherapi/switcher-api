@@ -5,7 +5,8 @@ import app from '../src/app';
 import {
     setupDatabase,
     adminMasterAccountToken,
-    domainId
+    domainId,
+    configId1
 } from './fixtures/db_metrics';
 
 afterAll(async () => { 
@@ -41,9 +42,9 @@ describe('Fetch metrics', () => {
             .send().expect(200)
             
         // Response validation
-        expect(response.body).not.toBeNull()
-        response.body.forEach(e => {
-            expect(e.key).toEqual('KEY_2')
+        expect(response.body.data).not.toBeNull()
+        response.body.data.forEach(e => {
+            expect(e.config.key).toEqual('KEY_2')
         })
     })
 
@@ -55,9 +56,9 @@ describe('Fetch metrics', () => {
             .send().expect(200)
             
         // Response validation
-        expect(response.body).not.toBeNull()
-        response.body.forEach(e => {
-            expect(e.key).toEqual('KEY_2')
+        expect(response.body.data).not.toBeNull()
+        response.body.data.forEach(e => {
+            expect(e.config.key).toEqual('KEY_2')
         })
     })
 
@@ -69,7 +70,7 @@ describe('Fetch metrics', () => {
             .send().expect(200)
             
         // Response validation
-        expect(response.body).toEqual([])
+        expect(response.body).toEqual({})
     })
 
     test('METRIC_SUITE - Should fetch records by COMPONENT', async () => {
@@ -80,8 +81,8 @@ describe('Fetch metrics', () => {
             .send().expect(200)
             
         // Response validation
-        expect(response.body).not.toBeNull()
-        response.body.forEach(e => {
+        expect(response.body.data).not.toBeNull()
+        response.body.data.forEach(e => {
             expect(e.component).toEqual('Component 1')
         })
     })
@@ -94,8 +95,8 @@ describe('Fetch metrics', () => {
             .send().expect(200)
             
         // Response validation
-        expect(response.body).not.toBeNull()
-        response.body.forEach(e => {
+        expect(response.body.data).not.toBeNull()
+        response.body.data.forEach(e => {
             expect(e.result).toEqual(true)
         })
     })
@@ -108,8 +109,8 @@ describe('Fetch metrics', () => {
             .send().expect(200)
             
         // Response validation
-        expect(response.body).not.toBeNull()
-        response.body.forEach(e => {
+        expect(response.body.data).not.toBeNull()
+        response.body.data.forEach(e => {
             expect(e.group).toEqual('GROUP 1')
         })
     })
@@ -122,8 +123,8 @@ describe('Fetch metrics', () => {
             .send().expect(200)
             
         // Response validation
-        expect(response.body).not.toBeNull()
-        response.body.forEach(e => {
+        expect(response.body.data).not.toBeNull()
+        response.body.data.forEach(e => {
             expect(moment(e.date).isSameOrAfter('2019-12-14 17:30:00')).toEqual(true)
         })
     })
@@ -136,8 +137,8 @@ describe('Fetch metrics', () => {
             .send().expect(200)
             
         // Response validation
-        expect(response.body).not.toBeNull()
-        response.body.forEach(e => {
+        expect(response.body.data).not.toBeNull()
+        response.body.data.forEach(e => {
             expect(moment(e.date).isSameOrBefore('2019-12-14 17:30:00')).toEqual(true)
         })
     })
@@ -150,8 +151,8 @@ describe('Fetch metrics', () => {
             .send().expect(200)
 
         // Response validation
-        expect(response.body).not.toBeNull()
-        response.body.forEach(e => {
+        expect(response.body.data).not.toBeNull()
+        response.body.data.forEach(e => {
             expect(moment(e.date).isSameOrBefore('2019-12-14 17:00:00')).toEqual(true)
         })
     })
@@ -164,9 +165,9 @@ describe('Fetch metrics', () => {
             .send().expect(200)
             
         // Response validation
-        expect(response.body).not.toBeNull()
-        response.body.forEach(e => {
-            expect(response.body.length).toEqual(1)
+        expect(response.body.data).not.toBeNull()
+        response.body.data.forEach(e => {
+            expect(response.body.data.length).toEqual(1)
         })
     })
 
@@ -177,8 +178,8 @@ describe('Fetch metrics', () => {
             .send().expect(200)
 
         // Response validation
-        expect(responseCount.body).not.toBeNull()
-        const count = responseCount.body.length
+        expect(responseCount.body.data).not.toBeNull()
+        const count = responseCount.body.data.length
 
         const args = `?skip=1`
         const response = await request(app)
@@ -187,10 +188,56 @@ describe('Fetch metrics', () => {
             .send().expect(200)
             
         // Response validation
-        expect(response.body).not.toBeNull()
-        response.body.forEach(e => {
-            expect(response.body.length).toEqual(count-1)
+        expect(response.body.data).not.toBeNull()
+        response.body.data.forEach(e => {
+            expect(response.body.data.length).toEqual(count-1)
         })
+    })
+
+})
+
+describe('Delete metrics', () => {
+    beforeAll(setupDatabase)
+
+    test('METRIC_SUITE - Should NOT delete metrics - Not found ID', async () => {
+        await request(app)
+            .delete('/metric/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404)
+    })
+
+    test('METRIC_SUITE - Should NOT delete metrics - Invalid ID', async () => {
+        await request(app)
+            .delete('/metric/INVALID_ID')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(500)
+    })
+
+    test('METRIC_SUITE - Should delete metrics', async () => {
+        const args = `?key=KEY_1`
+        let response = await request(app)
+            .get('/metric/' + domainId + args)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200)
+            
+        // Response validation
+        expect(response.body.data).not.toBeNull()
+        response.body.data.forEach(e => {
+            expect(e.config.key).toEqual('KEY_1')
+        })
+
+        await request(app)
+            .delete('/metric/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200)
+
+        response = await request(app)
+            .get('/metric/' + domainId + args)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200)
+            
+        // Response validation
+        expect(response.body.data).toEqual([])
     })
 
 })

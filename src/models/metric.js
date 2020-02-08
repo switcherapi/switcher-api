@@ -2,9 +2,10 @@ import mongoose from 'mongoose';
 import moment from 'moment';
 
 const metricSchema = new mongoose.Schema({
-    key: {
-        type: String,
-        required: true
+    config: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Config'
     },
     component: {
         type: String
@@ -56,7 +57,7 @@ metricSchema.options.toJSON = {
 
 export function addMetrics(context, response) {
     const metric = new Metric({
-        key: context.key,
+        config: context.config_id,
         component: context.component,
         entry: context.entry,
         result: response.result,
