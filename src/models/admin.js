@@ -29,7 +29,8 @@ const adminSchema = new mongoose.Schema({
         default: true
     },
     teams: [{
-        type: mongoose.Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Team'
     }],
     token: {
         type: String
@@ -62,6 +63,12 @@ adminSchema.virtual('configStrategy', {
     foreignField: 'owner'
 })
 
+adminSchema.virtual('team_list', {
+    ref: 'Team',
+    localField: 'teams',
+    foreignField: '_id'
+})
+
 adminSchema.options.toJSON = {
     getters: true,
     virtuals: true,
@@ -71,6 +78,12 @@ adminSchema.options.toJSON = {
             ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
             ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
         }
+
+        if (ret.team_list) {
+            ret.teams = ret.team_list
+            delete ret.team_list
+        }
+
         delete ret.password
         delete ret.token
         return ret

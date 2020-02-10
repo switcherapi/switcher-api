@@ -81,7 +81,7 @@ router.get('/domain/:id', auth, async (req, res) => {
             return res.status(404).send()
         }
 
-        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN)
+        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN, true)
         
         res.send(domain)
     } catch (e) {

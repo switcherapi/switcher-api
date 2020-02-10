@@ -197,6 +197,94 @@
 			"response": []
 		},
 		{
+			"name": "Admin - Read Collab",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d588267a-effd-4e44-a189-c4366083197f",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/admin/collaboration",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"collaboration"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - Read Permission",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d588267a-effd-4e44-a189-c4366083197f",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"domain\": \"5e0ece606f4f994eac9007ae\",\n\t\"action\": [\"READ\", \"UPDATE\"],\n\t\"router\": \"GROUP\",\n\t\"element\": {\n\t\t\"name\": \"Project 2\"\n\t}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/admin/collaboration/permission",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"collaboration",
+						"permission"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Admin - Read Single",
 			"event": [
 				{
@@ -1739,14 +1827,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/domain/generateApiKey/5e080381fcd19802c002eed7",
+					"raw": "{{url}}/domain/generateApiKey/5e0ece606f4f994eac9007ae",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"domain",
 						"generateApiKey",
-						"5e080381fcd19802c002eed7"
+						"5e0ece606f4f994eac9007ae"
 					]
 				}
 			},
@@ -3143,23 +3231,22 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/metric/5df166239194d613400a52e7",
+					"raw": "{{url}}/metric/5e0ece606f4f994eac9007ae?key=FEATURE2020",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"metric",
-						"5df166239194d613400a52e7"
+						"5e0ece606f4f994eac9007ae"
 					],
 					"query": [
 						{
 							"key": "key",
-							"value": "FF2FOR2030",
-							"disabled": true
+							"value": "FEATURE2020"
 						},
 						{
 							"key": "component",
-							"value": "Windows",
+							"value": "Android",
 							"disabled": true
 						},
 						{
@@ -3202,7 +3289,30 @@
 							"key": "skip",
 							"value": "9",
 							"disabled": true
+						},
+						{
+							"key": "dateGroupPattern",
+							"value": "YYYY-MM-DD HH:mm",
+							"disabled": true
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Metrics - Delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/metric/5e0eced36f4f994eac9007b4",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"metric",
+						"5e0eced36f4f994eac9007b4"
 					]
 				}
 			},
@@ -3320,7 +3430,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/criteria?showReason=true&showStrategy=true&key=FF2FOR2020",
+					"raw": "{{url}}/criteria?showReason=true&showStrategy=true&key=FEATURE2020",
 					"host": [
 						"{{url}}"
 					],
@@ -3343,7 +3453,7 @@
 						},
 						{
 							"key": "key",
-							"value": "FF2FOR2020"
+							"value": "FEATURE2020"
 						}
 					]
 				}

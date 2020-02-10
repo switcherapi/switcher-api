@@ -104,11 +104,7 @@ async function verifyRoles(team, element, action, routerType) {
     });
 
     if (role) {
-        if (action === ActionTypes.READ) {
-            return verifyIdentifiers(role, element);
-        } else {
-            return element;
-        }
+        return verifyIdentifiers(role, element);
     } else {
         throw new PermissionError(`Role not found for this operation: '${action}' - '${routerType}'`);
     }
@@ -131,7 +127,7 @@ async function verifyRolesCascade(team, element, action, routerType) {
             { router: RouterTypes.STRATEGY },
             { router: RouterTypes.ALL }
         ]
-    } else if (routerType === RouterTypes.CONFIG) {
+    } else if (routerType === RouterTypes.CONFIG || routerType === RouterTypes.STRATEGY) {
         orStatement = [
             { router: routerType },
             { router: RouterTypes.STRATEGY },
@@ -139,15 +135,17 @@ async function verifyRolesCascade(team, element, action, routerType) {
         ]
     }
 
-    const foundRole = await Role.findOne({
+    const foundRole = await Role.find({
         _id: { $in: team.roles }, 
-        action,
+        action: { $in: [action, ActionTypes.ALL] },
         active: true,
-        identifiedBy: undefined,
         $or: orStatement
     });
 
-    if (foundRole) {
+    const matchedRole = foundRole.filter(value => value.router === routerType);
+    if (matchedRole.length) {
+        return verifyIdentifiers(matchedRole[0], element);
+    } else if (foundRole[0]) {
         return element;
     }
 }
@@ -157,7 +155,7 @@ function verifyIdentifiers(role, element) {
         if (Array.isArray(element)) {
             if (role.values.length) {
                 element = element.filter(child => role.values.includes(child[`${role.identifiedBy}`]));
-                if (element) {
+                if (element.length) {
                     return element;
                 }
             }

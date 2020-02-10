@@ -8,7 +8,10 @@ import {
     adminMasterAccountId, 
     adminMasterAccount, 
     adminAccountId, 
-    adminAccount
+    adminAccount,
+    teamId,
+    domainId,
+    team1Id
 } from './fixtures/db_api';
 
 afterAll(async () => {
@@ -404,7 +407,7 @@ describe('Testing Admin login and fetch', () => {
     })
 })
 
-describe('Testing Domain logout', () => {
+describe('Testing Admin logout', () => {
     beforeAll(setupDatabase)
 
     test('ADMIN_SUITE - Should delete/me account for admin', async () => {
@@ -437,5 +440,94 @@ describe('Testing Domain logout', () => {
 
         // const configStrategy = await ConfigStrategy.find({ owner: adminMasterAccountId })
         // expect(configStrategy).toEqual([])
+    })
+})
+
+
+describe('Testing Admin collaboration endpoint', () => {
+    beforeAll(setupDatabase)
+
+    test('ADMIN_SUITE - Should read domains in which a user is collaborating', async () => {
+        const responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminMasterAccount.email,
+                password: adminMasterAccount.password
+            }).expect(200)
+
+        await request(app)
+            .patch('/team/member/add/' + teamId)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send({
+                member: adminMasterAccountId
+            }).expect(200)
+            
+        let response = await request(app)
+            .get('/admin/collaboration')
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send()
+            .expect(200)
+
+        expect(response.body.length).toEqual(1);
+
+        await request(app)
+            .patch('/team/member/remove/' + teamId)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send({
+                member: adminMasterAccountId
+            }).expect(200)
+
+        response = await request(app)
+            .get('/admin/collaboration')
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send()
+            .expect(200)
+
+        expect(response.body.length).toEqual(0);
+    })
+
+    test('ADMIN_SUITE - Should read credentials from an user', async () => {
+        let responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminMasterAccount.email,
+                password: adminMasterAccount.password
+            }).expect(200)
+
+        await request(app)
+            .patch('/team/member/add/' + team1Id)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send({
+                member: adminAccountId
+            }).expect(200)
+
+        responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminAccount.email,
+                password: adminAccount.password
+            }).expect(200)
+
+        const response = await request(app)
+            .post('/admin/collaboration/permission')
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send({
+                domain: domainId,
+                action: ['READ', 'UPDATE', 'CREATE'],
+                router: 'GROUP',
+                element: {
+                    name: 'Optional Group Name Here'
+                }
+            })
+            .expect(200)
+
+        expect(response.body.length > 0).toEqual(true);
+
+        const read = response.body.filter(credential => credential.action === 'READ');
+        expect(read[0].result).toEqual('ok');
+        const update = response.body.filter(credential => credential.action === 'UPDATE');
+        expect(update[0].result).toEqual('nok');
+        const create = response.body.filter(credential => credential.action === 'CREATE');
+        expect(create[0].result).toEqual('nok');
     })
 })

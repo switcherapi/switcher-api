@@ -174,7 +174,7 @@ router.patch('/team/member/remove/:id', auth, verifyInputUpdateParameters(['memb
 
         admin.teams.splice(indexTeam)
         indexTeam = team.members.indexOf(team._id)
-        team.members.splice(indexTeam)
+        team.members.splice(indexTeam, 1)
 
         await team.save()
         await admin.save()
@@ -196,7 +196,7 @@ router.patch('/team/role/remove/:id', auth, verifyInputUpdateParameters(['role']
         const indexRoles = team.roles.indexOf(role._id)
 
         await Role.deleteOne({ _id: req.body.role });
-        team.roles.splice(indexRoles)
+        team.roles.splice(indexRoles, 1)
         await team.save()
         res.send(team)
     } catch (e) {
