@@ -78,7 +78,7 @@ router.get("/environment", auth, async (req, res) => {
                 }
             })
 
-        environments = await verifyOwnership(req.admin, environments, req.query.domain, ActionTypes.READ, RouterTypes.ENVIRONMENT)
+        // environments = await verifyOwnership(req.admin, environments, req.query.domain, ActionTypes.READ, RouterTypes.ENVIRONMENT)
 
         res.send(environments)
     } catch (e) {
@@ -94,7 +94,7 @@ router.get('/environment/:id', auth, async (req, res) => {
             return res.status(404).send()
         }
 
-        environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.READ, RouterTypes.ENVIRONMENT)
+        // environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.READ, RouterTypes.ENVIRONMENT)
 
         res.send(environment)
     } catch (e) {

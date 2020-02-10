@@ -87,7 +87,7 @@ router.get('/configstrategy', auth, async (req, res) => {
         let configStrategies = config.configStrategy.filter(
             elements => elements.activated.get(req.query.env ? req.query.env : EnvType.DEFAULT) != undefined);
 
-        configStrategies = await verifyOwnership(req.admin, configStrategies, config.domain, ActionTypes.READ, RouterTypes.STRATEGY)
+        configStrategies = await verifyOwnership(req.admin, configStrategies, config.domain, ActionTypes.READ, RouterTypes.STRATEGY, true)
 
         res.send(configStrategies)
     } catch (e) {
@@ -255,7 +255,7 @@ router.patch('/configstrategy/updateval/:id', auth,
         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
         configStrategy.updatedBy = req.admin.email
 
-        configStrategy.values.splice(indexOldValue)
+        configStrategy.values.splice(indexOldValue, 1)
         configStrategy.values.push(newvalue)
         await configStrategy.save()
         res.send(configStrategy)
@@ -279,7 +279,7 @@ router.patch('/configstrategy/removeval/:id', auth,
         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
         configStrategy.updatedBy = req.admin.email
 
-        configStrategy.values.splice(indexValue)
+        configStrategy.values.splice(indexValue, 1)
         await configStrategy.save()
         res.send(configStrategy)
     } catch (e) {

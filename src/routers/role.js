@@ -143,8 +143,8 @@ router.delete('/role/:id', auth, async (req, res) => {
 
         const teams = await Team.find({ roles: role._id })
         teams.forEach(team => {
-            const indexValue = team.roles.indexOf(team._id)
-            team.roles.splice(indexValue)
+            const indexValue = team.roles.indexOf(role._id)
+            team.roles.splice(indexValue, 1)
             team.save()
         })
         
@@ -185,7 +185,7 @@ router.patch('/role/value/remove/:id', auth, verifyInputUpdateParameters(['value
             return res.status(404).send({ error: `Value '${value}' does not exist` })
         }
 
-        role.values.splice(indexValue)
+        role.values.splice(indexValue, 1)
         await role.save()
         res.send(role)
     } catch (e) {

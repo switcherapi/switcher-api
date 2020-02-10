@@ -65,7 +65,7 @@ componentSchema.pre('remove', async function (next) {
     const configsToRemoveFrom = await Config.find({ components: { $in: [component._id] } });
     configsToRemoveFrom.forEach(config => {
         const indexValue = config.components.indexOf(component._id);
-        config.components.splice(indexValue);
+        config.components.splice(indexValue, 1);
         config.save();
     })
 

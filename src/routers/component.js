@@ -53,7 +53,7 @@ router.get('/component', auth, async (req, res) => {
                 }
             })
 
-        components = await verifyOwnership(req.admin, components, req.query.domain, ActionTypes.READ, RouterTypes.COMPONENT);
+        // components = await verifyOwnership(req.admin, components, req.query.domain, ActionTypes.READ, RouterTypes.COMPONENT);
 
         res.send(components)
     } catch (e) {
@@ -69,7 +69,7 @@ router.get('/component/:id', auth, async (req, res) => {
             return res.status(404).send()
         }
 
-        component = await verifyOwnership(req.admin, component, component.domain, ActionTypes.READ, RouterTypes.COMPONENT);
+        // component = await verifyOwnership(req.admin, component, component.domain, ActionTypes.READ, RouterTypes.COMPONENT);
 
         res.send(component)
     } catch (e) {

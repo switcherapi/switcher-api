@@ -72,7 +72,7 @@ router.get('/config', auth, async (req, res) => {
 
         let configs = groupConfig.config
 
-        configs = await verifyOwnership(req.admin, configs, groupConfig.domain, ActionTypes.READ, RouterTypes.CONFIG)
+        configs = await verifyOwnership(req.admin, configs, groupConfig.domain, ActionTypes.READ, RouterTypes.CONFIG, true)
 
         res.send(configs)
     } catch (e) {
@@ -89,7 +89,7 @@ router.get('/config/:id', auth, async (req, res) => {
             return res.status(404).send()
         }
 
-        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG)
+        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG, true)
 
         if (req.query.resolveComponents) {
             await config.populate({ path: 'component_list' }).execPopulate()
@@ -247,7 +247,7 @@ router.patch('/config/removeComponent/:id', auth, async (req, res) => {
 
         config.updatedBy = req.admin.email
         const indexComponent = config.components.indexOf(req.body.component)
-        config.components.splice(indexComponent)
+        config.components.splice(indexComponent, 1)
         await config.save()
         res.send(config)
     } catch (e) {

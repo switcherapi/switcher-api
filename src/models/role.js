@@ -24,7 +24,8 @@ export const KeyTypes = Object.freeze({
     STRATEGY: 'strategy',
     NAME: 'name',
     KEY: 'key',
-    ID: 'id'
+    ID: 'id',
+    EMPTY: ''
 });
 
 const RouterKeySpec = [

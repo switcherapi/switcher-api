@@ -3,7 +3,8 @@ import Admin from '../models/admin';
 import { auth, authRefreshToken } from '../middleware/auth';
 import { verifyInputUpdateParameters } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
-import { responseException } from './common';
+import { responseException, verifyOwnership } from './common';
+import { Team } from '../models/team';
 
 const router = new express.Router()
 
@@ -58,7 +59,41 @@ router.post('/admin/refresh/me', authRefreshToken, async (req, res) => {
 })
 
 router.get('/admin/me', auth, async (req, res) => {
+    await req.admin.populate({ path: 'team_list' }).execPopulate()
     res.send(req.admin)
+})
+
+router.post('/admin/collaboration/permission', auth, async (req, res) => {
+    const element = {
+        _id: req.body.element.id,
+        name: req.body.element.name,
+        key: req.body.element.key,
+        strategy: req.body.element.strategy
+    }
+
+    let result = [];
+    for (let index = 0; index < req.body.action.length; index++) {
+        try {
+            await verifyOwnership(req.admin, element, req.body.domain, req.body.action[index], req.body.router)
+            result.push({
+                action: req.body.action[index],
+                result: 'ok'
+            })
+        } catch (e) {
+            result.push({
+                action : req.body.action[index],
+                result: 'nok'
+            })
+        }
+    }
+    
+    res.send(result)
+})
+
+router.get('/admin/collaboration', auth, async (req, res) => {
+    await req.admin.populate({ path: 'team_list' }).execPopulate()
+    const domains = req.admin.team_list.map(adm => adm.domain.toString())
+    res.send(Array.from(new Set(domains)))
 })
 
 router.get('/admin/:id', auth, async (req, res) => {

@@ -84,7 +84,7 @@ teamSchema.pre('remove', async function (next) {
     const membersToRemve = await Admin.find({ teams: team._id });
     membersToRemve.forEach(member => {
         const indexValue = member.teams.indexOf(team._id);
-        member.teams.splice(indexValue);
+        member.teams.splice(indexValue, 1);
         member.save();
     })
 

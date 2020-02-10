@@ -69,7 +69,7 @@ router.get('/groupconfig', auth, async (req, res) => {
 
         let groups = domain.groupConfig;
 
-        groups = await verifyOwnership(req.admin, groups, domain._id, ActionTypes.READ, RouterTypes.GROUP)
+        groups = await verifyOwnership(req.admin, groups, domain._id, ActionTypes.READ, RouterTypes.GROUP, true)
 
         res.send(groups)
     } catch (e) {
