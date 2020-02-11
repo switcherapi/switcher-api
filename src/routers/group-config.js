@@ -121,9 +121,9 @@ router.get('/groupconfig/history/:id', auth, async (req, res) => {
             }
         }).execPopulate()
 
-        let history = groupconfig.history;
+        const history = groupconfig.history;
 
-        history = await verifyOwnership(req.admin, history, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP)
+        await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP)
 
         res.send(history)
     } catch (e) {

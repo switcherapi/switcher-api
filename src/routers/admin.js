@@ -4,7 +4,6 @@ import { auth, authRefreshToken } from '../middleware/auth';
 import { verifyInputUpdateParameters } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
 import { responseException, verifyOwnership } from './common';
-import { Team } from '../models/team';
 
 const router = new express.Router()
 
