@@ -116,9 +116,9 @@ router.get('/domain/history/:id', auth, async (req, res) => {
             }
         }).execPopulate()
 
-        let history = domain.history;
+        const history = domain.history;
 
-        history = await verifyOwnership(req.admin, history, domain._id, ActionTypes.READ, RouterTypes.DOMAIN)
+        await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN)
 
         res.send(history)
     } catch (e) {

@@ -139,9 +139,9 @@ router.get('/configstrategy/history/:id', auth, async (req, res) => {
             }
         }).execPopulate()
 
-        let history = configStrategy.history;
+        const history = configStrategy.history;
 
-        history = await verifyOwnership(req.admin, history, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY)
+        await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY)
 
         res.send(history)
     } catch (e) {
