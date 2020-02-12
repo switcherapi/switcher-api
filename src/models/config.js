@@ -98,8 +98,12 @@ configSchema.virtual('configStrategy', {
 
 configSchema.pre('remove', async function (next) {
     const config = this
-    await ConfigStrategy.deleteMany({ config: config._id })
-
+    
+    const strategy = await ConfigStrategy.find({ config: config._id })
+    if (strategy) {
+        strategy.forEach(async (s) => await s.remove())
+    }
+    
     const history = await History.find({ elementId: config._id })
     if (history) {
         history.forEach((h) => h.remove())

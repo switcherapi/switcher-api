@@ -1,5 +1,6 @@
 import express from 'express';
 import Config from '../models/config';
+import History from '../models/history';
 import { Environment, EnvType } from '../models/environment';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { ConfigStrategy, strategyRequirements, StrategiesType } from '../models/config-strategy';
@@ -123,7 +124,7 @@ router.get('/configstrategy/history/:id', auth, async (req, res) => {
     }
 
     try {
-        const configStrategy = await ConfigStrategy.findOne({ _id: req.params.id })
+        const configStrategy = await ConfigStrategy.findById(req.params.id)
 
         if (!configStrategy) {
             return res.status(404).send()
@@ -144,6 +145,24 @@ router.get('/configstrategy/history/:id', auth, async (req, res) => {
         await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY)
 
         res.send(history)
+    } catch (e) {
+        responseException(res, e, 500)
+    }
+})
+
+router.delete('/configstrategy/history/:id', auth, async (req, res) => {
+    try {
+        const configStrategy = await ConfigStrategy.findById(req.params.id)
+
+        if (!configStrategy) {
+            return res.status(404).send()
+        }
+
+        await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.DELETE, RouterTypes.ADMIN)
+
+        await History.deleteMany({ elementId: configStrategy._id })
+
+        res.send(configStrategy)
     } catch (e) {
         responseException(res, e, 500)
     }

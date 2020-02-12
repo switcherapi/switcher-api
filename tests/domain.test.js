@@ -351,6 +351,31 @@ describe('Testing update Domain info', () => {
             .send().expect(404)
     })
 
+    test('DOMAIN_SUITE - Should NOT delete history by invalid Domain Id', async () => {
+        await request(app)
+            .delete('/domain/history/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404)
+
+        await request(app)
+            .delete('/domain/history/INVALID_ID_VALUE')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(500)
+    })
+
+    test('DOMAIN_SUITE - Should delete history from a Domain element', async () => {
+        let history = await History.find({ elementId: domainId })
+        expect(history.length > 0).toEqual(true)
+
+        await request(app)
+            .delete('/domain/history/' + domainId)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200)
+
+        history = await History.find({ elementId: domainId })
+        expect(history.length > 0).toEqual(false)
+    })
+
     test('DOMAIN_SUITE - Should record changes on history collection', async () => {
         let response = await request(app)
             .post('/domain/create')

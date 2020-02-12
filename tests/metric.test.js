@@ -6,7 +6,8 @@ import {
     setupDatabase,
     adminMasterAccountToken,
     domainId,
-    configId1
+    configId1,
+    config1Document
 } from './fixtures/db_metrics';
 
 afterAll(async () => { 
@@ -199,18 +200,11 @@ describe('Fetch metrics', () => {
 describe('Delete metrics', () => {
     beforeAll(setupDatabase)
 
-    test('METRIC_SUITE - Should NOT delete metrics - Not found ID', async () => {
-        await request(app)
-            .delete('/metric/' + new mongoose.Types.ObjectId())
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
-    })
-
     test('METRIC_SUITE - Should NOT delete metrics - Invalid ID', async () => {
         await request(app)
             .delete('/metric/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500)
+            .send().expect(404)
     })
 
     test('METRIC_SUITE - Should delete metrics', async () => {
@@ -227,7 +221,7 @@ describe('Delete metrics', () => {
         })
 
         await request(app)
-            .delete('/metric/' + configId1)
+            .delete('/metric/' + config1Document.key)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 

@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import Component from '../models/component';
 import GroupConfig from '../models/group-config';
 import Config from '../models/config';
+import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { removeConfigStatus, verifyOwnership, responseException, NotFoundError } from './common/index'
@@ -134,6 +135,24 @@ router.get('/config/history/:id', auth, async (req, res) => {
         await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG)
 
         res.send(history)
+    } catch (e) {
+        responseException(res, e, 500)
+    }
+})
+
+router.delete('/config/history/:id', auth, async (req, res) => {
+    try {
+        const config = await Config.findById(req.params.id)
+
+        if (!config) {
+            return res.status(404).send()
+        }
+
+        await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.ADMIN)
+
+        await History.deleteMany({ elementId: config._id })
+
+        res.send(config)
     } catch (e) {
         responseException(res, e, 500)
     }

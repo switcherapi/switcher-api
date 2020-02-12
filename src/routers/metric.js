@@ -108,14 +108,14 @@ router.get('/metric/:id', [check('id').isMongoId()], auth, async (req, res) => {
     }
 })
 
-router.delete('/metric/:id', auth, async (req, res) => {
+router.delete('/metric/:key', auth, async (req, res) => {
     try {
-        let config = await Config.findById(req.params.id)
+        let config = await Config.findOne({ key: req.params.key })
         if (!config) {
             return res.status(404).send()
         }
 
-        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG)
+        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.ADMIN)
 
         await Metric.deleteMany({ config: config._id })
         res.send({ message: 'Switcher metrics deleted' });

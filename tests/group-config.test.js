@@ -305,6 +305,31 @@ describe('Testing update Group info', () => {
             .send().expect(404)
     })
 
+    test('GROUP_SUITE - Should NOT delete history by invalid Group Id', async () => {
+        await request(app)
+            .delete('/groupconfig/history/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404)
+
+        await request(app)
+            .delete('/groupconfig/history/INVALID_ID_VALUE')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(500)
+    })
+
+    test('GROUP_SUITE - Should delete history from a Group element', async () => {
+        let history = await History.find({ elementId: groupConfigId })
+        expect(history.length > 0).toEqual(true)
+
+        await request(app)
+            .delete('/groupconfig/history/' + groupConfigId)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200)
+
+        history = await History.find({ elementId: groupConfigId })
+        expect(history.length > 0).toEqual(false)
+    })
+
     test('GROUP_SUITE - Should record changes on history collection', async () => {
         let response = await request(app)
             .post('/groupconfig/create')

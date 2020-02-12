@@ -549,6 +549,58 @@ describe('Testing update strategies #1', () => {
             .send().expect(500)
     })
 
+    test('STRATEGY_SUITE - Should NOT delete history by invalid Strategy Id', async () => {
+        await request(app)
+            .delete('/configstrategy/history/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404)
+
+        await request(app)
+            .delete('/configstrategy/history/INVALID_ID_VALUE')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(500)
+    })
+
+    test('STRATEGY_SUITE - Should delete history from a Strategy element', async () => {
+        let response = await request(app)
+            .post('/configstrategy/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                description: 'Description of my new Config Strategy',
+                strategy: StrategiesType.TIME,
+                operation: OperationsType.LOWER,
+                values: ['10:00'],
+                config: configId2,
+                env: EnvType.DEFAULT
+            }).expect(201)
+        
+        const strategyId = response.body._id
+        response = await request(app)
+                .get('/configstrategy/history/' + strategyId)
+                .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+                .send().expect(200)
+        
+        expect(response.body).toEqual([])
+
+        await request(app)
+            .patch('/configstrategy/' + strategyId)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                description: 'New description'
+            }).expect(200)
+
+        let history = await History.find({ elementId: strategyId })
+        expect(history.length > 0).toEqual(true)
+
+        await request(app)
+            .delete('/configstrategy/history/' + strategyId)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200)
+
+        history = await History.find({ elementId: strategyId })
+        expect(history.length > 0).toEqual(false)
+    })
+
     test('STRATEGY_SUITE - Should return a specific strategy requirements', async () => {
         let response = await request(app)
             .get('/configstrategy/req/' + StrategiesType.NETWORK)
