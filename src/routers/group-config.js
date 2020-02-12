@@ -1,6 +1,7 @@
 import express from 'express';
 import Domain from '../models/domain';
 import GroupConfig from '../models/group-config';
+import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { removeGroupStatus, verifyOwnership, responseException, NotFoundError } from './common/index'
@@ -126,6 +127,24 @@ router.get('/groupconfig/history/:id', auth, async (req, res) => {
         await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP)
 
         res.send(history)
+    } catch (e) {
+        responseException(res, e, 500)
+    }
+})
+
+router.delete('/groupconfig/history/:id', auth, async (req, res) => {
+    try {
+        const groupconfig = await GroupConfig.findById(req.params.id)
+
+        if (!groupconfig) {
+            return res.status(404).send()
+        }
+
+        await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.DELETE, RouterTypes.ADMIN)
+
+        await History.deleteMany({ elementId: groupconfig._id })
+
+        res.send(groupconfig)
     } catch (e) {
         responseException(res, e, 500)
     }

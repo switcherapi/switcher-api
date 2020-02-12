@@ -1,6 +1,7 @@
 import express from 'express';
 import Domain from '../models/domain';
 import { Environment } from '../models/environment';
+import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { removeDomainStatus, verifyOwnership, responseException } from './common/index'
@@ -123,6 +124,24 @@ router.get('/domain/history/:id', auth, async (req, res) => {
         res.send(history)
     } catch (e) {
         responseException(res, e, 400)
+    }
+})
+
+router.delete('/domain/history/:id', auth, async (req, res) => {
+    try {
+        const domain = await Domain.findById(req.params.id)
+
+        if (!domain) {
+            return res.status(404).send()
+        }
+
+        await verifyOwnership(req.admin, domain, domain._id, ActionTypes.DELETE, RouterTypes.ADMIN)
+
+        await History.deleteMany({ elementId: domain._id })
+
+        res.send(domain)
+    } catch (e) {
+        responseException(res, e, 500)
     }
 })
 

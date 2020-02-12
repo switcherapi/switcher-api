@@ -446,6 +446,31 @@ describe('Testing Environment status change', () => {
             .send().expect(500)
     })
 
+    test('CONFIG_SUITE - Should NOT delete history by invalid Config Id', async () => {
+        await request(app)
+            .delete('/config/history/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404)
+
+        await request(app)
+            .delete('/config/history/INVALID_ID_VALUE')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(500)
+    })
+
+    test('CONFIG_SUITE - Should delete history from a Config element', async () => {
+        let history = await History.find({ elementId: configId1 })
+        expect(history.length > 0).toEqual(true)
+
+        await request(app)
+            .delete('/config/history/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200)
+
+        history = await History.find({ elementId: configId1 })
+        expect(history.length > 0).toEqual(false)
+    })
+
     test('CONFIG_SUITE - Should NOT remove Config environment status', async () => {
         // Creating QA3 Environment...
         await request(app)

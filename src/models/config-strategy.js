@@ -287,7 +287,11 @@ configStrategySchema.options.toJSON = {
 
 configStrategySchema.pre('remove', async function (next) {
     const strategyConfig = this
-    await History.deleteMany({ elementId: strategyConfig._id })
+    const history = await History.find({ elementId: strategyConfig._id })
+    if (history) {
+        history.forEach((h) => h.remove())
+    }
+
     next()
 })
 

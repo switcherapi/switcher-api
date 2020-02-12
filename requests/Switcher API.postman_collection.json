@@ -2118,6 +2118,25 @@
 			"response": []
 		},
 		{
+			"name": "Domain - Delete Hsitory",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/domain/history/5e0ece606f4f994eac9007ae",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"domain",
+						"history",
+						"5e0ece606f4f994eac9007ae"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Domain - Delete",
 			"request": {
 				"method": "DELETE",
@@ -2347,6 +2366,84 @@
 			"response": []
 		},
 		{
+			"name": "Group - Read Hsitory",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/groupconfig/history/5df1664d9194d613400a52eb",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"groupconfig",
+						"history",
+						"5df1664d9194d613400a52eb"
+					],
+					"query": [
+						{
+							"key": "sortBy",
+							"value": "oldValue:updatedAt:desc",
+							"disabled": true
+						},
+						{
+							"key": "sortBy",
+							"value": "newValue:updatedAt:desc",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Group - Delete Hsitory",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/groupconfig/history/5df1664d9194d613400a52eb",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"groupconfig",
+						"history",
+						"5df1664d9194d613400a52eb"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Group - Delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/groupconfig/5dd230a81f11a7307c16452b",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"groupconfig",
+						"5dd230a81f11a7307c16452b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Config - Read Hsitory",
 			"request": {
 				"method": "GET",
@@ -2388,18 +2485,19 @@
 			"response": []
 		},
 		{
-			"name": "Group - Delete",
+			"name": "Config - Delete Hsitory",
 			"request": {
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/groupconfig/5dd230a81f11a7307c16452b",
+					"raw": "{{url}}/config/history/5df1664d9194d613400a52eb",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
-						"groupconfig",
-						"5dd230a81f11a7307c16452b"
+						"config",
+						"history",
+						"5df1664d9194d613400a52eb"
 					]
 				}
 			},
@@ -3183,6 +3281,25 @@
 							"value": "1",
 							"disabled": true
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConfigStrategy - Delete Hsitory",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/configstrategy/history/5df1668d9194d613400a52ee",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"configstrategy",
+						"history",
+						"5df1668d9194d613400a52ee"
 					]
 				}
 			},
