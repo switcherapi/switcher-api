@@ -25,9 +25,7 @@ app.use(express.json())
 /**
  * Cors configuration
  */
-if (process.env.ENV === 'DEV') {
-    app.use(cors())
-}
+ app.use(cors())
 
 /**
  * API Routers
