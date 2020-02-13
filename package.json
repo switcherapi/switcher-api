@@ -8,7 +8,8 @@
     "email": "roger.petruki@gmail.com"
   },
   "scripts": {
-    "start": "node ./src/index.js",
+    "start": "babel-node ./src/start.js",
+    "start-local": "env-cmd -e dev babel-node ./src/start.js",
     "dev": "env-cmd -e dev nodemon ./src/start.js",
     "prod": "env-cmd -e prod nodemon ./src/start.js",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
@@ -54,6 +55,8 @@
     "validator": "^12.0.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.7.4",
+    "@babel/node": "^7.7.4",
     "@babel/core": "^7.7.4",
     "@babel/preset-env": "^7.7.4",
     "@babel/register": "^7.7.4",
