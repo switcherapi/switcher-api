@@ -18,6 +18,8 @@ jobs:
         - npm test
         - sonar-scanner
     - stage: deploy
+      script:
+        - echo "Ready to deploy..."
       deploy:
         provider: heroku
         app: switcher-api
