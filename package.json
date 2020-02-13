@@ -8,8 +8,10 @@
     "email": "roger.petruki@gmail.com"
   },
   "scripts": {
-    "start": "babel-node ./src/start.js",
-    "start-local": "env-cmd -e dev babel-node ./src/start.js",
+    "build": "npm run clean && npm run build-babel",
+    "start": "npm run build && node ./build/index.js",
+    "build-babel": "babel -d ./build ./src -s",
+    "clean": "rm -rf build && mkdir build",
     "dev": "env-cmd -e dev nodemon ./src/start.js",
     "prod": "env-cmd -e prod nodemon ./src/start.js",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
