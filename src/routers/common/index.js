@@ -188,7 +188,7 @@ export class NotFoundError extends Error {
 
 export function responseException(res, err, code) {
     if (err instanceof PermissionError) {
-        res.status(401).send({ error: err.message })
+        res.status(401).send({ error: err.message, code: 401 })
     } else if (err instanceof NotFoundError) {
         res.status(404).send({ error: err.message })
     } else {

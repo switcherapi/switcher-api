@@ -74,6 +74,14 @@ describe('Testing Admin insertion', () => {
         expect(response.body.error).toEqual('Operation not found')
     })
 
+    test('ADMIN_SUITE - Should get All Good', async () => {
+        const response = await request(app)
+            .get('/check')
+            .send().expect(200)
+
+        expect(response.body.message).toEqual('All good')
+    })
+
     test('ADMIN_SUITE - Should renew access', async () => {
         const responseLogin = await request(app)
             .post('/admin/login')

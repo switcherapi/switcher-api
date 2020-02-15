@@ -58,6 +58,10 @@ app.use('/adm-graphql', auth, expressGraphQL({
     graphiql: true
 }))
 
+app.get('/check', (req, res) => {
+    res.status(200).send({ message: 'All good', code: 200 })
+})
+
 app.get('*', (req, res) => {
     res.status(404).send({ error: 'Operation not found' })
 })
