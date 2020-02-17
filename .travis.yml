@@ -17,21 +17,28 @@ jobs:
       script:
         - npm test
         - sonar-scanner
-    - stage: deploy
+    - stage: deploy to staging
       script:
-        - echo "Deploying to Heroku"
+        - echo "Deploying to Staging"
       deploy:
         provider: heroku
-        app:
-          staging: switcher-api
-          production: switcher-api
+        app: switcher-api-staging
+        api_key:
+          secure: ${HEROKU_KEY}
+    - stage: deploy to production
+      script:
+        - echo "Deploying to Production"
+      deploy:
+        provider: heroku
+        app: switcher-api
         api_key:
           secure: ${HEROKU_KEY}
 
 stages:
   - compile
   - test
-  - deploy
+  - deploy to staging
+  - deploy to production
 
 after_success: npm run coveralls
 
