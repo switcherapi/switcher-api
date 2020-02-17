@@ -23,7 +23,7 @@ jobs:
       deploy:
         provider: heroku
         app:
-          staging: switcher-api-staging
+          staging: switcher-api
           production: switcher-api
         api_key:
           secure: ${HEROKU_KEY}
