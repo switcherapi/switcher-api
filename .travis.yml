@@ -22,7 +22,7 @@ jobs:
         - echo "Deploying to Heroku"
       deploy:
         provider: heroku
-        app: switcher-api
+        app:
           staging: switcher-api-staging
           production: switcher-api
         api_key:
