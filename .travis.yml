@@ -36,9 +36,9 @@ jobs:
 
 stages:
   - compile
-  # - test
+  - test
   - deploy to staging
-  - deploy to production
+  # - deploy to production
 
 after_success: npm run coveralls
 
