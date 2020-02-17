@@ -17,7 +17,7 @@ jobs:
       script:
         - npm test
         - sonar-scanner
-    - stage: deploy_node1
+    - stage: deploy
       script:
         - echo "Deploying to Heroku"
       deploy:
