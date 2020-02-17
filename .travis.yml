@@ -23,26 +23,15 @@ jobs:
       deploy:
         provider: heroku
         app: switcher-api
+          staging: switcher-api-staging
+          production: switcher-api
         api_key:
           secure: ${HEROKU_KEY}
-    - stage: deploy_node2
-      script:
-        - echo "Deploying to OpenShift"
-      deploy:
-        provider: openshift
-        user: petruki
-        password:
-          secure: ofoGEBzYWwH4RgW8PNszJFAZmMa5OpH9ZXI317YzfuhTrSLbg6hjN7sBRmKksrx0w8tme7oH37yk+QECrI9liLtaUyHfcQS6N/HLAW8tEfGw3wtJ0B/7w1G3aXsNG3/EWOj/QU5YNNTQxbX1ltwxXT6QqAoIGpmVRySWZNzFw2r+SKj8fc7lCbXpUPJLTmAN9m+G7NDE8H/DSebc9/UGq8E4BKpF+09HKB7mExftxTK2V8alX1HlrOlTAX2gbjno8bhgsWOdpP4GbkvxrwAJJmApKkEwcQtoc9CDSFWZSyGoubRijpDmSRj/E9AEVX8EYivXJSRobyaJEfCGLivL5dLxyPqVOqXXGGP8IrIghKVlMd8Jp2xQYmnOV9sZdsl9iLVuddbB2qPoo8zA7VT2QcRJdVu1VJzZyWHbAMIwtJBztoCeQ07xy2zLytx3lj5PaRIHYy3ovcQVkqjkWYIMLklMBFkDWRGM2j1s3wL0InPZREkm/C7ioT+IyeRpBSY3+usJcpH923MMzvwKzjGlmR3GVRk+LVF3eKcivhoxKX66VAf2ktRxaE9MgLtGaPxs/R1dPv55ECnrXsTi43z1hqzxWd8lEywycGLT3xlnCyrCn+Ad9MeC0H0oASLNKdJN130yCZf3d6LsEimhOE4de/sXrEFXqBDais+zCGq/8d0=
-        app: switcher-api
-        domain: switcher-api
-        on:
-          repo: petruki/switcher-api
 
 stages:
   - compile
-  # - test
-  # - deploy_node1
-  - deploy_node2
+  - test
+  - deploy
 
 after_success: npm run coveralls
 
