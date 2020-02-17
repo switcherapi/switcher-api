@@ -42,9 +42,15 @@ const queryType = new GraphQLObjectType({
                         return source.activated.get(environment) === undefined ? 
                             source.activated.get(EnvType.DEFAULT) : source.activated.get(environment)
                     }
+                },
+                environment: {
+                    type: GraphQLString
                 }
             },
-            resolve: async (source, { _id, name, activated }, context) => {
+            resolve: async (source, { _id, name, activated, environment }, context) => {
+                if (environment) {
+                    context.environment = environment;
+                }
                 return await resolveDomain(_id, name, activated, context)
             }
         },
@@ -56,9 +62,16 @@ const queryType = new GraphQLObjectType({
                 },
                 key: {
                     type: GraphQLString
+                },
+                environment: {
+                    type: GraphQLString
                 }
             },
-            resolve: async (source, { group, key }) => {
+            resolve: async (source, { group, key, environment }, context) => {
+                if (environment) {
+                    context.environment = environment;
+                }
+
                 if (key) {
                     return resolveFlatConfigurationByConfig(key)
                 }

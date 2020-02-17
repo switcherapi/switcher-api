@@ -930,7 +930,7 @@ describe("Testing domain [Adm-GraphQL] ", () => {
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({ query: `
                 {
-                    domain(name: "Domain") { name description statusByEnv { env value }
+                    domain(name: "Domain", environment: "default") { name description statusByEnv { env value }
                         group { name description statusByEnv { env value }
                             config { key description statusByEnv { env value }
                                 strategies { strategy statusByEnv { env value } operation  values }
@@ -995,7 +995,7 @@ describe("Testing domain [Adm-GraphQL] ", () => {
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({ query: `
             {
-                configuration(key: "${keyConfig}") {
+                configuration(key: "${keyConfig}", environment: "default") {
                     domain { name description statusByEnv { env value } }
                     group { name description statusByEnv { env value } }
                     config { key description statusByEnv { env value } }
