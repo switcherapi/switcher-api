@@ -36,7 +36,7 @@ jobs:
 
 stages:
   - compile
-  - test
+  # - test
   - deploy to staging
   - deploy to production
 
