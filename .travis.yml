@@ -20,7 +20,6 @@ jobs:
       script:
         - echo "Deploying to Staging"
       deploy:
-        skip_cleanup: true
         provider: heroku
         app: switcher-api-staging
         api_key: ${HEROKU_KEY}
