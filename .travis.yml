@@ -23,8 +23,7 @@ jobs:
         skip_cleanup: true
         provider: heroku
         app: switcher-api-staging
-        api_key:
-          secure: ${HEROKU_KEY}
+        api_key: ${HEROKU_KEY}
 
 stages:
   - compile
