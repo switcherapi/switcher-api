@@ -36,10 +36,10 @@ This section guides you through submitting an enhancement suggestion for Switche
 
 ### Your First Code Contribution
 
-Unsure where to begin contributing to Switcher? You can start by looking through these `minor issue` and `help wanted` issues:
+Unsure where to begin contributing to Switcher? You can start by looking through these `minor-issue` and `bug` issues:
 
-* [Minor issue][minor issue] - issues which should only require a few lines of code, and a test or two.
-* [Help wanted][help wanted] - issues which should be a bit more involved than `minor` issues.
+* [Minor issue][minor-issue] - issues which should only require a few lines of code, and a test or two.
+* [Bug][bug] - issues which should be a bit more involved than `minor` issues.
 
 ### Pull Requests
 
