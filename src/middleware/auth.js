@@ -1,5 +1,3 @@
-"use strict";
-
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Admin from '../models/admin';
