@@ -180,7 +180,8 @@ export async function resolveCriteria(config, context, strategyFilter) {
         }
     }
 
-    if (!context.bypassMetric && process.env.METRICS_ACTIVATED === 'true') {
+    const bypassMetric = context.bypassMetric ? context.bypassMetric === 'true' : false;
+    if (!bypassMetric && process.env.METRICS_ACTIVATED === 'true') {
         addMetrics(context, response)
     }
 
