@@ -6,7 +6,7 @@ import Config from '../models/config';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeConfigStatus, verifyOwnership, responseException, NotFoundError } from './common/index'
+import { removeConfigStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router()
@@ -38,6 +38,7 @@ router.post('/config/create', auth, async (req, res) => {
         config = await verifyOwnership(req.admin, config, group.domain, ActionTypes.CREATE, RouterTypes.CONFIG)
 
         await config.save()
+        updateDomainVersion(config.domain)
         res.status(201).send(config)
     } catch (e) {
         responseException(res, e, 400)
@@ -151,7 +152,6 @@ router.delete('/config/history/:id', auth, async (req, res) => {
         await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.ADMIN)
 
         await History.deleteMany({ elementId: config._id })
-
         res.send(config)
     } catch (e) {
         responseException(res, e, 500)
@@ -169,6 +169,7 @@ router.delete('/config/:id', auth, async (req, res) => {
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG)
 
         await config.remove()
+        updateDomainVersion(config.domain)
         res.send(config)
     } catch (e) {
         responseException(res, e, 500)
@@ -189,6 +190,7 @@ router.patch('/config/:id', auth,
 
         req.updates.forEach((update) => config[update] = req.body[update])
         await config.save()
+        updateDomainVersion(config.domain)
         res.send(config)
     } catch (e) {
         responseException(res, e, 500)
@@ -210,6 +212,7 @@ router.patch('/config/updateStatus/:id', auth, async (req, res) => {
         
         updates.forEach((update) => config.activated.set(update, req.body[update]))
         await config.save()
+        updateDomainVersion(config.domain)
         res.send(config)
     } catch (e) {
         responseException(res, e, 400)
@@ -227,6 +230,7 @@ router.patch('/config/removeStatus/:id', auth, async (req, res) => {
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG)
         config.updatedBy = req.admin.email
 
+        updateDomainVersion(config.domain)
         res.send(await removeConfigStatus(config, req.body.env))
     } catch (e) {
         responseException(res, e, 400)
@@ -249,6 +253,7 @@ router.patch('/config/addComponent/:id', auth, async (req, res) => {
         config.updatedBy = req.admin.email
         config.components.push(component._id)
         await config.save()
+        updateDomainVersion(config.domain)
         res.send(config)
     } catch (e) {
         responseException(res, e, 500)
@@ -268,6 +273,7 @@ router.patch('/config/removeComponent/:id', auth, async (req, res) => {
         const indexComponent = config.components.indexOf(req.body.component)
         config.components.splice(indexComponent, 1)
         await config.save()
+        updateDomainVersion(config.domain)
         res.send(config)
     } catch (e) {
         responseException(res, e, 500)
@@ -287,6 +293,7 @@ router.patch('/config/updateComponents/:id', auth, async (req, res) => {
         config.updatedBy = req.admin.email
         config.components = componentIds
         await config.save()
+        updateDomainVersion(config.domain)
         res.send(config)
     } catch (e) {
         responseException(res, e, 400)

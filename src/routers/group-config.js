@@ -4,7 +4,7 @@ import GroupConfig from '../models/group-config';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeGroupStatus, verifyOwnership, responseException, NotFoundError } from './common/index'
+import { removeGroupStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router()
@@ -33,7 +33,7 @@ router.post('/groupconfig/create', auth, async (req, res) => {
         }
 
         groupconfig = await verifyOwnership(req.admin, groupconfig, domain._id, ActionTypes.CREATE, RouterTypes.GROUP)
-
+        updateDomainVersion(domain._id)
         await groupconfig.save()
         res.status(201).send(groupconfig)
     } catch (e) {
@@ -143,7 +143,6 @@ router.delete('/groupconfig/history/:id', auth, async (req, res) => {
         await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.DELETE, RouterTypes.ADMIN)
 
         await History.deleteMany({ elementId: groupconfig._id })
-
         res.send(groupconfig)
     } catch (e) {
         responseException(res, e, 500)
@@ -161,6 +160,7 @@ router.delete('/groupconfig/:id', auth, async (req, res) => {
         groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.DELETE, RouterTypes.GROUP)
 
         await groupconfig.remove()
+        updateDomainVersion(groupconfig.domain)
         res.send(groupconfig)
     } catch (e) {
         responseException(res, e, 500)
@@ -175,6 +175,7 @@ router.patch('/groupconfig/:id', auth,
 
         req.updates.forEach((update) => groupconfig[update] = req.body[update])
         await groupconfig.save()
+        updateDomainVersion(groupconfig.domain)
         res.send(groupconfig)
     } catch (e) {
         responseException(res, e, 500)
@@ -189,6 +190,7 @@ router.patch('/groupconfig/updateStatus/:id', auth, async (req, res) => {
         const updates = await checkEnvironmentStatusChange(req, res, groupconfig.domain)
         updates.forEach((update) => groupconfig.activated.set(update, req.body[update]))
         await groupconfig.save()
+        updateDomainVersion(groupconfig.domain)
         res.send(groupconfig)
     } catch (e) {
         responseException(res, e, 500)
@@ -199,7 +201,7 @@ router.patch('/groupconfig/removeStatus/:id', auth, async (req, res) => {
     try {
         const groupconfig = await verifyGroupInput(req.params.id, req.admin)
         groupconfig.updatedBy = req.admin.email
-
+        updateDomainVersion(groupconfig.domain)
         res.send(await removeGroupStatus(groupconfig, req.body.env))
     } catch (e) {
         responseException(res, e, 400)

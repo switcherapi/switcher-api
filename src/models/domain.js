@@ -31,6 +31,10 @@ const domainSchema = new mongoose.Schema({
         required: true,
         ref: 'Admin'
     },
+    lastUpdate: {
+        type: Number,
+        default: Date.now()
+    },
     updatedBy: {
         type: String
     },
@@ -166,13 +170,13 @@ domainSchema.pre('remove', async function (next) {
 async function recordDomainHistory(domain, modifiedField) {
     if (domain.__v !== undefined && modifiedField.length) {
         const oldDomain = await Domain.findById(domain._id);
-        recordHistory(modifiedField, oldDomain, domain)
+        recordHistory(modifiedField, oldDomain, domain, ['lastUpdate'])
     }
 }
 
 domainSchema.pre('save', async function (next) {
     const domain = this
-    await recordDomainHistory(domain, this.modifiedPaths());
+    await recordDomainHistory(domain, this.modifiedPaths())
     next()
 })
 

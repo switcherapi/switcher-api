@@ -1,18 +1,22 @@
 import History from '../history';
 
-export async function recordHistory(modifiedField, oldDocument, newDocument) {
+export async function recordHistory(modifiedField, oldDocument, newDocument, ignoredFields = []) {
     const oldValues = new Map();
-    const ignoredFields = ['_id', 'updatedAt'];
+    const defaultIgnoredFields = ['_id', 'updatedAt'];
+
+    if (ignoredFields.length) {
+        ignoredFields.forEach(field => defaultIgnoredFields.push(field))
+    }
 
     modifiedField.forEach(field => {
-        if (!ignoredFields.includes(field) && !field.startsWith('activated.')) {
+        if (!defaultIgnoredFields.includes(field) && !field.startsWith('activated.')) {
             oldValues.set(field, extractValue(oldDocument[`${field}`]));
         }
     });
 
     const newValues = new Map();
     modifiedField.forEach(field => {
-        if (!ignoredFields.includes(field) && !field.startsWith('activated.')) {
+        if (!defaultIgnoredFields.includes(field) && !field.startsWith('activated.')) {
             if (JSON.stringify(oldValues.get(field)) === JSON.stringify(newDocument[`${field}`])) {
                 oldValues.delete(field);
             } else {

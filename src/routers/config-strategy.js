@@ -5,7 +5,7 @@ import { Environment, EnvType } from '../models/environment';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { ConfigStrategy, strategyRequirements, StrategiesType } from '../models/config-strategy';
 import { auth } from '../middleware/auth';
-import { verifyOwnership, responseException, NotFoundError } from './common/index';
+import { verifyOwnership, updateDomainVersion, responseException, NotFoundError } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router()
@@ -52,6 +52,7 @@ router.post('/configstrategy/create', auth, async (req, res) => {
         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.CREATE, RouterTypes.STRATEGY);
 
         await configStrategy.save()
+        updateDomainVersion(configStrategy.domain)
         res.status(201).send(configStrategy)
     } catch (e) {
         responseException(res, e, 400)
@@ -161,7 +162,6 @@ router.delete('/configstrategy/history/:id', auth, async (req, res) => {
         await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.DELETE, RouterTypes.ADMIN)
 
         await History.deleteMany({ elementId: configStrategy._id })
-
         res.send(configStrategy)
     } catch (e) {
         responseException(res, e, 500)
@@ -195,6 +195,7 @@ router.delete('/configstrategy/:id', auth, async (req, res) => {
         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.DELETE, RouterTypes.STRATEGY)
 
         await configStrategy.remove()
+        updateDomainVersion(configStrategy.domain)
         res.send(configStrategy)
     } catch (e) {
         responseException(res, e, 500)
@@ -215,6 +216,7 @@ router.patch('/configstrategy/:id', auth,
         
         req.updates.forEach((update) => configStrategy[update] = req.body[update])
         await configStrategy.save()
+        updateDomainVersion(configStrategy.domain)
         res.send(configStrategy)
     } catch (e) {
         responseException(res, e, 400)
@@ -238,6 +240,7 @@ router.patch('/configstrategy/addval/:id', auth,
 
         configStrategy.values.push(value)
         await configStrategy.save()
+        updateDomainVersion(configStrategy.domain)
         res.send(configStrategy)
     } catch (e) {
         responseException(res, e, 400)
@@ -277,6 +280,7 @@ router.patch('/configstrategy/updateval/:id', auth,
         configStrategy.values.splice(indexOldValue, 1)
         configStrategy.values.push(newvalue)
         await configStrategy.save()
+        updateDomainVersion(configStrategy.domain)
         res.send(configStrategy)
     } catch (e) {
         responseException(res, e, 400)
@@ -300,6 +304,7 @@ router.patch('/configstrategy/removeval/:id', auth,
 
         configStrategy.values.splice(indexValue, 1)
         await configStrategy.save()
+        updateDomainVersion(configStrategy.domain)
         res.send(configStrategy)
     } catch (e) {
         responseException(res, e, 400)
@@ -358,6 +363,7 @@ router.patch('/configstrategy/updateStatus/:id', auth, async (req, res) => {
         
         configStrategy.activated.set(updates[0], req.body[updates[0]])
         await configStrategy.save()
+        updateDomainVersion(configStrategy.domain)
         res.send(configStrategy)
     } catch (e) {
         responseException(res, e, 400)

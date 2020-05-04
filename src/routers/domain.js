@@ -173,6 +173,7 @@ router.patch('/domain/:id', auth,
 
         domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
         domain.updatedBy = req.admin.email
+        domain.lastUpdate = Date.now()
         
         req.updates.forEach((update) => domain[update] = req.body[update])
         await domain.save()
@@ -192,6 +193,7 @@ router.patch('/domain/updateStatus/:id', auth, async (req, res) => {
 
         domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
         domain.updatedBy = req.admin.email
+        domain.lastUpdate = Date.now()
 
         const updates = await checkEnvironmentStatusChange(req, res, req.params.id)
 
@@ -213,6 +215,7 @@ router.patch('/domain/removeStatus/:id', auth, async (req, res) => {
 
         domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
         domain.updatedBy = req.admin.email
+        domain.lastUpdate = Date.now()
         
         res.send(await removeDomainStatus(domain, req.body.env))
     } catch (e) {

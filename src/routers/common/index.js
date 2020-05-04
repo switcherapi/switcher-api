@@ -63,6 +63,17 @@ export async function removeConfigStatus(config, environmentName) {
 //     }
 // }
 
+export async function updateDomainVersion(domainId) {
+    const domain = await Domain.findById(domainId)
+
+    if (!domain) {
+        throw new NotFoundError('Domain not found');
+    }
+
+    domain.lastUpdate = Date.now()
+    domain.save()
+} 
+
 export async function verifyOwnership(admin, element, domainId, action, routerType, cascade = false) {
     const domain = await Domain.findById(domainId)
 
