@@ -38,6 +38,7 @@ export const domainId = new mongoose.Types.ObjectId()
 export const domainDocument = {
     _id: domainId,
     name: 'Domain',
+    lastUpdate: 5,
     description: 'Test Domain',
     activated: new Map().set(EnvType.DEFAULT, true),
     owner: adminMasterAccountId

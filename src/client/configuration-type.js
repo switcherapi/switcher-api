@@ -1,5 +1,5 @@
 import { resolveConfigStrategy, resolveConfig, resolveGroupConfig, resolveEnvStatus } from './resolvers';
-import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean } from 'graphql';
+import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLInt, GraphQLFloat } from 'graphql';
 import { EnvType } from '../models/environment';
 import { resolveFlatDomain, resolveFlatGroupConfig, resolveFlatConfig, resolveFlatConfigStrategy } from './configuration-resolvers';
 
@@ -155,6 +155,10 @@ export const domainType = new GraphQLObjectType({
     fields: {
         _id: {
             type: GraphQLString
+        },
+        version: {
+            type: GraphQLFloat,
+            resolve: (source) => source.lastUpdate
         },
         name: {
             type: GraphQLString

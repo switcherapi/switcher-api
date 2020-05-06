@@ -37,6 +37,25 @@ router.post('/criteria', appAuth, checkConfig, async (req, res) => {
     }
 })
 
+router.get('/criteria/snapshot_check/:version', appAuth, async (req, res) => {
+    try {
+        const domain = req.domain
+        const version = req.params.version
+
+        if (isNaN(version)) {
+            return res.status(400).send({ error: 'Wrong value for domain version' })
+        }
+
+        if (domain.lastUpdate > version) {
+            res.send({ status: false })
+        } else {
+            res.send({ status: true })
+        }
+    } catch (e) {
+        res.status(500).send({ error: e.message })
+    }
+})
+
 router.post('/criteria/auth', appGenerateCredentials, async (req, res) => {
     try {
         const { exp } = jwt.decode(req.token)

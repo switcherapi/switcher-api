@@ -503,7 +503,7 @@ describe("Testing domain", () => {
             .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
-                    domain(name: "Domain") { name description activated
+                    domain(name: "Domain") { name version description activated
                         group(activated: true) { name description activated
                             config(activated: true) { key description activated
                                 strategies(activated: true) { strategy activated operation  values }
@@ -571,7 +571,7 @@ describe("Testing domain", () => {
             .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
-                    domain(name: "Domain") { name description activated
+                    domain(name: "Domain") { name version description activated
                         group(activated: true) { name description activated
                             config(activated: true) { key description activated
                                 strategies(activated: false) { strategy activated operation values }
@@ -881,6 +881,54 @@ describe("Testing criteria [REST] ", () => {
                 component: component1.name,
                 environment: EnvType.DEFAULT
             }).expect(401)
+    })
+
+    test('CLIENT_SUITE - Should return that snapshot version is outdated - status = false', (done) => {
+        request(app)
+            .get(`/criteria/snapshot_check/1`)
+            .set('Authorization', `Bearer ${token}`)
+            .send()
+            .expect(200)
+            .end((err, { body }) => {
+                expect(body.status).toEqual(false);
+                done();
+            })
+    })
+
+    test('CLIENT_SUITE - Should return that snapshot version is updated - status = true', (done) => {
+        request(app)
+            .get(`/criteria/snapshot_check/5`)
+            .set('Authorization', `Bearer ${token}`)
+            .send()
+            .expect(200)
+            .end((err, { body }) => {
+                expect(body.status).toEqual(true);
+                done();
+            })
+    })
+
+    test('CLIENT_SUITE - Should return error when validating snapshot version - Version is not a number', (done) => {
+        request(app)
+            .get(`/criteria/snapshot_check/ONLY_NUMBER_ALLOWED`)
+            .set('Authorization', `Bearer ${token}`)
+            .send()
+            .expect(400)
+            .end((err, { body }) => {
+                expect(body.error).toEqual('Wrong value for domain version');
+                done();
+            })
+    })
+
+    test('CLIENT_SUITE - Should return error when validating snapshot version - Invalid token', (done) => {
+        request(app)
+            .get(`/criteria/snapshot_check/5`)
+            .set('Authorization', `Bearer INVALID_TOKEN`)
+            .send()
+            .expect(500)
+            .end((err, { body }) => {
+                expect(body.error).toEqual('Invalid API token.');
+                done();
+            })
     })
 })
 
