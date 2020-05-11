@@ -1,6 +1,7 @@
 import Config from "../models/config";
 import GroupConfig from "../models/group-config";
 import Domain from "../models/domain";
+import Component from "../models/component";
 import { ConfigStrategy } from '../models/config-strategy';
 import { verifyOwnership } from "../routers/common";
 import { ActionTypes, RouterTypes } from "../models/role";
@@ -109,4 +110,9 @@ export async function resolveFlatDomain(source, context) {
     }
 
     return domain
+}
+
+export async function resolveComponents(source) {
+    const components = await Component.find( { _id: { $in: source.components } });
+    return components.length ? components.map(component => component.name) : [];
 }

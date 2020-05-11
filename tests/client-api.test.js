@@ -507,6 +507,7 @@ describe("Testing domain", () => {
                         group(activated: true) { name description activated
                             config(activated: true) { key description activated
                                 strategies(activated: true) { strategy activated operation  values }
+                                components
                             }
                         }
                     }
@@ -1003,7 +1004,7 @@ describe("Testing domain [Adm-GraphQL] ", () => {
             })
     })
 
-    test('CLIENT_SUITE - Should return domain Flat-structure', (done) => {
+    test('CLIENT_SUITE - Should return domain Flat-structure - By Switcher Key', (done) => {
         request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -1033,6 +1034,28 @@ describe("Testing domain [Adm-GraphQL] ", () => {
                                     {"strategy":"TIME_VALIDATION","operation":"BETWEEN","values":["13:00","14:00"],"statusByEnv":[{"env":"default","value":false}]},
                                     {"strategy":"DATE_VALIDATION","operation":"GREATER","values":["2019-12-01T13:00"],"statusByEnv":[{"env":"default","value":false}]}]}}}`;
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                done();
+            })
+    })
+
+    test('CLIENT_SUITE - Should return domain Flat-structure - By Group', (done) => {
+        request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({ query: `
+            {
+                configuration(group: "Group Test") {
+                    domain { name description statusByEnv { env value } }
+                    group { name description statusByEnv { env value } }
+                    config { key description statusByEnv { env value } }
+                    strategies { strategy operation values statusByEnv { env value } }
+                }
+            }
+            `})
+            .expect(200)
+            .end((err, res) => {
+                const result = JSON.parse(res.text);
+                expect(result.data.configuration.group[0].name).toEqual('Group Test');
                 done();
             })
     })
