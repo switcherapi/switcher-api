@@ -4,6 +4,7 @@ import { auth, authRefreshToken } from '../middleware/auth';
 import { verifyInputUpdateParameters } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
 import { responseException, verifyOwnership } from './common';
+import { getToken, getUserInfo } from '../external/oauth-git';
 
 const router = new express.Router()
 
@@ -26,6 +27,30 @@ router.post('/admin/signup', [
         res.status(201).send({ admin, jwt })
     } catch (e) {
         res.status(400).send(e)
+    }
+})
+
+router.post('/admin/github/auth', async (req, res) => {
+    try {
+        const token = await getToken(req.query.code)
+        const userInfo = await getUserInfo(token)
+
+        let admin = await Admin.findUserByGitId(userInfo.id)
+
+        if (!admin) {
+            admin = new Admin({
+                name: userInfo.name,
+                email: userInfo.email,
+                _gitid: userInfo.id,
+                password: Math.random().toString(36).slice(-8)
+            })
+            await admin.save()
+        }
+    
+        const jwt = await admin.generateAuthToken()
+        res.status(201).send({ admin, jwt })
+    } catch (e) {
+        res.status(401).send({ error: e.message })
     }
 })
 

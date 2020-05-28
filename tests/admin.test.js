@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import axios from 'axios';
+import sinon from 'sinon';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import app from '../src/app';
@@ -21,6 +23,9 @@ afterAll(async () => {
 
 describe('Testing Admin insertion', () => {
     beforeAll(setupDatabase)
+
+    let axiosPostStub;
+    let axiosGetStub;
 
     test('ADMIN_SUITE - Should signup a new Admin', async () => {
         const response = await request(app)
@@ -45,6 +50,39 @@ describe('Testing Admin insertion', () => {
         })
     })
 
+    test('ADMIN_SUITE - Should signup a new Admin - From GitHub', async () => {
+        // mock
+        axiosPostStub = sinon.stub(axios, 'post');
+        axiosGetStub = sinon.stub(axios, 'get');
+
+        // given
+        const mockedTokenData = { data: { access_token: 'MOCKED_TOKEN' } };
+        const mockedUserData = { data: 
+            { 
+                id: 123456789,
+                login: 'githubuser',
+                name: 'Mocked GitHub User'
+            } 
+        };
+
+        axiosPostStub.returns(Promise.resolve(mockedTokenData));
+        axiosGetStub.returns(Promise.resolve(mockedUserData));
+
+        // test
+        const response = await request(app)
+            .post('/admin/github/auth?code=GIT_CODE')
+            .send().expect(201);
+
+        // DB validation - document created
+        const admin = await Admin.findById(response.body.admin._id);
+        expect(admin).not.toBeNull();
+        expect(admin._gitid).toEqual("123456789");
+
+        // restore
+        axiosPostStub.restore();
+        axiosGetStub.restore();
+    })
+
     test('ADMIN_SUITE - Should NOT signup - invalid email format', async () => {
         await request(app)
             .post('/admin/signup')
@@ -52,7 +90,49 @@ describe('Testing Admin insertion', () => {
                 name: 'Admin',
                 email: 'admin@',
                 password: '12312312312'
-            }).expect(422)
+            }).expect(422);
+    })
+
+    test('ADMIN_SUITE - Should NOT signup - Access denied to GitHub User Info', async () => {
+        // mock
+        axiosPostStub = sinon.stub(axios, 'post');
+        axiosGetStub = sinon.stub(axios, 'get');
+
+        // given
+        const mockedTokenData = { data: { access_token: 'MOCKED_TOKEN' } };
+        
+        axiosPostStub.returns(Promise.resolve(mockedTokenData));
+        axiosGetStub.throwsException();
+
+        // test
+        const response = await request(app)
+            .post('/admin/github/auth?code=GIT_CODE')
+            .send().expect(401);
+
+        expect(response.body.error).toEqual("Failed to get GitHub user info");
+
+        // restore
+        axiosPostStub.restore();
+        axiosGetStub.restore();
+    })
+
+    test('ADMIN_SUITE - Should NOT signup - Access denied to GitHub Token', async () => {
+        // mock
+        axiosPostStub = sinon.stub(axios, 'post');
+
+        // given
+        axiosPostStub.throwsException();
+
+        // test
+        const response = await request(app)
+            .post('/admin/github/auth?code=GIT_CODE')
+            .send().expect(401);
+
+        expect(response.body.error).toEqual("Failed to get GitHub access token");
+
+        // restore
+        axiosPostStub.restore();
+        axiosGetStub.restore();
     })
 
     test('ADMIN_SUITE - Should login Master Admin', async () => {
@@ -434,20 +514,6 @@ describe('Testing Admin logout', () => {
 
         const admin = await Admin.findById(adminMasterAccountId)
         expect(admin).toBeNull()
-
-        // FIXME: It's working but need to be reviewed since build plans are messing with these validations.
-        // DB validation - Verify deleted dependencies
-        // const domain = await Domain.find({ owner: adminMasterAccountId })
-        // expect(domain).toEqual([])
-
-        // const group = await GroupConfig.find({ owner: adminMasterAccountId })
-        // expect(group).toEqual([])
-
-        // const config = await Config.find({ owner: adminMasterAccountId })
-        // expect(config).toEqual([])
-
-        // const configStrategy = await ConfigStrategy.find({ owner: adminMasterAccountId })
-        // expect(configStrategy).toEqual([])
     })
 })
 

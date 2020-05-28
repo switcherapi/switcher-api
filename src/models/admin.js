@@ -35,6 +35,9 @@ const adminSchema = new mongoose.Schema({
     token: {
         type: String
     },
+    _gitid: {
+        type: String
+    }
 }, {
     timestamps: true
 })
@@ -86,6 +89,7 @@ adminSchema.options.toJSON = {
 
         delete ret.password
         delete ret.token
+        delete ret._gitid
         return ret
     }
 }
@@ -122,6 +126,11 @@ adminSchema.statics.findByCredentials = async (email, password) => {
         throw new Error('Unable to login')
     }
 
+    return admin
+}
+
+adminSchema.statics.findUserByGitId = async (_gitid) => {
+    const admin = await Admin.findOne({ _gitid })
     return admin
 }
 
