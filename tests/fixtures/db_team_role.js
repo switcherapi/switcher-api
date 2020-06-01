@@ -7,6 +7,7 @@ import { Role, RouterTypes, ActionTypes, KeyTypes } from '../../src/models/role'
 import { EnvType } from '../../src/models/environment';
 import GroupConfig from '../../src/models/group-config';
 import Config from '../../src/models/config';
+import TeamInvite from '../../src/models/team-invite';
 
 export const adminMasterAccountId = new mongoose.Types.ObjectId()
 export const adminMasterAccount = {
@@ -143,30 +144,31 @@ export const adminAccount3 = {
 }
 
 export const setupDatabase = async () => {
-    await Config.deleteMany()
-    await GroupConfig.deleteMany()
-    await Domain.deleteMany()
-    await Admin.deleteMany()
-    await Team.deleteMany()
-    await Role.deleteMany()
+    await Config.deleteMany();
+    await GroupConfig.deleteMany();
+    await Domain.deleteMany();
+    await Admin.deleteMany();
+    await Team.deleteMany();
+    await TeamInvite.deleteMany();
+    await Role.deleteMany();
 
-    await new Admin(adminMasterAccount).save()
-    await new Admin(adminAccount).save()
-    await new Admin(adminAccount2).save()
-    await new Admin(adminAccount3).save()
+    await new Admin(adminMasterAccount).save();
+    await new Admin(adminAccount).save();
+    await new Admin(adminAccount2).save();
+    await new Admin(adminAccount3).save();
 
-    const apiKey = await bcrypt.hash(domainDocument._id + 'Domain', 8)
-    const hash = await bcrypt.hash(apiKey, 8)
-    domainDocument.apihash = hash
-    await new Domain(domainDocument).save()
+    const apiKey = await bcrypt.hash(domainDocument._id + 'Domain', 8);
+    const hash = await bcrypt.hash(apiKey, 8);
+    domainDocument.apihash = hash;
+    await new Domain(domainDocument).save();
 
-    await new GroupConfig(groupConfigDocument).save()
-    await new GroupConfig(groupConfig2Document).save()
-    await new Config(configDocument).save()
-    await new Role(role1).save()
-    await new Role(role2).save()
-    await new Role(role3).save()
-    await new Role(role4).save()
-    await new Team(team1).save()
-    await new Team(team2).save()
+    await new GroupConfig(groupConfigDocument).save();
+    await new GroupConfig(groupConfig2Document).save();
+    await new Config(configDocument).save();
+    await new Role(role1).save();
+    await new Role(role2).save();
+    await new Role(role3).save();
+    await new Role(role4).save();
+    await new Team(team1).save();
+    await new Team(team2).save();
 }

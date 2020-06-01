@@ -64,7 +64,6 @@ const existTeam = async (team) => {
     return false
 }
 
-
 teamSchema.pre('validate', async function (next) {
     const team = this
 

@@ -6,6 +6,8 @@ import { Role, checkActionType, ActionTypes, RouterTypes } from '../models/role'
 import { verifyInputUpdateParameters } from '../middleware/validators';
 import { verifyOwnership, responseException, NotFoundError } from './common/index';
 import Admin from '../models/admin';
+import TeamInvite from '../models/team-invite';
+import Domain from '../models/domain';
 
 const router = new express.Router()
 
@@ -127,20 +129,87 @@ router.delete('/team/:id', auth, async (req, res) => {
     }
 })
 
-router.patch('/team/member/invite/:id', auth, verifyInputUpdateParameters(['email']), async (req, res) => {
+router.post('/team/member/invite/:id', auth, verifyInputUpdateParameters(['email']), async (req, res) => {
     try {
-        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE);
 
-        const email = req.body.email.trim()
-        const admin = await Admin.findOne({ email });
+        const teamInvite = new TeamInvite({
+            teamid: team._id,
+            email: req.body.email.trim()
+        });
 
-        // TODO: Create invitation document
-        await addMemberToTeam(admin, team)
-        res.send(admin)
+        await teamInvite.save();
+        res.status(201).send(teamInvite);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
+
+router.get('/team/member/invite/:id', auth, async (req, res) => {
+    try {
+        const teamInvite = await TeamInvite.findById(req.params.id);
+
+        if (!teamInvite) {
+            throw new NotFoundError('Invite request not found');
+        }
+
+        await teamInvite.populate({
+            path: 'team'
+        }).execPopulate();
+
+        const team = teamInvite.team;
+        const domain = await Domain.findById(team[0].domain);
+        res.send({
+            team: team[0].name,
+            domain: domain.name
+        });
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+})
+
+router.post('/team/member/invite/accept/:request_id', auth, async (req, res) => {
+    try {
+        const teamInvite = await TeamInvite.findById(req.params.request_id);
+
+        if (!teamInvite) {
+            throw new NotFoundError('Invite request not found');
+        }
+
+        await teamInvite.populate({
+            path: 'team'
+        }).execPopulate();
+
+        const team = teamInvite.team;
+
+        if (team.length) {
+            const admin = req.admin;
+
+            await addMemberToTeam(admin, team[0]);
+            teamInvite.remove();
+            res.send(admin);
+        } else {
+            throw new Error('Team does not exist anymore');
+        }
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+})
+
+// Deprecated
+// router.patch('/team/member/invite/:id', auth, verifyInputUpdateParameters(['email']), async (req, res) => {
+//     try {
+//         const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
+
+//         const email = req.body.email.trim()
+//         const admin = await Admin.findOne({ email });
+
+//         await addMemberToTeam(admin, team)
+//         res.send(admin)
+//     } catch (e) {
+//         responseException(res, e, 400)
+//     }
+// })
 
 router.patch('/team/member/add/:id', auth, verifyInputUpdateParameters(['member']), async (req, res) => {
     try {

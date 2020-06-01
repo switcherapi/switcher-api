@@ -14,13 +14,12 @@ const adminSchema = new mongoose.Schema({
         type: String,
         unique: true,
         required: true,
-        trim: true,
-        lowercase: true
+        trim: true
     },
     password: {
         type: String,
         required: true,
-        minlength: 7,
+        minlength: 5,
         trim: true
     },
     active: {

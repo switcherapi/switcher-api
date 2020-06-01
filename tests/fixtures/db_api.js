@@ -7,6 +7,7 @@ import GroupConfig from '../../src/models/group-config';
 import Config from '../../src/models/config';
 import Component from '../../src/models/component';
 import History from '../../src/models/history';
+import TeamInvite from '../../src/models/team-invite';
 import { Team } from '../../src/models/team';
 import { Role, ActionTypes, RouterTypes } from '../../src/models/role';
 import { Metric } from '../../src/models/metric';
@@ -153,43 +154,51 @@ export const team1 = {
     roles: [role1Id]
 }
 
+export const teamInviteNoTeam = {
+    _id: new mongoose.Types.ObjectId(),
+    teamid: new mongoose.Types.ObjectId(),
+    email: 'switcherapi@noreply.switcherapi.com'
+}
+
 export const setupDatabase = async () => {
-    await ConfigStrategy.deleteMany()
-    await Config.deleteMany()
-    await GroupConfig.deleteMany()
-    await Domain.deleteMany()
-    await Admin.deleteMany()
-    await Environment.deleteMany()
-    await Component.deleteMany()
-    await History.deleteMany()
-    await Metric.deleteMany()
-    await Team.deleteMany()
-    await Role.deleteMany()
+    await ConfigStrategy.deleteMany();
+    await Config.deleteMany();
+    await GroupConfig.deleteMany();
+    await Domain.deleteMany();
+    await Admin.deleteMany();
+    await Environment.deleteMany();
+    await Component.deleteMany();
+    await History.deleteMany();
+    await Metric.deleteMany();
+    await Team.deleteMany();
+    await TeamInvite.deleteMany();
+    await Role.deleteMany();
 
-    const refreshTokenMaster = await bcrypt.hash(adminMasterAccountToken.split('.')[2], 8)
+    const refreshTokenMaster = await bcrypt.hash(adminMasterAccountToken.split('.')[2], 8);
     adminMasterAccount.token = refreshTokenMaster;
-    await new Admin(adminMasterAccount).save()
+    await new Admin(adminMasterAccount).save();
 
-    const refreshToken = await bcrypt.hash(adminAccountToken.split('.')[2], 8)
+    const refreshToken = await bcrypt.hash(adminAccountToken.split('.')[2], 8);
     adminAccount.token = refreshToken;
-    await new Admin(adminAccount).save()
+    await new Admin(adminAccount).save();
 
-    await new Environment(environment1).save()
+    await new Environment(environment1).save();
 
-    const apiKey = await bcrypt.hash(domainDocument._id + 'Domain', 8)
-    const hash = await bcrypt.hash(apiKey, 8)
-    domainDocument.apihash = hash
-    await new Domain(domainDocument).save()
+    const apiKey = await bcrypt.hash(domainDocument._id + 'Domain', 8);
+    const hash = await bcrypt.hash(apiKey, 8);
+    domainDocument.apihash = hash;
+    await new Domain(domainDocument).save();
 
-    await new GroupConfig(groupConfigDocument).save()
-    await new Config(config1Document).save()
-    await new Config(config2Document).save()
-    await new ConfigStrategy(configStrategyDocument).save()
-    await new Team(team1).save()
-    await new Team(team).save()
-    await new Role(role1).save()
-    await new Role(roleAll1).save()
-    await new Role(roleAll2).save()
-    await new Role(roleAll3).save()
-    await new Role(roleAll4).save()
+    await new GroupConfig(groupConfigDocument).save();
+    await new Config(config1Document).save();
+    await new Config(config2Document).save();
+    await new ConfigStrategy(configStrategyDocument).save();
+    await new TeamInvite(teamInviteNoTeam).save();
+    await new Team(team1).save();
+    await new Team(team).save();
+    await new Role(role1).save();
+    await new Role(roleAll1).save();
+    await new Role(roleAll2).save();
+    await new Role(roleAll3).save();
+    await new Role(roleAll4).save();
 }

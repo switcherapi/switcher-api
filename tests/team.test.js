@@ -2,23 +2,25 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import app from '../src/app';
 import { Team } from '../src/models/team';
+import TeamInvite from '../src/models/team-invite';
 import Admin from '../src/models/admin';
 import { 
     setupDatabase,
     adminMasterAccountToken,
     domainId,
+    domainDocument,
     team1Id,
     adminAccountId,
     role1Id,
     team1,
-    role1,
     adminMasterAccountId,
-    adminMasterAccount
+    adminMasterAccount,
+    teamInviteNoTeam
  } from './fixtures/db_api';
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
-    await mongoose.disconnect()
+    await mongoose.disconnect();
 })
 
 describe('Insertion tests', () => {
@@ -284,54 +286,81 @@ describe('Updating team members tests', () => {
         expect(admin.teams[0]).toEqual(team1._id)
     })
 
-    test('TEAM_SUITE - Should invite an user', async () => {
-        await request(app)
-            .patch('/team/member/invite/' + team1Id)
+    test('TEAM_SUITE - Should create invite request', async () => {
+        let response = await request(app)
+            .post('/team/member/invite/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
-            }).expect(200)
+            }).expect(201);
 
         // DB validation
-        let admin = await Admin.findById(adminMasterAccountId)
-        expect(admin.teams.includes(team1._id)).toEqual(true)
+        let teamInvite = await TeamInvite.findById(response.body._id);
+        expect(teamInvite).not.toBeNull();
 
-        // Should NOT invite, already added
-        await request(app)
-            .patch('/team/member/invite/' + team1Id)
+        response = await request(app)
+            .get('/team/member/invite/' + teamInvite._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
-            }).expect(400)
+            }).expect(200);
 
+        expect(response.body.team).toEqual(team1.name);
+        expect(response.body.domain).toEqual(domainDocument.name);
+
+        // Should NOT invite, request already made
         await request(app)
-            .patch('/team/member/remove/' + team1Id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                member: adminMasterAccountId
-            }).expect(200)
-
-        // DB validation
-        admin = await Admin.findById(adminMasterAccountId)
-        expect(admin.teams.includes(team1._id)).toEqual(false)
-    })
-
-    test('TEAM_SUITE - Should NOT invite an user - Not found', async () => {
-        await request(app)
-            .patch('/team/member/invite/' + team1Id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                email: 'random.email@email.com'
-            }).expect(404)
-    })
-
-    test('TEAM_SUITE - Should NOT invite an user - Invalid Team ID', async () => {
-        await request(app)
-            .patch('/team/member/invite/INVALID_ID')
+            .post('/team/member/invite/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
-            }).expect(400)
+            }).expect(400);
+
+        // Should accept invitation
+        await request(app)
+            .post('/team/member/invite/accept/' + teamInvite._id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        // Should NOT accept invitation - Already used
+        await request(app)
+            .post('/team/member/invite/accept/' + teamInvite._id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404);
+    })
+
+    test('TEAM_SUITE - Should NOT create invite request - Invalid Team ID', async () => {
+        await request(app)
+            .post('/team/member/invite/INVALID_ID')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                email: adminMasterAccount.email
+            }).expect(400);
+    })
+
+    test('TEAM_SUITE - Should NOT get invitation request - Invalid Request ID', async () => {
+        await request(app)
+            .get('/team/member/invite/INVALID_ID')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                email: adminMasterAccount.email
+            }).expect(400);
+
+        await request(app)
+            .get('/team/member/invite/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                email: adminMasterAccount.email
+            }).expect(404);
+    })
+
+    test('TEAM_SUITE - Should NOT accept invite - Team does not exist', async () => {
+        const response = await request(app)
+            .post('/team/member/invite/accept/' + teamInviteNoTeam._id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(400);
+
+        expect(response.body.error).toEqual('Team does not exist anymore');
     })
 
     test('TEAM_SUITE - Should NOT add a team member - Team not found', async () => {
@@ -396,12 +425,21 @@ describe('Updating team members tests', () => {
     })
 
     test('TEAM_SUITE - Should NOT remove a team member - Member do not belong to the team', async () => {
+        // Remove member
         await request(app)
             .patch('/team/member/remove/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: adminMasterAccountId
-            }).expect(404)
+            }).expect(200);
+
+        // Trying to remove again
+        await request(app)
+            .patch('/team/member/remove/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                member: adminMasterAccountId
+            }).expect(404);
     })
 
     test('TEAM_SUITE - Should NOT remove a team member - Member not given', async () => {
