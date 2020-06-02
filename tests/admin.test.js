@@ -28,17 +28,26 @@ describe('Testing Admin insertion', () => {
     let axiosGetStub;
 
     test('ADMIN_SUITE - Should signup a new Admin', async () => {
+        // mock
+        axiosPostStub = sinon.stub(axios, 'post');
+
+        // given
+        const mockedRecaptchaResponse = { data: { success: true } };
+        axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
+
+        // test
         const response = await request(app)
             .post('/admin/signup')
             .send({
                 name: 'New Admin',
                 email: 'new_admin@mail.com',
-                password: '12312312312'
-            }).expect(201)
+                password: '12312312312',
+                token: 'GOOGLE_RECAPTCHA_TOKEN'
+            }).expect(201);
 
         // DB validation - document created
-        const admin = await Admin.findById(response.body.admin._id)
-        expect(admin).not.toBeNull()
+        const admin = await Admin.findById(response.body.admin._id);
+        expect(admin).not.toBeNull();
 
         // Response validation
         expect(response.body).toMatchObject({
@@ -47,7 +56,46 @@ describe('Testing Admin insertion', () => {
                 email: 'new_admin@mail.com',
                 active: true
             }
-        })
+        });
+
+        // restore
+        axiosPostStub.restore();
+    })
+
+    test('ADMIN_SUITE - Should NOT signup - Failed to validate reCaptcha', async () => {
+        // mock
+        axiosPostStub = sinon.stub(axios, 'post');
+
+        // given
+        const mockedRecaptchaResponse = { data: { success: false } };
+        axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
+
+        // test
+        const response = await request(app)
+            .post('/admin/signup')
+            .send({
+                name: 'New Admin',
+                email: 'new_admin@mail.com',
+                password: '12312312312',
+                token: 'GOOGLE_RECAPTCHA_TOKEN'
+            }).expect(400);
+
+        expect(response.body.error).toEqual('Failed to validate capatcha');
+
+        // restore
+        axiosPostStub.restore();
+    })
+
+    test('ADMIN_SUITE - Should NO signup - No token provided', async () => {
+        const response = await request(app)
+            .post('/admin/signup')
+            .send({
+                name: 'New Admin',
+                email: 'new_admin@mail.com',
+                password: '12312312312'
+            }).expect(400);
+
+        expect(response.body.error).toEqual('Token is empty or invalid');
     })
 
     test('ADMIN_SUITE - Should signup a new Admin - From GitHub', async () => {
@@ -89,7 +137,8 @@ describe('Testing Admin insertion', () => {
             .send({
                 name: 'Admin',
                 email: 'admin@',
-                password: '12312312312'
+                password: '12312312312',
+                token: 'GOOGLE_RECAPTCHA_TOKEN'
             }).expect(422);
     })
 

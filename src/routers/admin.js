@@ -5,6 +5,7 @@ import { verifyInputUpdateParameters } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
 import { responseException, verifyOwnership } from './common';
 import { getToken, getUserInfo } from '../external/oauth-git';
+import { validate_token } from '../external/google-recaptcha';
 
 const router = new express.Router()
 
@@ -18,15 +19,15 @@ router.post('/admin/signup', [
         return res.status(422).json({ errors: errors.array() });
     }
 
-    const admin = new Admin(req.body)
-
     try {
-        const jwt = await admin.generateAuthToken()
+        await validate_token(req);
+        const admin = new Admin(req.body);
+        const jwt = await admin.generateAuthToken();
 
-        await admin.save()
-        res.status(201).send({ admin, jwt })
+        await admin.save();
+        res.status(201).send({ admin, jwt });
     } catch (e) {
-        res.status(400).send(e)
+        res.status(400).send({ error: e.message });
     }
 })
 
