@@ -4,6 +4,7 @@ import app from '../src/app';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
 import Config from '../src/models/config';
+import Component from '../src/models/component';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../src/models/config-strategy';
 import { 
     setupDatabase,
@@ -737,7 +738,7 @@ describe("Testing criteria [REST] ", () => {
         token = response.body.token
     })
 
-    test('CLIENT_SUITE - Should return success on a simple CRITERIA response', (done) => {
+    test('CLIENT_SUITE - Should return success on a entry-based CRITERIA response', (done) => {
         request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${token}`)
@@ -756,6 +757,49 @@ describe("Testing criteria [REST] ", () => {
                 expect(body.strategies.length).toEqual(4);
                 expect(body.reason).toEqual('Success');
                 expect(body.result).toBe(true);
+                done();
+            })
+    })
+
+    test('CLIENT_SUITE - Should NOT return success on a entry-based CRITERIA response - Component not registered', async (done) => {
+        //given
+        const component = {
+            _id: new mongoose.Types.ObjectId(),
+            name: 'Temp Component',
+            description: 'Temporary component',
+            domain: domainId,
+            owner: adminMasterAccountId
+        }
+        await new Component(component).save();
+
+        const response = await request(app)
+            .post('/criteria/auth')
+            .set('switcher-api-key', `${apiKey}`)
+            .send({
+                domain: domainDocument.name,
+                component: component.name,
+                environment: EnvType.DEFAULT
+            }).expect(200);
+
+        const tempToken = response.body.token;
+
+        //test
+        request(app)
+            .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .set('Authorization', `Bearer ${tempToken}`)
+            .send({
+                entry: [
+                    {
+                        strategy: StrategiesType.VALUE,
+                        input: 'USER_1'
+                    },
+                    {
+                        strategy: StrategiesType.NETWORK,
+                        input: '10.0.0.3'
+                    }]})
+            .expect(200)
+            .end((err, { body }) => {
+                expect(body.error).toEqual(`Component ${component.name} is not registered to ${keyConfig}`);
                 done();
             })
     })

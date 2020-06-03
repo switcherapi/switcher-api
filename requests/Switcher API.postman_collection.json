@@ -75,7 +75,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Roger\",\n\t\"email\": \"mail@mail.com\",\n\t\"password\": \"123123123\"\n}",
+					"raw": "{\n\t\"name\": \"Google\",\n\t\"email\": \"google@mail.com\",\n\t\"password\": \"123123123\",\n\t\"token\": \"03AGdBq25Xnq--ldb6KpAMHvng1FPwI9Cpj_bQhKcz5ontUkhbJGyLEWOXUcbHYgf-AndjZU-kFVG4D3GK1sb_YtHXuDP_M2ZFcfruXHoq6MdxUn2zU0tjxatc4qe-azccPr0QnAvJSUlbiiFrQ-3VOutdrsBUbR51-gOQfdkdo7t3u-Q0rcgi6WsQEYrb7qV9Q6JB8M1UP0gO2enwoWfitBeaLuVzPv9I1bevthEECLKY2PgBgaEge3aMLv2YXOdjPZuj2z-HMapV2WAqd1uXeMkEr1viMhj2Fn9qcrb7wQE6gU_kv_Vooydpr6pfFH9BoWuC8_3HT03pGBsrkB-yrOP6KBznHHYLeHoBq9K-3gGqdXOSeEIZZwPZEISIqntUVJbszcNjFPgUGpR1p_4y98wREhBr8iqjyLURzS9s5wKBm22oxuOddk32PgugrTOQKZd56tvLDWM_\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -90,6 +90,64 @@
 					"path": [
 						"admin",
 						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - GitHub Auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7ca62578-cf6e-4397-8322-e655149e3ae2",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('authToken', pm.response.json().jwt.token)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/admin/github/auth?code=",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"github",
+						"auth"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": ""
+						}
 					]
 				}
 			},
@@ -1049,6 +1107,154 @@
 					"path": [
 						"team",
 						"5e0d10c21078a209b4215b7f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Team - Invite Member",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "df142016-2b6f-4e1c-b3d1-f53a58ba2994",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"roger.petruki@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/member/invite/5e10eda73a649463a8ef3751",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"member",
+						"invite",
+						"5e10eda73a649463a8ef3751"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Team - Accept Invite",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "72a132bb-99ba-479a-869c-0edd63ec02a5",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/member/invite/accept/5ed404eabe178984d812f61e",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"member",
+						"invite",
+						"accept",
+						"5ed404eabe178984d812f61e"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Team - Invite Info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "01bcef61-ee52-48ef-9a04-dbea377cfeb2",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\": \"roger.petruki@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/member/invite/5ed404eabe178984d812f61e",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"member",
+						"invite",
+						"5ed404eabe178984d812f61e"
 					]
 				}
 			},
@@ -3851,6 +4057,30 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "{\r\n    # domain(name: \"Switcher API\") {\r\n    domain(_id: \"5e0ece606f4f994eac9007ae\", environment: \"default\") {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        statusByEnv {\r\n            env\r\n            value\r\n        }\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                statusByEnv {\r\n                    env\r\n                    value\r\n                }\r\n                strategies {\r\n                    _id\r\n                    strategy\r\n                    activated\r\n                    statusByEnv {\r\n                        env\r\n                        value\r\n                    }\r\n                    operation\r\n                    values\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{url}}/adm-graphql",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"adm-graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Client - Config Tree (Adm-GraphQL)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "{\r\n    # domain(name: \"Switcher API\") {\r\n    domain(_id: \"5e0ece606f4f994eac9007ae\", environment: \"default\") {\r\n        group {\r\n            config {\r\n                key\r\n            }\r\n        }\r\n    }\r\n}",
 						"variables": ""
 					}
 				},

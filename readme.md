@@ -6,27 +6,23 @@
 
 ![Switcher API: Cloud-based Feature Flag API](https://github.com/petruki/switcherapi-assets/blob/master/logo/switcherapi_grey.png)
 
-# Requirements  
-- MongoDB
-- Postman (optional for request examples)
-
 # About  
-**Switcher API** is an online *Feature Flag* API used to toggle features over different applications simultaneously.
+**Switcher API** is a *Feature Flag* API with the main focus on decreasing the friction caused by changes while keeping control of what really matters.
 
 Main features:
-- It is a remote toggle API. No fixed or immutable configuration files.
-- You no longer only toggle code, but business features. You can set up your eco-system to share switchers between applications.
-- Cross environment. You are still working on your feature but want to keep the production environment safe from whatever change you make.
-- Parallel strategies for the same switcher. Your test environment does not have the same variable as production. You can set up different strategies for the same switcher for two different environments.
-- Create teams with different roles of access.
-- It keeps track of every configuration change.
-- Produce relevant metrics.
-- High-security flow using *OAuth 2.0* flow and different levels of credentials for administrators.
-- Client URIs exposed in **REST** and **GraphQL**.
-- Generate a snapshot from your domain/environment to use with the offline mode of your Switcher Client.  
- - **JavaScript lib**: (https://github.com/petruki/switcher-client-master)
- - **Java lib**: (https://github.com/petruki/switcher-client)
- - **Switcher Management**: (https://github.com/petruki/switcher-management)
+- Control more using little effort by sharing switchers among application components.
+- Cross environment. Generate zero impact when manipulating switchers.
+- Customizable environment strategies. Setup switchers using variables per environment.
+- Create manageable teams to collaborate.
+- Keep track of every configuration change.
+- Detailed metrics.
+- Client endpoints exposed in **REST** and **GraphQL**.
+- Zero-latency mode also enables your applications to work with no latency.
+ 
+
+- **JavaScript lib**: (https://github.com/petruki/switcher-client-master)
+- **Java lib**: (https://github.com/petruki/switcher-client)
+- **Switcher Management**: (https://github.com/petruki/switcher-management)
 
 # Configuration
 1) npm install
@@ -45,31 +41,12 @@ Main features:
     "HISTORY_ACTIVATED": true,
     "METRICS_ACTIVATED": true,
     "GIT_OAUTH_CLIENT_ID": "[GITHUB_CLIENT_ID]",
-    "GIT_OAUTH_SECRET": "[GITHUB_API_SECRET]"
+    "GIT_OAUTH_SECRET": "[GITHUB_API_SECRET]",
+    "GOOGLE_RECAPTCHA_SECRET": "[GOOGLE_RECAPTCHA_SECRET]"
   },
   "prod": {
-    "PORT": "3000",
-    "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-prd",
-    "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
-    "JWT_ADMIN_TOKEN_RENEW_INTERVAL": "5m",
-    "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
-    "MAX_EXIST_STRATEGYOPERATION": 100,
-    "HISTORY_ACTIVATED": false,
-    "METRICS_ACTIVATED": true,
-    "GIT_OAUTH_CLIENT_ID": "[GITHUB_CLIENT_ID]",
-    "GIT_OAUTH_SECRET": "[GITHUB_API_SECRET]"
   },
   "test": {
-    "PORT": "3000",
-    "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-test",
-    "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
-    "JWT_ADMIN_TOKEN_RENEW_INTERVAL": "5m",
-    "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
-    "MAX_EXIST_STRATEGYOPERATION": 100,
-    "HISTORY_ACTIVATED": true,
-    "METRICS_ACTIVATED": true,
-    "GIT_OAUTH_CLIENT_ID": "[GITHUB_CLIENT_ID]",
-    "GIT_OAUTH_SECRET": "[GITHUB_API_SECRET]"
   }
 }
 ```
@@ -97,7 +74,8 @@ Once token expires, a new one can be generate using: **{{url}}/admin/refresh/me*
 {
   "name": "Switcher User",
   "email": "mail@gmail.com",
-  "password": "123123123"
+  "password": "123123123",
+  "token": "GOOGLE_TOKEN"
 }
 ```
 *copy from the response the generated token to use in conjunction with the next steps.*

@@ -1,6 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import { checkConfig } from '../middleware/validators';
+import { checkConfig, checkConfigComponent } from '../middleware/validators';
 import { appAuth, appGenerateCredentials } from '../middleware/auth';
 import { resolveCriteria } from '../client/resolvers';
 
@@ -10,7 +10,7 @@ const router = new express.Router()
 // GET /check?key=KEY&showReason=true
 // GET /check?key=KEY&showStrategy=true
 // GET /check?key=KEY&bypassMetric=true
-router.post('/criteria', appAuth, checkConfig, async (req, res) => {
+router.post('/criteria', appAuth, checkConfig, checkConfigComponent, async (req, res) => {
     try {
         const environment = req.environment
         const domain = req.domain

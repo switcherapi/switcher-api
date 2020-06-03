@@ -93,6 +93,7 @@ export const configDocument = {
     description: 'Test config 1',
     activated: new Map().set(EnvType.DEFAULT, true),
     owner: adminMasterAccountId,
+    components: [],
     group: groupConfigId,
     domain: domainId
 }
@@ -157,6 +158,7 @@ export const component1 = {
     domain: domainId,
     owner: adminMasterAccountId
 }
+configDocument.components.push(component1Id);
 
 export const roleConfigsId = new mongoose.Types.ObjectId()
 export const roleConfigs = {
