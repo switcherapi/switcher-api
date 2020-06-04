@@ -23,25 +23,31 @@ async function verifyAddComponentInput(configId, admin) {
 
 router.post('/config/create', auth, async (req, res) => {
     try {
-        const group = await GroupConfig.findById(req.body.group)
+        const group = await GroupConfig.findById(req.body.group);
 
         if (!group) {
-            return res.status(404).send({ error: 'Group Config not found' })
+            return res.status(404).send({ error: 'Group Config not found' });
+        }
+
+        let config = await Config.findOne({ key: req.body.key, group: group._id, domain: group.domain });
+
+        if (config) {
+            return res.status(400).send({ error: `Config ${config.key} already exist` });
         }
     
-        let config = new Config({
+        config = new Config({
             ...req.body,
             domain: group.domain,
             owner: req.admin._id
-        })
+        });
 
-        config = await verifyOwnership(req.admin, config, group.domain, ActionTypes.CREATE, RouterTypes.CONFIG)
+        config = await verifyOwnership(req.admin, config, group.domain, ActionTypes.CREATE, RouterTypes.CONFIG);
 
-        await config.save()
-        updateDomainVersion(config.domain)
-        res.status(201).send(config)
+        await config.save();
+        updateDomainVersion(config.domain);
+        res.status(201).send(config);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
@@ -179,21 +185,29 @@ router.delete('/config/:id', auth, async (req, res) => {
 router.patch('/config/:id', auth,
     verifyInputUpdateParameters(['key', 'description']), async (req, res) => {
     try {
-        let config = await Config.findById(req.params.id)
+        let config = await Config.findById(req.params.id);
  
         if (!config) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
-        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG)
-        config.updatedBy = req.admin.email
+        if (req.body.key) {
+            const configFound = await Config.findOne({ key: req.body.key, group: config.group, domain: config.domain });
+    
+            if (configFound) {
+                return res.status(400).send({ error: `Config ${req.body.key} already exist` });
+            }
+        }
 
-        req.updates.forEach((update) => config[update] = req.body[update])
-        await config.save()
-        updateDomainVersion(config.domain)
-        res.send(config)
+        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
+        config.updatedBy = req.admin.email;
+
+        req.updates.forEach((update) => config[update] = req.body[update]);
+        await config.save();
+        updateDomainVersion(config.domain);
+        res.send(config);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 

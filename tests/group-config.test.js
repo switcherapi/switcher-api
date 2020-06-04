@@ -30,21 +30,33 @@ describe('Testing Group insertion', () => {
     beforeAll(setupDatabase)
 
     test('GROUP_SUITE - Should create a new Group Config', async () => {
-        const response = await request(app)
+        let response = await request(app)
             .post('/groupconfig/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'New Group Config',
                 description: 'Description of my new Group Config',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         // DB validation - document created
-        const group = await GroupConfig.findById(response.body._id)
-        expect(group).not.toBeNull()
+        const group = await GroupConfig.findById(response.body._id);
+        expect(group).not.toBeNull();
 
         // Response validation
-        expect(response.body.name).toBe('New Group Config')
+        expect(response.body.name).toBe('New Group Config');
+
+        // Should not create duplicated
+        response = await request(app)
+            .post('/groupconfig/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'New Group Config',
+                description: 'Description of my new Group Config',
+                domain: domainId
+            }).expect(400);
+
+        expect(response.body.error).toBe(`Group New Group Config already exist`);
     })
 
     test('GROUP_SUITE - Should not create a new Group Config - with wrong domain Id', async () => {
@@ -234,20 +246,30 @@ describe('Testing update Group info', () => {
 
     test('GROUP_SUITE - Should update Group Config info', async () => {
 
-        let group = await GroupConfig.findById(groupConfigId)
-        expect(group).not.toBeNull()
+        let group = await GroupConfig.findById(groupConfigId);
+        expect(group).not.toBeNull();
 
         await request(app)
             .patch('/groupconfig/' + groupConfigId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'Updated Group Name'
-            }).expect(200)
+            }).expect(200);
         
         // DB validation - verify data updated
-        group = await GroupConfig.findById(groupConfigId)
-        expect(group).not.toBeNull()
-        expect(group.name).toEqual('Updated Group Name')
+        group = await GroupConfig.findById(groupConfigId);
+        expect(group).not.toBeNull();
+        expect(group.name).toEqual('Updated Group Name');
+
+        // Should not update - same name
+        const response = await request(app)
+            .patch('/groupconfig/' + groupConfigId)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'Updated Group Name'
+            }).expect(400);
+
+        expect(response.body.error).toEqual(`Group Updated Group Name already exist`);
     })
 
     test('GROUP_SUITE - Should NOT update Group Config info', async () => {

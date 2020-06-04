@@ -23,21 +23,27 @@ router.post('/groupconfig/create', auth, async (req, res) => {
     let groupconfig = new GroupConfig({
         ...req.body,
         owner: req.admin._id
-    })
+    });
 
     try {
-        const domain = await Domain.findById(req.body.domain)
+        let group = await GroupConfig.findOne({ name: req.body.name, domain: req.body.domain });
 
-        if (!domain) {
-            return res.status(404).send({ error: 'Domain not found' })
+        if (group) {
+            return res.status(400).send({ error: `Group ${group.name} already exist` });
         }
 
-        groupconfig = await verifyOwnership(req.admin, groupconfig, domain._id, ActionTypes.CREATE, RouterTypes.GROUP)
-        updateDomainVersion(domain._id)
-        await groupconfig.save()
-        res.status(201).send(groupconfig)
+        const domain = await Domain.findById(req.body.domain);
+
+        if (!domain) {
+            return res.status(404).send({ error: 'Domain not found' });
+        }
+
+        groupconfig = await verifyOwnership(req.admin, groupconfig, domain._id, ActionTypes.CREATE, RouterTypes.GROUP);
+        updateDomainVersion(domain._id);
+        await groupconfig.save();
+        res.status(201).send(groupconfig);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
@@ -170,15 +176,23 @@ router.delete('/groupconfig/:id', auth, async (req, res) => {
 router.patch('/groupconfig/:id', auth, 
     verifyInputUpdateParameters(['name', 'description']), async (req, res) => {
     try {
-        const groupconfig = await verifyGroupInput(req.params.id, req.admin)
-        groupconfig.updatedBy = req.admin.email
+        const groupconfig = await verifyGroupInput(req.params.id, req.admin);
+        groupconfig.updatedBy = req.admin.email;
 
-        req.updates.forEach((update) => groupconfig[update] = req.body[update])
-        await groupconfig.save()
-        updateDomainVersion(groupconfig.domain)
-        res.send(groupconfig)
+        if (req.body.name) {
+            let groupFound = await GroupConfig.findOne({ name: req.body.name, domain: groupconfig.domain });
+    
+            if (groupFound) {
+                return res.status(400).send({ error: `Group ${req.body.name} already exist` });
+            }
+        }
+
+        req.updates.forEach((update) => groupconfig[update] = req.body[update]);
+        await groupconfig.save();
+        updateDomainVersion(groupconfig.domain);
+        res.send(groupconfig);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 

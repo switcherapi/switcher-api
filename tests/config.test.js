@@ -30,21 +30,33 @@ describe('Testing configuration insertion', () => {
     beforeAll(setupDatabase)
 
     test('CONFIG_SUITE - Should create a new Config', async () => {
-        const response = await request(app)
+        let response = await request(app)
             .post('/config/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 key: 'NEW_CONFIG',
                 description: 'Description of my new Config',
                 group: groupConfigId
-            }).expect(201)
+            }).expect(201);
 
         // DB validation - document created
-        const config = await Config.findById(response.body._id)
-        expect(config).not.toBeNull()
+        const config = await Config.findById(response.body._id);
+        expect(config).not.toBeNull();
 
         // Response validation
-        expect(response.body.key).toBe('NEW_CONFIG')
+        expect(response.body.key).toBe('NEW_CONFIG');
+
+        // Should not create duplicated
+        response = await request(app)
+            .post('/config/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                key: 'NEW_CONFIG',
+                description: 'Description of my new Config',
+                group: groupConfigId
+            }).expect(400);
+
+        expect(response.body.error).toBe(`Config NEW_CONFIG already exist`);
     })
 
     test('CONFIG_SUITE - Should NOT create a new Config - with wrong group config Id', async () => {
@@ -223,8 +235,8 @@ describe('Testing update info', () => {
 
     test('CONFIG_SUITE - Should update Config info', async () => {
 
-        let config = await Config.findById(configId1)
-        expect(config).not.toBeNull()
+        let config = await Config.findById(configId1);
+        expect(config).not.toBeNull();
 
         await request(app)
             .patch('/config/' + configId1)
@@ -232,13 +244,21 @@ describe('Testing update info', () => {
             .send({
                 key: 'NEWKEY',
                 description: 'New description'
-            }).expect(200)
+            }).expect(200);
         
         // DB validation - verify flag updated
-        config = await Config.findById(configId1)
-        expect(config).not.toBeNull()
-        expect(config.key).toEqual('NEWKEY')
-        expect(config.description).toEqual('New description')
+        config = await Config.findById(configId1);
+        expect(config).not.toBeNull();
+        expect(config.key).toEqual('NEWKEY');
+        expect(config.description).toEqual('New description');
+
+        // Should not update - same key
+        const response = await request(app)
+            .patch('/config/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({ key: 'NEWKEY' }).expect(400);
+
+        expect(response.body.error).toEqual(`Config NEWKEY already exist`);
     })
 
     test('CONFIG_SUITE - Should NOT update Config info', async () => {

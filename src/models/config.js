@@ -9,8 +9,7 @@ const configSchema = new mongoose.Schema({
     key: {
         type: String,
         required: true,
-        unique: true,
-        trim: true
+        trim: true,
     },
     description: {
         type: String,
@@ -47,6 +46,8 @@ const configSchema = new mongoose.Schema({
 }, {
     timestamps: true
 })
+
+configSchema.index({ key: 1 });
 
 configSchema.virtual('history', {
     ref: 'History',
