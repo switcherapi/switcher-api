@@ -132,13 +132,21 @@ router.delete('/team/:id', auth, async (req, res) => {
 router.post('/team/member/invite/:id', auth, verifyInputUpdateParameters(['email']), async (req, res) => {
     try {
         const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE);
+        const email = req.body.email.trim();
 
-        const teamInvite = new TeamInvite({
-            teamid: team._id,
-            email: req.body.email.trim()
-        });
+        let teamInvite = await TeamInvite.findOne({ email });
 
-        await teamInvite.save();
+        if (teamInvite) {
+            return res.status(200).send(teamInvite);
+        } else {
+            teamInvite = new TeamInvite({
+                teamid: team._id,
+                email: req.body.email.trim()
+            });
+    
+            await teamInvite.save();
+        }
+
         res.status(201).send(teamInvite);
     } catch (e) {
         responseException(res, e, 400);

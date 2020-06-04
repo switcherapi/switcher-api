@@ -308,13 +308,13 @@ describe('Updating team members tests', () => {
         expect(response.body.team).toEqual(team1.name);
         expect(response.body.domain).toEqual(domainDocument.name);
 
-        // Should NOT invite, request already made
+        // Should get invite already made
         await request(app)
             .post('/team/member/invite/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
-            }).expect(400);
+            }).expect(200);
 
         // Should accept invitation
         await request(app)

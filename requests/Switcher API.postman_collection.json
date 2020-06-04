@@ -1238,7 +1238,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"email\": \"roger.petruki@gmail.com\"\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1246,7 +1246,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/team/member/invite/5ed404eabe178984d812f61e",
+					"raw": "{{url}}/team/member/invite/5ed80055ada7c13b4cfd6a63",
 					"host": [
 						"{{url}}"
 					],
@@ -1254,7 +1254,7 @@
 						"team",
 						"member",
 						"invite",
-						"5ed404eabe178984d812f61e"
+						"5ed80055ada7c13b4cfd6a63"
 					]
 				}
 			},
