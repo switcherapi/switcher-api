@@ -7,6 +7,7 @@
 ![Switcher API: Cloud-based Feature Flag API](https://github.com/petruki/switcherapi-assets/blob/master/logo/switcherapi_grey.png)
 
 # About  
+
 **Switcher API** is a *Feature Flag* API with the main focus on decreasing the friction caused by changes while keeping control of what really matters.
 
 Main features:
@@ -24,10 +25,12 @@ Main features:
 - **Java lib**: (https://github.com/petruki/switcher-client)
 - **Switcher Management**: (https://github.com/petruki/switcher-management)
 
-# Configuration
-1) npm install
-2) Add .env-cmdrc file into the project directory.
-3) Fill it according to the description below.
+* * *
+
+### Local setup
+1. npm install
+2. Add .env-cmdrc file into the project directory.
+3. Fill it according to the description below.
 
 ```
 {
@@ -51,126 +54,182 @@ Main features:
 }
 ```
 
-# Testing using JEST
-Different suites were created to test them separately.
+# Usage
+### API configuration
+#### Signing up
+Signing up to Switcher API must be made via Switcher Management.
+<br />It can be done by using an email address or linking it to a GitHub account.
 
-- Example: test only Admin routers:
-```
-npm run test-admin
-```
-
-# Hands-on testing
-Find attached into this repository some request samples (./requests). You just need to import to Postman.
-
-{{url}} = endpoint from where you are running the API.
-
-All calls use **Bearer Token**. Remember to copy the jwt combination after signing up. It generates a expirable token and a refresh token.
-
-Once token expires, a new one can be generate using: **{{url}}/admin/refresh/me**
-
-**1) Create a master admin user.**
-- {{url}}/admin/signup [POST]
+- **Singing up via email** - /admin/signup [POST]
 ```json
 {
-  "name": "Switcher User",
-  "email": "mail@gmail.com",
-  "password": "123123123",
-  "token": "GOOGLE_TOKEN"
-}
-```
-*copy from the response the generated token to use in conjunction with the next steps.*
-
-**2) Create your domain.**
-- {{url}}/domain/create [POST]
-```json
-{
-  "name": "MyCompany Solutions",
-  "description": "Your company/business description here"
-}
-```
-*copy from the response the domain _id for the next step.*
-
-*copy from the response your API Key for executing your configuration later on. You can generate it again if you lost it.*
-
-**3) Create a component.**
-- {{url}}/component/create [POST]
-```json
-{
-  "name": "MyApp 2.0",
-  "description": "My application description",
-  "domain": "5df166239194d613400a52e7"
+    "name": "[USER NAME]",
+    "email": "[EMAIL ADDRESS]",
+    "password": "[PASSWORD]",
+    "token": "[GOOGLE reCAPTCHA TOKEN]"
 }
 ```
 
-**4) Create a switcher group.**
-- {{url}}/groupconfig/create [POST]
+- **Singing up via GitHub** - /admin/github/auth?code= [POST]
+  Code must be set by the API service provider.
+
+#### Domain
+
+- **New domain** - /domain/create [POST]
+  The API Key will be generated after creating the domain.
 ```json
 {
-  "name": "Project New Feature",
-  "description": "My new Project features",
-  "domain": "5df166239194d613400a52e7"
+    "name": "[DOMAIN NAME]",
+    "description": "[DOMAIN DESCRIPTION]"
 }
 ```
-*copy from the response the group _id for the next step.*
 
-**5) Create a switcher configuration. This is the one you will use on your application.**
-- {{url}}/config/create
+- **Generating a new API Key** - /domain/generateApiKey/DOMAIN_ID [GET]
+  This operation cannot be undone.
+
+#### Component
+
+- **Create a component** - /component/create [POST]
 ```json
 {
-  "key": "NEW_FEATURE",
-  "description": "Call my new page",
-  "group": "5df166429194d613400a52ea"
+    "name": "[COMPONENT NAME]",
+    "description": "[COMPONENT DESCRIPTION]",
+    "domain": "[DOMAIN ID]"
 }
 ```
-*copy from the response the config _id for the next optional step.*
 
-**6) Optional step - Create a strategy for this configuration.**
-- {{url}}/configstrategy/create
+#### Group
+
+- **New Group** - /groupconfig/create [POST]
 ```json
 {
-  "description": "Users allowed to use this new feature",
-  "strategy": "VALUE_VALIDATION",
-  "values": ["Victoria", "John", "Julia", "Mark", "Roger"],
-  "operation": "EXIST",
-  "config": "5df1664d9194d613400a52eb",
-  "env": "default"
+    "name": "[GROUP NAME]",
+    "description": "[GROUP DESCRIPTION]",
+    "domain": "[DOMAIN ID]"
 }
 ```
-- Field 'env' is only available to set up on strategy creation since its values might not be the same in production environment.
 
-# Using the configuration
-Let's use your configuration. Do you still have the API Key generated when you had created your domain?
-- {{url}}/domain/generateApiKey/{{YOUR_DOMAIN_ID_HERE}} [GET]
+#### Switcher
 
-*copy your new API Key*
-
-**1) Getting your token.**
-- {{url}}/criteria/auth [GET]
-
-- Header 
-    * Key: switcher-api-key
-    * Value: {{YOUR API KEY HERE}}
+- **New Switcher** - /config/create [POST]
 ```json
 {
-   "domain": "MyCompany Solutions",
-   "component": "MyApp 2.0",
+    "key": "[SWITCHER KEY]",
+    "description": "[SWITCHER DESCRIPTION]",
+    "group": "[GROUP ID]"
+}
+```
+
+#### Strategy
+
+- **New Strategy** - /configstrategy/create [POST]
+```json
+{
+    "description": "[STRATEGY DESCRIPTION]",
+    "strategy": "[STRATEGY TYPE]",
+    "values": ["ARRAY OF VALUES"],
+    "operation": "[SRATEGY OPERATION]",
+    "config": "[CONFIG ID]",
+    "env": "default"
+}
+```
+
+*env can be replaced by the environment your application is currently running.*
+
+  - **Strategy types**
+    - VALUE_VALIDATION
+
+      Plain text validation. No format required.
+
+    - NETWORK_VALIDATION
+
+      This validation accept CIDR (e.g. 10.0.0.0/24) or IPv4 (e.g. 10.0.0.1) formats.
+
+    - TIME_VALIDATION
+
+      This validation accept only HH:mm format input.
+
+    - DATE_VALIDATION
+
+      Date validation accept both date and time input (e.g. YYYY-MM-DD or YYYY-MM-DDTHH:mm) formats.
+
+  - **Strategy operations**
+    - EXIST / NOT_EXIST
+    - EQUAL / NOT_EQUAL
+    - GREATER / LOWER / BETWEEN
+
+* * *
+
+### API usage
+To use the API, each component must authenticate before executing the API criteria evaluation.
+
+- **Auth** - /criteria/auth [POST]
+The header must contain the following:
+```
+'headers': {
+    'switcher-api-key': '[API_KEY]'
+}
+```
+The body must contain the exact registered domain, component, and environment name.
+```json
+{
+   "domain": "[DOMAIN NAME]",
+   "component": "[COMPONENT NAME]",
    "environment": "default"
 }
 ```
-*copy from the response your token.*
 
-**2) Executing your configuration.**
+- **Executing** - /criteria?key=SWITCHER_KEY [POST]
+The header must contain the authorization token provided by the criteria/auth endpoint.
+```
+Bearer Token: [TOKEN]
+```
 
-{{url}}/criteria?key=NEW_FEATURE [GET]
+**Optional parameters**
+
+- showReason [true/false]: returns the criteria result.
+- showStrategy [true/false]: returns the configured strategy.
+- bypassMetric [true'false]: bypass registering the execution result.
+
+**REST - Strategy input**
+
+Multiple input can be provided to the API. In case the registered Switcher does not contain any configured strategy, the input sent is going to be ignored.
+
 ```json
 {
   "entry": [
     {
-      "strategy": "VALUE_VALIDATION",
-      "input": "Victoria"
+      "strategy": "[STRATEGY TYPE]",
+      "input": "[VALUE]"
     }]
 }
 ```
+
+**GraphQL - Strategy input** - /graphql [POST]
+
+A GraphQL endpoint can also be used to execute the API. Extra return information can be specified under response block request.
+
+```
+{
+  criteria(
+    key: "[SWITCHER KEY]", 
+    bypassMetric: [true/false],
+    entry: [
+        {
+          strategy: "[STRATEGY TYPE]", 
+          input: "[VALUE]"
+        }
+      ]
+    ) {
+    response {
+      result
+      reason
+    }
+  }
+}
+```
+
+* * *
 
 ## Donation
 Donations for cookies and pizza are extremely welcomed.
