@@ -141,6 +141,10 @@ Signing up to Switcher API must be made via Switcher Management.
 
       Plain text validation. No format required.
 
+    - NUMERIC_VALIDATION
+
+      Integer or Decimal value validation.
+
     - NETWORK_VALIDATION
 
       This validation accept CIDR (e.g. 10.0.0.0/24) or IPv4 (e.g. 10.0.0.1) formats.

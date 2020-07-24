@@ -8,6 +8,7 @@ import { NotFoundError } from '../routers/common';
 export const StrategiesType = Object.freeze({
     NETWORK: 'NETWORK_VALIDATION',
     VALUE: 'VALUE_VALIDATION',
+    NUMERIC: 'NUMERIC_VALIDATION',
     TIME: 'TIME_VALIDATION',
     DATE: 'DATE_VALIDATION'
 });
@@ -32,6 +33,13 @@ const StrategyRequirementDefinition = [
     {
         strategy: StrategiesType.VALUE,
         operations: [OperationsType.EXIST, OperationsType.NOT_EXIST, OperationsType.EQUAL, OperationsType.NOT_EQUAL]
+    },
+    {
+        strategy: StrategiesType.NUMERIC,
+        operations: [OperationsType.EXIST, OperationsType.NOT_EXIST, OperationsType.EQUAL, OperationsType.NOT_EQUAL,
+            OperationsType.BETWEEN, OperationsType.LOWER, OperationsType.GREATER],
+        format: 'Integer or Decimal',
+        validator: '([0-9]+(.[0-9])?)'
     },
     {
         strategy: StrategiesType.TIME,
@@ -83,30 +91,30 @@ const OperationValuesValidation = [
         min: 2,
         max: 2
     }
-]
+];
 
 export function validateStrategyValue(strategy, value) {
-    const strategyRules = StrategyRequirementDefinition.filter(element => element.strategy === strategy)
+    const strategyRules = StrategyRequirementDefinition.filter(element => element.strategy === strategy);
 
     if (!value.match(strategyRules[0].validator)) {
-        throw new Error(`Value does not match with the requirements for this Strategy. Please, try using: ${strategyRules[0].format}`)
+        throw new Error(`Value does not match with the requirements for this Strategy. Please, try using: ${strategyRules[0].format}`);
     }
-    return true
+    return true;
 }
 
 export function strategyRequirements(strategy) {
-    const foundStrategy = Object.values(StrategiesType).find(element => element === strategy)
+    const foundStrategy = Object.values(StrategiesType).find(element => element === strategy);
 
     if (!foundStrategy) {
-        throw new NotFoundError(`Strategy '${strategy}' not found. Please, try using: ${Object.values(StrategiesType)}`)
+        throw new NotFoundError(`Strategy '${strategy}' not found. Please, try using: ${Object.values(StrategiesType)}`);
     }
 
-    const operationsAvailable = StrategyRequirementDefinition.find(element => element.strategy === foundStrategy)
+    const operationsAvailable = StrategyRequirementDefinition.find(element => element.strategy === foundStrategy);
 
-    let operationRequirements = []
+    let operationRequirements = [];
     operationsAvailable.operations.forEach((o) => {
-        operationRequirements.push(OperationValuesValidation.find(element => element.operation === o))
-    })
+        operationRequirements.push(OperationValuesValidation.find(element => element.operation === o));
+    });
 
     return {
         strategy,
@@ -118,19 +126,21 @@ export function strategyRequirements(strategy) {
 export function processOperation(strategy, operation, input, values) {
     switch(strategy) {
         case StrategiesType.NETWORK:
-            return processNETWORK(operation, input, values)
+            return processNETWORK(operation, input, values);
         case StrategiesType.VALUE:
-            return processVALUE(operation, input, values)
+            return processVALUE(operation, input, values);
+        case StrategiesType.NUMERIC:
+            return processNUMERIC(operation, input, values);
         case StrategiesType.TIME:
-            return processTime(operation, input, values)
+            return processTime(operation, input, values);
         case StrategiesType.DATE:
-            return processDate(operation, input, values)
+            return processDate(operation, input, values);
     }
 }
 
 function processNETWORK(operation, input, values) {
 
-    const cidrRegex = '^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$'
+    const cidrRegex = '^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$';
     
     switch(operation) {
         case OperationsType.EXIST:
@@ -138,10 +148,10 @@ function processNETWORK(operation, input, values) {
                 if (values[i].match(cidrRegex)) {
                     const cidr = new IPCIDR(values[i]);
                     if (cidr.contains(input)) {
-                        return true
+                        return true;
                     }
                 } else {
-                    return values.includes(input)
+                    return values.includes(input);
                 }
             }
             break;
@@ -150,69 +160,93 @@ function processNETWORK(operation, input, values) {
                 if (element.match(cidrRegex)) {
                     const cidr = new IPCIDR(element);
                     if (cidr.contains(input)) {
-                        return true
+                        return true;
                     }
                 } else {
-                    return values.includes(input)
+                    return values.includes(input);
                 }
             })
-            return result.length === 0
+            return result.length === 0;
     }
 
-    return false
+    return false;
 }
 
 function processVALUE(operation, input, values) {
     switch(operation) {
         case OperationsType.EXIST:
-            return values.includes(input)
+            return values.includes(input);
         case OperationsType.NOT_EXIST:
-            return !values.includes(input)
+            return !values.includes(input);
         case OperationsType.EQUAL:
-            return input === values[0]
+            return input === values[0];
         case OperationsType.NOT_EQUAL:
-            const result = values.filter(element => element === input)
-            return result.length === 0
+            return values.filter(element => element === input).length === 0;
+    }
+}
+
+function processNUMERIC(operation, input, values) {
+    switch(operation) {
+        case OperationsType.EXIST:
+            return values.includes(input);
+        case OperationsType.NOT_EXIST:
+            return !values.includes(input);
+        case OperationsType.EQUAL:
+            return input === values[0];
+        case OperationsType.NOT_EQUAL:
+            return values.filter(element => element === input).length === 0;
+        case OperationsType.LOWER:
+            return input < values[0];
+        case OperationsType.GREATER:
+            return input > values[0];
+        case OperationsType.BETWEEN:
+            return input >= values[0] && input <= values[1];
     }
 }
 
 function processTime(operation, input, values) {
-    const today = moment().format('YYYY-MM-DD')
+    const today = moment().format('YYYY-MM-DD');
 
     switch(operation) {
         case OperationsType.LOWER:
-            return moment(`${today}T${input}`).isSameOrBefore(`${today}T${values[0]}`)
+            return moment(`${today}T${input}`).isSameOrBefore(`${today}T${values[0]}`);
         case OperationsType.GREATER:
-            return moment(`${today}T${input}`).isSameOrAfter(`${today}T${values[0]}`)
+            return moment(`${today}T${input}`).isSameOrAfter(`${today}T${values[0]}`);
         case OperationsType.BETWEEN:
-            return moment(`${today}T${input}`).isBetween(`${today}T${values[0]}`, `${today}T${values[1]}`)
+            return moment(`${today}T${input}`).isBetween(`${today}T${values[0]}`, `${today}T${values[1]}`);
     }
 }
 
 function processDate(operation, input, values) {
     switch(operation) {
         case OperationsType.LOWER:
-            return moment(input).isSameOrBefore(values[0])
+            return moment(input).isSameOrBefore(values[0]);
         case OperationsType.GREATER:
-            return moment(input).isSameOrAfter(values[0])
+            return moment(input).isSameOrAfter(values[0]);
         case OperationsType.BETWEEN:
-            return moment(input).isBetween(values[0], values[1])
+            return moment(input).isBetween(values[0], values[1]);
     }
 }
 
 async function recordStrategyHistory(strategyConfig, modifiedField) {
     if (strategyConfig.__v !== undefined && modifiedField.length) {
         const oldStrategy = await ConfigStrategy.findById(strategyConfig._id);
-        recordHistory(modifiedField, oldStrategy, strategyConfig)
+        recordHistory(modifiedField, oldStrategy, strategyConfig);
     }
 }
 
 async function existStrategy(strategyConfig) {
     if (strategyConfig.__v === undefined) {
-        const foundStrategy = await ConfigStrategy.find({ config: strategyConfig.config, strategy: strategyConfig.strategy, activated: strategyConfig.activated })
-        return foundStrategy.length > 0
+        const foundStrategy = await ConfigStrategy
+            .find({ 
+                config: strategyConfig.config, 
+                strategy: strategyConfig.strategy,
+                activated: strategyConfig.activated 
+            });
+
+        return foundStrategy.length > 0;
     }
-    return false
+    return false;
 }
 
 const configStrategySchema = new mongoose.Schema({
@@ -267,7 +301,7 @@ configStrategySchema.virtual('history', {
     ref: 'History',
     localField: '_id',
     foreignField: 'elementId'
-})
+});
 
 configStrategySchema.options.toJSON = {
     getters: true,
@@ -275,66 +309,66 @@ configStrategySchema.options.toJSON = {
     minimize: false,
     transform: function (doc, ret, options) {
         if (ret.updatedAt || ret.createdAt) {
-            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
-            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
+            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
+            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
         }
         if (!ret.id) {
-            delete ret.id
+            delete ret.id;
         }
-        return ret
+        return ret;
     }
 }
 
 configStrategySchema.pre('remove', async function (next) {
-    const strategyConfig = this
-    const history = await History.find({ elementId: strategyConfig._id })
+    const strategyConfig = this;
+    const history = await History.find({ elementId: strategyConfig._id });
     if (history) {
-        history.forEach((h) => h.remove())
+        history.forEach((h) => h.remove());
     }
 
-    next()
-})
+    next();
+});
 
 configStrategySchema.pre('save', async function (next) {
-    const strategyConfig = this
+    const strategyConfig = this;
 
-    const strategy = strategyConfig.strategy
-    const operationStrategy = strategyConfig.operation
-    const { min, max } = OperationValuesValidation.filter(element => element.operation === operationStrategy)[0]
+    const strategy = strategyConfig.strategy;
+    const operationStrategy = strategyConfig.operation;
+    const { min, max } = OperationValuesValidation.filter(element => element.operation === operationStrategy)[0];
 
     // Verify if strategy already exist
     if (await existStrategy(strategyConfig)) {
-        const err = new Error(`Unable to complete the operation. Strategy '${strategy}' already exist for this configuration and environment`)
+        const err = new Error(`Unable to complete the operation. Strategy '${strategy}' already exist for this configuration and environment`);
         return next(err);
     }
 
     // Verify strategy value quantity
     if (!strategyConfig.values || strategyConfig.values.length < min || strategyConfig.values.length > max) {
-        const err =  new Error(`Unable to complete the operation. The number of values for the operation '${operationStrategy}', are min: ${min} and max: ${max} values`)
+        const err =  new Error(`Unable to complete the operation. The number of values for the operation '${operationStrategy}', are min: ${min} and max: ${max} values`);
         return next(err);
     }
 
-    const operations = StrategyRequirementDefinition.find(element => element.strategy === strategy).operations
-    const foundOperation = operations.filter((element) => element === operationStrategy)
+    const operations = StrategyRequirementDefinition.find(element => element.strategy === strategy).operations;
+    const foundOperation = operations.filter((element) => element === operationStrategy);
 
     // Verify strategy operation requirements
     if (!foundOperation) {
-        const err =  new Error(`Unable to complete the operation. The strategy '${strategy}' needs ${operations} as operation`)
+        const err =  new Error(`Unable to complete the operation. The strategy '${strategy}' needs ${operations} as operation`);
         return next(err);
     }
 
     // Verify strategy values format
     try {
-        strategyConfig.values.forEach(value => validateStrategyValue(strategy, value))
+        strategyConfig.values.forEach(value => validateStrategyValue(strategy, value));
     } catch (err) {
         return next(err);
     }
 
     await recordStrategyHistory(strategyConfig, this.modifiedPaths());
 
-    next()
+    next();
 })
 
 Object.assign(configStrategySchema.statics, { StrategiesType, OperationsType });
 
-export const ConfigStrategy = mongoose.model('ConfigStrategy', configStrategySchema)
+export const ConfigStrategy = mongoose.model('ConfigStrategy', configStrategySchema);
