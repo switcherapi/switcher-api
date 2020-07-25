@@ -38,8 +38,8 @@ const StrategyRequirementDefinition = [
         strategy: StrategiesType.NUMERIC,
         operations: [OperationsType.EXIST, OperationsType.NOT_EXIST, OperationsType.EQUAL, OperationsType.NOT_EQUAL,
             OperationsType.BETWEEN, OperationsType.LOWER, OperationsType.GREATER],
-        format: 'Integer or Decimal',
-        validator: '([0-9]+(.[0-9])?)'
+        format: 'Numeric values (positive/negative or with decimal)',
+        validator: '^((-[0-9]{1,})|([0-9]{1,}))(\\.[0-9]{1,})?$'
     },
     {
         strategy: StrategiesType.TIME,
