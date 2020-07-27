@@ -1,8 +1,8 @@
 import express from 'express';
-import expressGraphQL from 'express-graphql';
+import { graphqlHTTP } from 'express-graphql';
 import cors from 'cors';
 
-require('./db/mongoose')
+require('./db/mongoose');
 
 import clientApiRouter from './routers/client-api';
 import adminRouter from './routers/admin';
@@ -18,9 +18,9 @@ import roleRouter from './routers/role';
 import schema from './client/schema';
 import { appAuth, auth } from './middleware/auth';
 
-const app = express()
+const app = express();
 
-app.use(express.json())
+app.use(express.json());
 
 /**
  * Cors configuration
@@ -30,40 +30,40 @@ app.use(express.json())
 /**
  * API Routers
  */
-app.use(clientApiRouter)
-app.use(adminRouter)
-app.use(component)
-app.use(environment)
-app.use(domainRouter)
-app.use(groupConfigRouter)
-app.use(configRouter)
-app.use(configStrategyRouter)
-app.use(metricRouter)
-app.use(teamRouter)
-app.use(roleRouter)
+app.use(clientApiRouter);
+app.use(adminRouter);
+app.use(component);
+app.use(environment);
+app.use(domainRouter);
+app.use(groupConfigRouter);
+app.use(configRouter);
+app.use(configStrategyRouter);
+app.use(metricRouter);
+app.use(teamRouter);
+app.use(roleRouter);
 
 /**
  * Client API - GraphQL
  */
-app.use('/graphql', appAuth, expressGraphQL({
+app.use('/graphql', appAuth, graphqlHTTP({
     schema,
     graphiql: true
-}))
+}));
 
 /**
  * Client API - GraphQL
  */
-app.use('/adm-graphql', auth, expressGraphQL({
+app.use('/adm-graphql', auth, graphqlHTTP({
     schema,
     graphiql: true
-}))
+}));
 
 app.get('/check', (req, res) => {
     res.status(200).send({ message: 'All good', code: 200 })
-})
+});
 
 app.get('*', (req, res) => {
     res.status(404).send({ error: 'Operation not found' })
-})
+});
 
 export default app;
