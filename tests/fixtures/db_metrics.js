@@ -129,12 +129,8 @@ export const setupDatabase = async () => {
     const refreshTokenMaster = await bcrypt.hash(adminMasterAccountToken.split('.')[2], 8)
     adminMasterAccount.token = refreshTokenMaster;
     await new Admin(adminMasterAccount).save()
-
-    const apiKey = await bcrypt.hash(domainDocument._id + 'Domain', 8)
-    const hash = await bcrypt.hash(apiKey, 8)
-    domainDocument.apihash = hash
-    await new Domain(domainDocument).save()
     
+    await new Domain(domainDocument).save()
     await new GroupConfig(groupConfigDocument).save()
     await new Config(config1Document).save()
     await new Config(config2Document).save()

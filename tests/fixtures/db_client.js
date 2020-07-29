@@ -199,13 +199,9 @@ export const setupDatabase = async () => {
     adminAccount.teams = [teamId];
     await new Admin(adminAccount).save()
 
+    await new Domain(domainDocument).save()
     await new Environment(environment1).save()
     await new Environment(environment2).save()
-
-    apiKey = await bcrypt.hash(domainDocument._id + 'Domain', 8)
-    const hash = await bcrypt.hash(apiKey, 8)
-    domainDocument.apihash = hash
-    await new Domain(domainDocument).save()
 
     await new Team(team).save()
     await new Role(roleConfigs).save()
@@ -217,5 +213,9 @@ export const setupDatabase = async () => {
     await new ConfigStrategy(configStrategyCIDRDocument).save()
     await new ConfigStrategy(configStrategyTIME_BETWEENDocument).save()
     await new ConfigStrategy(configStrategyTIME_GREATDocument).save()
+
+    apiKey = await bcrypt.hash(component1._id + component1.name, 8)
+    const hash = await bcrypt.hash(apiKey, 8)
+    component1.apihash = hash
     await new Component(component1).save()
 }

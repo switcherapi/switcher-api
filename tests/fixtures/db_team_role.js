@@ -156,12 +156,8 @@ export const setupDatabase = async () => {
     await new Admin(adminAccount).save();
     await new Admin(adminAccount2).save();
     await new Admin(adminAccount3).save();
-
-    const apiKey = await bcrypt.hash(domainDocument._id + 'Domain', 8);
-    const hash = await bcrypt.hash(apiKey, 8);
-    domainDocument.apihash = hash;
+    
     await new Domain(domainDocument).save();
-
     await new GroupConfig(groupConfigDocument).save();
     await new GroupConfig(groupConfig2Document).save();
     await new Config(configDocument).save();

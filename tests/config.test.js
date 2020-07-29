@@ -564,12 +564,12 @@ describe('Testing component association', () => {
             .patch('/config/addComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                component: responseComponent.body._id
+                component: responseComponent.body.component._id
             }).expect(200)
 
         // DB validation - document updated
         const config = await Config.findById(configId1)
-        expect(config.components.includes(responseComponent.body._id)).toBe(true)
+        expect(config.components.includes(responseComponent.body.component._id)).toBe(true)
     })
 
     test('CONFIG_SUITE - Should associate multiple components to a config', async () => {
@@ -596,8 +596,8 @@ describe('Testing component association', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 components: [
-                    responseComponent1.body._id,
-                    responseComponent2.body._id
+                    responseComponent1.body.component._id,
+                    responseComponent2.body.component._id
                 ]
             }).expect(200)
 
@@ -663,14 +663,14 @@ describe('Testing component association', () => {
             .patch('/config/addComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                component: responseComponent.body._id
+                component: responseComponent.body.component._id
             }).expect(200)
 
         const responseAdd = await request(app)
             .patch('/config/addComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                component: responseComponent.body._id
+                component: responseComponent.body.component._id
             }).expect(400)
         
         expect(responseAdd.body.error).toBe('Component NewComponent Added 2x already exists')
@@ -731,19 +731,19 @@ describe('Testing component association', () => {
             .patch('/config/addComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                component: responseComponent.body._id
+                component: responseComponent.body.component._id
             }).expect(200)
 
         await request(app)
             .patch('/config/removeComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                component: responseComponent.body._id
+                component: responseComponent.body.component._id
             }).expect(200)
 
         // DB validation - document updated
         const config = await Config.findById(configId1)
-        expect(config.components.includes(responseComponent.body._id)).toEqual(false)
+        expect(config.components.includes(responseComponent.body.component._id)).toEqual(false)
     })
 
     test('CONFIG_SUITE - Should remove records from history after deleting element', async () => {

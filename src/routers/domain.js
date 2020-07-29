@@ -9,25 +9,6 @@ import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router()
 
-router.get('/domain/generateApiKey/:domain/', auth, async (req, res) => {
-    try {
-        let domain = await Domain.findById(req.params.domain)
-
-        if (!domain) {
-            return res.status(404).send()
-        }
-
-        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
-        domain.updatedBy = req.admin.email
-
-        const apiKey = await domain.generateApiKey();
-        
-        res.status(201).send({ apiKey })
-    } catch (e) {
-        responseException(res, e, 400)
-    }
-})
-
 router.post('/domain/create', auth, async (req, res) => {
     try {
         let domain = new Domain({
@@ -41,9 +22,8 @@ router.post('/domain/create', auth, async (req, res) => {
         });
 
         environment.save();
-
-        const apiKey = await domain.generateApiKey();
-        res.status(201).send({ domain, apiKey })
+        await domain.save();
+        res.status(201).send(domain);
     } catch (e) {
         res.status(400).send(e);
     }
@@ -52,11 +32,11 @@ router.post('/domain/create', auth, async (req, res) => {
 // GET /domain?limit=10&skip=20
 // GET /domain?sortBy=createdAt:desc
 router.get('/domain', auth, async (req, res) => {
-    const sort = {}
+    const sort = {};
 
     if (req.query.sortBy) {
-        const parts = req.query.sortBy.split(':')
-        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
+        const parts = req.query.sortBy.split(':');
+        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
     }
 
     try {
@@ -67,26 +47,26 @@ router.get('/domain', auth, async (req, res) => {
                 skip: parseInt(req.query.skip),
                 sort
             }
-        }).execPopulate()
-        res.send(req.admin.domain)
+        }).execPopulate();
+        res.send(req.admin.domain);
     } catch (e) {
-        res.status(500).send()
+        res.status(500).send();
     }
 })
 
 router.get('/domain/:id', auth, async (req, res) => {
     try {
-        let domain = await Domain.findById(req.params.id)
+        let domain = await Domain.findById(req.params.id);
 
         if (!domain) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
-        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN, true)
+        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN, true);
         
-        res.send(domain)
+        res.send(domain);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
@@ -94,18 +74,18 @@ router.get('/domain/:id', auth, async (req, res) => {
 // GET /domain/ID?limit=10&skip=20
 // GET /domain/ID
 router.get('/domain/history/:id', auth, async (req, res) => {
-    const sort = {}
+    const sort = {};
 
     if (req.query.sortBy) {
-        const parts = req.query.sortBy.split(':')
-        sort[`${parts[0]}`] = parts[1] === 'desc' ? -1 : 1
+        const parts = req.query.sortBy.split(':');
+        sort[`${parts[0]}`] = parts[1] === 'desc' ? -1 : 1;
     }
 
     try {
-        const domain = await Domain.findById(req.params.id)
+        const domain = await Domain.findById(req.params.id);
 
         if (!domain) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
         await domain.populate({
             path: 'history',
@@ -115,111 +95,111 @@ router.get('/domain/history/:id', auth, async (req, res) => {
                 skip: parseInt(req.query.skip),
                 sort
             }
-        }).execPopulate()
+        }).execPopulate();
 
         const history = domain.history;
 
-        await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN)
+        await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN);
 
-        res.send(history)
+        res.send(history);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
 router.delete('/domain/history/:id', auth, async (req, res) => {
     try {
-        const domain = await Domain.findById(req.params.id)
+        const domain = await Domain.findById(req.params.id);
 
         if (!domain) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
-        await verifyOwnership(req.admin, domain, domain._id, ActionTypes.DELETE, RouterTypes.ADMIN)
+        await verifyOwnership(req.admin, domain, domain._id, ActionTypes.DELETE, RouterTypes.ADMIN);
 
-        await History.deleteMany({ elementId: domain._id })
+        await History.deleteMany({ elementId: domain._id });
 
-        res.send(domain)
+        res.send(domain);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
 router.delete('/domain/:id', auth, async (req, res) => {
     try {
-        let domain = await Domain.findById(req.params.id)
+        let domain = await Domain.findById(req.params.id);
 
         if (!domain) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
-        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.DELETE, RouterTypes.DOMAIN)
+        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.DELETE, RouterTypes.DOMAIN);
 
-        await domain.remove()
-        res.send(domain)
+        await domain.remove();
+        res.send(domain);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
 router.patch('/domain/:id', auth,
     verifyInputUpdateParameters(['description']), async (req, res) => {
     try {
-        let domain = await Domain.findById(req.params.id)
+        let domain = await Domain.findById(req.params.id);
 
         if (!domain) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
-        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
-        domain.updatedBy = req.admin.email
-        domain.lastUpdate = Date.now()
+        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN);
+        domain.updatedBy = req.admin.email;
+        domain.lastUpdate = Date.now();
         
-        req.updates.forEach((update) => domain[update] = req.body[update])
-        await domain.save()
-        res.send(domain)
+        req.updates.forEach((update) => domain[update] = req.body[update]);
+        await domain.save();
+        res.send(domain);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
 router.patch('/domain/updateStatus/:id', auth, async (req, res) => {
     try {
-        let domain = await Domain.findById(req.params.id)
+        let domain = await Domain.findById(req.params.id);
 
         if (!domain) {
-            return res.status(404).send({ error: 'Domain does not exist' })
+            return res.status(404).send({ error: 'Domain does not exist' });
         }
 
-        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
-        domain.updatedBy = req.admin.email
-        domain.lastUpdate = Date.now()
+        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN);
+        domain.updatedBy = req.admin.email;
+        domain.lastUpdate = Date.now();
 
-        const updates = await checkEnvironmentStatusChange(req, res, req.params.id)
+        const updates = await checkEnvironmentStatusChange(req, res, req.params.id);
 
-        updates.forEach((update) => domain.activated.set(update, req.body[update]))
-        await domain.save()
-        res.send(domain)
+        updates.forEach((update) => domain.activated.set(update, req.body[update]));
+        await domain.save();
+        res.send(domain);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
 router.patch('/domain/removeStatus/:id', auth, async (req, res) => {
     try {
-        let domain = await Domain.findById(req.params.id)
+        let domain = await Domain.findById(req.params.id);
         
         if (!domain) {
-            return res.status(404).send({ error: 'Domain does not exist' })
+            return res.status(404).send({ error: 'Domain does not exist' });
         }
 
-        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN)
-        domain.updatedBy = req.admin.email
-        domain.lastUpdate = Date.now()
+        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN);
+        domain.updatedBy = req.admin.email;
+        domain.lastUpdate = Date.now();
         
-        res.send(await removeDomainStatus(domain, req.body.env))
+        res.send(await removeDomainStatus(domain, req.body.env));
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 

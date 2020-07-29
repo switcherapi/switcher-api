@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 import app from '../src/app';
-import bcrypt from 'bcrypt';
 import Admin from '../src/models/admin';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
@@ -43,11 +42,11 @@ describe('Testing Domain insertion', () => {
             }).expect(201)
 
         // DB validation - document created
-        const domain = await Domain.findById(response.body.domain._id)
+        const domain = await Domain.findById(response.body._id)
         expect(domain).not.toBeNull()
 
         // Response validation
-        expect(response.body.domain.name).toBe('New Domain')
+        expect(response.body.name).toBe('New Domain')
     })
 
     test('DOMAIN_SUITE - Should NOT create a new Domain - Missing required params', async () => {
@@ -57,31 +56,6 @@ describe('Testing Domain insertion', () => {
             .send({
                 description: 'Description of my new Domain'
             }).expect(400)
-    })
-
-    test('DOMAIN_SUITE - Should generate a valid API Key for a Domain', async () => {
-        const response = await request(app)
-            .get('/domain/generateApiKey/' + domainId)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(201)
-
-        expect(response.body.apiKey).not.toBeNull()
-        // DB validation - current Domain token should not be as the same as the generated
-        const domain = await Domain.findById(domainId).lean()
-        const isMatch = await bcrypt.compare(response.body.apiKey, domain.apihash)
-        expect(isMatch).toEqual(true)
-    })
-
-    test('DOMAIN_SUITE - Should NOT generate an API Key for an inexistent Domain', async () => {
-        await request(app)
-            .get('/domain/generateApiKey/INVALID_DOMAIN_ID')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400)
-
-        await request(app)
-            .get('/domain/generateApiKey/5dd05cfa98adc4285457e29a')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
     })
 })
 
@@ -111,7 +85,7 @@ describe('Testing fect Domain info', () => {
             }).expect(201)
 
         // DB validation - document created
-        const domain = await Domain.findById(response.body.domain._id)
+        const domain = await Domain.findById(response.body._id)
         expect(domain).not.toBeNull()
 
         response = await request(app)
@@ -150,7 +124,7 @@ describe('Testing fect Domain info', () => {
             }).expect(201)
 
         response = await request(app)
-            .get('/domain/' + response.body.domain._id)
+            .get('/domain/' + response.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
     })
@@ -384,8 +358,8 @@ describe('Testing update Domain info', () => {
                 name: 'New Domain Record',
                 description: 'Description of my new Domain'
             }).expect(201)
-        
-        const id = response.body.domain._id
+            
+        const id = response.body._id
         response = await request(app)
                 .get('/domain/history/' + id)
                 .set('Authorization', `Bearer ${adminMasterAccountToken}`)
