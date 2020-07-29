@@ -12,14 +12,14 @@
 **Switcher API** is a *Feature Flag* API with the main focus on decreasing the friction caused by changes while keeping control of what really matters.
 
 Main features:
-- Control more using little effort by sharing switchers among application components.
-- Cross environment. Generate zero impact when manipulating switchers.
+- Control & track more using little effort by sharing switchers among application components.
+- Cross environment. Generate zero impact when manipulating your project features.
 - Customizable environment strategies. Setup switchers using variables per environment.
 - Create manageable teams to collaborate.
-- Keep track of every configuration change.
+- Keep track of every modification and features usage.
 - Detailed metrics.
 - Client endpoints exposed in **REST** and **GraphQL**.
-- Zero-latency mode also enables your applications to work with no latency.
+- Zero-latency mode also enables your applications to work with zero latency.
  
 
 - **JavaScript lib**: (https://github.com/petruki/switcher-client-master)
@@ -77,7 +77,7 @@ Signing up to Switcher API must be made via Switcher Management.
 #### Domain
 
 - **New domain** - /domain/create [POST]
-  The API Key will be generated after creating the domain.
+  Domains is big wrapper which allows you centralize releases, teams, environment, components, and much more.
 ```json
 {
     "name": "[DOMAIN NAME]",
@@ -85,12 +85,11 @@ Signing up to Switcher API must be made via Switcher Management.
 }
 ```
 
-- **Generating a new API Key** - /domain/generateApiKey/DOMAIN_ID [GET]
-  This operation cannot be undone.
-
 #### Component
 
 - **Create a component** - /component/create [POST]
+  Name here all your applications that will be using Switchers. 
+  Each application has its API Key.
 ```json
 {
     "name": "[COMPONENT NAME]",
@@ -98,6 +97,9 @@ Signing up to Switcher API must be made via Switcher Management.
     "domain": "[DOMAIN ID]"
 }
 ```
+
+- **Generating a new API Key** - /component/generateApiKeyCOMPONENT_ID [GET]
+  This operation cannot be undone.
 
 #### Group
 

@@ -741,6 +741,134 @@
 			"response": []
 		},
 		{
+			"name": "Component - API Key",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0548910c-25b2-4d52-bdbf-7fa38112939c",
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "",
+						"type": "text",
+						"value": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/component/generateApiKey/5edb2330985c4725fcf2146f",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"component",
+						"generateApiKey",
+						"5edb2330985c4725fcf2146f"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Domain - API Key",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "",
+								"type": "text",
+								"value": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/domain/generateApiKey/5df166239194d613400a52e7",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"domain",
+								"generateApiKey",
+								"5df166239194d613400a52e7"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "73"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"49-UUQ0fKZ1ks2v9yj6/x/6QT0U2MU\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 12 Dec 2019 04:22:10 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"apiKey\": \"$2b$08$ukaPxVKYA9mIt1Xym.73SefuYU8Cne8PRprDlSxgOjaEvz3iP.a6S\"\n}"
+				}
+			]
+		},
+		{
 			"name": "Component - Read",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
@@ -2027,134 +2155,6 @@
 				}
 			},
 			"response": []
-		},
-		{
-			"name": "Domain - API Key",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "3e33bd74-3929-499e-a5c6-df5d2613dc9b",
-						"exec": [
-							"if (pm.response.code === 201) {",
-							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
-							"}"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					},
-					{
-						"key": "",
-						"type": "text",
-						"value": ""
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{url}}/domain/generateApiKey/5e0ece606f4f994eac9007ae",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"domain",
-						"generateApiKey",
-						"5e0ece606f4f994eac9007ae"
-					]
-				}
-			},
-			"response": [
-				{
-					"name": "Domain - API Key",
-					"originalRequest": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							},
-							{
-								"key": "",
-								"type": "text",
-								"value": ""
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/domain/generateApiKey/5df166239194d613400a52e7",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"domain",
-								"generateApiKey",
-								"5df166239194d613400a52e7"
-							]
-						}
-					},
-					"status": "Created",
-					"code": 201,
-					"_postman_previewlanguage": "json",
-					"header": [
-						{
-							"key": "X-Powered-By",
-							"value": "Express"
-						},
-						{
-							"key": "Content-Type",
-							"value": "application/json; charset=utf-8"
-						},
-						{
-							"key": "Content-Length",
-							"value": "73"
-						},
-						{
-							"key": "ETag",
-							"value": "W/\"49-UUQ0fKZ1ks2v9yj6/x/6QT0U2MU\""
-						},
-						{
-							"key": "Date",
-							"value": "Thu, 12 Dec 2019 04:22:10 GMT"
-						},
-						{
-							"key": "Connection",
-							"value": "keep-alive"
-						}
-					],
-					"cookie": [],
-					"body": "{\n    \"apiKey\": \"$2b$08$ukaPxVKYA9mIt1Xym.73SefuYU8Cne8PRprDlSxgOjaEvz3iP.a6S\"\n}"
-				}
-			]
 		},
 		{
 			"name": "Domain - Update",
@@ -3723,7 +3723,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"domain\": \"My Domain\",\n\t\"component\": \"Android\",\n\t\"environment\": \"default\"\n}",
+					"raw": "{\n\t\"domain\": \"My Domain\",\n\t\"component\": \"CustomerAPI\",\n\t\"environment\": \"default\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -4114,7 +4114,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "{\r\n    # configuration(key: \"FEATURE01\") { #FF3FOR2020\r\n    configuration(group: \"Project 1\") {\r\n        domain {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        group {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        config {\r\n            key\r\n            description\r\n            activated\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n}",
+						"query": "{\r\n    # configuration(key: \"FEATURE01\") { #FF3FOR2020\r\n    configuration(group: \"Release 1\") {\r\n        domain {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        group {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        config {\r\n            key\r\n            description\r\n            activated\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n}",
 						"variables": ""
 					}
 				},

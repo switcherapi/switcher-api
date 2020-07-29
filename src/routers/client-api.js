@@ -2,7 +2,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import { checkConfig, checkConfigComponent } from '../middleware/validators';
 import { appAuth, appGenerateCredentials } from '../middleware/auth';
-import { resolveCriteria } from '../client/resolvers';
+import { resolveCriteria, checkDomain } from '../client/resolvers';
 
 const router = new express.Router()
 
@@ -12,56 +12,56 @@ const router = new express.Router()
 // GET /check?key=KEY&bypassMetric=true
 router.post('/criteria', appAuth, checkConfig, checkConfigComponent, async (req, res) => {
     try {
-        const environment = req.environment
-        const domain = req.domain
-        const entry = req.body.entry
+        const environment = req.environment;
+        const domain = req.domain;
+        const entry = req.body.entry;
 
-        const context = { domain, entry, environment, bypassMetric: req.query.bypassMetric, component: req.component }
+        const context = { domain, entry, environment, bypassMetric: req.query.bypassMetric, component: req.component };
 
-        const response = await resolveCriteria(req.config, context, 'values description strategy operation activated -_id')
+        const response = await resolveCriteria(req.config, context, 'values description strategy operation activated -_id');
 
-        delete response.domain
-        delete response.group
+        delete response.domain;
+        delete response.group;
 
         if (!req.query.showReason) {
-            delete response.reason
+            delete response.reason;
         }
 
         if (!req.query.showStrategy) {
-            delete response.strategies
+            delete response.strategies;
         }
 
-        res.send(response)
+        res.send(response);
     } catch (e) {
-        res.status(500).send({ error: e.message })
+        res.status(500).send({ error: e.message });
     }
 })
 
 router.get('/criteria/snapshot_check/:version', appAuth, async (req, res) => {
     try {
-        const domain = req.domain
-        const version = req.params.version
+        const domain = await checkDomain(req.domain);
+        const version = req.params.version;
 
         if (isNaN(version)) {
-            return res.status(400).send({ error: 'Wrong value for domain version' })
+            return res.status(400).send({ error: 'Wrong value for domain version' });
         }
 
         if (domain.lastUpdate > version) {
-            res.send({ status: false })
+            res.send({ status: false });
         } else {
-            res.send({ status: true })
+            res.send({ status: true });
         }
     } catch (e) {
-        res.status(500).send({ error: e.message })
+        res.status(500).send({ error: e.message });
     }
 })
 
 router.post('/criteria/auth', appGenerateCredentials, async (req, res) => {
     try {
-        const { exp } = jwt.decode(req.token)
-        res.send({ token: req.token, exp })
+        const { exp } = jwt.decode(req.token);
+        res.send({ token: req.token, exp });
     } catch (e) {
-        res.status(400).send({ error: e.message })
+        res.status(400).send({ error: e.message });
     }
 })
 

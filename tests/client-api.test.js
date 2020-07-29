@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
+import bcrypt from 'bcrypt';
 import app from '../src/app';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
@@ -769,7 +770,11 @@ describe("Testing criteria [REST] ", () => {
             description: 'Temporary component',
             domain: domainId,
             owner: adminMasterAccountId
-        }
+        };
+
+        const apiKey = await bcrypt.hash(component._id + component.name, 8);
+        const hash = await bcrypt.hash(apiKey, 8);
+        component.apihash = hash;
         await new Component(component).save();
 
         const response = await request(app)
@@ -868,7 +873,7 @@ describe("Testing criteria [REST] ", () => {
         expect(firstResponse.body.result).toBe(true);
 
         const responseNewApiKey = await request(app)
-            .get('/domain/generateApiKey/' + domainId)
+            .get('/component/generateApiKey/' + component1._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(201)
 

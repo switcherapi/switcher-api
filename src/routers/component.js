@@ -6,7 +6,7 @@ import { check, validationResult } from 'express-validator';
 import Component from '../models/component';
 import { ActionTypes, RouterTypes } from '../models/role';
 
-const router = new express.Router()
+const router = new express.Router();
 
 router.post('/component/create', auth, [
     check('name').isLength({ min: 2, max: 50 }),
@@ -20,13 +20,32 @@ router.post('/component/create', auth, [
     let component = new Component({
         ...req.body,
         owner: req.admin._id
-    })
+    });
 
     try {
         component = await verifyOwnership(req.admin, component, req.body.domain, ActionTypes.CREATE, RouterTypes.COMPONENT);
+        const apiKey = await component.generateApiKey();
+        await component.save();
+        res.status(201).send({ component, apiKey });
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+})
 
-        await component.save()
-        res.status(201).send(component)
+router.get('/component/generateApiKey/:component/', auth, async (req, res) => {
+    try {
+        let component = await Component.findById(req.params.component);
+
+        if (!component) {
+            return res.status(404).send();
+        }
+
+        component = await verifyOwnership(req.admin, component, component.domain, ActionTypes.UPDATE, RouterTypes.COMPONENT);
+        component.updatedBy = req.admin.email;
+
+        const apiKey = await component.generateApiKey();
+        
+        res.status(201).send({ apiKey });
     } catch (e) {
         responseException(res, e, 400);
     }
@@ -39,7 +58,7 @@ router.get('/component', auth, async (req, res) => {
     if (!req.query.domain) {
         return res.status(400).send({
             error: 'Please, specify the \'domain\' id'
-        })
+        });
     }
 
     try {
@@ -51,7 +70,7 @@ router.get('/component', auth, async (req, res) => {
                 sort: {
                     name: req.query.sort === 'desc' ? -1 : 1
                 }
-            })
+            });
 
         // components = await verifyOwnership(req.admin, components, req.query.domain, ActionTypes.READ, RouterTypes.COMPONENT);
 
@@ -63,15 +82,15 @@ router.get('/component', auth, async (req, res) => {
 
 router.get('/component/:id', auth, async (req, res) => {
     try {
-        let component = await Component.findById(req.params.id)
+        let component = await Component.findById(req.params.id);
 
         if (!component) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
         // component = await verifyOwnership(req.admin, component, component.domain, ActionTypes.READ, RouterTypes.COMPONENT);
 
-        res.send(component)
+        res.send(component);
     } catch (e) {
         responseException(res, e, 400);
     }
@@ -84,17 +103,17 @@ router.patch('/component/:id', auth, verifyInputUpdateParameters(['name', 'descr
     }
 
     try {
-        let component = await Component.findById(req.params.id)
+        let component = await Component.findById(req.params.id);
  
         if (!component) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
         component = await verifyOwnership(req.admin, component, component.domain, ActionTypes.UPDATE, RouterTypes.COMPONENT);
 
-        req.updates.forEach((update) => component[update] = req.body[update])
-        await component.save()
-        res.send(component)
+        req.updates.forEach((update) => component[update] = req.body[update]);
+        await component.save();
+        res.send(component);
     } catch (e) {
         responseException(res, e, 400);
     }
@@ -102,16 +121,16 @@ router.patch('/component/:id', auth, verifyInputUpdateParameters(['name', 'descr
 
 router.delete('/component/:id', auth, async (req, res) => {
     try {
-        let component = await Component.findById(req.params.id)
+        let component = await Component.findById(req.params.id);
 
         if (!component) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
         component = await verifyOwnership(req.admin, component, component.domain, ActionTypes.DELETE, RouterTypes.COMPONENT);
 
-        await component.remove()
-        res.send(component)
+        await component.remove();
+        res.send(component);
     } catch (e) {
         responseException(res, e, 400);
     }

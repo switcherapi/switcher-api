@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import Config from './config';
+import Domain from './domain';
 
 const componentSchema = new mongoose.Schema({
     name: {
@@ -21,6 +24,11 @@ const componentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'Admin'
+    },
+    apihash: {
+        type: String,
+        required: true,
+        unique: true
     }
 }, {
     timestamps: true
@@ -32,31 +40,78 @@ componentSchema.options.toJSON = {
     minimize: false,
     transform: function (doc, ret, options) {
         if (ret.updatedAt || ret.createdAt) {
-            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
-            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
+            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
+            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
         }
-        return ret
+        delete ret.apihash;
+        return ret;
     }
+}
+
+componentSchema.methods.generateApiKey = async function () {
+    const component = this;
+    const apiKey = await bcrypt.hash(component._id + component.name, 8);
+    const hash = await bcrypt.hash(apiKey, 8);
+    component.apihash = hash;
+    await component.save();
+
+    return apiKey;
+}
+
+componentSchema.methods.generateAuthToken = async function (environment) {
+    const component = this;
+
+    var options = {
+        expiresIn: process.env.JWT_CLIENT_TOKEN_EXP_TIME
+    };
+
+    const token = jwt.sign(({ 
+        component: component._id,
+        environment,
+        vc: component.apihash.substring(50, component.apihash.length - 1) 
+    }), process.env.JWT_SECRET, options);
+
+    return token;
+}
+
+componentSchema.statics.findByCredentials = async (domainName, componentName, apiKey) => {
+    const domain = await Domain.findOne({ name: domainName });
+    const component = await Component.findOne({ name: componentName, domain: domain._id || '' });
+
+    if (!component) {
+        throw new Error('Unable to find this Component');
+    }
+
+    const isMatch = await bcrypt.compare(apiKey, component.apihash);
+
+    if (!isMatch) {
+        throw new Error('Unable to find this Component');
+    }
+
+    return {
+        component,
+        domain
+    };
 }
 
 const existComponent = async (component) => {
     if (component.__v === undefined) {
-        const foundComponent = await Component.find({ name: component.name })
-        return foundComponent.length > 0
+        const foundComponent = await Component.find({ name: component.name });
+        return foundComponent.length > 0;
     }
-    return false
+    return false;
 }
 
 componentSchema.pre('validate', async function (next) {
-    const component = this
+    const component = this;
 
     // Verify if component already exist
     if (await existComponent(component)) {
-        const err = new Error(`Unable to complete the operation. Component '${component.name}' already exist for this Domain`)
+        const err = new Error(`Unable to complete the operation. Component '${component.name}' already exist for this Domain`);
         next(err);
     }
 
-    next()
+    next();
 })
 
 componentSchema.pre('remove', async function (next) {

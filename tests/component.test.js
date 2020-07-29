@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
+import bcrypt from 'bcrypt';
 import app from '../src/app';
 import Component from '../src/models/component';
 import { 
@@ -17,6 +18,8 @@ afterAll(async () => {
 })
 
 describe('Insertion tests', () => {
+    let component1Id
+
     beforeAll(setupDatabase)
 
     test('COMPONENT_SUITE - Should create a new Component', async () => {
@@ -30,11 +33,12 @@ describe('Insertion tests', () => {
             }).expect(201)
 
         // DB validation - document created
-        const component = await Component.findById(response.body._id)
+        const component = await Component.findById(response.body.component._id)
         expect(component).not.toBeNull()
 
         // Response validation
-        expect(response.body.name).toBe('my-web-app')
+        expect(response.body.component.name).toBe('my-web-app')
+        component1Id = response.body.component._id
     })
 
     test('COMPONENT_SUITE - Should NOT create a new Component - Component already exist', async () => {
@@ -71,6 +75,31 @@ describe('Insertion tests', () => {
                 domain: domainId
             }).expect(422)
     })
+
+    test('COMPONENT_SUITE - Should generate a valid API Key for a Component', async () => {
+        const response = await request(app)
+            .get('/component/generateApiKey/' + component1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(201)
+
+        expect(response.body.apiKey).not.toBeNull()
+        // DB validation - current Domain token should not be as the same as the generated
+        const component = await Component.findById(component1Id).lean()
+        const isMatch = await bcrypt.compare(response.body.apiKey, component.apihash)
+        expect(isMatch).toEqual(true)
+    })
+
+    test('COMPONENT_SUITE - Should NOT generate an API Key for an inexistent Component', async () => {
+        await request(app)
+            .get('/component/generateApiKey/INVALID_COMPONENT_ID')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(400)
+
+        await request(app)
+            .get('/component/generateApiKey/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404)
+    })
 })
 
 describe('Reading tests', () => {
@@ -87,7 +116,7 @@ describe('Reading tests', () => {
                 domain: domainId
             }).expect(201)
 
-        component1Id = response.body._id
+        component1Id = response.body.component._id
     })
 
     test('COMPONENT_SUITE - Should read all Components from a Domain', async () => {
@@ -151,11 +180,11 @@ describe('Updating tests', () => {
             }).expect(201)
         
         // DB validation - document created
-        let component = await Component.findById(response.body._id)
+        let component = await Component.findById(response.body.component._id)
         expect(component.description).toBe('This is my Web App using this wonderful API')
 
         response = await request(app)
-            .patch('/component/' + response.body._id)
+            .patch('/component/' + response.body.component._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Wow, this is my updated description'
@@ -211,14 +240,14 @@ describe('Deletion tests', () => {
             .patch('/config/addComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                component: response.body._id
+                component: response.body.component._id
             }).expect(200)
 
-        const configsToRemoveFrom = await Config.find({ components: { $in: [response.body._id] } });
+        const configsToRemoveFrom = await Config.find({ components: { $in: [response.body.component._id] } });
         expect(configsToRemoveFrom[0]._id).toEqual(configId1)
 
         response = await request(app)
-            .delete('/component/' + response.body._id)
+            .delete('/component/' + response.body.component._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 
