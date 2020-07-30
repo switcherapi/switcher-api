@@ -188,13 +188,13 @@ function processVALUE(operation, input, values) {
 function processNUMERIC(operation, input, values) {
     switch(operation) {
         case OperationsType.EXIST:
-            return values.includes(input);
+            return processVALUE(operation, input, values);
         case OperationsType.NOT_EXIST:
-            return !values.includes(input);
+            return processVALUE(operation, input, values);
         case OperationsType.EQUAL:
-            return input === values[0];
+            return processVALUE(operation, input, values);
         case OperationsType.NOT_EQUAL:
-            return values.filter(element => element === input).length === 0;
+            return processVALUE(operation, input, values);
         case OperationsType.LOWER:
             return input < values[0];
         case OperationsType.GREATER:
@@ -350,9 +350,9 @@ configStrategySchema.pre('save', async function (next) {
 
     const operations = StrategyRequirementDefinition.find(element => element.strategy === strategy).operations;
     const foundOperation = operations.filter((element) => element === operationStrategy);
-
+    
     // Verify strategy operation requirements
-    if (!foundOperation) {
+    if (!foundOperation.length) {
         const err =  new Error(`Unable to complete the operation. The strategy '${strategy}' needs ${operations} as operation`);
         return next(err);
     }

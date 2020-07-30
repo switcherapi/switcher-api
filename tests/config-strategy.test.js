@@ -36,7 +36,7 @@ describe('Testing strategy creation #1', () => {
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.NETWORK,
-                operation: OperationsType.EQUAL,
+                operation: OperationsType.EXIST,
                 values: ['192.168.0.1/16'],
                 config: configId2,
                 env: EnvType.DEFAULT
@@ -96,6 +96,22 @@ describe('Testing strategy creation #1', () => {
             }).expect(400)
 
         expect(response.body.error).toBe(`Unable to complete the operation. Strategy '${StrategiesType.VALUE}' already exist for this configuration and environment`)
+    })
+
+    test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Operation not available', async () => {
+        const response = await request(app)
+            .post('/configstrategy/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                description: 'Description of my new Config Strategy',
+                strategy: StrategiesType.TIME,
+                operation: OperationsType.EXIST,
+                values: ['USER_1'],
+                config: configId1,
+                env: EnvType.DEFAULT
+            }).expect(400)
+
+        expect(response.body.error).toBe(`Unable to complete the operation. The strategy '${StrategiesType.TIME}' needs BETWEEN,LOWER,GREATER as operation`)
     })
 
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Wrong operation and strategies', async () => {
@@ -306,7 +322,7 @@ describe('Testing reading strategies #1', () => {
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.NETWORK,
-                operation: OperationsType.EQUAL,
+                operation: OperationsType.EXIST,
                 values: ['192.168.0.1/16'],
                 config: configId1,
                 env: EnvType.DEFAULT
@@ -359,7 +375,7 @@ describe('Testing reading strategies #2', () => {
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.NETWORK,
-                operation: OperationsType.EQUAL,
+                operation: OperationsType.EXIST,
                 values: ['192.168.0.1/16'],
                 config: configId1,
                 env: EnvType.DEFAULT
@@ -905,7 +921,7 @@ describe('Scenario: creating QA environment and modifying its status', () => {
             .send({
                 description: 'Description of my new Config Strategy',
                 strategy: StrategiesType.NETWORK,
-                operation: OperationsType.EQUAL,
+                operation: OperationsType.EXIST,
                 values: ['192.168.0.1/16'],
                 config: configId2,
                 env: 'QA'
