@@ -23,11 +23,11 @@ router.post('/criteria', appAuth, checkConfig, checkConfigComponent, async (req,
         delete response.domain;
         delete response.group;
 
-        if (!req.query.showReason) {
+        if ((req.query.showReason || 'false') === 'false') {
             delete response.reason;
         }
 
-        if (!req.query.showStrategy) {
+        if ((req.query.showStrategy || 'false') === 'false') {
             delete response.strategies;
         }
 
