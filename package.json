@@ -4,7 +4,7 @@
   "description": "Feature Flag/Toggle API",
   "main": "start.js",
   "author": {
-    "name": "Rogerio Petruki",
+    "name": "Roger Floriano",
     "email": "switcher.project@gmail.com"
   },
   "scripts": {
@@ -75,6 +75,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/petruki/switcher-api"
+    "url": "https://github.com/switcherapi/switcher-api"
   }
 }
