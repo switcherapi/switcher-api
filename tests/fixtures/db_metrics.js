@@ -9,7 +9,7 @@ import Config from '../../src/models/config';
 import Domain from '../../src/models/domain';
 
 export const adminMasterAccountId = new mongoose.Types.ObjectId()
-export const adminMasterAccountToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET)
+export const adminMasterAccountToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET || 'test_secret')
 export const adminMasterAccount = {
     _id: adminMasterAccountId,
     name: 'Metric Admin',

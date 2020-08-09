@@ -340,7 +340,7 @@ describe('Testing Admin insertion', () => {
     })
 
     test('ADMIN_SUITE - Should return token expired', async () => {
-        const tempToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET, { expiresIn: '0s' })
+        const tempToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET || 'test_secret', { expiresIn: '0s' })
 
         let response = await request(app)
             .get('/admin/me')

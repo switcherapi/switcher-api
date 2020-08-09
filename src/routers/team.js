@@ -176,6 +176,15 @@ router.get('/team/member/invite/:id', auth, async (req, res) => {
     }
 })
 
+router.get('/team/member/invite/pending/:id', auth, async (req, res) => {
+    try {
+        const teamInvites = await TeamInvite.find({ teamid: req.params.id });
+        res.send(teamInvites);
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+})
+
 router.post('/team/member/invite/accept/:request_id', auth, async (req, res) => {
     try {
         const teamInvite = await TeamInvite.findById(req.params.request_id);
@@ -199,6 +208,23 @@ router.post('/team/member/invite/accept/:request_id', auth, async (req, res) => 
         } else {
             throw new Error('Team does not exist anymore');
         }
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+})
+
+router.delete('/team/member/invite/remove/:id/:request_id', auth, async (req, res) => {
+    try {
+        await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE);
+
+        const teamInvite = await TeamInvite.findById(req.params.request_id);
+
+        if (!teamInvite) {
+            throw new NotFoundError('Invite request not found');
+        }
+
+        teamInvite.remove();
+        res.send(teamInvite);
     } catch (e) {
         responseException(res, e, 400);
     }
