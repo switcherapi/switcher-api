@@ -1289,7 +1289,7 @@
 			"response": []
 		},
 		{
-			"name": "Team - Accept Invite",
+			"name": "Team - Invite Accept",
 			"event": [
 				{
 					"listen": "test",
@@ -1332,6 +1332,56 @@
 						"invite",
 						"accept",
 						"5ed404eabe178984d812f61e"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Team - Invite Remove",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "47d26345-cd9b-49cf-8fee-f36a8b40e83c",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/member/invite/remove/5e10eda73a649463a8ef3751/5f30448867be1453684853fc",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"member",
+						"invite",
+						"remove",
+						"5e10eda73a649463a8ef3751",
+						"5f30448867be1453684853fc"
 					]
 				}
 			},
@@ -1383,6 +1433,58 @@
 						"member",
 						"invite",
 						"5ed80055ada7c13b4cfd6a63"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Team - Invite List Pending",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "04a061db-4f05-4113-9e5f-b1d0d3d40315",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/team/member/invite/pending/5e10eda73a649463a8ef3751",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"team",
+						"member",
+						"invite",
+						"pending",
+						"5e10eda73a649463a8ef3751"
 					]
 				}
 			},

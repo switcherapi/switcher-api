@@ -8,6 +8,8 @@ import GroupConfig from '../../src/models/group-config';
 import Config from '../../src/models/config';
 import Domain from '../../src/models/domain';
 
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test_secret';
+
 export const adminMasterAccountId = new mongoose.Types.ObjectId()
 export const adminMasterAccountToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET)
 export const adminMasterAccount = {

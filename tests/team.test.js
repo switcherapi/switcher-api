@@ -354,6 +354,65 @@ describe('Updating team members tests', () => {
             }).expect(404);
     })
 
+    test('TEAM_SUITE - Should get all invitation requests from a team', async () => {
+        await request(app)
+            .post('/team/member/invite/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                email: adminMasterAccount.email
+            }).expect(201);
+
+        const response = await request(app)
+            .get('/team/member/invite/pending/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+            
+        expect(response.body.length).toEqual(1);
+        expect(response.body[0].teamid).toEqual(String(team1Id));
+    })
+
+    test('TEAM_SUITE - Should NOT get invitation requests - NO TEAM ID', async () => {
+        await request(app)
+            .get('/team/member/invite/pending')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(400);
+    })
+
+    test('TEAM_SUITE - Should NOT remove team invitaion - TEAM INVITE REQUEST NOT FOUND', async () => {
+        let response = await request(app)
+            .get('/team/member/invite/pending/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        const invitationRequest = response.body[0]._id
+
+        await request(app)
+            .delete(`/team/member/invite/remove/${team1Id}/${new mongoose.Types.ObjectId()}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404);
+    })
+
+    test('TEAM_SUITE - Should remove team invitaion', async () => {
+        let response = await request(app)
+            .get('/team/member/invite/pending/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        const invitationRequest = response.body[0]._id
+
+        await request(app)
+            .delete(`/team/member/invite/remove/${team1Id}/${invitationRequest}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        response = await request(app)
+            .get('/team/member/invite/pending/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+            
+        expect(response.body.length).toEqual(0);
+    })
+
     test('TEAM_SUITE - Should NOT accept invite - Team does not exist', async () => {
         const response = await request(app)
             .post('/team/member/invite/accept/' + teamInviteNoTeam._id)

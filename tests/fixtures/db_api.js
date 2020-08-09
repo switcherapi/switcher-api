@@ -14,6 +14,8 @@ import { Metric } from '../../src/models/metric';
 import { EnvType, Environment } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
 
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test_secret';
+
 export const adminMasterAccountId = new mongoose.Types.ObjectId()
 export const adminMasterAccountToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET)
 export const adminMasterAccount = {
