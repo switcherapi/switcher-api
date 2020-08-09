@@ -3784,7 +3784,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"entry\": [\n\t\t{\n\t\t\t\"strategy\": \"VALUE_VALIDATION\",\n\t\t\t\"input\": \"Roger\"\n\t\t},\n\t\t{\n\t\t\t\"strategy\": \"NETWORK_VALIDATION\",\n\t\t\t\"input\": \"10.0.0.3\"\n    \t}]\n}",
+					"raw": "{\n\t\"entry\": [\n\t\t{\n\t\t\t\"strategy\": \"VALUE_VALIDATION\",\n\t\t\t\"input\": \"Roger\"\n\t\t}]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -3792,7 +3792,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/criteria?showReason=true&showStrategy=true&key=FEATURE2020",
+					"raw": "{{url}}/criteria?showReason=false&showStrategy=false&key=FEATURE01",
 					"host": [
 						"{{url}}"
 					],
@@ -3802,11 +3802,11 @@
 					"query": [
 						{
 							"key": "showReason",
-							"value": "true"
+							"value": "false"
 						},
 						{
 							"key": "showStrategy",
-							"value": "true"
+							"value": "false"
 						},
 						{
 							"key": "bypassMetric",
@@ -3815,7 +3815,7 @@
 						},
 						{
 							"key": "key",
-							"value": "FEATURE2020"
+							"value": "FEATURE01"
 						}
 					]
 				}
@@ -4138,7 +4138,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "{\r\n    # configuration(key: \"FEATURE01\") { #FEATURE02\r\n    # configuration(group: \"Project 1\") {\r\n    configuration(key: \"FEATURE02\", environment: \"default\") {\r\n        domain {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        group {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        config {\r\n            key\r\n            description\r\n            activated\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n}",
+						"query": "{\r\n    configuration(domain: \"5e0ece606f4f994eac9007ae\", group: \"Project 2\") {\r\n    # configuration(domain: \"5e0ece606f4f994eac9007ae\", key: \"FEATURE01\", environment: \"default\") {\r\n    # configuration(domain: \"5e4f9d8966e06b59c8254500\", key: \"FEATURE01\", environment: \"default\") {\r\n        domain {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        group {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        config {\r\n            key\r\n            description\r\n            activated\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n}",
 						"variables": ""
 					}
 				},

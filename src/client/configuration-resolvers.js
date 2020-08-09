@@ -6,8 +6,8 @@ import { ConfigStrategy } from '../models/config-strategy';
 import { verifyOwnership } from "../routers/common";
 import { ActionTypes, RouterTypes } from "../models/role";
 
-export async function resolveFlatConfigurationByConfig(key) {
-    const config = await Config.find({ key }).lean();
+export async function resolveFlatConfigurationByConfig(key, domainId) {
+    const config = await Config.find({ key, domain: domainId }).lean();
     if (config.length > 0) {
         return { config };
     } else {
@@ -15,8 +15,8 @@ export async function resolveFlatConfigurationByConfig(key) {
     }
 }
 
-export async function resolveFlatConfigurationTypeByGroup(groupConfig) {
-    const group = await GroupConfig.find({ name: groupConfig }).lean();
+export async function resolveFlatConfigurationTypeByGroup(groupConfig, domainId) {
+    const group = await GroupConfig.find({ name: groupConfig, domain: domainId }).lean();
     if (group.length > 0) {
         return { group };
     } else {
@@ -92,12 +92,6 @@ export async function resolveFlatDomain(source, context) {
 
     if (context.domain) {
         domain = await Domain.findById(context.domain).lean();
-    } else {
-        if (source.config) {
-            domain = await Domain.findById(source.config[0].domain).lean();
-        } else if (source.group) {
-            domain = await Domain.findById(source.group[0].domain).lean();
-        }
     }
 
     try {
