@@ -1059,7 +1059,7 @@ describe("Testing domain [Adm-GraphQL] ", () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({ query: `
             {
-                configuration(key: "${keyConfig}") {
+                configuration(domain: "${domainId}", key: "${keyConfig}") {
                     domain { name description statusByEnv { env value } }
                     group { name description statusByEnv { env value } }
                     config { key description statusByEnv { env value } }
@@ -1093,7 +1093,7 @@ describe("Testing domain [Adm-GraphQL] ", () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({ query: `
             {
-                configuration(group: "Group Test") {
+                configuration(domain: "${domainId}", group: "Group Test") {
                     domain { name description statusByEnv { env value } }
                     group { name description statusByEnv { env value } }
                     config { key description statusByEnv { env value } }
@@ -1115,7 +1115,7 @@ describe("Testing domain [Adm-GraphQL] ", () => {
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({ query: `
             {
-                configuration(key: "${keyConfig}", environment: "default") {
+                configuration(domain: "${domainId}", key: "${keyConfig}", environment: "default") {
                     domain { name description statusByEnv { env value } }
                     group { name description statusByEnv { env value } }
                     config { key description statusByEnv { env value } }

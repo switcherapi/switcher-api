@@ -57,6 +57,9 @@ const queryType = new GraphQLObjectType({
         configuration: {
             type: flatConfigurationType,
             args: {
+                domain: {
+                    type: GraphQLString
+                },
                 group: {
                     type: GraphQLString
                 },
@@ -67,17 +70,21 @@ const queryType = new GraphQLObjectType({
                     type: GraphQLString
                 }
             },
-            resolve: async (source, { group, key, environment }, context) => {
+            resolve: async (source, { domain, group, key, environment }, context) => {
                 if (environment) {
                     context.environment = environment;
                 }
 
-                if (key) {
-                    return resolveFlatConfigurationByConfig(key)
-                }
+                if (context.domain || domain) {
+                    context.environment = environment;
+                    context.domain = context.domain || domain;
+                    if (key) {
+                        return resolveFlatConfigurationByConfig(key, context.domain)
+                    }
 
-                if (group) {
-                    return resolveFlatConfigurationTypeByGroup(group)
+                    if (group) {
+                        return resolveFlatConfigurationTypeByGroup(group, context.domain)
+                    }
                 }
             }
         },
