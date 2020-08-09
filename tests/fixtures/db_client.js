@@ -13,8 +13,10 @@ import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models
 import { ActionTypes, RouterTypes, Role } from '../../src/models/role';
 import { Team } from '../../src/models/team';
 
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test_secret';
+
 export const adminMasterAccountId = new mongoose.Types.ObjectId()
-export const adminMasterAccountToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET || 'test_secret')
+export const adminMasterAccountToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET)
 export const adminMasterAccount = {
     _id: adminMasterAccountId,
     name: 'Master Admin',
@@ -24,7 +26,7 @@ export const adminMasterAccount = {
 }
 
 export const adminAccountId = new mongoose.Types.ObjectId()
-export const adminAccountToken = jwt.sign({ _id: adminAccountId }, process.env.JWT_SECRET || 'test_secret')
+export const adminAccountToken = jwt.sign({ _id: adminAccountId }, process.env.JWT_SECRET)
 export const adminAccount = {
     _id: adminAccountId,
     name: 'Admin',
