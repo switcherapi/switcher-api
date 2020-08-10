@@ -212,6 +212,64 @@
 			"response": []
 		},
 		{
+			"name": "Admin - BitBucket Auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7f2a0f31-3bc0-4a2e-87bd-bf530d734188",
+						"exec": [
+							"// if (pm.response.code === 201) {",
+							"//     pm.environment.set('authToken', pm.response.json().jwt.token)",
+							"// }"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/admin/bitbucket/auth?code=",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"bitbucket",
+						"auth"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Admin - Update Me",
 			"request": {
 				"method": "PATCH",
