@@ -88,7 +88,6 @@ adminSchema.options.toJSON = {
 
         delete ret.password
         delete ret.token
-        delete ret._gitid
         return ret
     }
 }
