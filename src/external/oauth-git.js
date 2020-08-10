@@ -3,7 +3,7 @@ import axios from 'axios';
 export const githubAccessTokenUrl = 'https://github.com/login/oauth/access_token';
 export const githubAPIUserUrl = 'https://api.github.com/user';
 
-export async function getToken(code) {
+export async function getGitToken(code) {
     try {
         const response = await axios.post(
             `${githubAccessTokenUrl}?client_id=${process.env.GIT_OAUTH_CLIENT_ID}&client_secret=${process.env.GIT_OAUTH_SECRET}&code=${code}`, null,
@@ -20,7 +20,7 @@ export async function getToken(code) {
     }
 }
 
-export async function getUserInfo(token) {
+export async function getGitUserInfo(token) {
     try {
         const response = await axios.get(githubAPIUserUrl,
             { 
@@ -32,7 +32,8 @@ export async function getUserInfo(token) {
         return {
             id: response.data.id,
             name: response.data.name || response.data.login,
-            email: response.data.email || `${response.data.id}+${response.data.login}@admin.noreply.switcherapi.com`
+            email: response.data.email || `${response.data.id}+${response.data.login}@admin.noreply.switcherapi.com`,
+            avatar: response.data.avatar_url
         };
    } catch (error) {
        throw new GitAuthError('Failed to get GitHub user info');

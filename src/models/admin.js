@@ -36,6 +36,12 @@ const adminSchema = new mongoose.Schema({
     },
     _gitid: {
         type: String
+    },
+    _bitbucketid: {
+        type: String
+    },
+    _avatar: {
+        type: String
     }
 }, {
     timestamps: true
@@ -77,84 +83,91 @@ adminSchema.options.toJSON = {
     minimize: false,
     transform: function (doc, ret, options) {
         if (ret.updatedAt || ret.createdAt) {
-            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
-            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
+            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
+            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
         }
 
         if (ret.team_list) {
-            ret.teams = ret.team_list
-            delete ret.team_list
+            ret.teams = ret.team_list;
+            delete ret.team_list;
         }
 
-        delete ret.password
-        delete ret.token
-        return ret
+        delete ret.password;
+        delete ret.token;
+        delete ret._gitid;
+        delete ret._bitbucketid;
+        return ret;
     }
 }
 
 adminSchema.methods.generateAuthToken = async function () {
-    const admin = this
+    const admin = this;
 
     const options = {
         expiresIn: process.env.JWT_ADMIN_TOKEN_RENEW_INTERVAL
     };
 
-    const token = jwt.sign(({ _id: admin.id.toString() }), process.env.JWT_SECRET, options)
-    const refreshToken = await bcrypt.hash(token.split('.')[2], 8)
+    const token = jwt.sign(({ _id: admin.id.toString() }), process.env.JWT_SECRET, options);
+    const refreshToken = await bcrypt.hash(token.split('.')[2], 8);
 
     admin.token = refreshToken;
-    await admin.save()
+    await admin.save();
 
     return {
         token,
         refreshToken
-    }
+    };
 }
 
 adminSchema.statics.findByCredentials = async (email, password) => {
-    const admin = await Admin.findOne({ email })
+    const admin = await Admin.findOne({ email });
 
     if (!admin) {
-        throw new Error('Unable to login')
+        throw new Error('Unable to login');
     }
 
-    const isMatch = await bcrypt.compare(password, admin.password)
+    const isMatch = await bcrypt.compare(password, admin.password);
 
     if (!isMatch) {
-        throw new Error('Unable to login')
+        throw new Error('Unable to login');
     }
 
-    return admin
+    return admin;
 }
 
 adminSchema.statics.findUserByGitId = async (_gitid) => {
-    const admin = await Admin.findOne({ _gitid })
-    return admin
+    const admin = await Admin.findOne({ _gitid });
+    return admin;
+}
+
+adminSchema.statics.findUserByBitBucketId = async (_bitbucketid) => {
+    const admin = await Admin.findOne({ _bitbucketid });
+    return admin;
 }
 
 adminSchema.pre('save', async function (next) {
-    const admin = this
+    const admin = this;
 
     if (admin.isModified('password')) {
-        admin.password = await bcrypt.hash(admin.password, 8)
+        admin.password = await bcrypt.hash(admin.password, 8);
     }
 
-    next()
+    next();
 })
 
 adminSchema.pre('remove', async function (next) {
     var ObjectId = (require('mongoose').Types.ObjectId);
 
     const admin = this;
-    const domains = await Domain.find({ owner: new ObjectId(admin._id) })
+    const domains = await Domain.find({ owner: new ObjectId(admin._id) });
 
     if (domains) {
-        domains.forEach(async (domain) => await domain.remove())
+        domains.forEach(async (domain) => await domain.remove());
     }
 
-    next()
+    next();
 })
 
-const Admin = mongoose.model('Admin', adminSchema)
+const Admin = mongoose.model('Admin', adminSchema);
 
 export default Admin;
