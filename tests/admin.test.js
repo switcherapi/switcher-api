@@ -131,6 +131,44 @@ describe('Testing Admin insertion', () => {
         axiosGetStub.restore();
     })
 
+    test('ADMIN_SUITE - Should signup a new Admin - From BitBucket', async () => {
+        // mock
+        axiosPostStub = sinon.stub(axios, 'post');
+        axiosGetStub = sinon.stub(axios, 'get');
+
+        // given
+        const mockedTokenData = { data: { access_token: 'MOCKED_TOKEN' } };
+        const mockedUserData = { data: 
+            { 
+                account_id: 123456789,
+                nickname: 'bitbucketuser',
+                display_name: 'Mocked BitBucket User'
+            } 
+        };
+
+        var bodyFormData = new URLSearchParams();
+        bodyFormData.set('grant_type', 'authorization_code');
+        bodyFormData.set('code', 'BITBUCKET_CODE');
+
+        axiosPostStub.calledWith('data', bodyFormData)
+        axiosPostStub.returns(Promise.resolve(mockedTokenData));
+        axiosGetStub.returns(Promise.resolve(mockedUserData));
+
+        // test
+        const response = await request(app)
+            .post('/admin/bitbucket/auth?code=BITBUCKET_CODE')
+            .send().expect(201);
+
+        // DB validation - document created
+        const admin = await Admin.findById(response.body.admin._id);
+        expect(admin).not.toBeNull();
+        expect(admin._bitbucketid).toEqual("123456789");
+
+        // restore
+        axiosPostStub.restore();
+        axiosGetStub.restore();
+    })
+
     test('ADMIN_SUITE - Should NOT signup - invalid email format', async () => {
         await request(app)
             .post('/admin/signup')
@@ -178,6 +216,60 @@ describe('Testing Admin insertion', () => {
             .send().expect(401);
 
         expect(response.body.error).toEqual("Failed to get GitHub access token");
+
+        // restore
+        axiosPostStub.restore();
+        axiosGetStub.restore();
+    })
+
+    test('ADMIN_SUITE - Should NOT signup - Access denied to BitBucket User Info', async () => {
+        // mock
+        axiosPostStub = sinon.stub(axios, 'post');
+        axiosGetStub = sinon.stub(axios, 'get');
+
+        // given
+        const mockedTokenData = { data: { access_token: 'MOCKED_TOKEN' } };
+        const mockedUserData = { data: 
+            { 
+                account_id: 123456789,
+                nickname: 'bitbucketuser',
+                display_name: 'Mocked BitBucket User'
+            } 
+        };
+
+        var bodyFormData = new URLSearchParams();
+        bodyFormData.set('grant_type', 'authorization_code');
+        bodyFormData.set('code', 'BITBUCKET_CODE');
+
+        axiosPostStub.calledWith('data', bodyFormData)
+        axiosPostStub.returns(Promise.resolve(mockedTokenData));
+        axiosGetStub.throwsException();
+
+        // test
+        const response = await request(app)
+            .post('/admin/bitbucket/auth?code=BITBUCKET_CODE')
+            .send().expect(401);
+
+        expect(response.body.error).toEqual("Failed to get BitBucket user info");
+
+        // restore
+        axiosPostStub.restore();
+        axiosGetStub.restore();
+    })
+
+    test('ADMIN_SUITE - Should NOT signup - Access denied to BitBucket Token', async () => {
+        // mock
+        axiosPostStub = sinon.stub(axios, 'post');
+
+        // given
+        axiosPostStub.throwsException();
+
+        // test
+        const response = await request(app)
+            .post('/admin/bitbucket/auth?code=BITBUCKET_CODE')
+            .send().expect(401);
+
+        expect(response.body.error).toEqual("Failed to get BitBucket access token");
 
         // restore
         axiosPostStub.restore();

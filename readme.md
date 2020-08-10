@@ -46,6 +46,8 @@ Main features:
     "METRICS_ACTIVATED": true,
     "GIT_OAUTH_CLIENT_ID": "[GITHUB_CLIENT_ID]",
     "GIT_OAUTH_SECRET": "[GITHUB_API_SECRET]",
+    "BITBUCKET_OAUTH_CLIENT_ID": "[BITBUCKET_CLIENT_ID]",
+    "BITBUCKET_OAUTH_SECRET": "[BITBUCKET_API_SECRET]",
     "GOOGLE_RECAPTCHA_SECRET": "[GOOGLE_RECAPTCHA_SECRET]"
   },
   "prod": {
@@ -59,7 +61,7 @@ Main features:
 ### API configuration
 #### Signing up
 Signing up to Switcher API must be made via Switcher Management.
-<br />It can be done by using an email address or linking it to a GitHub account.
+<br />It can be done by using an email address or linking it to a GitHub or BitBucket account.
 
 - **Singing up via email** - /admin/signup [POST]
 ```json
@@ -72,6 +74,9 @@ Signing up to Switcher API must be made via Switcher Management.
 ```
 
 - **Singing up via GitHub** - /admin/github/auth?code= [POST]
+  Code must be set by the API service provider.
+
+- **Singing up via BitBucket** - /admin/bitbucket/auth?code= [POST]
   Code must be set by the API service provider.
 
 #### Domain
@@ -240,5 +245,6 @@ A GraphQL endpoint can also be used to execute the API. Extra return information
 
 ## Donation
 Donations for cookies and pizza are extremely welcomed.
+[![Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/switcherapi)
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9FKW64V67RKXW&source=url)

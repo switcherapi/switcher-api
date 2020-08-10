@@ -4,7 +4,8 @@ import { auth, authRefreshToken } from '../middleware/auth';
 import { verifyInputUpdateParameters } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
 import { responseException, verifyOwnership } from './common';
-import { getToken, getUserInfo } from '../external/oauth-git';
+import { getGitToken, getGitUserInfo } from '../external/oauth-git';
+import { getBitBucketToken, getBitBucketUserInfo } from '../external/oauth-bitbucket';
 import { validate_token } from '../external/google-recaptcha';
 
 const router = new express.Router()
@@ -33,25 +34,55 @@ router.post('/admin/signup', [
 
 router.post('/admin/github/auth', async (req, res) => {
     try {
-        const token = await getToken(req.query.code)
-        const userInfo = await getUserInfo(token)
+        const token = await getGitToken(req.query.code);
+        const userInfo = await getGitUserInfo(token);
 
-        let admin = await Admin.findUserByGitId(userInfo.id)
+        let admin = await Admin.findUserByGitId(userInfo.id);
 
         if (!admin) {
             admin = new Admin({
                 name: userInfo.name,
                 email: userInfo.email,
                 _gitid: userInfo.id,
+                _avatar: userInfo.avatar,
                 password: Math.random().toString(36).slice(-8)
             })
-            await admin.save()
+            await admin.save();
+        } else {
+            admin._avatar = userInfo.avatar;
         }
     
-        const jwt = await admin.generateAuthToken()
-        res.status(201).send({ admin, jwt })
+        const jwt = await admin.generateAuthToken();
+        res.status(201).send({ admin, jwt });
     } catch (e) {
-        res.status(401).send({ error: e.message })
+        res.status(401).send({ error: e.message });
+    }
+})
+
+router.post('/admin/bitbucket/auth', async (req, res) => {
+    try {
+        const token = await getBitBucketToken(req.query.code);
+        const userInfo = await getBitBucketUserInfo(token);
+
+        let admin = await Admin.findUserByBitBucketId(userInfo.id);
+
+        if (!admin) {
+            admin = new Admin({
+                name: userInfo.name,
+                email: userInfo.email,
+                _bitbucketid: userInfo.id,
+                _avatar: userInfo.avatar,
+                password: Math.random().toString(36).slice(-8)
+            });
+            await admin.save();
+        } else {
+            admin._avatar = userInfo.avatar;
+        }
+    
+        const jwt = await admin.generateAuthToken();
+        res.status(201).send({ admin, jwt });
+    } catch (e) {
+        res.status(401).send({ error: e.message });
     }
 })
 
@@ -65,27 +96,27 @@ router.post('/admin/login', [
     }
 
     try {
-        const admin = await Admin.findByCredentials(req.body.email, req.body.password)
-        const jwt = await admin.generateAuthToken()
-        res.send({ admin, jwt })
+        const admin = await Admin.findByCredentials(req.body.email, req.body.password);
+        const jwt = await admin.generateAuthToken();
+        res.send({ admin, jwt });
     } catch (e) {
-        res.status(401).send({ error: 'Invalid email/password' })
+        res.status(401).send({ error: 'Invalid email/password' });
     }
 })
 
 router.post('/admin/logout', auth, async (req, res) => {
     req.admin.token = null;
-    await req.admin.save()
-    res.send()
+    await req.admin.save();
+    res.send();
 })
 
 router.post('/admin/refresh/me', authRefreshToken, async (req, res) => {
-    res.status(200).send(req.jwt)
+    res.status(200).send(req.jwt);
 })
 
 router.get('/admin/me', auth, async (req, res) => {
-    await req.admin.populate({ path: 'team_list' }).execPopulate()
-    res.send(req.admin)
+    await req.admin.populate({ path: 'team_list' }).execPopulate();
+    res.send(req.admin);
 })
 
 router.post('/admin/collaboration/permission', auth, async (req, res) => {
@@ -99,51 +130,51 @@ router.post('/admin/collaboration/permission', auth, async (req, res) => {
     let result = [];
     for (let index = 0; index < req.body.action.length; index++) {
         try {
-            await verifyOwnership(req.admin, element, req.body.domain, req.body.action[index], req.body.router)
+            await verifyOwnership(req.admin, element, req.body.domain, req.body.action[index], req.body.router);
             result.push({
                 action: req.body.action[index],
                 result: 'ok'
-            })
+            });
         } catch (e) {
             result.push({
                 action : req.body.action[index],
                 result: 'nok'
-            })
+            });
         }
     }
     
-    res.send(result)
+    res.send(result);
 })
 
 router.get('/admin/collaboration', auth, async (req, res) => {
-    await req.admin.populate({ path: 'team_list' }).execPopulate()
-    const domains = req.admin.team_list.map(adm => adm.domain.toString())
-    res.send(Array.from(new Set(domains)))
+    await req.admin.populate({ path: 'team_list' }).execPopulate();
+    const domains = req.admin.team_list.map(adm => adm.domain.toString());
+    res.send(Array.from(new Set(domains)));
 })
 
 router.get('/admin/:id', auth, async (req, res) => {
     try {
-        let admin = await Admin.findById(req.params.id)
+        let admin = await Admin.findById(req.params.id);
 
         if (!admin) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
         
-        res.send(admin)
+        res.send(admin);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
 router.delete('/admin/me', auth, async (req, res) => {
-    await req.admin.remove()
-    res.send(req.admin)
+    await req.admin.remove();
+    res.send(req.admin);
 })
 
 router.patch('/admin/me', auth, verifyInputUpdateParameters(['name', 'email', 'password']), async (req, res) => {
-    req.updates.forEach((update) => req.admin[update] = req.body[update])
-    await req.admin.save()
-    res.send(req.admin)
+    req.updates.forEach((update) => req.admin[update] = req.body[update]);
+    await req.admin.save();
+    res.send(req.admin);
 })
 
 export default router;
