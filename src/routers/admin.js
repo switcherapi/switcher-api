@@ -48,6 +48,8 @@ router.post('/admin/github/auth', async (req, res) => {
                 password: Math.random().toString(36).slice(-8)
             })
             await admin.save();
+        } else {
+            admin._avatar = userInfo.avatar;
         }
     
         const jwt = await admin.generateAuthToken();
@@ -73,6 +75,8 @@ router.post('/admin/bitbucket/auth', async (req, res) => {
                 password: Math.random().toString(36).slice(-8)
             });
             await admin.save();
+        } else {
+            admin._avatar = userInfo.avatar;
         }
     
         const jwt = await admin.generateAuthToken();
