@@ -40,7 +40,7 @@ export async function getBitBucketUserInfo(token) {
             id: response.data.account_id,
             name: response.data.display_name || response.data.nickname,
             email: `${response.data.account_id}+${response.data.username}@admin.noreply.switcherapi.com`,
-            avatar: response.data?.links?.avatar,
+            avatar: response.data?.links?.avatar?.href
         };
    } catch (error) {
        throw new BitBucketAuthError('Failed to get BitBucket user info');
