@@ -25,13 +25,16 @@ const adminSchema = new mongoose.Schema({
     active: {
         type: Boolean,
         required: true,
-        default: true
+        default: false
     },
     teams: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Team'
     }],
     token: {
+        type: String
+    },
+    code: {
         type: String
     },
     _gitid: {
@@ -94,6 +97,7 @@ adminSchema.options.toJSON = {
 
         delete ret.password;
         delete ret.token;
+        delete ret.code;
         delete ret._gitid;
         delete ret._bitbucketid;
         return ret;
@@ -119,8 +123,14 @@ adminSchema.methods.generateAuthToken = async function () {
     };
 }
 
+adminSchema.methods.generateAuthCode = async function () {
+    const admin = this;
+    admin.code = await bcrypt.hash(admin.email, 8);
+    return admin.code;
+}
+
 adminSchema.statics.findByCredentials = async (email, password) => {
-    const admin = await Admin.findOne({ email });
+    const admin = await Admin.findOne({ email, active: true });
 
     if (!admin) {
         throw new Error('Unable to login');
@@ -132,6 +142,11 @@ adminSchema.statics.findByCredentials = async (email, password) => {
         throw new Error('Unable to login');
     }
 
+    return admin;
+}
+
+adminSchema.statics.findUserByAuthCode = async (code) => {
+    const admin = await Admin.findOne({ code, active: false });
     return admin;
 }
 

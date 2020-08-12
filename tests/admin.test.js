@@ -27,6 +27,8 @@ describe('Testing Admin insertion', () => {
     let axiosPostStub;
     let axiosGetStub;
 
+    let signedupUser;
+
     test('ADMIN_SUITE - Should signup a new Admin', async () => {
         // mock
         axiosPostStub = sinon.stub(axios, 'post');
@@ -49,17 +51,72 @@ describe('Testing Admin insertion', () => {
         const admin = await Admin.findById(response.body.admin._id);
         expect(admin).not.toBeNull();
 
+        //used at: ADMIN_SUITE - Should confirm access to a new Admin
+        signedupUser = response.body.admin._id; 
+
         // Response validation
         expect(response.body).toMatchObject({
             admin: {
                 name: 'New Admin',
                 email: 'new_admin@mail.com',
-                active: true
+                active: false
             }
         });
 
         // restore
         axiosPostStub.restore();
+    })
+
+    test('ADMIN_SUITE - Should NOT login before access confirmation sent via Email', async () => {
+        // given
+        let admin = await Admin.findById(signedupUser);
+        expect(admin).not.toBeNull();
+        expect(admin.active).toEqual(false);
+
+        // test
+        await request(app)
+            .post('/admin/login')
+            .send({
+                email: admin.email,
+                password: '12312312312'
+            }).expect(401);
+    })
+
+    test('ADMIN_SUITE - Should confirm access to a new Admin', async () => {
+        // given
+        let admin = await Admin.findById(signedupUser);
+        expect(admin).not.toBeNull();
+        expect(admin.active).toEqual(false);
+
+        // test
+        const response = await request(app)
+            .post(`/admin/signup/authorization?code=${admin.code}`)
+            .send().expect(201);
+
+        // DB validation - document updated
+        admin = await Admin.findById(signedupUser);
+        expect(admin.active).toEqual(true);
+    })
+
+    test('ADMIN_SUITE - Should login after access confirmation', async () => {
+        // given
+        let admin = await Admin.findById(signedupUser);
+        expect(admin).not.toBeNull();
+        expect(admin.active).toEqual(true);
+
+        // test
+        await request(app)
+            .post('/admin/login')
+            .send({
+                email: admin.email,
+                password: '12312312312'
+            }).expect(200);
+    })
+
+    test('ADMIN_SUITE - Should NOT confirm access to a new Admin - Invalid access code', async () => {
+        await request(app)
+            .post(`/admin/signup/authorization?code=INVALID_CODE`)
+            .send().expect(404);
     })
 
     test('ADMIN_SUITE - Should NOT signup - Failed to validate reCaptcha', async () => {

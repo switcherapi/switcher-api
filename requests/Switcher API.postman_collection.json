@@ -50,7 +50,56 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "bc8552fc-029b-432b-b090-dc2988741dca",
+						"id": "b574ce7e-01d4-4e3a-a3dd-602b56844d39",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"Petruki\",\n\t\"email\": \"roger.petruki@gmail.com\",\n\t\"password\": \"123123123\",\n\t\"token\": \"03AGdBq25Xnq--ldb6KpAMHvng1FPwI9Cpj_bQhKcz5ontUkhbJGyLEWOXUcbHYgf-AndjZU-kFVG4D3GK1sb_YtHXuDP_M2ZFcfruXHoq6MdxUn2zU0tjxatc4qe-azccPr0QnAvJSUlbiiFrQ-3VOutdrsBUbR51-gOQfdkdo7t3u-Q0rcgi6WsQEYrb7qV9Q6JB8M1UP0gO2enwoWfitBeaLuVzPv9I1bevthEECLKY2PgBgaEge3aMLv2YXOdjPZuj2z-HMapV2WAqd1uXeMkEr1viMhj2Fn9qcrb7wQE6gU_kv_Vooydpr6pfFH9BoWuC8_3HT03pGBsrkB-yrOP6KBznHHYLeHoBq9K-3gGqdXOSeEIZZwPZEISIqntUVJbszcNjFPgUGpR1p_4y98wREhBr8iqjyLURzS9s5wKBm22oxuOddk32PgugrTOQKZd56tvLDWM_\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/admin/signup",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - Signup Authorization",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dd03f569-7872-4f52-839d-910f37a84857",
 						"exec": [
 							"if (pm.response.code === 201) {",
 							"    pm.environment.set('authToken', pm.response.json().jwt.token)",
@@ -69,13 +118,13 @@
 					{
 						"key": "Content-Type",
 						"name": "Content-Type",
-						"value": "application/json",
-						"type": "text"
+						"type": "text",
+						"value": "application/json"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"name\": \"Google\",\n\t\"email\": \"google@mail.com\",\n\t\"password\": \"123123123\",\n\t\"token\": \"03AGdBq25Xnq--ldb6KpAMHvng1FPwI9Cpj_bQhKcz5ontUkhbJGyLEWOXUcbHYgf-AndjZU-kFVG4D3GK1sb_YtHXuDP_M2ZFcfruXHoq6MdxUn2zU0tjxatc4qe-azccPr0QnAvJSUlbiiFrQ-3VOutdrsBUbR51-gOQfdkdo7t3u-Q0rcgi6WsQEYrb7qV9Q6JB8M1UP0gO2enwoWfitBeaLuVzPv9I1bevthEECLKY2PgBgaEge3aMLv2YXOdjPZuj2z-HMapV2WAqd1uXeMkEr1viMhj2Fn9qcrb7wQE6gU_kv_Vooydpr6pfFH9BoWuC8_3HT03pGBsrkB-yrOP6KBznHHYLeHoBq9K-3gGqdXOSeEIZZwPZEISIqntUVJbszcNjFPgUGpR1p_4y98wREhBr8iqjyLURzS9s5wKBm22oxuOddk32PgugrTOQKZd56tvLDWM_\"\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -83,13 +132,20 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/admin/signup",
+					"raw": "{{url}}/admin/signup/authorization?code=",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"admin",
-						"signup"
+						"signup",
+						"authorization"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": ""
+						}
 					]
 				}
 			},
@@ -141,64 +197,6 @@
 					"path": [
 						"admin",
 						"github",
-						"auth"
-					],
-					"query": [
-						{
-							"key": "code",
-							"value": ""
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Admin - BitBucket Auth",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "7f2a0f31-3bc0-4a2e-87bd-bf530d734188",
-						"exec": [
-							"// if (pm.response.code === 201) {",
-							"//     pm.environment.set('authToken', pm.response.json().jwt.token)",
-							"// }"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{url}}/admin/bitbucket/auth?code=",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"admin",
-						"bitbucket",
 						"auth"
 					],
 					"query": [
