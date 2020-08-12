@@ -3,10 +3,11 @@ import Admin from '../models/admin';
 import { auth, authRefreshToken } from '../middleware/auth';
 import { verifyInputUpdateParameters } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
-import { responseException, verifyOwnership } from './common';
+import { responseException, verifyOwnership, NotFoundError } from './common';
 import { getGitToken, getGitUserInfo } from '../external/oauth-git';
 import { getBitBucketToken, getBitBucketUserInfo } from '../external/oauth-bitbucket';
 import { validate_token } from '../external/google-recaptcha';
+import { sendAuthCode } from '../external/sendgrid';
 
 const router = new express.Router()
 
@@ -23,12 +24,32 @@ router.post('/admin/signup', [
     try {
         await validate_token(req);
         const admin = new Admin(req.body);
+        const code = await admin.generateAuthCode();
+
+        sendAuthCode(admin.email, admin.name, code);
+        await admin.save();
+        res.status(201).send({ admin });
+    } catch (e) {
+        res.status(400).send({ error: e.message });
+    }
+})
+
+router.post('/admin/signup/authorization', async (req, res) => {
+    try {
+        let admin = await Admin.findUserByAuthCode(req.query.code);
+
+        if (!admin) {
+            throw new NotFoundError('Account not found');
+        }
+
+        admin.active = true;
+        admin.code = null;
         const jwt = await admin.generateAuthToken();
 
         await admin.save();
         res.status(201).send({ admin, jwt });
     } catch (e) {
-        res.status(400).send({ error: e.message });
+        responseException(res, e, 400);
     }
 })
 
