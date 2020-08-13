@@ -44,6 +44,9 @@ Main features:
     "MAX_EXIST_STRATEGYOPERATION": 100,
     "HISTORY_ACTIVATED": true,
     "METRICS_ACTIVATED": true,
+    "SENDGRID_API_KEY": "[SENDGRID_API_KEY]",
+    "SENDGRID_MAIL_FROM": "[SENDGRID_MAIL_FROM]",
+    "SENDGRID_CONFIRMATION_TEMPLATE": "[SENDGRID_CONFIRMATION_TEMPLATE]",
     "GIT_OAUTH_CLIENT_ID": "[GITHUB_CLIENT_ID]",
     "GIT_OAUTH_SECRET": "[GITHUB_API_SECRET]",
     "BITBUCKET_OAUTH_CLIENT_ID": "[BITBUCKET_CLIENT_ID]",
@@ -78,6 +81,9 @@ Signing up to Switcher API must be made via Switcher Management.
 
 - **Singing up via BitBucket** - /admin/bitbucket/auth?code= [POST]
   Code must be set by the API service provider.
+
+- **Access confirmation** - /admin/signup/authorization?code=[GENERATED_CODE] [POST]
+  Code must be generated via /admin/signup.
 
 #### Domain
 
