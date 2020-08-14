@@ -119,6 +119,102 @@ describe('Testing Admin insertion', () => {
             .send().expect(404);
     })
 
+    test('ADMIN_SUITE - Should request password recovery', async () => {
+        // mock
+        axiosPostStub = sinon.stub(axios, 'post');
+
+        // given
+        const mockedRecaptchaResponse = { data: { success: true } };
+        axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
+
+        // test
+        let admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true });
+        expect(admin).not.toBeNull();
+        expect(admin.code).toBeNull();
+
+        const response = await request(app)
+            .post('/admin/login/request/recovery')
+            .send({
+                email: 'new_admin@mail.com'
+            }).expect(200);
+
+        // DB validation - document obtained
+        admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true });
+        expect(admin).not.toBeNull();
+        expect(admin.code).not.toBeNull();
+
+        // restore
+        axiosPostStub.restore();
+    })
+
+    test('ADMIN_SUITE - Should reset admin password', async () => {
+        // mock
+        axiosPostStub = sinon.stub(axios, 'post');
+
+        // given
+        const mockedRecaptchaResponse = { data: { success: true } };
+        axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
+
+        // test
+        let admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true });
+        expect(admin).not.toBeNull();
+        expect(admin.code).not.toBeNull();
+
+        await request(app)
+            .post('/admin/login/recovery')
+            .send({
+                code: admin.code,
+                password: 'qweqweqwe',
+                token: 'GOOGLE_RECAPTCHA_TOKEN'
+            }).expect(200);
+
+        await request(app)
+            .post('/admin/login')
+            .send({
+                email: admin.email,
+                password: '12312312312'
+            }).expect(401);
+
+        await request(app)
+            .post('/admin/login')
+            .send({
+                email: admin.email,
+                password: 'qweqweqwe'
+            }).expect(200);
+
+        // restore
+        axiosPostStub.restore();
+    })
+
+    test('ADMIN_SUITE - Should NOT request password recovery - Invalid email', async () => {
+        await request(app)
+            .post('/admin/login/request/recovery')
+            .send({
+                email: 'new_admin'
+            }).expect(422);
+    })
+
+    test('ADMIN_SUITE - Should NOT reset admin password - Invalid code', async () => {
+        // mock
+        axiosPostStub = sinon.stub(axios, 'post');
+
+        // given
+        const mockedRecaptchaResponse = { data: { success: true } };
+        axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
+
+        // test
+        await request(app)
+            .post('/admin/login/recovery')
+            .send({
+                code: 'INVALID_CODE',
+                password: 'qweqweqwe',
+                token: 'GOOGLE_RECAPTCHA_TOKEN'
+            }).expect(404);
+
+        // restore
+        axiosPostStub.restore();
+    })
+
     test('ADMIN_SUITE - Should NOT signup - Failed to validate reCaptcha', async () => {
         // mock
         axiosPostStub = sinon.stub(axios, 'post');

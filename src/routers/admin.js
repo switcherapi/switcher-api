@@ -7,7 +7,7 @@ import { responseException, verifyOwnership, NotFoundError } from './common';
 import { getGitToken, getGitUserInfo } from '../external/oauth-git';
 import { getBitBucketToken, getBitBucketUserInfo } from '../external/oauth-bitbucket';
 import { validate_token } from '../external/google-recaptcha';
-import { sendAuthCode } from '../external/sendgrid';
+import { sendAuthCode, sendAccountRecoveryCode } from '../external/sendgrid';
 
 const router = new express.Router()
 
@@ -25,9 +25,9 @@ router.post('/admin/signup', [
         await validate_token(req);
         const admin = new Admin(req.body);
         const code = await admin.generateAuthCode();
+        await admin.save();
 
         sendAuthCode(admin.email, admin.name, code);
-        await admin.save();
         res.status(201).send({ admin });
     } catch (e) {
         res.status(400).send({ error: e.message });
@@ -36,7 +36,7 @@ router.post('/admin/signup', [
 
 router.post('/admin/signup/authorization', async (req, res) => {
     try {
-        let admin = await Admin.findUserByAuthCode(req.query.code);
+        let admin = await Admin.findUserByAuthCode(req.query.code, false);
 
         if (!admin) {
             throw new NotFoundError('Account not found');
@@ -122,6 +122,42 @@ router.post('/admin/login', [
         res.send({ admin, jwt });
     } catch (e) {
         res.status(401).send({ error: 'Invalid email/password' });
+    }
+})
+
+router.post('/admin/login/request/recovery', 
+    check('email').isEmail(), async (req, res) => {
+        
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    const admin = await Admin.findOne({ email: req.body.email });
+    if (admin) {
+        const code = await admin.generateAuthCode();
+        admin.save();
+        sendAccountRecoveryCode(admin.email, admin.name, code);
+    }
+
+    res.status(200).send({ message: 'Request received' });
+})
+
+router.post('/admin/login/recovery', async (req, res) => {
+    try {
+        await validate_token(req);
+        let admin = await Admin.findUserByAuthCode(req.body.code, true);
+
+        if (!admin) {
+            throw new NotFoundError('Account not found');
+        }
+
+        admin.code = null;
+        admin.password = req.body.password;
+        const jwt = await admin.generateAuthToken();
+        res.status(200).send({ admin, jwt });
+    } catch (e) {
+        responseException(res, e, 400);
     }
 })
 
