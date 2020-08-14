@@ -114,6 +114,7 @@ adminSchema.methods.generateAuthToken = async function () {
     const token = jwt.sign(({ _id: admin.id.toString() }), process.env.JWT_SECRET, options);
     const refreshToken = await bcrypt.hash(token.split('.')[2], 8);
 
+    admin.code = null;
     admin.token = refreshToken;
     await admin.save();
 
@@ -125,7 +126,7 @@ adminSchema.methods.generateAuthToken = async function () {
 
 adminSchema.methods.generateAuthCode = async function () {
     const admin = this;
-    admin.code = await bcrypt.hash(admin.email, 8);
+    admin.code = Math.random().toString(36).slice(-8);
     return admin.code;
 }
 
@@ -145,8 +146,8 @@ adminSchema.statics.findByCredentials = async (email, password) => {
     return admin;
 }
 
-adminSchema.statics.findUserByAuthCode = async (code) => {
-    const admin = await Admin.findOne({ code, active: false });
+adminSchema.statics.findUserByAuthCode = async (code, active) => {
+    const admin = await Admin.findOne({ code, active });
     return admin;
 }
 

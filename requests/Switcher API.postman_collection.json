@@ -354,6 +354,109 @@
 			"response": []
 		},
 		{
+			"name": "Admin - Request Password Recovery",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "39c82702-212f-4116-8f05-a3b9b75b1b9b",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"email\": \"mail@mail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/admin/login/request/recovery",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"login",
+						"request",
+						"recovery"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin - Password Recovery",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0d50caf4-eba9-4ec6-ad4e-e7eca26cca42",
+						"exec": [
+							"if (pm.response.code === 201) {\r",
+							"    pm.environment.set('authToken', pm.response.json().jwt.token)\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"code\": \"qm1vfijm\",\r\n\t\"password\": \"123123123\",\r\n\t\"token\": \"03AGdBq25Xnq--ldb6KpAMHvng1FPwI9Cpj_bQhKcz5ontUkhbJGyLEWOXUcbHYgf-AndjZU-kFVG4D3GK1sb_YtHXuDP_M2ZFcfruXHoq6MdxUn2zU0tjxatc4qe-azccPr0QnAvJSUlbiiFrQ-3VOutdrsBUbR51-gOQfdkdo7t3u-Q0rcgi6WsQEYrb7qV9Q6JB8M1UP0gO2enwoWfitBeaLuVzPv9I1bevthEECLKY2PgBgaEge3aMLv2YXOdjPZuj2z-HMapV2WAqd1uXeMkEr1viMhj2Fn9qcrb7wQE6gU_kv_Vooydpr6pfFH9BoWuC8_3HT03pGBsrkB-yrOP6KBznHHYLeHoBq9K-3gGqdXOSeEIZZwPZEISIqntUVJbszcNjFPgUGpR1p_4y98wREhBr8iqjyLURzS9s5wKBm22oxuOddk32PgugrTOQKZd56tvLDWM_\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/admin/login/recovery",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"login",
+						"recovery"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Admin - Logout",
 			"request": {
 				"method": "POST",
