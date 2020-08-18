@@ -30,6 +30,18 @@ const historySchema = new mongoose.Schema({
     }
 });
 
+historySchema.options.toJSON = {
+    getters: true,
+    minimize: false,
+    transform: function (doc, ret, options) {
+        ret.date = moment(ret.date).format('YYYY-MM-DD HH:mm:ss');
+        if (!ret.id) {
+            delete ret.id;
+        }
+        return ret;
+    }
+}
+
 const History = mongoose.model(`History`, historySchema);
 
 export default History;
