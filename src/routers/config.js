@@ -131,8 +131,7 @@ router.get('/config/history/:id', auth, async (req, res) => {
             .select('oldValue newValue updatedBy date -_id')
             .sort(sort)
             .limit(parseInt(req.query.limit))
-            .skip(parseInt(req.query.skip))
-            .lean();
+            .skip(parseInt(req.query.skip));
 
         await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG);
 
