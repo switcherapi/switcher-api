@@ -92,7 +92,7 @@ function buildStatistics(aggregatedData, dataKey, timeframe = false) {
 
         if (entry.length) {
             entry[0][`${result}`] += data.total;
-            entry[0].total = entry[0].[`${result}`] + entry[0].[`${!data.result ? 'positive' : 'negative'}`];
+            entry[0].total = entry[0][`${result}`] + entry[0][`${!data.result ? 'positive' : 'negative'}`];
         } else {
             const newEntry = {
                 [`${dataKey}`]: data[`${dataKey}`],
