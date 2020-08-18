@@ -5,7 +5,7 @@ import { check, validationResult } from 'express-validator';
 import { auth } from '../middleware/auth';
 import { EnvType } from '../models/environment';
 import Config from '../models/config';
-import { getDateGroupFormat, verifyOwnership, responseException } from './common/index';
+import { verifyOwnership, responseException } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { ObjectId } from 'mongodb';
 
@@ -254,7 +254,7 @@ router.get('/metric/data/', [
 
     try {
         if (req.query.key) { 
-            const config = await Config.findOne({ key: req.query.key });
+            const config = await Config.findOne({ domain: req.query.domainid, key: req.query.key });
             if (config) {
                 args.config = config._id;
             } else {
@@ -301,7 +301,7 @@ router.get('/metric/statistics/', [
             req.query.dateGroupPattern : 'YYYY-MM';
 
         if (req.query.key) { 
-            const config = await Config.findOne({ key: req.query.key });
+            const config = await Config.findOne({ domain: req.query.domainid, key: req.query.key });
             if (config) {
                 aggregatorFilter.$match.$expr.$and.push({ $eq: ['$config', config._id] });
             } else {

@@ -24,7 +24,7 @@ const queryType = new GraphQLObjectType({
             resolve: async (source, { key, entry, bypassMetric }, context) => {
                 context.entry = entry
                 context.bypassMetric = bypassMetric
-                return resolveConfigByKey(key)
+                return resolveConfigByKey(context.domain, key)
             }
         },
         domain: {
