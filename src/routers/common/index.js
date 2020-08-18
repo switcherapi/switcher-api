@@ -2,7 +2,6 @@ import { Environment, EnvType } from '../../models/environment';
 import Domain from '../../models/domain';
 import { Team } from '../../models/team';
 import { Role, ActionTypes, RouterTypes } from '../../models/role';
-import moment from 'moment';
 
 async function checkEnvironmentStatusRemoval(domainId, environmentName, strategy = false) {
     const environment = await Environment.find({ domain: domainId }).select('name -_id')

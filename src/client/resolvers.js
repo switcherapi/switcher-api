@@ -203,4 +203,4 @@ export async function resolveCriteria(config, context, strategyFilter) {
     return response;
 }
 
-export const resolveConfigByKey = async (key) => await Config.findOne({ key }, null, { lean: true });
+export const resolveConfigByKey = async (domain, key) => await Config.findOne({ domain, key }, null, { lean: true });
