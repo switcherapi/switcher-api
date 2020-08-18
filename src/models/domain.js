@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import moment from 'moment';
 import GroupConfig from './group-config';
 import History from './history';
+import { Metric } from '../models/metric';
 import { Team } from './team';
 import { EnvType, Environment } from './environment';
 import { recordHistory } from './common/index'
@@ -64,12 +65,6 @@ domainSchema.virtual('environment', {
     foreignField: 'domain'
 })
 
-domainSchema.virtual('history', {
-    ref: 'History',
-    localField: '_id',
-    foreignField: 'elementId'
-})
-
 domainSchema.virtual('team', {
     ref: 'Team',
     localField: '_id',
@@ -94,6 +89,7 @@ domainSchema.pre('remove', async function (next) {
 
     const domain = this;
     const group = await GroupConfig.find({ domain: new ObjectId(domain._id) });
+    
     if (group) {
         group.forEach(async (g) => await g.remove());
     }
@@ -103,15 +99,9 @@ domainSchema.pre('remove', async function (next) {
         team.forEach(async (e) => await e.remove());
     }
 
-    const environment = await Environment.find({ domain: new ObjectId(domain._id) });
-    if (environment) {
-        environment.forEach(async (e) => await e.remove());
-    }
-
-    const history = await History.find({ elementId: new ObjectId(domain._id) });
-    if (history) {
-        history.forEach((h) => h.remove());
-    }
+    await Environment.deleteMany({ domain: new ObjectId(domain._id) });
+    await History.deleteMany({ domainId: domain._id });
+    await Metric.deleteMany({ domain: new ObjectId(domain._id) });
 
     next();
 })
@@ -119,7 +109,7 @@ domainSchema.pre('remove', async function (next) {
 async function recordDomainHistory(domain, modifiedField) {
     if (domain.__v !== undefined && modifiedField.length) {
         const oldDomain = await Domain.findById(domain._id);
-        recordHistory(modifiedField, oldDomain, domain, ['lastUpdate']);
+        await recordHistory(modifiedField, oldDomain, domain, domain._id, ['lastUpdate']);
     }
 }
 

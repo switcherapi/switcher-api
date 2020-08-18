@@ -39,29 +39,23 @@ const groupConfigSchema = new mongoose.Schema({
     timestamps: true
 })
 
-groupConfigSchema.virtual('history', {
-    ref: 'History',
-    localField: '_id',
-    foreignField: 'elementId'
-})
-
 groupConfigSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
     transform: function (doc, ret, options) {
         if (ret.updatedAt || ret.createdAt) {
-            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
-            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
+            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
+            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
         }
-        return ret
+        return ret;
     }
 }
 
 async function recordGroupHistory(group, modifiedField) {
     if (group.__v !== undefined && modifiedField.length) {
         const oldGroup = await GroupConfig.findById(group._id);
-        recordHistory(modifiedField, oldGroup, group)
+        await recordHistory(modifiedField, oldGroup, group, group.domain);
     }
 }
 
@@ -74,27 +68,23 @@ groupConfigSchema.virtual('config', {
 groupConfigSchema.pre('remove', async function (next) {
     var ObjectId = (require('mongoose').Types.ObjectId);
 
-    const group = this
-    const config = await Config.find({ group: new ObjectId(group._id) })
+    const group = this;
+    const config = await Config.find({ group: new ObjectId(group._id) });
 
     if (config) {
-        config.forEach(async (c) => await c.remove())
+        config.forEach(async (c) => await c.remove());
     }
 
-    const history = await History.find({ elementId: group._id })
-    if (history) {
-        history.forEach((h) => h.remove())
-    }
-    
-    next()
+    await History.deleteMany({ domainId: group.domain, elementId: group._id });
+    next();
 })
 
 groupConfigSchema.pre('save', async function (next) {
-    const group = this
+    const group = this;
     await recordGroupHistory(group, this.modifiedPaths());
-    next()
+    next();
 })
 
-const GroupConfig = mongoose.model('GroupConfig', groupConfigSchema)
+const GroupConfig = mongoose.model('GroupConfig', groupConfigSchema);
 
 export default GroupConfig;

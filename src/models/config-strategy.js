@@ -231,7 +231,7 @@ function processDate(operation, input, values) {
 async function recordStrategyHistory(strategyConfig, modifiedField) {
     if (strategyConfig.__v !== undefined && modifiedField.length) {
         const oldStrategy = await ConfigStrategy.findById(strategyConfig._id);
-        recordHistory(modifiedField, oldStrategy, strategyConfig);
+        await recordHistory(modifiedField, oldStrategy, strategyConfig, strategyConfig.domain);
     }
 }
 
@@ -297,12 +297,6 @@ const configStrategySchema = new mongoose.Schema({
     timestamps: true
 })
 
-configStrategySchema.virtual('history', {
-    ref: 'History',
-    localField: '_id',
-    foreignField: 'elementId'
-});
-
 configStrategySchema.options.toJSON = {
     getters: true,
     virtuals: true,
@@ -321,11 +315,9 @@ configStrategySchema.options.toJSON = {
 
 configStrategySchema.pre('remove', async function (next) {
     const strategyConfig = this;
-    const history = await History.find({ elementId: strategyConfig._id });
-    if (history) {
-        history.forEach((h) => h.remove());
-    }
-
+    await History.deleteMany({ domainId: strategyConfig.domain, 
+        elementId: strategyConfig._id });
+        
     next();
 });
 

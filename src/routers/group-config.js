@@ -7,16 +7,16 @@ import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../mi
 import { removeGroupStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
 
-const router = new express.Router()
+const router = new express.Router();
 
 async function verifyGroupInput(groupId, admin) {
-    let groupconfig = await GroupConfig.findById(groupId)
+    let groupconfig = await GroupConfig.findById(groupId);
         
     if (!groupconfig) {
-        throw new NotFoundError('GroupConfig does not exist')
+        throw new NotFoundError('GroupConfig does not exist');
     }
 
-    return await verifyOwnership(admin, groupconfig, groupconfig.domain, ActionTypes.UPDATE, RouterTypes.GROUP)
+    return await verifyOwnership(admin, groupconfig, groupconfig.domain, ActionTypes.UPDATE, RouterTypes.GROUP);
 }
 
 router.post('/groupconfig/create', auth, async (req, res) => {
@@ -51,18 +51,18 @@ router.post('/groupconfig/create', auth, async (req, res) => {
 // GET /groupconfig?sortBy=createdAt:desc
 // GET /groupconfig?domain=ID
 router.get('/groupconfig', auth, async (req, res) => {
-    const sort = {}
+    const sort = {};
 
     if (req.query.sortBy) {
-        const parts = req.query.sortBy.split(':')
-        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
+        const parts = req.query.sortBy.split(':');
+        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
     }
 
     try {
-        const domain = await Domain.findById(req.query.domain)
+        const domain = await Domain.findById(req.query.domain);
 
         if (!domain) {
-            return res.status(404).send({ error: 'Domain not found' })
+            return res.status(404).send({ error: 'Domain not found' });
         }
 
         await domain.populate({
@@ -72,31 +72,31 @@ router.get('/groupconfig', auth, async (req, res) => {
                 skip: parseInt(req.query.skip),
                 sort
             }
-        }).execPopulate()
+        }).execPopulate();
 
         let groups = domain.groupConfig;
 
-        groups = await verifyOwnership(req.admin, groups, domain._id, ActionTypes.READ, RouterTypes.GROUP, true)
+        groups = await verifyOwnership(req.admin, groups, domain._id, ActionTypes.READ, RouterTypes.GROUP, true);
 
-        res.send(groups)
+        res.send(groups);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
 router.get('/groupconfig/:id', auth, async (req, res) => {
     try {
-        let groupconfig = await GroupConfig.findById(req.params.id)
+        let groupconfig = await GroupConfig.findById(req.params.id);
 
         if (!groupconfig) {
-            return res.status(404).send({ error: 'Group not found' })
+            return res.status(404).send({ error: 'Group not found' });
         }
 
-        groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP)
+        groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP);
 
-        res.send(groupconfig)
+        res.send(groupconfig);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
@@ -104,72 +104,67 @@ router.get('/groupconfig/:id', auth, async (req, res) => {
 // GET /groupconfig/ID?limit=10&skip=20
 // GET /groupconfig/ID
 router.get('/groupconfig/history/:id', auth, async (req, res) => {
-    const sort = {}
+    const sort = {};
 
     if (req.query.sortBy) {
-        const parts = req.query.sortBy.split(':')
-        sort[`${parts[0]}`] = parts[1] === 'desc' ? -1 : 1
+        const parts = req.query.sortBy.split(':');
+        sort[`${parts[0]}`] = parts[1] === 'desc' ? -1 : 1;
     }
 
     try {
-        const groupconfig = await GroupConfig.findById(req.params.id)
+        const groupconfig = await GroupConfig.findById(req.params.id);
 
         if (!groupconfig) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
-        await groupconfig.populate({
-            path: 'history',
-            select: 'oldValue newValue updatedBy date -_id',
-            options: {
-                limit: parseInt(req.query.limit),
-                skip: parseInt(req.query.skip),
-                sort
-            }
-        }).execPopulate()
+        const history = await History.find({ domainId: groupconfig.domain, elementId: groupconfig._id })
+            .select('oldValue newValue updatedBy date -_id')
+            .sort(sort)
+            .limit(parseInt(req.query.limit))
+            .skip(parseInt(req.query.skip))
+            .lean();
 
-        const history = groupconfig.history;
+        await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP);
 
-        await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP)
-
-        res.send(history)
+        res.send(history);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
 router.delete('/groupconfig/history/:id', auth, async (req, res) => {
     try {
-        const groupconfig = await GroupConfig.findById(req.params.id)
+        const groupconfig = await GroupConfig.findById(req.params.id);
 
         if (!groupconfig) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
-        await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.DELETE, RouterTypes.ADMIN)
+        await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
 
-        await History.deleteMany({ elementId: groupconfig._id })
-        res.send(groupconfig)
+        await History.deleteMany({ domainId: groupconfig.domain, elementId: groupconfig._id });
+        res.send(groupconfig);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
 router.delete('/groupconfig/:id', auth, async (req, res) => {
     try {
-        let groupconfig = await GroupConfig.findById(req.params.id)
+        let groupconfig = await GroupConfig.findById(req.params.id);
 
         if (!groupconfig) {
-            return res.status(404).send({ error: 'Group not found' })
+            return res.status(404).send({ error: 'Group not found' });
         }
 
-        groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.DELETE, RouterTypes.GROUP)
+        groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.DELETE, RouterTypes.GROUP);
 
-        await groupconfig.remove()
-        updateDomainVersion(groupconfig.domain)
-        res.send(groupconfig)
+        await groupconfig.remove();
+        updateDomainVersion(groupconfig.domain);
+        res.send(groupconfig);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
@@ -198,27 +193,27 @@ router.patch('/groupconfig/:id', auth,
 
 router.patch('/groupconfig/updateStatus/:id', auth, async (req, res) => {
     try {
-        const groupconfig = await verifyGroupInput(req.params.id, req.admin)
-        groupconfig.updatedBy = req.admin.email
+        const groupconfig = await verifyGroupInput(req.params.id, req.admin);
+        groupconfig.updatedBy = req.admin.email;
 
-        const updates = await checkEnvironmentStatusChange(req, res, groupconfig.domain)
-        updates.forEach((update) => groupconfig.activated.set(update, req.body[update]))
-        await groupconfig.save()
-        updateDomainVersion(groupconfig.domain)
-        res.send(groupconfig)
+        const updates = await checkEnvironmentStatusChange(req, res, groupconfig.domain);
+        updates.forEach((update) => groupconfig.activated.set(update, req.body[update]));
+        await groupconfig.save();
+        updateDomainVersion(groupconfig.domain);
+        res.send(groupconfig);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
 router.patch('/groupconfig/removeStatus/:id', auth, async (req, res) => {
     try {
-        const groupconfig = await verifyGroupInput(req.params.id, req.admin)
-        groupconfig.updatedBy = req.admin.email
-        updateDomainVersion(groupconfig.domain)
-        res.send(await removeGroupStatus(groupconfig, req.body.env))
+        const groupconfig = await verifyGroupInput(req.params.id, req.admin);
+        groupconfig.updatedBy = req.admin.email;
+        updateDomainVersion(groupconfig.domain);
+        res.send(await removeGroupStatus(groupconfig, req.body.env));
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 

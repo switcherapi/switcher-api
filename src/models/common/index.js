@@ -1,6 +1,6 @@
 import History from '../history';
 
-export async function recordHistory(modifiedField, oldDocument, newDocument, ignoredFields = []) {
+export async function recordHistory(modifiedField, oldDocument, newDocument, domainId, ignoredFields = []) {
     const oldValues = new Map();
     const defaultIgnoredFields = ['_id', 'updatedAt'];
 
@@ -24,8 +24,9 @@ export async function recordHistory(modifiedField, oldDocument, newDocument, ign
             }
         }
     });
-
+    
     const history = new History({
+        domainId,
         elementId: newDocument._id,
         oldValue: oldValues,
         newValue: newValues,

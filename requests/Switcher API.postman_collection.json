@@ -3912,18 +3912,34 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/metric/5e0ece606f4f994eac9007ae?key=FEATURE2020",
+					"raw": "{{url}}/metric/data?domainid=5e0ece606f4f994eac9007ae&page=1",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"metric",
-						"5e0ece606f4f994eac9007ae"
+						"data"
 					],
 					"query": [
 						{
+							"key": "domainid",
+							"value": "5e0ece606f4f994eac9007ae",
+							"description": "required"
+						},
+						{
+							"key": "page",
+							"value": "1",
+							"description": "required"
+						},
+						{
 							"key": "key",
-							"value": "FEATURE2020"
+							"value": "FEATURE01",
+							"disabled": true
+						},
+						{
+							"key": "dateGroupPattern",
+							"value": "YYYY-MM-DD HH:mm",
+							"disabled": true
 						},
 						{
 							"key": "component",
@@ -3946,13 +3962,13 @@
 							"disabled": true
 						},
 						{
-							"key": "dateBefore",
-							"value": "2019-12-14 17:06:59",
+							"key": "dateAfter",
+							"value": "2020-07-30 23:20:00",
 							"disabled": true
 						},
 						{
-							"key": "dateAfter",
-							"value": "2019-12-14 17:06:30",
+							"key": "dateBefore",
+							"value": "2020-07-30 23:22:27",
 							"disabled": true
 						},
 						{
@@ -3960,20 +3976,100 @@
 							"value": "result",
 							"description": "Can add params separated by ;",
 							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Metrics - Statistics",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/metric/statistics?domainid=5e0ece606f4f994eac9007ae&statistics=all",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"metric",
+						"statistics"
+					],
+					"query": [
+						{
+							"key": "domainid",
+							"value": "5e0ece606f4f994eac9007ae",
+							"description": "required"
 						},
 						{
-							"key": "limit",
-							"value": "3",
-							"disabled": true
+							"key": "statistics",
+							"value": "all",
+							"description": "switchers,components,reasons,all"
 						},
 						{
-							"key": "skip",
-							"value": "9",
+							"key": "key",
+							"value": "FEATURE01",
 							"disabled": true
 						},
 						{
 							"key": "dateGroupPattern",
 							"value": "YYYY-MM-DD HH:mm",
+							"disabled": true
+						},
+						{
+							"key": "component",
+							"value": "InventoryWS",
+							"disabled": true
+						},
+						{
+							"key": "result",
+							"value": "true",
+							"disabled": true
+						},
+						{
+							"key": "group",
+							"value": "Release 1",
+							"disabled": true
+						},
+						{
+							"key": "environment",
+							"value": "QA",
+							"disabled": true
+						},
+						{
+							"key": "dateAfter",
+							"value": "2020-07-30 23:20:00",
+							"disabled": true
+						},
+						{
+							"key": "dateBefore",
+							"value": "2020-07-30 23:22:27",
+							"disabled": true
+						},
+						{
+							"key": "sortBy",
+							"value": "result",
+							"description": "Can add params separated by ;",
 							"disabled": true
 						}
 					]
@@ -3987,13 +4083,25 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{url}}/metric/5e0eced36f4f994eac9007b4",
+					"raw": "{{url}}/metric/?domainid=5e0eced36f4f994eac9007b4&key=SWITCHER_KEY",
 					"host": [
 						"{{url}}"
 					],
 					"path": [
 						"metric",
-						"5e0eced36f4f994eac9007b4"
+						""
+					],
+					"query": [
+						{
+							"key": "domainid",
+							"value": "5e0eced36f4f994eac9007b4",
+							"description": "required"
+						},
+						{
+							"key": "key",
+							"value": "SWITCHER_KEY",
+							"description": "required"
+						}
 					]
 				}
 			},

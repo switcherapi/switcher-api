@@ -5,7 +5,8 @@ const metricSchema = new mongoose.Schema({
     config: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'Config'
+        ref: 'Config',
+        index: true
     },
     component: {
         type: String
@@ -32,7 +33,8 @@ const metricSchema = new mongoose.Schema({
     domain: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'Domain'
+        ref: 'Domain',
+        index: true
     },
     date: {
         type: Date,
@@ -45,13 +47,11 @@ metricSchema.options.toJSON = {
     virtuals: true,
     minimize: false,
     transform: function (doc, ret, options) {
-        if (ret.date) {
-            ret.date = moment(ret.date).format('YYYY-MM-DD HH:mm:ss')
-        }
+        ret.date = moment(ret.date).format('YYYY-MM-DD HH:mm:ss');
         if (!ret.id) {
-            delete ret.id
+            delete ret.id;
         }
-        return ret
+        return ret;
     }
 }
 
@@ -66,8 +66,8 @@ export function addMetrics(context, response) {
         environment: context.environment,
         domain: response.domain._id,
         date: Date.now()
-    })
-    metric.save()
+    });
+    metric.save();
 }
 
-export const Metric = mongoose.model('Metric', metricSchema)
+export const Metric = mongoose.model('Metric', metricSchema);

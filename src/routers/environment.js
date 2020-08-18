@@ -14,46 +14,46 @@ import {
 } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
 
-const router = new express.Router()
+const router = new express.Router();
 
 async function removeEnvironmentFromElements(environment) {
     await ConfigStrategy.deleteMany({ domain: environment.domain, $or: [ 
         { activated: { [`${environment.name}`]: true } }, 
         { activated: { [`${environment.name}`]: false } } 
-    ] })
+    ] });
 
-    const configs = await Config.find({ domain: environment.domain })
+    const configs = await Config.find({ domain: environment.domain });
     if (configs.length) {
         configs.forEach(async function(config) {
             await removeConfigStatus(config, environment.name)
-        })
+        });
     }
 
-    const groupConfigs = await GroupConfig.find({ domain: environment.domain })
+    const groupConfigs = await GroupConfig.find({ domain: environment.domain });
     if (groupConfigs.length) {
         groupConfigs.forEach(async function(group) {
-            await removeGroupStatus(group, environment.name)
+            await removeGroupStatus(group, environment.name);
         })
     }
 
-    const domain = await Domain.findById(environment.domain)
+    const domain = await Domain.findById(environment.domain);
     
-    await removeDomainStatus(domain, environment.name)
+    await removeDomainStatus(domain, environment.name);
 }
 
 router.post('/environment/create', auth, async (req, res) => {
     let environment = new Environment({
         ...req.body, 
         owner: req.admin._id
-    })
+    });
 
     try {
-        environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.CREATE, RouterTypes.ENVIRONMENT)
+        environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.CREATE, RouterTypes.ENVIRONMENT);
 
-        await environment.save()
-        res.status(201).send(environment)
+        await environment.save();
+        res.status(201).send(environment);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
@@ -64,7 +64,7 @@ router.get("/environment", auth, async (req, res) => {
     if (!req.query.domain) {
         return res.status(500).send({
             error: 'Please, specify the \'domain\' id'
-        })
+        });
     }
 
     try {
@@ -76,70 +76,70 @@ router.get("/environment", auth, async (req, res) => {
                 sort: {
                     name: req.query.sort === 'desc' ? -1 : 1
                 }
-            })
+            });
 
         // environments = await verifyOwnership(req.admin, environments, req.query.domain, ActionTypes.READ, RouterTypes.ENVIRONMENT)
 
-        res.send(environments)
+        res.send(environments);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
 router.get('/environment/:id', auth, async (req, res) => {
     try {
-        let environment = await Environment.findById(req.params.id)
+        let environment = await Environment.findById(req.params.id);
 
         if (!environment) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
         // environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.READ, RouterTypes.ENVIRONMENT)
 
-        res.send(environment)
+        res.send(environment);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
 router.delete('/environment/:id', auth, async (req, res) => {
     try {
-        let environment = await Environment.findById(req.params.id)
+        let environment = await Environment.findById(req.params.id);
 
         if (!environment) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
         if (environment.name === EnvType.DEFAULT) {
-            return res.status(400).send({ error: 'Unable to delete this environment' })
+            return res.status(400).send({ error: 'Unable to delete this environment' });
         }
 
-        environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.DELETE, RouterTypes.ENVIRONMENT)
+        environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.DELETE, RouterTypes.ENVIRONMENT);
 
-        await removeEnvironmentFromElements(environment)
+        await removeEnvironmentFromElements(environment);
         
-        await environment.remove()
-        res.send(environment)
+        await environment.remove();
+        res.send(environment);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
 router.patch('/environment/recover/:id', auth, async (req, res) => {
     try {
-        let environment = await Environment.findById(req.params.id)
+        let environment = await Environment.findById(req.params.id);
 
         if (!environment) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
-        environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.UPDATE, RouterTypes.ENVIRONMENT)
+        environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.UPDATE, RouterTypes.ENVIRONMENT);
 
-        await removeEnvironmentFromElements(environment)
+        await removeEnvironmentFromElements(environment);
 
-        res.send({ message: `Environment '${environment.name}' recovered` })
+        res.send({ message: `Environment '${environment.name}' recovered` });
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
