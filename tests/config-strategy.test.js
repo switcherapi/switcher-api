@@ -530,7 +530,7 @@ describe('Testing update strategies #1', () => {
             }).expect(200)
 
         response = await request(app)
-            .get('/configstrategy/history/' + strategyId + '?sortBy=createdAt:desc')
+            .get(`/configstrategy/history/${strategyId}?sortBy=createdAt:desc`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200)
 

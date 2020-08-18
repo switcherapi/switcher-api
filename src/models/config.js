@@ -49,12 +49,6 @@ const configSchema = new mongoose.Schema({
 
 configSchema.index({ key: 1 });
 
-configSchema.virtual('history', {
-    ref: 'History',
-    localField: '_id',
-    foreignField: 'elementId'
-})
-
 configSchema.virtual('component_list', {
     ref: 'Component',
     localField: 'components',
@@ -67,19 +61,19 @@ configSchema.options.toJSON = {
     minimize: false,
     transform: function (doc, ret, options) {
         if (ret.updatedAt || ret.createdAt) {
-            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
-            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
+            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
+            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
         }
 
         if (!ret.id) {
-            delete ret.id
+            delete ret.id;
         }
         
         if (ret.component_list) {
-            ret.components = ret.component_list
-            delete ret.component_list
+            ret.components = ret.component_list;
+            delete ret.component_list;
         }
-        return ret
+        return ret;
     }
 }
 
@@ -87,7 +81,7 @@ async function recordConfigHistory(config, modifiedField) {
     if (config.__v !== undefined && modifiedField.length) {
         const oldConfig = await Config.findById(config._id);
         await oldConfig.populate({ path: 'component_list' }).execPopulate();
-        recordHistory(modifiedField, oldConfig.toJSON(), config);
+        await recordHistory(modifiedField, oldConfig.toJSON(), config, config.domain);
     }
 }
 
@@ -98,28 +92,24 @@ configSchema.virtual('configStrategy', {
 })
 
 configSchema.pre('remove', async function (next) {
-    const config = this
+    const config = this;
     
-    const strategy = await ConfigStrategy.find({ config: config._id })
+    const strategy = await ConfigStrategy.find({ config: config._id });
     if (strategy) {
-        strategy.forEach(async (s) => await s.remove())
+        strategy.forEach(async (s) => await s.remove());
     }
     
-    const history = await History.find({ elementId: config._id })
-    if (history) {
-        history.forEach((h) => h.remove())
-    }
-
-    next()
+    await History.deleteMany({ domainId: config.domain, elementId: config._id });
+    next();
 })
 
 configSchema.pre('save', async function (next) {
     const config = this
     await config.populate({ path: 'component_list' }).execPopulate();
     await recordConfigHistory(config.toJSON(), this.modifiedPaths());
-    next()
+    next();
 })
 
-const Config = mongoose.model('Config', configSchema)
+const Config = mongoose.model('Config', configSchema);
 
 export default Config;

@@ -180,44 +180,46 @@ export const team = {
 }
 
 export const setupDatabase = async () => {
-    await ConfigStrategy.deleteMany()
-    await Config.deleteMany()
-    await GroupConfig.deleteMany()
-    await Domain.deleteMany()
-    await Admin.deleteMany()
-    await Environment.deleteMany()
-    await Component.deleteMany()
-    await History.deleteMany()
-    await Metric.deleteMany()
-    await Team.deleteMany()
-    await Role.deleteMany()
+    await ConfigStrategy.deleteMany();
+    await Config.deleteMany();
+    await GroupConfig.deleteMany();
+    await Domain.deleteMany();
+    await Admin.deleteMany();
+    await Environment.deleteMany();
+    await Component.deleteMany();
 
-    const refreshTokenMaster = await bcrypt.hash(adminMasterAccountToken.split('.')[2], 8)
+    await History.deleteMany();
+    await Metric.deleteMany();
+
+    await Team.deleteMany();
+    await Role.deleteMany();
+
+    const refreshTokenMaster = await bcrypt.hash(adminMasterAccountToken.split('.')[2], 8);
     adminMasterAccount.token = refreshTokenMaster;
-    await new Admin(adminMasterAccount).save()
+    await new Admin(adminMasterAccount).save();
 
-    const refreshToken = await bcrypt.hash(adminAccountToken.split('.')[2], 8)
+    const refreshToken = await bcrypt.hash(adminAccountToken.split('.')[2], 8);
     adminAccount.token = refreshToken;
     adminAccount.teams = [teamId];
-    await new Admin(adminAccount).save()
+    await new Admin(adminAccount).save();
 
-    await new Domain(domainDocument).save()
-    await new Environment(environment1).save()
-    await new Environment(environment2).save()
+    await new Domain(domainDocument).save();
+    await new Environment(environment1).save();
+    await new Environment(environment2).save();
 
-    await new Team(team).save()
-    await new Role(roleConfigs).save()
+    await new Team(team).save();
+    await new Role(roleConfigs).save();
 
-    await new GroupConfig(groupConfigDocument).save()
-    await new Config(configDocument).save()
-    await new Config(configPrdQADocument).save()
-    await new ConfigStrategy(configStrategyUSERDocument).save()
-    await new ConfigStrategy(configStrategyCIDRDocument).save()
-    await new ConfigStrategy(configStrategyTIME_BETWEENDocument).save()
-    await new ConfigStrategy(configStrategyTIME_GREATDocument).save()
+    await new GroupConfig(groupConfigDocument).save();
+    await new Config(configDocument).save();
+    await new Config(configPrdQADocument).save();
+    await new ConfigStrategy(configStrategyUSERDocument).save();
+    await new ConfigStrategy(configStrategyCIDRDocument).save();
+    await new ConfigStrategy(configStrategyTIME_BETWEENDocument).save();
+    await new ConfigStrategy(configStrategyTIME_GREATDocument).save();
 
-    apiKey = await bcrypt.hash(component1._id + component1.name, 8)
-    const hash = await bcrypt.hash(apiKey, 8)
-    component1.apihash = hash
-    await new Component(component1).save()
+    apiKey = await bcrypt.hash(component1._id + component1.name, 8);
+    const hash = await bcrypt.hash(apiKey, 8);
+    component1.apihash = hash;
+    await new Component(component1).save();
 }

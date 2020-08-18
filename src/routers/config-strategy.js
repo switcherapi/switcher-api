@@ -8,38 +8,38 @@ import { auth } from '../middleware/auth';
 import { verifyOwnership, updateDomainVersion, responseException, NotFoundError } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
 
-const router = new express.Router()
+const router = new express.Router();
 
 async function verifyStrategyValueInput(strategyId, value) {
-    const configStrategy = await ConfigStrategy.findById(strategyId)
+    const configStrategy = await ConfigStrategy.findById(strategyId);
             
     if (!configStrategy) {
-        throw new NotFoundError('Strategy not found')
+        throw new NotFoundError('Strategy not found');
     }
 
     if (!value) {
-        throw new Error('The attribute \'value\' must be assigned')
+        throw new Error('The attribute \'value\' must be assigned');
     }
 
-    return configStrategy
+    return configStrategy;
 }
 
 router.post('/configstrategy/create', auth, async (req, res) => {
     try {
-        const config = await Config.findById(req.body.config)
+        const config = await Config.findById(req.body.config);
 
         if (!config) {
-            return res.status(404).send({ error: 'Config not found' })
+            return res.status(404).send({ error: 'Config not found' });
         }
 
         if (!req.body.env) {
-            return res.status(400).send({ error: 'Must specify environment' })
+            return res.status(400).send({ error: 'Must specify environment' });
         }
 
-        const environment = await Environment.findOne({ name: req.body.env, domain: config.domain })
+        const environment = await Environment.findOne({ name: req.body.env, domain: config.domain });
 
         if (!environment) {
-            return res.status(400).send({ error: 'Environment does not exist' })
+            return res.status(400).send({ error: 'Environment does not exist' });
         }
 
         let configStrategy = new ConfigStrategy({
@@ -47,15 +47,15 @@ router.post('/configstrategy/create', auth, async (req, res) => {
             activated: new Map().set(environment.name, true),
             domain: config.domain,
             owner: req.admin._id
-        })
+        });
 
         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.CREATE, RouterTypes.STRATEGY);
 
-        await configStrategy.save()
-        updateDomainVersion(configStrategy.domain)
-        res.status(201).send(configStrategy)
+        await configStrategy.save();
+        updateDomainVersion(configStrategy.domain);
+        res.status(201).send(configStrategy);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
@@ -63,18 +63,18 @@ router.post('/configstrategy/create', auth, async (req, res) => {
 // GET /configstrategy?sortBy=createdAt:desc
 // GET /configstrategy?config=ID&env=QA
 router.get('/configstrategy', auth, async (req, res) => {
-    const sort = {}
+    const sort = {};
 
     if (req.query.sortBy) {
-        const parts = req.query.sortBy.split(':')
-        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
+        const parts = req.query.sortBy.split(':');
+        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
     }
 
     try {
-        const config = await Config.findById(req.query.config)
+        const config = await Config.findById(req.query.config);
 
         if (!config) {
-            return res.status(404).send() 
+            return res.status(404).send() ;
         }
 
         await config.populate({
@@ -84,32 +84,32 @@ router.get('/configstrategy', auth, async (req, res) => {
                 skip: parseInt(req.query.skip),
                 sort
             }
-        }).execPopulate()
+        }).execPopulate();
         
         let configStrategies = config.configStrategy.filter(
             elements => elements.activated.get(req.query.env ? req.query.env : EnvType.DEFAULT) != undefined);
 
-        configStrategies = await verifyOwnership(req.admin, configStrategies, config.domain, ActionTypes.READ, RouterTypes.STRATEGY, true)
+        configStrategies = await verifyOwnership(req.admin, configStrategies, config.domain, ActionTypes.READ, RouterTypes.STRATEGY, true);
 
-        res.send(configStrategies)
+        res.send(configStrategies);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
 router.get('/configstrategy/:id', auth, async (req, res) => {
     try {
-        let configStrategy = await ConfigStrategy.findById(req.params.id)
+        let configStrategy = await ConfigStrategy.findById(req.params.id);
 
         if (!configStrategy) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
-        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY)
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY);
 
-        res.send(configStrategy)
+        res.send(configStrategy);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
@@ -117,197 +117,192 @@ router.get('/configstrategy/:id', auth, async (req, res) => {
 // GET /configstrategy/ID?limit=10&skip=20
 // GET /configstrategy/ID
 router.get('/configstrategy/history/:id', auth, async (req, res) => {
-    const sort = {}
+    const sort = {};
 
     if (req.query.sortBy) {
-        const parts = req.query.sortBy.split(':')
-        sort[`${parts[0]}`] = parts[1] === 'desc' ? -1 : 1
+        const parts = req.query.sortBy.split(':');
+        sort[`${parts[0]}`] = parts[1] === 'desc' ? -1 : 1;
     }
 
     try {
-        const configStrategy = await ConfigStrategy.findById(req.params.id)
+        const configStrategy = await ConfigStrategy.findById(req.params.id);
 
         if (!configStrategy) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
-        await configStrategy.populate({
-            path: 'history',
-            select: 'oldValue newValue updatedBy date -_id',
-            options: {
-                limit: parseInt(req.query.limit),
-                skip: parseInt(req.query.skip),
-                sort
-            }
-        }).execPopulate()
+        const history = await History.find({ domainId: configStrategy.domain, elementId: configStrategy._id })
+            .select('oldValue newValue updatedBy date -_id')
+            .sort(sort)
+            .limit(parseInt(req.query.limit))
+            .skip(parseInt(req.query.skip))
+            .lean();
 
-        const history = configStrategy.history;
+        await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY);
 
-        await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY)
-
-        res.send(history)
+        res.send(history);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
 router.delete('/configstrategy/history/:id', auth, async (req, res) => {
     try {
-        const configStrategy = await ConfigStrategy.findById(req.params.id)
+        const configStrategy = await ConfigStrategy.findById(req.params.id);
 
         if (!configStrategy) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
-        await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.DELETE, RouterTypes.ADMIN)
+        await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
 
-        await History.deleteMany({ elementId: configStrategy._id })
-        res.send(configStrategy)
+        await History.deleteMany({ domainId: configStrategy.domain, elementId: configStrategy._id });
+        res.send(configStrategy);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
 router.get('/configstrategy/req/:strategy', auth, (req, res) => {
     try {
-        const result = strategyRequirements(req.params.strategy)
-        if (result.strategy)
-            res.send(result)
+        const result = strategyRequirements(req.params.strategy);
+        if (result.strategy);
+            res.send(result);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
 router.get('/configstrategy/spec/strategies', auth, (req, res) => {
     res.send({
         strategiesAvailable: Object.values(StrategiesType)
-    })
+    });
 })
 
 router.delete('/configstrategy/:id', auth, async (req, res) => {
     try {
-        let configStrategy = await ConfigStrategy.findById(req.params.id)
+        let configStrategy = await ConfigStrategy.findById(req.params.id);
 
         if (!configStrategy) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
-        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.DELETE, RouterTypes.STRATEGY)
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.DELETE, RouterTypes.STRATEGY);
 
-        await configStrategy.remove()
-        updateDomainVersion(configStrategy.domain)
-        res.send(configStrategy)
+        await configStrategy.remove();
+        updateDomainVersion(configStrategy.domain);
+        res.send(configStrategy);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
 router.patch('/configstrategy/:id', auth, 
     verifyInputUpdateParameters(['description', 'values', 'operation']), async (req, res) => {
     try {
-        let configStrategy = await ConfigStrategy.findById(req.params.id)
+        let configStrategy = await ConfigStrategy.findById(req.params.id);
             
         if (!configStrategy) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
-        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
-        configStrategy.updatedBy = req.admin.email
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY);
+        configStrategy.updatedBy = req.admin.email;
         
-        req.updates.forEach((update) => configStrategy[update] = req.body[update])
-        await configStrategy.save()
-        updateDomainVersion(configStrategy.domain)
-        res.send(configStrategy)
+        req.updates.forEach((update) => configStrategy[update] = req.body[update]);
+        await configStrategy.save();
+        updateDomainVersion(configStrategy.domain);
+        res.send(configStrategy);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
 router.patch('/configstrategy/addval/:id', auth,
     verifyInputUpdateParameters(['value']), async (req, res) => {
     try {
-        let configStrategy = await verifyStrategyValueInput(req.params.id, req.body.value)
+        let configStrategy = await verifyStrategyValueInput(req.params.id, req.body.value);
 
-        const value = req.body.value.trim()
-        const foundExistingOne = configStrategy.values.find((element) => element === value)
+        const value = req.body.value.trim();
+        const foundExistingOne = configStrategy.values.find((element) => element === value);
 
         if (foundExistingOne) {
-            return res.status(400).send({ error: `Value '${value}' already exist` })
+            return res.status(400).send({ error: `Value '${value}' already exist` });
         }
 
-        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
-        configStrategy.updatedBy = req.admin.email
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY);
+        configStrategy.updatedBy = req.admin.email;
 
-        configStrategy.values.push(value)
-        await configStrategy.save()
-        updateDomainVersion(configStrategy.domain)
-        res.send(configStrategy)
+        configStrategy.values.push(value);
+        await configStrategy.save();
+        updateDomainVersion(configStrategy.domain);
+        res.send(configStrategy);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
 router.patch('/configstrategy/updateval/:id', auth,
     verifyInputUpdateParameters(['oldvalue', 'newvalue']), async (req, res) => {
     try {
-        let configStrategy = await ConfigStrategy.findById(req.params.id)
+        let configStrategy = await ConfigStrategy.findById(req.params.id);
             
         if (!configStrategy) {
-            return res.status(404).send()
+            return res.status(404).send();
         }
 
         if (!req.body.oldvalue || !req.body.newvalue) {
-            return res.status(400).send({ error: 'Attributes \'oldvalue\' and \'newvalue\' must be assigned' })
+            return res.status(400).send({ error: 'Attributes \'oldvalue\' and \'newvalue\' must be assigned' });
         }
 
-        const oldvalue = req.body.oldvalue.trim()
-        const indexOldValue = configStrategy.values.indexOf(oldvalue)
+        const oldvalue = req.body.oldvalue.trim();
+        const indexOldValue = configStrategy.values.indexOf(oldvalue);
 
         if (indexOldValue < 0) {
-            return res.status(404).send({ error: `Old value '${oldvalue}' not found` })
+            return res.status(404).send({ error: `Old value '${oldvalue}' not found` });
         }
 
-        const newvalue = req.body.newvalue.trim()
-        const indexNewValue = configStrategy.values.indexOf(newvalue)
+        const newvalue = req.body.newvalue.trim();
+        const indexNewValue = configStrategy.values.indexOf(newvalue);
 
         if (indexNewValue >= 0) {
-            return res.status(400).send({ error: `Value '${newvalue}' already exist` })
+            return res.status(400).send({ error: `Value '${newvalue}' already exist` });
         }
 
-        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
-        configStrategy.updatedBy = req.admin.email
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY);
+        configStrategy.updatedBy = req.admin.email;
 
-        configStrategy.values.splice(indexOldValue, 1)
-        configStrategy.values.push(newvalue)
-        await configStrategy.save()
-        updateDomainVersion(configStrategy.domain)
-        res.send(configStrategy)
+        configStrategy.values.splice(indexOldValue, 1);
+        configStrategy.values.push(newvalue);
+        await configStrategy.save();
+        updateDomainVersion(configStrategy.domain);
+        res.send(configStrategy);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
 router.patch('/configstrategy/removeval/:id', auth,
     verifyInputUpdateParameters(['value']),  async (req, res) => {
     try {
-        let configStrategy = await verifyStrategyValueInput(req.params.id, req.body.value)
+        let configStrategy = await verifyStrategyValueInput(req.params.id, req.body.value);
 
-        const value = req.body.value.trim()
-        const indexValue = configStrategy.values.indexOf(value)
+        const value = req.body.value.trim();
+        const indexValue = configStrategy.values.indexOf(value);
 
         if (indexValue < 0) {
-            return res.status(404).send({ error: `Value '${value}' does not exist` })
+            return res.status(404).send({ error: `Value '${value}' does not exist` });
         }
 
-        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
-        configStrategy.updatedBy = req.admin.email
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY);
+        configStrategy.updatedBy = req.admin.email;
 
-        configStrategy.values.splice(indexValue, 1)
-        await configStrategy.save()
-        updateDomainVersion(configStrategy.domain)
-        res.send(configStrategy)
+        configStrategy.values.splice(indexValue, 1);
+        await configStrategy.save();
+        updateDomainVersion(configStrategy.domain);
+        res.send(configStrategy);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
@@ -315,76 +310,59 @@ router.patch('/configstrategy/removeval/:id', auth,
 // GET /configstrategy/values:id?limit=10&skip=20
 router.get('/configstrategy/values/:id', auth, async (req, res) => {
     try {
-        const configStrategy = await ConfigStrategy.findById(req.params.id)
+        const configStrategy = await ConfigStrategy.findById(req.params.id);
 
         if (!configStrategy) {
-            return res.status(404).send() 
+            return res.status(404).send();
         }
         
-        let values = configStrategy.values
+        let values = configStrategy.values;
         if (req.query.sort === 'true') {
-            values.sort()
+            values.sort();
         }
 
         if (req.query.limit) {
-            values = values.slice(req.query.skip, req.query.limit)
+            values = values.slice(req.query.skip, req.query.limit);
         } else if (req.query.skip) {
-            values = values.slice(req.query.skip, values.length)
+            values = values.slice(req.query.skip, values.length);
         }
 
-        values = await verifyOwnership(req.admin, values, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY)
+        values = await verifyOwnership(req.admin, values, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY);
 
-        res.send(values)
+        res.send(values);
     } catch (e) {
-        responseException(res, e, 500)
+        responseException(res, e, 500);
     }
 })
 
 router.patch('/configstrategy/updateStatus/:id', auth, async (req, res) => {
     try {
-        let updates = Object.keys(req.body)
+        let updates = Object.keys(req.body);
 
         if (updates.length > 1) {
-            return res.status(400).send({ error: `You can only update one environment at time` })
+            return res.status(400).send({ error: `You can only update one environment at time` });
         }
 
-        let configStrategy = await ConfigStrategy.findById(req.params.id)
+        let configStrategy = await ConfigStrategy.findById(req.params.id);
         if (!configStrategy) {
-            return res.status(404).send({ error: 'Strategy does not exist'})
+            return res.status(404).send({ error: 'Strategy does not exist'});
         }
 
-        updates = await checkEnvironmentStatusChange(req, res, configStrategy.domain)
+        updates = await checkEnvironmentStatusChange(req, res, configStrategy.domain);
         if (configStrategy.activated.get(updates[0]) === undefined) {
-            return res.status(404).send({ error: 'Strategy does not exist on this environment'})
+            return res.status(404).send({ error: 'Strategy does not exist on this environment'});
         }
 
-        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
-        configStrategy.updatedBy = req.admin.email
+        configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY);
+        configStrategy.updatedBy = req.admin.email;
         
-        configStrategy.activated.set(updates[0], req.body[updates[0]])
-        await configStrategy.save()
-        updateDomainVersion(configStrategy.domain)
-        res.send(configStrategy)
+        configStrategy.activated.set(updates[0], req.body[updates[0]]);
+        await configStrategy.save();
+        updateDomainVersion(configStrategy.domain);
+        res.send(configStrategy);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
-
-// Deprecated since strategies should contain only one environment configured
-// router.patch('/configstrategy/removeStatus/:id', auth, async (req, res) => {
-//     try {
-//         let configStrategy = await ConfigStrategy.findById(req.params.id)
-        
-//         if (!configStrategy) {
-//             return res.status(404).send({ error: 'Strategy does not exist'})
-//         }
-
-//         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY)
-
-//         res.send(await removeConfigStrategyStatus(configStrategy, req.body.env))
-//     } catch (e) {
-//         responseException(res, e, 400)
-//     }
-// })
 
 export default router;

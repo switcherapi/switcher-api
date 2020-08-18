@@ -7,7 +7,7 @@ import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../mi
 import { removeDomainStatus, verifyOwnership, responseException } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
 
-const router = new express.Router()
+const router = new express.Router();
 
 router.post('/domain/create', auth, async (req, res) => {
     try {
@@ -87,17 +87,13 @@ router.get('/domain/history/:id', auth, async (req, res) => {
         if (!domain) {
             return res.status(404).send();
         }
-        await domain.populate({
-            path: 'history',
-            select: 'oldValue newValue updatedBy date -_id',
-            options: {
-                limit: parseInt(req.query.limit),
-                skip: parseInt(req.query.skip),
-                sort
-            }
-        }).execPopulate();
 
-        const history = domain.history;
+        const history = await History.find({ elementId: domain._id })
+            .select('oldValue newValue updatedBy date -_id')
+            .sort(sort)
+            .limit(parseInt(req.query.limit))
+            .skip(parseInt(req.query.skip))
+            .lean();
 
         await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN);
 

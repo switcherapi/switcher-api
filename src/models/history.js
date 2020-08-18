@@ -2,6 +2,11 @@ import mongoose from 'mongoose';
 import moment from 'moment';
 
 const historySchema = new mongoose.Schema({
+    domainId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        index: true
+    },
     elementId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -23,22 +28,8 @@ const historySchema = new mongoose.Schema({
         type: Date,
         required: true
     }
-})
+});
 
-historySchema.options.toJSON = {
-    getters: true,
-    virtuals: true,
-    minimize: false,
-    transform: function (doc, ret, options) {
-        ret.date = moment(ret.date).format('YYYY-MM-DD HH:mm:ss')
-        if (!ret.id) {
-            delete ret.id
-        }
-        return ret
-    }
-}
+const History = mongoose.model(`History`, historySchema);
 
-
-const HistorySchema = mongoose.model('History', historySchema)
-
-module.exports = HistorySchema
+export default History;

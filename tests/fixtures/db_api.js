@@ -170,8 +170,10 @@ export const setupDatabase = async () => {
     await Admin.deleteMany();
     await Environment.deleteMany();
     await Component.deleteMany();
+
     await History.deleteMany();
     await Metric.deleteMany();
+
     await Team.deleteMany();
     await TeamInvite.deleteMany();
     await Role.deleteMany();
