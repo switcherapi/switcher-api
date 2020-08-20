@@ -3,9 +3,14 @@ import Domain from '../models/domain';
 import { Environment } from '../models/environment';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
+import { check, validationResult } from 'express-validator';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeDomainStatus, verifyOwnership, responseException } from './common/index'
+import { removeDomainStatus, verifyOwnership, responseException, NotFoundError } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
+import GroupConfig from '../models/group-config';
+import Config from '../models/config';
+import { ConfigStrategy } from '../models/config-strategy';
+import Component from '../models/component';
 
 const router = new express.Router();
 
@@ -134,6 +139,56 @@ router.delete('/domain/:id', auth, async (req, res) => {
         res.send(domain);
     } catch (e) {
         responseException(res, e, 500);
+    }
+})
+
+router.patch('/domain/transfer/request', [check('domain').isMongoId()], auth, async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+        
+        let domain = await Domain.findOne({ _id: req.body.domain, owner: req.admin._id });
+        if (!domain) {
+            throw new NotFoundError('Domain does not exist');
+        }
+
+        domain.updatedBy = req.admin.email;
+        domain.transfer = domain.transfer ? null : true;
+        await domain.save();
+        res.send(domain);
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+})
+
+router.patch('/domain/transfer/accept', [check('domain').isMongoId()], auth, async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+        
+        let domain = await Domain.findOne({ _id: req.body.domain, transfer: true });
+        if (!domain) {
+            throw new NotFoundError('Domain does not exist');
+        }
+        
+        domain.transfer = null;
+        domain.owner = req.admin._id;
+        await Promise.all([
+            GroupConfig.updateMany({ domain: domain._id }, { owner: req.admin._id }),
+            Config.updateMany({ domain: domain._id }, { owner: req.admin._id }),
+            ConfigStrategy.updateMany({ domain: domain._id }, { owner: req.admin._id }),
+            Component.updateMany({ domain: domain._id }, { owner: req.admin._id }),
+            Environment.updateMany({ domain: domain._id }, { owner: req.admin._id }),
+            domain.save()
+        ]);
+        
+        res.send(domain);
+    } catch (e) {
+        responseException(res, e, 400);
     }
 })
 

@@ -36,6 +36,9 @@ const domainSchema = new mongoose.Schema({
     },
     updatedBy: {
         type: String
+    },
+    transfer: {
+        type: Boolean
     }
 }, {
     timestamps: true

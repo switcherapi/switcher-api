@@ -795,19 +795,41 @@ describe('Testing Admin login and fetch', () => {
 describe('Testing Admin logout', () => {
     beforeAll(setupDatabase)
 
+    test('ADMIN_SUITE - Should NOT delete/me account - Domain must be deleted', async () => {
+        const responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminMasterAccount.email,
+                password: adminMasterAccount.password
+            }).expect(200);
+
+        const response = await request(app)
+            .delete('/admin/me')
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send()
+            .expect(400);
+
+        expect(response.body.error).toEqual('This account has 1 Domain(s) that must be either deleted or transfered to another account.');
+    })
+
     test('ADMIN_SUITE - Should delete/me account for admin', async () => {
         const responseLogin = await request(app)
             .post('/admin/login')
             .send({
                 email: adminMasterAccount.email,
                 password: adminMasterAccount.password
-            }).expect(200)
+            }).expect(200);
+
+        await request(app)
+            .delete('/domain/' + domainId)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send().expect(200);
 
         await request(app)
             .delete('/admin/me')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
-            .expect(200)
+            .expect(200);
 
         const admin = await Admin.findById(adminMasterAccountId)
         expect(admin).toBeNull()
@@ -991,6 +1013,12 @@ describe('Testing Admin collaboration endpoint', () => {
         teams.forEach(team => {
             expect(team.members[0]).toEqual(adminMasterAccountId);
         });
+
+        //removing Domains from user to perform its deletion afterwards
+        await request(app)
+            .delete('/domain/' + domainId)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send().expect(200);
 
         //test
         await request(app)

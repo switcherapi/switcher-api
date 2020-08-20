@@ -21,8 +21,11 @@ import {
     configId1,
     configId2,
     configStrategyId,
-    environment1Id
+    environment1Id,
+    adminAccountId
  } from './fixtures/db_api';
+import { Team } from '../src/models/team';
+import Component from '../src/models/component';
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -526,5 +529,151 @@ describe('Testing environment configurations', () => {
         const domain = await Domain.findById(domainId)
         expect(domain.activated.get(EnvType.DEFAULT)).toEqual(true);
         expect(domain.activated.get('QA3')).toEqual(true);
+    })
+})
+
+describe('Testing transfer Domain', () => {
+    beforeAll(setupDatabase)
+
+    test('DOMAIN_SUITE - Should NOT request Domain to transfer - Domain not found', async () => {
+        await request(app)
+            .patch('/domain/transfer/request')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                domain: new mongoose.Types.ObjectId()
+            }).expect(404);
+    })
+
+    test('DOMAIN_SUITE - Should NOT request Domain to transfer - Invalid Domain ID', async () => {
+        await request(app)
+            .patch('/domain/transfer/request')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                domain: 'NOT_VALID_ID'
+            }).expect(422);
+    })
+
+    test('DOMAIN_SUITE - Should NOT request Domain to transfer - Admin is not owner', async () => {
+        await request(app)
+            .patch('/domain/transfer/request')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send({
+                domain: domainId
+            }).expect(404);
+    })
+
+    test('DOMAIN_SUITE - Should request/cancel Domain to transfer', async () => {
+        await request(app)
+            .patch('/domain/transfer/request')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                domain: domainId
+            }).expect(200);
+
+        //Verify transfer flag to be true
+        let domain = await Domain.findById(domainId);
+        expect(domain.transfer).toBe(true);
+
+        //Calling again make it transfer flag to be null
+        await request(app)
+            .patch('/domain/transfer/request')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                domain: domainId
+            }).expect(200);
+
+        //Verify transfer flag to be true
+        domain = await Domain.findById(domainId);
+        expect(domain.transfer).toBe(null);
+    })
+
+    test('DOMAIN_SUITE - Should NOT accept Domain to transfer - Domain not found', async () => {
+        await request(app)
+            .patch('/domain/transfer/accept')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send({
+                domain: new mongoose.Types.ObjectId()
+            }).expect(404);
+    })
+
+    test('DOMAIN_SUITE - Should NOT accept Domain to transfer - Invalid Domain ID', async () => {
+        await request(app)
+            .patch('/domain/transfer/accept')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send({
+                domain: 'NOT_VALID_ID'
+            }).expect(422);
+    })
+
+    test('DOMAIN_SUITE - Should NOT accept Domain to transfer - Domain not flagged to be transfered', async () => {
+        await request(app)
+            .patch('/domain/transfer/accept')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send({
+                domain: domainId
+            }).expect(404);
+    })
+
+    test('DOMAIN_SUITE - Should accept Domain to transfer', async () => {
+        //given 'domainId' to be transfered
+        await request(app)
+            .patch('/domain/transfer/request')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                domain: domainId
+            }).expect(200);
+
+        //Verify transfer flag to be true
+        let domain = await Domain.findById(domainId);
+        expect(domain.transfer).toBe(true);
+        expect(domain.owner).toMatchObject(adminMasterAccountId);
+
+        let groups, configs, strategies, environment;
+        await Promise.all([
+            GroupConfig.find({ domain: domain._id, owner: adminMasterAccountId }).countDocuments(),
+            Config.find({ domain: domain._id, owner: adminMasterAccountId }).countDocuments(),
+            ConfigStrategy.find({ domain: domain._id, owner: adminMasterAccountId }).countDocuments(),
+            Environment.find({ domain: domain._id, owner: adminMasterAccountId }).countDocuments()
+        ]).then(data => {
+            groups = data[0];
+            configs = data[1];
+            strategies = data[2];
+            environment = data[3];
+        });
+
+        expect(groups > 0).toBe(true);
+        expect(configs > 0).toBe(true);
+        expect(strategies > 0).toBe(true);
+        expect(environment > 0).toBe(true);
+
+        //test
+        await request(app)
+            .patch('/domain/transfer/accept')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send({
+                domain: domainId
+            }).expect(200);
+
+        //Verify if transfer has been done
+        domain = await Domain.findById(domainId);
+        expect(domain.owner).toMatchObject(adminAccountId);
+        
+        groups, configs, strategies, environment;
+        await Promise.all([
+            GroupConfig.find({ domain: domain._id, owner: adminAccountId }).countDocuments(),
+            Config.find({ domain: domain._id, owner: adminAccountId }).countDocuments(),
+            ConfigStrategy.find({ domain: domain._id, owner: adminAccountId }).countDocuments(),
+            Environment.find({ domain: domain._id, owner: adminAccountId }).countDocuments()
+        ]).then(data => {
+            groups = data[0];
+            configs = data[1];
+            strategies = data[2];
+            environment = data[3];
+        });
+
+        expect(groups > 0).toBe(true);
+        expect(configs > 0).toBe(true);
+        expect(strategies > 0).toBe(true);
+        expect(environment > 0).toBe(true);
     })
 })

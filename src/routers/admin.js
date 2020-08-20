@@ -9,6 +9,7 @@ import { getGitToken, getGitUserInfo } from '../external/oauth-git';
 import { getBitBucketToken, getBitBucketUserInfo } from '../external/oauth-bitbucket';
 import { validate_token } from '../external/google-recaptcha';
 import { sendAuthCode, sendAccountRecoveryCode } from '../external/sendgrid';
+import Domain from '../models/domain';
 
 const router = new express.Router()
 
@@ -225,8 +226,17 @@ router.get('/admin/:id', auth, async (req, res) => {
 })
 
 router.delete('/admin/me', auth, async (req, res) => {
-    await req.admin.remove();
-    res.send(req.admin);
+    try {
+        const domains = await Domain.find({ owner: req.admin._id }).countDocuments();
+        if (domains > 0) {
+            throw new Error(`This account has ${domains} Domain(s) that must be either deleted or transfered to another account.`);
+        }
+
+        await req.admin.remove();
+        res.send(req.admin);
+    } catch (e) {
+        responseException(res, e, 400);
+    }
 })
 
 router.patch('/admin/me', auth, verifyInputUpdateParameters(['name', 'email', 'password']), async (req, res) => {

@@ -34,10 +34,10 @@ teamSchema.options.toJSON = {
     minimize: false,
     transform: function (doc, ret, options) {
         if (ret.members_list) {
-            ret.members = ret.members_list
-            delete ret.members_list
+            ret.members = ret.members_list;
+            delete ret.members_list;
         }
-        return ret
+        return ret;
     }
 }
 
@@ -58,10 +58,10 @@ export async function addDefaultRole(action, team) {
 
 const existTeam = async (team) => {
     if (team.__v === undefined) {
-        const foundTeam = await Team.find({ name: team.name, domain: team.domain })
-        return foundTeam.length > 0
+        const foundTeam = await Team.find({ name: team.name, domain: team.domain });
+        return foundTeam.length > 0;
     }
-    return false
+    return false;
 }
 
 teamSchema.pre('validate', async function (next) {
@@ -73,12 +73,12 @@ teamSchema.pre('validate', async function (next) {
         next(err);
     }
 
-    next()
+    next();
 })
 
 teamSchema.pre('remove', async function (next) {
-    const team = this
-    await Role.deleteMany({ _id: { $in: team.roles } })
+    const team = this;
+    await Role.deleteMany({ _id: { $in: team.roles } });
 
     const membersToRemve = await Admin.find({ teams: team._id });
     membersToRemve.forEach(member => {
@@ -87,7 +87,7 @@ teamSchema.pre('remove', async function (next) {
         member.save();
     })
 
-    next()
+    next();
 })
 
 export const Team = mongoose.model('Team', teamSchema);
