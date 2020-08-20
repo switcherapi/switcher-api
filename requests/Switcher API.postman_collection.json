@@ -2531,6 +2531,76 @@
 			"response": []
 		},
 		{
+			"name": "Domain - Request Transfer",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"domain\": \"5e4f9d8966e06b59c8254500\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/domain/transfer/request",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"domain",
+						"transfer",
+						"request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Domain - Accept Transfer",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"domain\": \"5e4f9d8966e06b59c8254500\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/domain/transfer/accept",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"domain",
+						"transfer",
+						"accept"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Domain - Update Env",
 			"request": {
 				"method": "PATCH",

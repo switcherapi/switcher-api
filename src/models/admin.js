@@ -114,6 +114,7 @@ adminSchema.methods.generateAuthToken = async function () {
     const refreshToken = await bcrypt.hash(token.split('.')[2], 8);
 
     admin.code = null;
+    admin.active = true;
     admin.token = refreshToken;
     await admin.save();
 
