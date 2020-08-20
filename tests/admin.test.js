@@ -13,8 +13,11 @@ import {
     adminAccount,
     teamId,
     domainId,
-    team1Id
+    team1Id,
+    adminMasterAccountToken
 } from './fixtures/db_api';
+import { Team } from '../src/models/team';
+import { ObjectId } from 'mongodb';
 
 afterAll(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -897,5 +900,107 @@ describe('Testing Admin collaboration endpoint', () => {
         expect(update[0].result).toEqual('nok');
         const create = response.body.filter(credential => credential.action === 'CREATE');
         expect(create[0].result).toEqual('nok');
+    })
+
+    test('ADMIN_SUITE - Should remove user from all teams given a specific Domain', async () => {
+        //given - log user
+        const responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminMasterAccount.email,
+                password: adminMasterAccount.password
+            }).expect(200);
+
+        //given - add user to 'teamId' which is under 'domainId'
+        await request(app)
+            .patch('/team/member/add/' + teamId)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send({
+                member: adminMasterAccountId
+            }).expect(200);
+            
+        //verify
+        let teams = await Team.find({ members: adminMasterAccountId });
+        teams.forEach(team => {
+            expect(team.members[0]).toEqual(adminMasterAccountId);
+        });
+
+        //test
+        await request(app)
+            .patch('/admin/me/team/leave/' + domainId)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send().expect(200);
+
+        teams = await Team.find({ members: adminMasterAccountId });
+        teams.forEach(team => {
+            expect(team.members[0]).toBeNull();
+        });
+    })
+
+    test('ADMIN_SUITE - Should NOT remove any user from teams given a not found Domain ID', async () => {
+        //given - log user
+        const responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminMasterAccount.email,
+                password: adminMasterAccount.password
+            }).expect(200);
+
+        //test
+        await request(app)
+            .patch('/admin/me/team/leave/' +  new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send().expect(404);
+    })
+
+    test('ADMIN_SUITE - Should NOT remove any user from teams given a INVALID Domain ID', async () => {
+        //given - log user
+        const responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminMasterAccount.email,
+                password: adminMasterAccount.password
+            }).expect(200);
+
+        //test
+        await request(app)
+            .patch('/admin/me/team/leave/INVALID_ID')
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send().expect(422);
+    })
+
+    test('ADMIN_SUITE - Should remove user from all teams when user is deleted', async () => {
+        //given - log user
+        const responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminMasterAccount.email,
+                password: adminMasterAccount.password
+            }).expect(200);
+
+        //given - add user to 'teamId' which is under 'domainId'
+        await request(app)
+            .patch('/team/member/add/' + teamId)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send({
+                member: adminMasterAccountId
+            }).expect(200);
+            
+        //verify
+        let teams = await Team.find({ members: adminMasterAccountId });
+        teams.forEach(team => {
+            expect(team.members[0]).toEqual(adminMasterAccountId);
+        });
+
+        //test
+        await request(app)
+            .delete('/admin/me')
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send().expect(200);
+
+        teams = await Team.find({ members: adminMasterAccountId });
+        teams.forEach(team => {
+            expect(team.members[0]).toBeNull();
+        });
     })
 })

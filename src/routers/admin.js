@@ -1,5 +1,6 @@
 import express from 'express';
 import Admin from '../models/admin';
+import { Team } from '../models/team';
 import { auth, authRefreshToken } from '../middleware/auth';
 import { verifyInputUpdateParameters } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
@@ -232,6 +233,35 @@ router.patch('/admin/me', auth, verifyInputUpdateParameters(['name', 'email', 'p
     req.updates.forEach((update) => req.admin[update] = req.body[update]);
     await req.admin.save();
     res.send(req.admin);
+})
+
+router.patch('/admin/me/team/leave/:domainid', [check('domainid').isMongoId()], auth, async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+
+        const teams = await Team.find({ domain: req.params.domainid, members: req.admin.id });
+
+        if (!teams.length) {
+            throw new NotFoundError('No team found for this given domain id');
+        }
+
+        for (let i = 0; i < teams.length; i++) {
+            let indexMmeber = teams[i].members.indexOf(req.admin.id);
+            teams[i].members.splice(indexMmeber, 1);
+            await teams[i].save();
+
+            let indexTeam = req.admin.teams.indexOf(teams[i]._id);
+            req.admin.teams.splice(indexTeam, 1);
+            await req.admin.save();
+        }
+
+        res.send(req.admin);
+    } catch (e) {
+        responseException(res, e, 400);
+    }
 })
 
 export default router;
