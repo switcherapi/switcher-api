@@ -4,45 +4,45 @@ import { Team } from '../../models/team';
 import { Role, ActionTypes, RouterTypes } from '../../models/role';
 
 async function checkEnvironmentStatusRemoval(domainId, environmentName, strategy = false) {
-    const environment = await Environment.find({ domain: domainId }).select('name -_id')
+    const environment = await Environment.find({ domain: domainId }).select('name -_id');
     const isValidOperation = environment.filter((e) => 
         e.name === environmentName && 
-        !strategy ? environmentName !== EnvType.DEFAULT : strategy).length > 0
+        !strategy ? environmentName !== EnvType.DEFAULT : strategy).length > 0;
         
     if (!isValidOperation) {
-        throw new Error('Invalid environment')
+        throw new Error('Invalid environment');
     }
 }
 
 export async function removeDomainStatus(domain, environmentName) {
     try {
-        await checkEnvironmentStatusRemoval(domain._id, environmentName)
-        domain.activated.delete(environmentName)
-        return await domain.save()
+        await checkEnvironmentStatusRemoval(domain._id, environmentName);
+        domain.activated.delete(environmentName);
+        return await domain.save();
     } catch (e) {
-        throw new Error(e.message)
+        throw new Error(e.message);
     }
 }
 
 export async function removeGroupStatus(groupconfig, environmentName) {
     try {
-        await checkEnvironmentStatusRemoval(groupconfig.domain, environmentName)
+        await checkEnvironmentStatusRemoval(groupconfig.domain, environmentName);
 
-        groupconfig.activated.delete(environmentName)
-        return await groupconfig.save()
+        groupconfig.activated.delete(environmentName);
+        return await groupconfig.save();
     } catch (e) {
-        throw new Error(e.message)
+        throw new Error(e.message);
     }
 }
 
 export async function removeConfigStatus(config, environmentName) {
     try {
-        await checkEnvironmentStatusRemoval(config.domain, environmentName)
+        await checkEnvironmentStatusRemoval(config.domain, environmentName);
 
-        config.activated.delete(environmentName)
-        return await config.save()
+        config.activated.delete(environmentName);
+        return await config.save();
     } catch (e) {
-        throw new Error(e.message)
+        throw new Error(e.message);
     }
 }
 
@@ -63,19 +63,18 @@ export async function removeConfigStatus(config, environmentName) {
 // }
 
 export async function updateDomainVersion(domainId) {
-    const domain = await Domain.findById(domainId)
+    const domain = await Domain.findById(domainId);
 
     if (!domain) {
         throw new NotFoundError('Domain not found');
     }
 
-    domain.lastUpdate = Date.now()
-    domain.save()
+    domain.lastUpdate = Date.now();
+    domain.save();
 } 
 
 export async function verifyOwnership(admin, element, domainId, action, routerType, cascade = false) {
-    const domain = await Domain.findById(domainId)
-
+    const domain = await Domain.findById(domainId);
     if (!domain) {
         throw new NotFoundError('Domain not found');
     }
@@ -84,25 +83,20 @@ export async function verifyOwnership(admin, element, domainId, action, routerTy
         return element;
     }
     
-    const teams = await Team.find({ _id: { $in: admin.teams }, domain: domain._id })
-    
-    if (admin.teams.length) {
+    const teams = await Team.find({ _id: { $in: admin.teams }, domain: domain._id, active: true });
+    if (teams.length && admin.teams.length) {
         for (var i = 0; i < teams.length; i++) {
-            if (teams[i].active) {
-                if (cascade) {
-                    element = await verifyRolesCascade(teams[i], element, action, routerType);
-                } else {
-                    element = await verifyRoles(teams[i], element, action, routerType);
-                }
+            if (cascade) {
+                element = await verifyRolesCascade(teams[i], element, action, routerType);
             } else {
-                throw new PermissionError('Team is not active to verify this operation');
+                element = await verifyRoles(teams[i], element, action, routerType);
             }
         }
     } else {
         throw new PermissionError('It was not possible to find any team that allows you to proceed with this operation');
     }
 
-    return  element;
+    return element;
 }
   
 async function verifyRoles(team, element, action, routerType) {
@@ -129,20 +123,20 @@ async function verifyRolesCascade(team, element, action, routerType) {
             { router: RouterTypes.CONFIG },
             { router: RouterTypes.STRATEGY },
             { router: RouterTypes.ALL }
-        ]
+        ];
     } else if (routerType === RouterTypes.GROUP) {
         orStatement = [
             { router: routerType },
             { router: RouterTypes.CONFIG },
             { router: RouterTypes.STRATEGY },
             { router: RouterTypes.ALL }
-        ]
+        ];
     } else if (routerType === RouterTypes.CONFIG || routerType === RouterTypes.STRATEGY) {
         orStatement = [
             { router: routerType },
             { router: RouterTypes.STRATEGY },
             { router: RouterTypes.ALL }
-        ]
+        ];
     }
 
     const foundRole = await Role.find({
@@ -198,10 +192,10 @@ export class NotFoundError extends Error {
 
 export function responseException(res, err, code) {
     if (err instanceof PermissionError) {
-        res.status(401).send({ error: err.message, code: 401 })
+        res.status(401).send({ error: err.message, code: 401 });
     } else if (err instanceof NotFoundError) {
-        res.status(404).send({ error: err.message })
+        res.status(404).send({ error: err.message });
     } else {
-        res.status(code).send({ error: err.message })
+        res.status(code).send({ error: err.message });
     }
 }

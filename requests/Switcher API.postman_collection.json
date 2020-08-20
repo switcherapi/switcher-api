@@ -708,6 +708,27 @@
 			"response": []
 		},
 		{
+			"name": "Admin - Leave Domain",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/admin/me/team/leave/5ed5b45fbcd74972fc55b72e",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"admin",
+						"me",
+						"team",
+						"leave",
+						"5ed5b45fbcd74972fc55b72e"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Environment - Create",
 			"request": {
 				"method": "POST",

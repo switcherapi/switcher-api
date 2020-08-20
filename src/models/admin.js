@@ -3,6 +3,7 @@ import moment from 'moment';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Domain from './domain';
+import { Team } from './team';
 
 const adminSchema = new mongoose.Schema({
     name: {
@@ -98,8 +99,6 @@ adminSchema.options.toJSON = {
         delete ret.password;
         delete ret.token;
         delete ret.code;
-        delete ret._gitid;
-        delete ret._bitbucketid;
         return ret;
     }
 }
@@ -179,6 +178,13 @@ adminSchema.pre('remove', async function (next) {
 
     if (domains) {
         domains.forEach(async (domain) => await domain.remove());
+    }
+
+    const teams = await Team.find({ members: admin._id });
+    for (let i = 0; i < teams.length; i++) {
+        let indexMmeber = teams[i].members.indexOf(admin._id);
+        teams[i].members.splice(indexMmeber, 1);
+        await teams[i].save();
     }
 
     next();

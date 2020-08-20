@@ -243,7 +243,7 @@ describe('Error tests', () => {
         }
     })
 
-    test('UNIT_TEAM_ROLE_SUITE - Should NOT allow access - Team innactive', async () => {
+    test('UNIT_TEAM_ROLE_SUITE - Should NOT allow access - Team not active', async () => {
         await changeTeamStatus(team1Id, false)
 
         try {
@@ -256,7 +256,7 @@ describe('Error tests', () => {
 
                 expect(element).toBeNull();
         } catch (e) {
-            expect(e).toEqual(new Error('Team is not active to verify this operation'))
+            expect(e).toEqual(new Error('It was not possible to find any team that allows you to proceed with this operation'))
         } finally {
             await changeTeamStatus(team1Id, true)
         }
