@@ -169,7 +169,7 @@ describe('Deletion tests', () => {
     })
 
     test('ENV_SUITE - Should recover an Environment', async () => {
-        const envName = 'Recoverable Environment'
+        const envName = 'RecoverableEnvironment'
         let envId
 
         let response = await request(app)

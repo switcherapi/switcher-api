@@ -10,7 +10,8 @@ import {
     removeGroupStatus,
     removeConfigStatus,
     verifyOwnership,
-    responseException
+    responseException,
+    formatInput
 } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
 
@@ -48,6 +49,7 @@ router.post('/environment/create', auth, async (req, res) => {
     });
 
     try {
+        environment.name = formatInput(environment.name);
         environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.CREATE, RouterTypes.ENVIRONMENT);
 
         await environment.save();

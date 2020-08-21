@@ -46,22 +46,6 @@ export async function removeConfigStatus(config, environmentName) {
     }
 }
 
-// Deprecated since strategies should contain only one configured environment
-// export async function removeConfigStrategyStatus(configStrategy, environmentName) {
-//     try {
-//         await checkEnvironmentStatusRemoval(configStrategy.domain, environmentName, true)
-
-//         if (configStrategy.activated.size === 1) {
-//             throw new Error('Invalid operation. One environment status must be saved')
-//         }
-
-//         configStrategy.activated.delete(environmentName)
-//         return await configStrategy.save()
-//     } catch (e) {
-//         throw new Error(e.message)
-//     }
-// }
-
 export async function updateDomainVersion(domainId) {
     const domain = await Domain.findById(domainId);
 
@@ -71,7 +55,30 @@ export async function updateDomainVersion(domainId) {
 
     domain.lastUpdate = Date.now();
     domain.save();
-} 
+}
+
+export function formatInput(input, 
+    options = { toUpper: false, toLower: false, autoUnderscore: false, allowSpace: false }) {
+
+    const regexStr = options.autoUnderscore ? /^[a-zA-Z0-9_\- ]*$/ : 
+        options.allowSpace ? /^[-a-zA-Z0-9_\- ]*$/ : /^[a-zA-Z0-9_\-]*$/;
+
+    if (!input.match(regexStr)) {
+        throw new Error('Invalid input format. Use only alphanumeric digits.');
+    }
+    
+    if (options.toUpper) {
+        input = input.toUpperCase();
+    } else if (options.toLower) {
+        input = input.toLowerCase();
+    }
+
+    if (options.autoUnderscore) {
+        input = input.replace(/\s/g, '_');
+    }
+
+    return input.trim();
+}
 
 export async function verifyOwnership(admin, element, domainId, action, routerType, cascade = false) {
     const domain = await Domain.findById(domainId);

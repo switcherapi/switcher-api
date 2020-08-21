@@ -30,7 +30,8 @@
     "test-role": "env-cmd -e test jest -t 'ROLE_SUITE' --collect-coverage",
     "test-unit-strategy": "env-cmd -e test jest -t 'UNIT_STRATEGY' --collect-coverage",
     "test-unit-team": "env-cmd -e test jest -t 'UNIT_TEAM_ROLE_SUITE' --collect-coverage",
-    "test-unit-metric": "env-cmd -e test jest -t 'UNIT_ROUTER_METRIC' --collect-coverage"
+    "test-unit-metric": "env-cmd -e test jest -t 'UNIT_ROUTER_METRIC' --collect-coverage",
+    "test-unit-router-index": "env-cmd -e test jest -t 'UNIT_ROUTER_INDEX' --collect-coverage"
   },
   "keywords": [
     "feature",

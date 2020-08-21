@@ -77,7 +77,7 @@ export const config2Document = {
 export const component1Id = new mongoose.Types.ObjectId();
 export const component1 = {
     _id: component1Id,
-    name: 'Component 1',
+    name: 'Component_1',
     description: 'Test app',
     domain: domainId,
     owner: adminMasterAccountId
@@ -88,7 +88,7 @@ config2Document.components.push(component1Id);
 export const entry1 = {
     _id: new mongoose.Types.ObjectId(),
     config: configId1,
-    component: 'Component 1',
+    component: 'Component_1',
     result: true,
     reason: 'Success',
     group: 'GROUP 1',
@@ -100,7 +100,7 @@ export const entry1 = {
 export const entry2 = {
     _id: new mongoose.Types.ObjectId(),
     config: configId1,
-    component: 'Component 1',
+    component: 'Component_1',
     result: false,
     reason: 'Something went wrong',
     group: 'GROUP 1',
@@ -112,7 +112,7 @@ export const entry2 = {
 export const entry3 = {
     _id: new mongoose.Types.ObjectId(),
     config: configId2,
-    component: 'Component 1',
+    component: 'Component_1',
     result: true,
     reason: 'Success',
     group: 'GROUP 1',
@@ -124,7 +124,7 @@ export const entry3 = {
 export const entry4 = {
     _id: new mongoose.Types.ObjectId(),
     config: configId2,
-    component: 'Component 2',
+    component: 'Component_2',
     result: false,
     reason: 'Something went wrong',
     group: 'GROUP 1',
@@ -136,7 +136,7 @@ export const entry4 = {
 export const entry5 = {
     _id: new mongoose.Types.ObjectId(),
     config: configId2,
-    component: 'Component 2',
+    component: 'Component_2',
     result: false,
     reason: 'Something went wrong in QA',
     group: 'GROUP 1',
