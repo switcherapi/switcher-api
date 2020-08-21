@@ -4,7 +4,7 @@ import GroupConfig from '../models/group-config';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeGroupStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError } from './common/index'
+import { removeGroupStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError, formatInput } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router();
@@ -26,6 +26,7 @@ router.post('/groupconfig/create', auth, async (req, res) => {
     });
 
     try {
+        groupconfig.name = formatInput(groupconfig.name, { allowSpace: true });
         let group = await GroupConfig.findOne({ name: req.body.name, domain: req.body.domain });
 
         if (group) {
@@ -181,6 +182,7 @@ router.patch('/groupconfig/:id', auth,
             }
         }
 
+        groupconfig.name = formatInput(groupconfig.name, { allowSpace: true });
         req.updates.forEach((update) => groupconfig[update] = req.body[update]);
         await groupconfig.save();
         updateDomainVersion(groupconfig.domain);

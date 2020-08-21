@@ -5,7 +5,7 @@ import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { check, validationResult } from 'express-validator';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeDomainStatus, verifyOwnership, responseException, NotFoundError } from './common/index'
+import { removeDomainStatus, verifyOwnership, responseException, NotFoundError, formatInput } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
 import GroupConfig from '../models/group-config';
 import Config from '../models/config';
@@ -21,6 +21,7 @@ router.post('/domain/create', auth, async (req, res) => {
             owner: req.admin._id
         });
 
+        domain.name = formatInput(domain.name, { allowSpace: true });
         const environment = new Environment({
             domain: domain._id,
             owner: req.admin._id

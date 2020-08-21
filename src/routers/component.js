@@ -1,6 +1,6 @@
 import express from 'express';
 import { auth } from '../middleware/auth';
-import { verifyOwnership, responseException } from './common/index';
+import { verifyOwnership, responseException, formatInput } from './common/index';
 import { verifyInputUpdateParameters } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
 import Component from '../models/component';
@@ -23,6 +23,7 @@ router.post('/component/create', auth, [
     });
 
     try {
+        component.name = formatInput(component.name);
         component = await verifyOwnership(req.admin, component, req.body.domain, ActionTypes.CREATE, RouterTypes.COMPONENT);
         const apiKey = await component.generateApiKey();
         await component.save();
@@ -109,6 +110,7 @@ router.patch('/component/:id', auth, verifyInputUpdateParameters(['name', 'descr
             return res.status(404).send();
         }
 
+        component.name = formatInput(component.name);
         component = await verifyOwnership(req.admin, component, component.domain, ActionTypes.UPDATE, RouterTypes.COMPONENT);
 
         req.updates.forEach((update) => component[update] = req.body[update]);

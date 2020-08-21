@@ -654,7 +654,7 @@ describe('Testing component association', () => {
             .post('/component/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                name: 'NewComponent Added 2x',
+                name: 'NewComponent-Added-2x',
                 description: 'Description of my component',
                 domain: domainId
             }).expect(201)
@@ -673,7 +673,7 @@ describe('Testing component association', () => {
                 component: responseComponent.body.component._id
             }).expect(400)
         
-        expect(responseAdd.body.error).toBe('Component NewComponent Added 2x already exists')
+        expect(responseAdd.body.error).toBe('Component NewComponent-Added-2x already exists')
     })
 
     test('CONFIG_SUITE - Should NOT associate component to a config - Config not found', async () => {
@@ -722,7 +722,7 @@ describe('Testing component association', () => {
             .post('/component/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                name: 'Will be removed later',
+                name: 'Will_be_removed_later',
                 description: 'Will be removed later',
                 domain: domainId
             }).expect(201)

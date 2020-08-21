@@ -6,7 +6,7 @@ import Config from '../models/config';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeConfigStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError } from './common/index'
+import { removeConfigStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError, formatInput } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router();
@@ -41,6 +41,7 @@ router.post('/config/create', auth, async (req, res) => {
             owner: req.admin._id
         });
 
+        config.key = formatInput(config.key, { toUpper: true, autoUnderscore: true });
         config = await verifyOwnership(req.admin, config, group.domain, ActionTypes.CREATE, RouterTypes.CONFIG);
 
         await config.save();
@@ -193,6 +194,7 @@ router.patch('/config/:id', auth,
             }
         }
 
+        config.key = formatInput(config.key, { toUpper: true, autoUnderscore: true });
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
         config.updatedBy = req.admin.email;
 

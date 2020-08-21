@@ -200,7 +200,7 @@ describe('Updating tests', () => {
             .post('/component/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                name: 'Cannot Update This',
+                name: 'CannotUpdateThis',
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
             }).expect(201)
@@ -261,7 +261,7 @@ describe('Deletion tests', () => {
             .post('/component/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                name: 'Cannot Delete This',
+                name: 'CannotDeleteThis',
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
             }).expect(201)

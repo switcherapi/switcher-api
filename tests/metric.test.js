@@ -163,7 +163,7 @@ describe('Fetch metrics', () => {
     })
 
     test('METRIC_SUITE - Should fetch records by COMPONENT', async () => {
-        const args = `&page=1&component=Component 1`
+        const args = `&page=1&component=Component_1`
         const response = await request(app)
             .get(`/metric/data?domainid=${domainId}${args}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -172,7 +172,7 @@ describe('Fetch metrics', () => {
         // Response validation
         expect(response.body.data).not.toBeNull()
         response.body.data.forEach(e => {
-            expect(e.component).toEqual('Component 1')
+            expect(e.component).toEqual('Component_1')
         })
     })
 
