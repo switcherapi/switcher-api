@@ -110,10 +110,10 @@ router.patch('/component/:id', auth, verifyInputUpdateParameters(['name', 'descr
             return res.status(404).send();
         }
 
-        component.name = formatInput(component.name);
         component = await verifyOwnership(req.admin, component, component.domain, ActionTypes.UPDATE, RouterTypes.COMPONENT);
 
         req.updates.forEach((update) => component[update] = req.body[update]);
+        component.name = formatInput(component.name);
         await component.save();
         res.send(component);
     } catch (e) {

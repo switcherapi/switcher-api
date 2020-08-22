@@ -182,8 +182,8 @@ router.patch('/groupconfig/:id', auth,
             }
         }
 
-        groupconfig.name = formatInput(groupconfig.name, { allowSpace: true });
         req.updates.forEach((update) => groupconfig[update] = req.body[update]);
+        groupconfig.name = formatInput(groupconfig.name, { allowSpace: true });
         await groupconfig.save();
         updateDomainVersion(groupconfig.domain);
         res.send(groupconfig);

@@ -194,11 +194,11 @@ router.patch('/config/:id', auth,
             }
         }
 
-        config.key = formatInput(config.key, { toUpper: true, autoUnderscore: true });
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
         config.updatedBy = req.admin.email;
 
         req.updates.forEach((update) => config[update] = req.body[update]);
+        config.key = formatInput(config.key, { toUpper: true, autoUnderscore: true });
         await config.save();
         updateDomainVersion(config.domain);
         res.send(config);
