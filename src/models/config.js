@@ -13,7 +13,6 @@ const configSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: true,
         trim: true
     },
     activated: {
