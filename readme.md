@@ -172,6 +172,10 @@ Signing up to Switcher API must be made via Switcher Management.
 
       Date validation accept both date and time input (e.g. YYYY-MM-DD or YYYY-MM-DDTHH:mm) formats.
 
+    - REGEX_VALIDATION
+
+      Regular expression based validation. No format required.
+
   - **Strategy operations**
     - EXIST / NOT_EXIST
     - EQUAL / NOT_EQUAL
