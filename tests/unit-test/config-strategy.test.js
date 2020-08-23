@@ -424,3 +424,78 @@ describe('Processing strategy: DATE', () => {
         } catch (e) { }
     })
 })
+
+describe('Processing strategy: REGEX', () => {
+    const mock_values1 = [
+        '\\bUSER_[0-9]{1,2}\\b'
+    ];
+
+    const mock_values2 = [
+        '\\bUSER_[0-9]{1,2}\\b', '\\buser-[0-9]{1,2}\\b'
+    ];
+
+    const mock_values3 = [
+        'USER_[0-9]{1,2}'
+    ];
+
+    test('UNIT_STRATEGY_SUITE - Should agree when expect to exist using EXIST operation', () => {
+        let result = processOperation(
+            StrategiesType.REGEX, OperationsType.EXIST, 'USER_1', mock_values1);
+        expect(result).toBe(true);
+
+        result = processOperation(
+            StrategiesType.REGEX, OperationsType.EXIST, 'user-01', mock_values2);
+        expect(result).toBe(true);
+    })
+
+    test('UNIT_STRATEGY_SUITE - Should NOT agree when expect to exist using EXIST operation', () => {
+        let result = processOperation(
+            StrategiesType.REGEX, OperationsType.EXIST, 'USER_123', mock_values1);
+        expect(result).toBe(false);
+
+        //mock_values3 does not require exact match
+        result = processOperation(
+            StrategiesType.REGEX, OperationsType.EXIST, 'USER_123', mock_values3);
+        expect(result).toBe(true);
+    })
+
+    test('UNIT_STRATEGY_SUITE - Should agree when expect to not exist using NOT_EXIST operation', () => {
+        let result = processOperation(
+            StrategiesType.REGEX, OperationsType.NOT_EXIST, 'USER_123', mock_values1);
+        expect(result).toBe(true);
+
+        result = processOperation(
+            StrategiesType.REGEX, OperationsType.NOT_EXIST, 'user-123', mock_values2);
+        expect(result).toBe(true);
+    })
+
+    test('UNIT_STRATEGY_SUITE - Should NOT agree when expect to not exist using NOT_EXIST operation', () => {
+        const result = processOperation(
+            StrategiesType.REGEX, OperationsType.NOT_EXIST, 'USER_12', mock_values1);
+        expect(result).toBe(false);
+    })
+
+    test('UNIT_STRATEGY_SUITE - Should agree when expect to be equal using EQUAL operation', () => {
+        const result = processOperation(
+            StrategiesType.REGEX, OperationsType.EQUAL, 'USER_11', mock_values3);
+        expect(result).toBe(true);
+    })
+
+    test('UNIT_STRATEGY_SUITE - Should NOT agree when expect to be equal using EQUAL operation', () => {
+        const result = processOperation(
+            StrategiesType.REGEX, OperationsType.EQUAL, 'user-11', mock_values3);
+        expect(result).toBe(false);
+    })
+
+    test('UNIT_STRATEGY_SUITE - Should agree when expect to not be equal using NOT_EQUAL operation', () => {
+        const result = processOperation(
+            StrategiesType.REGEX, OperationsType.NOT_EQUAL, 'USER_123', mock_values3);
+        expect(result).toBe(true);
+    })
+
+    test('UNIT_STRATEGY_SUITE - Should NOT agree when expect to not be equal using NOT_EQUAL operation', () => {
+        const result = processOperation(
+            StrategiesType.REGEX, OperationsType.NOT_EQUAL, 'USER_1', mock_values3);
+        expect(result).toBe(false);
+    })
+})
