@@ -246,12 +246,7 @@ function processREGEX(operation, input, values) {
             }
             return false;
         case OperationsType.NOT_EXIST:
-            for (var i = 0; i < values.length; i++) {
-                if (input.match(values[i])) {
-                    return false;
-                }
-            }
-            return true;
+            return !processREGEX(OperationsType.EXIST, input, values);
         case OperationsType.EQUAL:
             return input.match(`\\b${values[0]}\\b`) != null;
         case OperationsType.NOT_EQUAL:
