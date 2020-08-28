@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import moment from 'moment';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import Config from './config';
+import { Config } from './config';
 import Domain from './domain';
 
 const componentSchema = new mongoose.Schema({

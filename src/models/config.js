@@ -3,7 +3,26 @@ import moment from 'moment';
 import History from './history';
 import { ConfigStrategy } from './config-strategy';
 import { EnvType } from './environment';
-import { recordHistory } from './common/index'
+import { recordHistory } from './common/index';
+
+const RelayMethods = Object.freeze({
+    POST: 'POST',
+    GET: 'GET'
+});
+
+const RelayTypes = Object.freeze({
+    VALIDATION: 'VALIDATION',
+    NOTIFICATION: 'NOTIFICATION'
+});
+
+export const StrategiesToRelayDataType = Object.freeze({
+    NETWORK_VALIDATION: 'network',
+    VALUE_VALIDATION: 'value',
+    NUMERIC_VALIDATION: 'numeric',
+    TIME_VALIDATION: 'time',
+    DATE_VALIDATION: 'date',
+    REGEX_VALIDATION: 'regex'
+});
 
 const configSchema = new mongoose.Schema({
     key: {
@@ -42,6 +61,34 @@ const configSchema = new mongoose.Schema({
     updatedBy: {
         type: String
     },
+    relay: {
+        type: {
+            type: String,
+            enum: Object.values(RelayTypes)
+        },
+        description: {
+            type: String
+        },
+        activated: {
+            type: Map,
+            of: Boolean
+        },
+        endpoint: {
+            type: Map,
+            of: String
+        },
+        method: {
+            type: String,
+            enum: Object.values(RelayMethods)
+        },
+        auth_prefix: {
+            type: String
+        },
+        auth_token: {
+            type: Map,
+            of: String
+        }
+    }
 }, {
     timestamps: true
 })
@@ -66,6 +113,13 @@ configSchema.options.toJSON = {
 
         if (!ret.id) {
             delete ret.id;
+        }
+
+        if (!ret.relay) {
+            delete ret.relay;
+        } else if (!ret.relay.auth_prefix) {
+            delete ret.relay.auth_prefix;
+            delete ret.relay.auth_token;
         }
         
         if (ret.component_list) {
@@ -109,6 +163,11 @@ configSchema.pre('save', async function (next) {
     next();
 })
 
-const Config = mongoose.model('Config', configSchema);
+export const Config = mongoose.model('Config', configSchema);
 
-export default Config;
+export function relayOptions() {
+    return {
+        methods: Object.values(RelayMethods),
+        types: Object.values(RelayTypes)
+    };
+}

@@ -10,7 +10,7 @@ import {
     domainId,
     configId1
  } from './fixtures/db_api';
-import Config from '../src/models/config';
+import { Config } from '../src/models/config';
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));

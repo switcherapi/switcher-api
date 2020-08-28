@@ -6,7 +6,7 @@ import { Team } from '../../src/models/team';
 import { Role, RouterTypes, ActionTypes, KeyTypes } from '../../src/models/role';
 import { EnvType } from '../../src/models/environment';
 import GroupConfig from '../../src/models/group-config';
-import Config from '../../src/models/config';
+import { Config } from '../../src/models/config';
 import TeamInvite from '../../src/models/team-invite';
 
 export const adminMasterAccountId = new mongoose.Types.ObjectId()

@@ -40,6 +40,13 @@ export async function removeConfigStatus(config, environmentName) {
         await checkEnvironmentStatusRemoval(config.domain, environmentName);
 
         config.activated.delete(environmentName);
+
+        if (config.relay.activated) {
+            config.relay.activated.delete(environmentName);
+            config.relay.endpoint.delete(environmentName);
+            config.relay.auth_token.delete(environmentName);
+        }
+
         return await config.save();
     } catch (e) {
         throw new Error(e.message);

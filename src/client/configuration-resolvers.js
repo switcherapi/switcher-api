@@ -1,4 +1,4 @@
-import Config from "../models/config";
+import { Config } from "../models/config";
 import GroupConfig from "../models/group-config";
 import Domain from "../models/domain";
 import Component from "../models/component";

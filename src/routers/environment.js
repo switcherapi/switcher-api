@@ -1,7 +1,7 @@
 import express from 'express';
 import { Environment, EnvType } from '../models/environment';
 import GroupConfig from '../models/group-config';
-import Config from '../models/config';
+import { Config } from '../models/config';
 import Domain from '../models/domain';
 import { ConfigStrategy } from '../models/config-strategy';
 import { auth } from '../middleware/auth';
