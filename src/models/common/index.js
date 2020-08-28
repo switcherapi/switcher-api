@@ -2,7 +2,7 @@ import History from '../history';
 
 function checkDifference(oldValues, newValues, oldDocument, newDocument, 
     defaultIgnoredFields, keyArr, keys, pos) {
-
+    
     if (!defaultIgnoredFields.includes(keyArr[pos])) {
         const oldValue = getValue(oldDocument, keyArr[pos]) || '';
         const newValue = getValue(newDocument, keyArr[pos]) || '';
@@ -13,6 +13,11 @@ function checkDifference(oldValues, newValues, oldDocument, newDocument,
                     getValue(oldDocument, keyArr[pos]), 
                     getValue(newDocument, keyArr[pos]), 
                     defaultIgnoredFields, keyArr, keys, pos+1);
+            } else {
+                if (!Object.is(extractValue(oldValue), extractValue(newValue))) {
+                    oldValues.set(keys, extractValue(oldValue));
+                    newValues.set(keys, extractValue(newValue));
+                }
             }
         } else {
             if (!Object.is(oldValue, newValue)) {
@@ -20,6 +25,14 @@ function checkDifference(oldValues, newValues, oldDocument, newDocument,
                 newValues.set(keys, newValue);
             }
         }
+    }
+}
+
+function extractValue(element) {
+    if (Array.isArray(element)) {
+        return element.map(val => {
+            return val.name ? val.name : val.key ? val.key : val;
+        });
     }
 }
 
@@ -45,7 +58,7 @@ export async function recordHistory(modifiedField, oldDocument, newDocument, dom
     if (ignoredFields.length) {
         ignoredFields.forEach(field => defaultIgnoredFields.push(field))
     }
-
+    
     modifiedField.forEach(keys => {
         const keyArr = keys.split('.');
         checkDifference(oldValues, newValues, oldDocument, newDocument, 
