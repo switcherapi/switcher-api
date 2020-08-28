@@ -5,7 +5,7 @@ import { Metric } from '../../src/models/metric';
 import Admin from '../../src/models/admin';
 import { EnvType } from '../../src/models/environment';
 import GroupConfig from '../../src/models/group-config';
-import Config from '../../src/models/config';
+import { Config } from '../../src/models/config';
 import Domain from '../../src/models/domain';
 import Component from '../../src/models/component';
 

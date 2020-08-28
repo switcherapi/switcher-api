@@ -3172,7 +3172,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"key\": \"FEATURE2020\",\n\t\"description\": \"Feature #22020 description\",\n\t\"group\": \"5e0ece9e6f4f994eac9007b1\"\n}",
+					"raw": "{\n\t\"key\": \"RELAY_1\",\n\t\"description\": \"Feature which contains a relay\",\n\t\"group\": \"5e0ece9e6f4f994eac9007b1\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -3221,6 +3221,76 @@
 					"path": [
 						"config",
 						"5dd232241f11a7307c164535"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Config - Update Relay",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"type\": \"VALIDATION\",\n\t\"description\": \"Validate input via external API\",\n\t\"activated\": {\n\t\t\"default\": true\n\t},\n\t\"endpoint\": {\n\t\t\"default\": \"http://localhost:3001\"\n\t},\n\t\"method\": \"GET\",\n\t\"auth_prefix\": \"Bearer\",\n\t\"auth_token\": {\n\t\t\"default\": \"123\"\n\t}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/config/updateRelay/5f45ca87b196cd151c6ec8bf",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"config",
+						"updateRelay",
+						"5f45ca87b196cd151c6ec8bf"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Config - Update Relay (Environment)",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"activated\": {\n\t\t\"development\": true\n\t},\n\t\"endpoint\": {\n\t\t\"development\": \"http://localhost:3000\"\n\t}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/config/updateRelay/5f4588335a311b4848e51f2e",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"config",
+						"updateRelay",
+						"5f4588335a311b4848e51f2e"
 					]
 				}
 			},
@@ -3396,6 +3466,77 @@
 						"config",
 						"removeComponent",
 						"5deac6e42d61a41fa0a8478b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Config - Remove Relay",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/config/removeRelay/5f458a38388f1a389892780a",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"config",
+						"removeRelay",
+						"5f458a38388f1a389892780a"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Config - Read Relay Specs",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/config/spec/relay",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"config",
+						"spec",
+						"relay"
+					],
+					"query": [
+						{
+							"key": "sortBy",
+							"value": "createdAt:asc",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "skip",
+							"value": "2",
+							"disabled": true
+						}
 					]
 				}
 			},
@@ -3718,41 +3859,6 @@
 						"configstrategy",
 						"updateStatus",
 						"5e2b7f09b91d810cd037424b"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "ConfigStrategy - Remove Env",
-			"request": {
-				"method": "PATCH",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"env\": \"default\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{url}}/configstrategy/removeStatus/5de9ffb4616fd02be086d84d",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"configstrategy",
-						"removeStatus",
-						"5de9ffb4616fd02be086d84d"
 					]
 				}
 			},

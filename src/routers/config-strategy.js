@@ -1,5 +1,5 @@
 import express from 'express';
-import Config from '../models/config';
+import { Config } from '../models/config';
 import History from '../models/history';
 import { Environment, EnvType } from '../models/environment';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';

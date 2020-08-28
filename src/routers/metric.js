@@ -4,7 +4,7 @@ import { Metric } from '../models/metric';
 import { check, validationResult } from 'express-validator';
 import { auth } from '../middleware/auth';
 import { EnvType } from '../models/environment';
-import Config from '../models/config';
+import { Config } from '../models/config';
 import { verifyOwnership, responseException } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { ObjectId } from 'mongodb';

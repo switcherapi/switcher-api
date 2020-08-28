@@ -1,4 +1,4 @@
-import Config from '../models/config';
+import { Config } from '../models/config';
 import { Environment } from '../models/environment';
 import Component from '../models/component';
 
@@ -23,9 +23,9 @@ export async function checkConfigComponent(req, res, next) {
     next();
 }
 
-export async function checkEnvironmentStatusChange (req, res, domain) {
+export async function checkEnvironmentStatusChange(req, res, domain, field) {
     const environment = await Environment.find({ domain }).select('name -_id');
-    const updates = Object.keys(req.body);
+    const updates = Object.keys(field || req.body);
     const isValidOperation = updates.every((update) => {
         return environment.filter((e) => e.name === update).length > 0;
     });

@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import Admin from '../../src/models/admin';
 import Domain from '../../src/models/domain';
 import GroupConfig from '../../src/models/group-config';
-import Config from '../../src/models/config';
+import { Config } from '../../src/models/config';
 import Component from '../../src/models/component';
 import History from '../../src/models/history';
 import { Metric } from '../../src/models/metric';

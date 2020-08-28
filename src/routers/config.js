@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import Component from '../models/component';
 import GroupConfig from '../models/group-config';
-import Config from '../models/config';
+import { Config, relayOptions } from '../models/config';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
@@ -178,7 +178,7 @@ router.delete('/config/:id', auth, async (req, res) => {
 })
 
 router.patch('/config/:id', auth,
-    verifyInputUpdateParameters(['key', 'description']), async (req, res) => {
+    verifyInputUpdateParameters(['key', 'description', 'relay']), async (req, res) => {
     try {
         let config = await Config.findById(req.params.id);
  
@@ -204,6 +204,36 @@ router.patch('/config/:id', auth,
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);
+    }
+})
+
+router.patch('/config/updateRelay/:id', auth, async (req, res) => {
+    try {
+        let config = await Config.findById(req.params.id);
+        
+        if (!config) {
+            return res.status(404).send({ error: 'Config does not exist'});
+        }
+
+        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
+        config.updatedBy = req.admin.email;
+
+        for (let index = 0; index < Object.keys(req.body).length; index++) {
+            const update = Object.keys(req.body)[index];
+            if (config.relay[update] && 'activated endpoint auth_token'.indexOf(update) >= 0) {
+                await checkEnvironmentStatusChange(req, res, config.domain, req.body[update]);
+                Object.keys(req.body[update]).forEach((map) =>
+                    config.relay[update].set(map, req.body[update][map]));
+            } else {
+                config.relay[update] = req.body[update];
+            }
+        }
+        
+        await config.save();
+        updateDomainVersion(config.domain);
+        res.send(config);
+    } catch (e) {
+        responseException(res, e, 400);
     }
 })
 
@@ -308,6 +338,40 @@ router.patch('/config/updateComponents/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
+})
+
+router.patch('/config/removeRelay/:id/:env', auth, async (req, res) => {
+    try {
+        let config = await Config.findById(req.params.id);
+        
+        if (!config) {
+            return res.status(404).send({ error: 'Config does not exist'});
+        }
+
+        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG);
+        config.updatedBy = req.admin.email;
+
+        if (config.relay.activated && config.relay.activated.get(req.params.env) != undefined) {
+            if (config.relay.activated.size > 1) {
+                config.relay.activated.delete(req.params.env);
+                config.relay.endpoint.delete(req.params.env);
+                config.relay.auth_token.delete(req.params.env);
+            } else {
+                config.relay = {};
+            }
+
+            await config.save();
+            updateDomainVersion(config.domain);
+        }
+ 
+        res.send(config);
+    } catch (e) {
+        responseException(res, e, 500);
+    }
+})
+
+router.get('/config/spec/relay', auth, (req, res) => {
+    res.send(relayOptions());
 })
 
 export default router;

@@ -4,7 +4,7 @@ import app from '../src/app';
 import { Environment, EnvType } from '../src/models/environment';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
-import Config from '../src/models/config';
+import { Config } from '../src/models/config';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../src/models/config-strategy';
 import { 
     setupDatabase,

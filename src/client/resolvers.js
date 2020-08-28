@@ -1,7 +1,7 @@
 import { EnvType } from '../models/environment';
 import Domain from '../models/domain';
 import GroupConfig from '../models/group-config';
-import Config from '../models/config';
+import { Config } from '../models/config';
 import { addMetrics } from '../models/metric';
 import { ConfigStrategy, processOperation } from '../models/config-strategy';
 import { ActionTypes, RouterTypes } from '../models/role';

@@ -8,7 +8,7 @@ import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../mi
 import { removeDomainStatus, verifyOwnership, responseException, NotFoundError, formatInput } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
 import GroupConfig from '../models/group-config';
-import Config from '../models/config';
+import { Config } from '../models/config';
 import { ConfigStrategy } from '../models/config-strategy';
 import Component from '../models/component';
 

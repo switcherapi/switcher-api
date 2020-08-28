@@ -4,7 +4,7 @@ import app from '../src/app';
 import Admin from '../src/models/admin';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
-import Config from '../src/models/config';
+import { Config } from '../src/models/config';
 import History from '../src/models/history';
 import { EnvType } from '../src/models/environment';
 import { ConfigStrategy } from '../src/models/config-strategy';

@@ -4,7 +4,7 @@ import app from '../src/app';
 import Admin from '../src/models/admin';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
-import Config from '../src/models/config';
+import { Config } from '../src/models/config';
 import History from '../src/models/history';
 import { ConfigStrategy } from '../src/models/config-strategy';
 import { EnvType, Environment } from '../src/models/environment';
@@ -437,8 +437,8 @@ describe('Testing environment configurations', () => {
 
         // DB validation - verify history record added
         history = await History.find({ elementId: domainId })
-        expect(history[0].oldValue.get('activated')[EnvType.DEFAULT]).toEqual(true);
-        expect(history[0].newValue.get('activated')['QA']).toEqual(true);
+        expect(history[0].oldValue.get('activated/QA')).toEqual('');
+        expect(history[0].newValue.get('activated/QA')).toEqual('true');
 
         // Inactivating QA. Default environment should stay activated
         await request(app)

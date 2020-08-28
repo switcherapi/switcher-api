@@ -1,28 +1,55 @@
 import History from '../history';
 
+function checkDifference(oldValues, newValues, oldDocument, newDocument, 
+    defaultIgnoredFields, keyArr, keys, pos) {
+
+    if (!defaultIgnoredFields.includes(keyArr[pos])) {
+        const oldValue = getValue(oldDocument, keyArr[pos]) || '';
+        const newValue = getValue(newDocument, keyArr[pos]) || '';
+        
+        if (typeof oldValue === 'object' || typeof newValue === 'object') {
+            if (keyArr.length - 1 > pos) {
+                checkDifference(oldValues, newValues,  
+                    getValue(oldDocument, keyArr[pos]), 
+                    getValue(newDocument, keyArr[pos]), 
+                    defaultIgnoredFields, keyArr, keys, ++pos);
+            }
+        } else {
+            if (!Object.is(oldValue, newValue)) {
+                oldValues.set(keys, oldValue);
+                newValues.set(keys, newValue);
+            }
+        }
+    }
+}
+
+function getValue(document, field) {
+    if (document != undefined) {
+        if (document instanceof Map) {
+            return typeof document.get(field) === 'boolean' ?
+                String(document.get(field)) : document.get(field);
+        } else {
+            return typeof document[field] === 'boolean' ? 
+                String(document[field]) : document[field];
+        }
+    } else {
+        return '';
+    }
+}
+
 export async function recordHistory(modifiedField, oldDocument, newDocument, domainId, ignoredFields = []) {
     const oldValues = new Map();
+    const newValues = new Map();
     const defaultIgnoredFields = ['_id', 'updatedAt'];
 
     if (ignoredFields.length) {
         ignoredFields.forEach(field => defaultIgnoredFields.push(field))
     }
 
-    modifiedField.forEach(field => {
-        if (!defaultIgnoredFields.includes(field) && !field.startsWith('activated.')) {
-            oldValues.set(field, extractValue(oldDocument[`${field}`]));
-        }
-    });
-
-    const newValues = new Map();
-    modifiedField.forEach(field => {
-        if (!defaultIgnoredFields.includes(field) && !field.startsWith('activated.')) {
-            if (JSON.stringify(oldValues.get(field)) === JSON.stringify(newDocument[`${field}`])) {
-                oldValues.delete(field);
-            } else {
-                newValues.set(field, extractValue(newDocument[`${field}`]));
-            }
-        }
+    modifiedField.forEach(keys => {
+        const keyArr = keys.split('.');
+        checkDifference(oldValues, newValues, oldDocument, newDocument, 
+            defaultIgnoredFields, keyArr, keys.replace(/\./g, '/'), 0);
     });
     
     const history = new History({
@@ -37,14 +64,4 @@ export async function recordHistory(modifiedField, oldDocument, newDocument, dom
     if (newValues.size > 0 && process.env.HISTORY_ACTIVATED === 'true') {
         await history.save();
     }
-}
-
-function extractValue(element) {
-    if (Array.isArray(element)) {
-        return element.map(val => {
-            return val.name ? val.name : val.key ? val.key : val;
-        });
-    }
-
-    return element;
 }
