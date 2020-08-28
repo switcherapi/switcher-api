@@ -9,17 +9,17 @@ describe('Processing strategy: NETWORK', () => {
 
     const mock_values1 = [
         '10.0.0.0/30'
-    ]
+    ];
 
     const mock_values2 = [
         '10.0.0.0/30', '192.168.0.0/30'
-    ]
+    ];
 
     const mock_values3 = [
         '192.168.56.56',
         '192.168.56.57',
         '192.168.56.58'
-    ]
+    ];
 
     test('UNIT_STRATEGY_SUITE - Should agree when input range EXIST', async () => {
         const result = await processOperation(
@@ -65,14 +65,14 @@ describe('Processing strategy: NETWORK', () => {
 
     test('UNIT_STRATEGY_SUITE - Should return true for a valid IPv4 address as input', () => {
         try {
-            const result = validateStrategyValue(StrategiesType.NETWORK, '10.0.0.3')
+            const result = validateStrategyValue(StrategiesType.NETWORK, '10.0.0.3');
             expect(result).toBe(true);
         } catch (e) { }
     })
 
     test('UNIT_STRATEGY_SUITE - Should NOT return for an invalid IPv4 address as input', () => {
         try {
-            validateStrategyValue(StrategiesType.NETWORK, '10.0.0.322A')
+            validateStrategyValue(StrategiesType.NETWORK, '10.0.0.322A');
         } catch (e) {
             expect(e.message).not.toBeNull()
         }
@@ -80,7 +80,7 @@ describe('Processing strategy: NETWORK', () => {
     
     test('UNIT_STRATEGY_SUITE - Should return true for a valid CIDR address as input', () => {
         try {
-            const result = validateStrategyValue(StrategiesType.NETWORK, '10.0.0.0/24')
+            const result = validateStrategyValue(StrategiesType.NETWORK, '10.0.0.0/24');
             expect(result).toBe(true);
         } catch (e) { }
     })
@@ -90,11 +90,11 @@ describe('Processing strategy: NETWORK', () => {
 describe('Processing strategy: VALUE', () => {
     const mock_values1 = [
         'USER_1'
-    ]
+    ];
 
     const mock_values2 = [
         'USER_1', 'USER_2'
-    ]
+    ];
 
     test('UNIT_STRATEGY_SUITE - Should agree when input EXIST', () => {
         const result = processOperation(
@@ -142,15 +142,15 @@ describe('Processing strategy: VALUE', () => {
 describe('Processing strategy: NUMERIC', () => {
     const mock_values1 = [
         '1'
-    ]
+    ];
 
     const mock_values2 = [
         '1', '3'
-    ]
+    ];
 
     const mock_values3 = [
         '1.5'
-    ]
+    ];
 
     test('UNIT_STRATEGY_SUITE - Should agree when input EXIST in values', () => {
         const result = processOperation(
@@ -253,11 +253,11 @@ describe('Processing strategy: NUMERIC', () => {
 describe('Processing strategy: TIME', () => {
     const mock_values1 = [
         '08:00'
-    ]
+    ];
 
     const mock_values2 = [
         '08:00', '10:00'
-    ]
+    ];
 
     test('UNIT_STRATEGY_SUITE - Should agree when input is LOWER', () => {
         const result = processOperation(
@@ -309,16 +309,16 @@ describe('Processing strategy: TIME', () => {
 
     test('UNIT_STRATEGY_SUITE - Should return true for a valid time as input', () => {
         try {
-            const result = validateStrategyValue(StrategiesType.TIME, '16:00')
+            const result = validateStrategyValue(StrategiesType.TIME, '16:00');
             expect(result).toBe(true);
         } catch (e) { }
     })
 
     test('UNIT_STRATEGY_SUITE - Should NOT return for an invalid time as input', () => {
         try {
-            validateStrategyValue(StrategiesType.TIME, '2019-12-10')
+            validateStrategyValue(StrategiesType.TIME, '2019-12-10');
         } catch (e) {
-            expect(e.message).not.toBeNull()
+            expect(e.message).not.toBeNull();
         }
     })
 })
@@ -326,15 +326,15 @@ describe('Processing strategy: TIME', () => {
 describe('Processing strategy: DATE', () => {
     const mock_values1 = [
         '2019-12-01'
-    ]
+    ];
 
     const mock_values2 = [
         '2019-12-01', '2019-12-05'
-    ]
+    ];
 
     const mock_values3 = [
         '2019-12-01T08:30'
-    ]
+    ];
 
     test('UNIT_STRATEGY_SUITE - Should agree when input is LOWER', () => {
         const result = processOperation(
@@ -404,22 +404,22 @@ describe('Processing strategy: DATE', () => {
 
     test('UNIT_STRATEGY_SUITE - Should return true for a valid date as input', () => {
         try {
-            const result = validateStrategyValue(StrategiesType.DATE, '2019-12-10')
+            const result = validateStrategyValue(StrategiesType.DATE, '2019-12-10');
             expect(result).toBe(true);
         } catch (e) { }
     })
 
     test('UNIT_STRATEGY_SUITE - Should NOT return for an invalid date format as input', () => {
         try {
-            validateStrategyValue(StrategiesType.DATE, '19-12-10')
+            validateStrategyValue(StrategiesType.DATE, '19-12-10');
         } catch (e) {
-            expect(e.message).not.toBeNull()
+            expect(e.message).not.toBeNull();
         }
     })
     
     test('UNIT_STRATEGY_SUITE - Should return true for a valid date/time as input', () => {
         try {
-            const result = validateStrategyValue(StrategiesType.DATE, '2019-12-10T08:00')
+            const result = validateStrategyValue(StrategiesType.DATE, '2019-12-10T08:00');
             expect(result).toBe(true);
         } catch (e) { }
     })

@@ -29,11 +29,11 @@ import Component from '../src/models/component';
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
-    await mongoose.disconnect()
+    await mongoose.disconnect();
 })
 
 describe('Testing Domain insertion', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('DOMAIN_SUITE - Should create a new Domain', async () => {
         const response = await request(app)
@@ -42,14 +42,14 @@ describe('Testing Domain insertion', () => {
             .send({
                 name: 'New Domain',
                 description: 'Description of my new Domain'
-            }).expect(201)
+            }).expect(201);
 
         // DB validation - document created
-        const domain = await Domain.findById(response.body._id)
-        expect(domain).not.toBeNull()
+        const domain = await Domain.findById(response.body._id).lean();
+        expect(domain).not.toBeNull();
 
         // Response validation
-        expect(response.body.name).toBe('New Domain')
+        expect(response.body.name).toBe('New Domain');
     })
 
     test('DOMAIN_SUITE - Should NOT create a new Domain - Missing required params', async () => {
@@ -58,25 +58,25 @@ describe('Testing Domain insertion', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Domain'
-            }).expect(400)
+            }).expect(400);
     })
 })
 
 describe('Testing fect Domain info', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('DOMAIN_SUITE - Should get Domain information', async () => {
         let response = await request(app)
             .get('/domain')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body.length).toEqual(1)
+        expect(response.body.length).toEqual(1);
         expect(response.body[0].activated[EnvType.DEFAULT]).toEqual(true);
-        expect(String(response.body[0]._id)).toEqual(String(domainDocument._id))
-        expect(response.body[0].name).toEqual(domainDocument.name)
-        expect(String(response.body[0].owner)).toEqual(String(domainDocument.owner))
-        expect(response.body[0].token).toEqual(domainDocument.token)
+        expect(String(response.body[0]._id)).toEqual(String(domainDocument._id));
+        expect(response.body[0].name).toEqual(domainDocument.name);
+        expect(String(response.body[0].owner)).toEqual(String(domainDocument.owner));
+        expect(response.body[0].token).toEqual(domainDocument.token);
 
         // Adding new Domain
         response = await request(app)
@@ -85,37 +85,37 @@ describe('Testing fect Domain info', () => {
             .send({
                 name: 'My New Domain',
                 description: 'Description of my new Domain'
-            }).expect(201)
+            }).expect(201);
 
         // DB validation - document created
-        const domain = await Domain.findById(response.body._id)
-        expect(domain).not.toBeNull()
+        const domain = await Domain.findById(response.body._id).lean();
+        expect(domain).not.toBeNull();
 
         response = await request(app)
             .get('/domain?sortBy=createdAt:desc')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body.length).toEqual(2)
+        expect(response.body.length).toEqual(2);
 
         response = await request(app)
             .get('/domain?limit=1')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body.length).toEqual(1)
+        expect(response.body.length).toEqual(1);
     })
 
     test('DOMAIN_SUITE - Should get Domain information by Id', async () => {
         let response = await request(app)
             .get('/domain/' + domainId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(String(response.body._id)).toEqual(String(domainDocument._id))
-        expect(response.body.name).toEqual(domainDocument.name)
-        expect(String(response.body.owner)).toEqual(String(domainDocument.owner))
-        expect(response.body.token).toEqual(domainDocument.token)
+        expect(String(response.body._id)).toEqual(String(domainDocument._id));
+        expect(response.body.name).toEqual(domainDocument.name);
+        expect(String(response.body.owner)).toEqual(String(domainDocument.owner));
+        expect(response.body.token).toEqual(domainDocument.token);
 
         // Adding new Domain
         response = await request(app)
@@ -124,24 +124,24 @@ describe('Testing fect Domain info', () => {
             .send({
                 name: 'New Domain 2',
                 description: 'Description of my new Domain 2'
-            }).expect(201)
+            }).expect(201);
 
         response = await request(app)
             .get('/domain/' + response.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
     })
 
     test('DOMAIN_SUITE - Should NOT found Domain information by Id', async () => {
         await request(app)
             .get('/domain/' + domainId + 'NOTEXIST')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400)
+            .send().expect(400);
 
         await request(app)
             .get('/domain/5dd05cfa98adc4285457e29a')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
     })
 
     test('DOMAIN_SUITE - Should delete Domain', async () => {
@@ -150,53 +150,53 @@ describe('Testing fect Domain info', () => {
             .send({
                 email: adminMasterAccount.email,
                 password: adminMasterAccount.password
-            }).expect(200)
+            }).expect(200);
 
         // DB validation Before deleting
-        let domain = await Domain.findById(domainId)
-        expect(domain).not.toBeNull()
+        let domain = await Domain.findById(domainId).lean();
+        expect(domain).not.toBeNull();
 
-        let group = await GroupConfig.findById(groupConfigId)
-        expect(group).not.toBeNull()
+        let group = await GroupConfig.findById(groupConfigId).lean();
+        expect(group).not.toBeNull();
 
-        let config1 = await Config.findById(configId1)
-        expect(config1).not.toBeNull()
+        let config1 = await Config.findById(configId1).lean();
+        expect(config1).not.toBeNull();
 
-        let config2 = await Config.findById(configId2)
-        expect(config2).not.toBeNull()
+        let config2 = await Config.findById(configId2).lean();
+        expect(config2).not.toBeNull();
 
-        let configStrategy = await ConfigStrategy.findById(configStrategyId)
-        expect(configStrategy).not.toBeNull()
+        let configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
+        expect(configStrategy).not.toBeNull();
 
-        let environment = await Environment.findById(environment1Id)
-        expect(environment).not.toBeNull()
+        let environment = await Environment.findById(environment1Id).lean();
+        expect(environment).not.toBeNull();
         
         await request(app)
             .delete('/domain/' + domainId)
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        const admin = await Admin.findById(adminMasterAccountId)
-        expect(admin).not.toBeNull()
+        const admin = await Admin.findById(adminMasterAccountId).lean();
+        expect(admin).not.toBeNull();
 
         // DB validation After - Verify deleted dependencies
-        domain = await Domain.findById(domainId)
-        expect(domain).toBeNull()
+        domain = await Domain.findById(domainId).lean();
+        expect(domain).toBeNull();
 
-        group = await GroupConfig.findById(groupConfigId)
-        expect(group).toBeNull()
+        group = await GroupConfig.findById(groupConfigId).lean();
+        expect(group).toBeNull();
 
-        config1 = await Config.findById(configId1)
-        expect(config1).toBeNull()
+        config1 = await Config.findById(configId1).lean();
+        expect(config1).toBeNull();
 
-        config2 = await Config.findById(configId2)
-        expect(config2).toBeNull()
+        config2 = await Config.findById(configId2).lean();
+        expect(config2).toBeNull();
 
-        configStrategy = await ConfigStrategy.findById(configStrategyId)
-        expect(configStrategy).toBeNull()
+        configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
+        expect(configStrategy).toBeNull();
 
-        environment = await Environment.findById(environment1Id)
-        expect(environment).toBeNull()
+        environment = await Environment.findById(environment1Id).lean();
+        expect(environment).toBeNull();
     })
 
     test('DOMAIN_SUITE - Should NOT delete Domain', async () => {
@@ -205,44 +205,44 @@ describe('Testing fect Domain info', () => {
             .send({
                 email: adminMasterAccount.email,
                 password: adminMasterAccount.password
-            }).expect(200)
+            }).expect(200);
 
         await request(app)
             .delete('/domain/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
-            .send().expect(404)
+            .send().expect(404);
 
         await request(app)
             .delete('/domain/INVALID_DOMAIN_ID')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
-            .send().expect(500)
+            .send().expect(500);
     })
 })
 
 describe('Testing update Domain info', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('DOMAIN_SUITE - Should update Domain info', async () => {
-        const oldQuery = await Domain.findById(domainId).select('description')
+        const oldQuery = await Domain.findById(domainId).select('description').lean();
 
-        let history = await History.find({ elementId: domainId })
-        expect(history.length).toEqual(0)
+        let history = await History.find({ elementId: domainId }).lean();
+        expect(history.length).toEqual(0);
 
         await request(app)
             .patch('/domain/' + domainId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description updated'
-            }).expect(200)
+            }).expect(200);
         
         // DB validation - verify description updated
-        const newQuery = await Domain.findById(domainId).select('description')
-        expect(oldQuery).not.toEqual(newQuery)
-        expect(newQuery.description).toEqual('Description updated')
+        const newQuery = await Domain.findById(domainId).select('description').lean();
+        expect(oldQuery).not.toEqual(newQuery);
+        expect(newQuery.description).toEqual('Description updated');
 
         // DB validation - verify history record added
-        history = await History.find({ elementId: domainId })
-        expect(history.length > 0).toEqual(true)
+        history = await History.find({ elementId: domainId }).lean();
+        expect(history.length > 0).toEqual(true);
     })
 
     test('DOMAIN_SUITE - Should NOT update Domain info', async () => {
@@ -251,14 +251,14 @@ describe('Testing update Domain info', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description updated'
-            }).expect(500)
+            }).expect(500);
 
         await request(app)
             .patch('/domain/5dd05cfa98adc4285457e29a')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description updated'
-            }).expect(404)
+            }).expect(404);
     })
 
     test('DOMAIN_SUITE - Should NOT update Domain name', async () => {
@@ -267,7 +267,7 @@ describe('Testing update Domain info', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'New Domain name'
-            }).expect(400)
+            }).expect(400);
     })
 
     test('DOMAIN_SUITE - Should update Domain environment status - default', async () => {
@@ -283,8 +283,8 @@ describe('Testing update Domain info', () => {
         expect(response.body.activated[EnvType.DEFAULT]).toEqual(false);
 
         // DB validation - verify status updated
-        const domain = await Domain.findById(domainId)
-        expect(domain.activated.get(EnvType.DEFAULT)).toEqual(false);
+        const domain = await Domain.findById(domainId).lean();
+        expect(domain.activated[EnvType.DEFAULT]).toEqual(false);
     })
 
     test('DOMAIN_SUITE - Should NOT update environment status given an unknown Domain ID ', async () => {
@@ -318,39 +318,39 @@ describe('Testing update Domain info', () => {
         await request(app)
             .get('/domain/history/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400)
+            .send().expect(400);
     })
 
     test('DOMAIN_SUITE - Should NOT read changes on history collection - Domain not found', async () => {
         await request(app)
             .get('/domain/history/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
     })
 
     test('DOMAIN_SUITE - Should NOT delete history by invalid Domain Id', async () => {
         await request(app)
             .delete('/domain/history/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
 
         await request(app)
             .delete('/domain/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500)
+            .send().expect(500);
     })
 
     test('DOMAIN_SUITE - Should delete history from a Domain element', async () => {
-        let history = await History.find({ elementId: domainId })
-        expect(history.length > 0).toEqual(true)
+        let history = await History.find({ elementId: domainId }).lean();
+        expect(history.length > 0).toEqual(true);
 
         await request(app)
             .delete('/domain/history/' + domainId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        history = await History.find({ elementId: domainId })
-        expect(history.length > 0).toEqual(false)
+        history = await History.find({ elementId: domainId }).lean();
+        expect(history.length > 0).toEqual(false);
     })
 
     test('DOMAIN_SUITE - Should record changes on history collection', async () => {
@@ -360,34 +360,34 @@ describe('Testing update Domain info', () => {
             .send({
                 name: 'New Domain Record',
                 description: 'Description of my new Domain'
-            }).expect(201)
+            }).expect(201);
             
-        const id = response.body._id
+        const id = response.body._id;
         response = await request(app)
                 .get('/domain/history/' + id)
                 .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-                .send().expect(200)
+                .send().expect(200);
         
-        expect(response.body).toEqual([])
+        expect(response.body).toEqual([]);
 
         await request(app)
             .patch('/domain/' + id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
-            }).expect(200)
+            }).expect(200);
 
         response = await request(app)
             .get('/domain/history/' + id + '?sortBy=createdAt:desc')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body).not.toEqual([])
+        expect(response.body).not.toEqual([]);
 
         // DB validation
-        let history = await History.find({ elementId: id })
-        expect(history[0].oldValue.get('description')).toEqual('Description of my new Domain')
-        expect(history[0].newValue.get('description')).toEqual('New description')
+        let history = await History.find({ elementId: id }).lean();
+        expect(history[0].oldValue['description']).toEqual('Description of my new Domain');
+        expect(history[0].newValue['description']).toEqual('New description');
 
         await request(app)
             .patch('/domain/updateStatus/' + id)
@@ -397,13 +397,13 @@ describe('Testing update Domain info', () => {
             }).expect(200);
         
         // DB validation
-        history = await History.find({ elementId: id })
-        expect(history.length).toEqual(2)
+        history = await History.find({ elementId: id }).lean();
+        expect(history.length).toEqual(2);
     })
 })
 
 describe('Testing environment configurations', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('DOMAIN_SUITE - Should update Domain environment status - QA', async () => {
         // QA Environment still does not exist
@@ -416,10 +416,10 @@ describe('Testing environment configurations', () => {
             .send({
                 name: 'QA',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
-        let history = await History.find({ elementId: domainId })
-        expect(history.length).toEqual(0)
+        let history = await History.find({ elementId: domainId }).lean();
+        expect(history.length).toEqual(0);
 
         const response = await request(app)
             .patch('/domain/updateStatus/' + domainId)
@@ -431,14 +431,14 @@ describe('Testing environment configurations', () => {
         expect(response.body.activated['QA']).toEqual(true);
 
         // DB validation - verify status updated
-        let domain = await Domain.findById(domainId)
-        expect(domain.activated.get(EnvType.DEFAULT)).toEqual(true);
-        expect(domain.activated.get('QA')).toEqual(true);
+        let domain = await Domain.findById(domainId).lean();
+        expect(domain.activated[EnvType.DEFAULT]).toEqual(true);
+        expect(domain.activated['QA']).toEqual(true);
 
         // DB validation - verify history record added
-        history = await History.find({ elementId: domainId })
-        expect(history[0].oldValue.get('activated/QA')).toEqual('');
-        expect(history[0].newValue.get('activated/QA')).toEqual('true');
+        history = await History.find({ elementId: domainId }).lean();
+        expect(history[0].oldValue['activated/QA']).toEqual('');
+        expect(history[0].newValue['activated/QA']).toEqual('true');
 
         // Inactivating QA. Default environment should stay activated
         await request(app)
@@ -448,9 +448,9 @@ describe('Testing environment configurations', () => {
                 QA: false
             }).expect(200);
 
-        domain = await Domain.findById(domainId)
-        expect(domain.activated.get(EnvType.DEFAULT)).toEqual(true);
-        expect(domain.activated.get('QA')).toEqual(false);
+        domain = await Domain.findById(domainId).lean();
+        expect(domain.activated[EnvType.DEFAULT]).toEqual(true);
+        expect(domain.activated['QA']).toEqual(false);
     })
 
     test('DOMAIN_SUITE - Should remove Domain environment status', async () => {
@@ -461,7 +461,7 @@ describe('Testing environment configurations', () => {
             .send({
                 name: 'QA1',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
         
         await request(app)
             .patch('/domain/updateStatus/' + domainId)
@@ -470,8 +470,8 @@ describe('Testing environment configurations', () => {
                 QA1: true
             }).expect(200);
 
-        let domain = await Domain.findById(domainId)
-        expect(domain.activated.get('QA1')).toEqual(true);
+        let domain = await Domain.findById(domainId).lean();
+        expect(domain.activated['QA1']).toEqual(true);
 
         await request(app)
             .patch('/domain/removeStatus/' + domainId)
@@ -481,8 +481,8 @@ describe('Testing environment configurations', () => {
             }).expect(200);
 
         // DB validation - verify status updated
-        domain = await Domain.findById(domainId)
-        expect(domain.activated.get('QA1')).toEqual(undefined);
+        domain = await Domain.findById(domainId).lean();
+        expect(domain.activated['QA1']).toEqual(undefined);
     })
 
     test('DOMAIN_SUITE - Should NOT remove Domain environment status', async () => {
@@ -493,7 +493,7 @@ describe('Testing environment configurations', () => {
             .send({
                 name: 'QA3',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         await request(app)
             .patch('/domain/updateStatus/' + domainId)
@@ -526,14 +526,14 @@ describe('Testing environment configurations', () => {
                 env: 'QA3'
             }).expect(404);
 
-        const domain = await Domain.findById(domainId)
-        expect(domain.activated.get(EnvType.DEFAULT)).toEqual(true);
-        expect(domain.activated.get('QA3')).toEqual(true);
+        const domain = await Domain.findById(domainId).lean();
+        expect(domain.activated[EnvType.DEFAULT]).toEqual(true);
+        expect(domain.activated['QA3']).toEqual(true);
     })
 })
 
 describe('Testing transfer Domain', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('DOMAIN_SUITE - Should NOT request Domain to transfer - Domain not found', async () => {
         await request(app)
@@ -571,7 +571,7 @@ describe('Testing transfer Domain', () => {
             }).expect(200);
 
         //Verify transfer flag to be true
-        let domain = await Domain.findById(domainId);
+        let domain = await Domain.findById(domainId).lean();
         expect(domain.transfer).toBe(true);
 
         //Calling again make it transfer flag to be null
@@ -583,7 +583,7 @@ describe('Testing transfer Domain', () => {
             }).expect(200);
 
         //Verify transfer flag to be true
-        domain = await Domain.findById(domainId);
+        domain = await Domain.findById(domainId).lean();
         expect(domain.transfer).toBe(null);
     })
 
@@ -624,7 +624,7 @@ describe('Testing transfer Domain', () => {
             }).expect(200);
 
         //Verify transfer flag to be true
-        let domain = await Domain.findById(domainId);
+        let domain = await Domain.findById(domainId).lean();
         expect(domain.transfer).toBe(true);
         expect(domain.owner).toMatchObject(adminMasterAccountId);
 
@@ -655,7 +655,7 @@ describe('Testing transfer Domain', () => {
             }).expect(200);
 
         //Verify if transfer has been done
-        domain = await Domain.findById(domainId);
+        domain = await Domain.findById(domainId).lean();
         expect(domain.owner).toMatchObject(adminAccountId);
         
         groups, configs, strategies, environment;

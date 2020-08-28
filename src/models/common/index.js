@@ -12,7 +12,7 @@ function checkDifference(oldValues, newValues, oldDocument, newDocument,
                 checkDifference(oldValues, newValues,  
                     getValue(oldDocument, keyArr[pos]), 
                     getValue(newDocument, keyArr[pos]), 
-                    defaultIgnoredFields, keyArr, keys, ++pos);
+                    defaultIgnoredFields, keyArr, keys, pos+1);
             }
         } else {
             if (!Object.is(oldValue, newValue)) {

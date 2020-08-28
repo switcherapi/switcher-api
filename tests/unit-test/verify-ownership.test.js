@@ -40,7 +40,7 @@ const changeTeamStatus = async (teamId, status) => {
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
-    await mongoose.disconnect()
+    await mongoose.disconnect();
 })
 
 describe('Success tests', () => {
@@ -53,9 +53,9 @@ describe('Success tests', () => {
                 domainDocument, 
                 domainDocument, 
                 ActionTypes.READ, 
-                RouterTypes.DOMAIN)
+                RouterTypes.DOMAIN);
 
-            expect(element._id).toEqual(domainDocument._id)
+            expect(element._id).toEqual(domainDocument._id);
         } catch (e) {
             expect(e).toBeNull();
         }
@@ -68,9 +68,9 @@ describe('Success tests', () => {
                 groupConfig2Document, 
                 domainDocument, 
                 ActionTypes.READ, 
-                RouterTypes.GROUP)
+                RouterTypes.GROUP);
 
-            expect(element._id).toEqual(groupConfig2Document._id)
+            expect(element._id).toEqual(groupConfig2Document._id);
         } catch (e) {
             expect(e).toBeNull();
         }
@@ -78,17 +78,17 @@ describe('Success tests', () => {
 
     test('UNIT_TEAM_ROLE_SUITE - Should allow access - Member has permission to select just one of those', async () => {
         try {
-            let groups = await GroupConfig.find({ domain: domainId })
-            expect(groups.length).toEqual(2)
+            let groups = await GroupConfig.find({ domain: domainId });
+            expect(groups.length).toEqual(2);
 
             const element = await verifyOwnership(
                 adminAccount, 
                 groups, 
                 domainDocument, 
                 ActionTypes.READ, 
-                RouterTypes.GROUP)
+                RouterTypes.GROUP);
 
-            expect(element.length).toEqual(1)
+            expect(element.length).toEqual(1);
         } catch (e) {
             expect(e).toBeNull();
         }
@@ -101,9 +101,9 @@ describe('Success tests', () => {
                 configDocument, 
                 domainDocument, 
                 ActionTypes.DELETE, 
-                RouterTypes.CONFIG)
+                RouterTypes.CONFIG);
 
-            expect(element).toMatchObject(configDocument)
+            expect(element).toMatchObject(configDocument);
         } catch (e) {
             expect(e).toBeNull();
         }
@@ -119,9 +119,9 @@ describe('Success tests', () => {
                 configDocument, 
                 domainDocument, 
                 ActionTypes.READ, 
-                RouterTypes.CONFIG)
+                RouterTypes.CONFIG);
 
-            expect(element).toMatchObject(configDocument)
+            expect(element).toMatchObject(configDocument);
         } catch (e) {
             expect(e).toBeNull();
         } finally {
@@ -139,37 +139,37 @@ describe('Success tests', () => {
                 ActionTypes.READ, 
                 RouterTypes.GROUP)
 
-            expect(element._id).toEqual(groupConfig2Document._id)
+            expect(element._id).toEqual(groupConfig2Document._id);
 
             element = await verifyOwnership(
                 adminAccount3, 
                 domainDocument, 
                 domainDocument, 
                 ActionTypes.READ, 
-                RouterTypes.DOMAIN)
+                RouterTypes.DOMAIN);
 
-            expect(element._id).toEqual(domainDocument._id)
+            expect(element._id).toEqual(domainDocument._id);
 
             element = await verifyOwnership(
                 adminAccount3, 
                 configDocument, 
                 domainDocument, 
                 ActionTypes.READ, 
-                RouterTypes.CONFIG)
+                RouterTypes.CONFIG);
 
-            expect(element._id).toEqual(configDocument._id)
+            expect(element._id).toEqual(configDocument._id);
 
-            let groups = await GroupConfig.find({ domain: domainId })
-            expect(groups.length).toEqual(2)
+            let groups = await GroupConfig.find({ domain: domainId });
+            expect(groups.length).toEqual(2);
 
             element = await verifyOwnership(
                 adminAccount3, 
                 groups, 
                 domainDocument, 
                 ActionTypes.READ, 
-                RouterTypes.GROUP)
+                RouterTypes.GROUP);
 
-            expect(element.length).toEqual(2)
+            expect(element.length).toEqual(2);
         } catch (e) {
             expect(e).toBeNull();
         }
@@ -180,7 +180,7 @@ describe('Success tests', () => {
 describe('Error tests', () => {
 
     test('UNIT_TEAM_ROLE_SUITE - Should NOT allow access - Role innactive', async () => {
-        await changeRoleStatus(role2Id, false)
+        await changeRoleStatus(role2Id, false);
         
         try {
             const element = await verifyOwnership(
@@ -188,13 +188,13 @@ describe('Error tests', () => {
                 groupConfig2Document, 
                 domainDocument, 
                 ActionTypes.READ, 
-                RouterTypes.GROUP)
+                RouterTypes.GROUP);
 
             expect(element).toBeNull();
         } catch (e) {
-            expect(e).toEqual(new PermissionError(`Role not found for this operation: '${ActionTypes.READ}' - '${RouterTypes.GROUP}'`))
+            expect(e).toEqual(new PermissionError(`Role not found for this operation: '${ActionTypes.READ}' - '${RouterTypes.GROUP}'`));
         } finally {
-            await changeRoleStatus(role2Id, true)
+            await changeRoleStatus(role2Id, true);
         }
     })
 
@@ -205,11 +205,11 @@ describe('Error tests', () => {
                 domainDocument, 
                 domainDocument, 
                 ActionTypes.CREATE, 
-                RouterTypes.GROUP)
+                RouterTypes.GROUP);
 
             expect(element).toBeNull();
         } catch (e) {
-            expect(e).toEqual(new PermissionError(`Role not found for this operation: '${ActionTypes.CREATE}' - '${RouterTypes.GROUP}'`))
+            expect(e).toEqual(new PermissionError(`Role not found for this operation: '${ActionTypes.CREATE}' - '${RouterTypes.GROUP}'`));
         }
     })
 
@@ -220,11 +220,11 @@ describe('Error tests', () => {
                 configDocument, 
                 domainDocument, 
                 ActionTypes.READ, 
-                RouterTypes.CONFIG)
+                RouterTypes.CONFIG);
 
             expect(element).toBeNull();
         } catch (e) {
-            expect(e).toEqual(new Error('It was not possible to match the requiring element to the current role'))
+            expect(e).toEqual(new Error('It was not possible to match the requiring element to the current role'));
         }
     })
 
@@ -235,16 +235,16 @@ describe('Error tests', () => {
                 domainDocument, 
                 domainDocument, 
                 ActionTypes.READ, 
-                RouterTypes.DOMAIN)
+                RouterTypes.DOMAIN);
 
             expect(element).toBeNull();
         } catch (e) {
-            expect(e).toEqual(new Error('It was not possible to find any team that allows you to proceed with this operation'))
+            expect(e).toEqual(new Error('It was not possible to find any team that allows you to proceed with this operation'));
         }
     })
 
     test('UNIT_TEAM_ROLE_SUITE - Should NOT allow access - Team not active', async () => {
-        await changeTeamStatus(team1Id, false)
+        await changeTeamStatus(team1Id, false);
 
         try {
             const element = await verifyOwnership(
@@ -252,13 +252,13 @@ describe('Error tests', () => {
                 groupConfig2Document, 
                 domainDocument, 
                 ActionTypes.READ, 
-                RouterTypes.GROUP)
+                RouterTypes.GROUP);
 
                 expect(element).toBeNull();
         } catch (e) {
-            expect(e).toEqual(new Error('It was not possible to find any team that allows you to proceed with this operation'))
+            expect(e).toEqual(new Error('It was not possible to find any team that allows you to proceed with this operation'));
         } finally {
-            await changeTeamStatus(team1Id, true)
+            await changeTeamStatus(team1Id, true);
         }
     })
 

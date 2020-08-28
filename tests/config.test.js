@@ -41,7 +41,7 @@ describe('Testing configuration insertion', () => {
             }).expect(201);
 
         // DB validation - document created
-        const config = await Config.findById(response.body._id);
+        const config = await Config.findById(response.body._id).lean();
         expect(config).not.toBeNull();
 
         // Response validation
@@ -90,14 +90,14 @@ describe('Testing fetch configuration info', () => {
         let response = await request(app)
             .get('/config?group=' + groupConfigId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body.length).toEqual(2)
+        expect(response.body.length).toEqual(2);
 
-        expect(String(response.body[0]._id)).toEqual(String(config1Document._id))
-        expect(response.body[0].key).toEqual(config1Document.key)
-        expect(String(response.body[0].owner)).toEqual(String(config1Document.owner))
-        expect(response.body[0].activated[EnvType.DEFAULT]).toEqual(config1Document.activated.get(EnvType.DEFAULT))
+        expect(String(response.body[0]._id)).toEqual(String(config1Document._id));
+        expect(response.body[0].key).toEqual(config1Document.key);
+        expect(String(response.body[0].owner)).toEqual(String(config1Document.owner));
+        expect(response.body[0].activated[EnvType.DEFAULT]).toEqual(config1Document.activated.get(EnvType.DEFAULT));
 
         // Adding new Config
         response = await request(app)
@@ -107,42 +107,42 @@ describe('Testing fetch configuration info', () => {
                 key: 'NEW_CONFIG123',
                 description: 'Description of my new Config',
                 group: groupConfigId
-            }).expect(201)
+            }).expect(201);
 
         // DB validation - document created
-        const config = await Config.findById(response.body._id)
-        expect(config).not.toBeNull()
+        const config = await Config.findById(response.body._id).lean();
+        expect(config).not.toBeNull();
 
         response = await request(app)
             .get('/config?group=' + groupConfigId + '&sortBy=createdAt:desc')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body.length).toEqual(3)
+        expect(response.body.length).toEqual(3);
     })
 
     test('CONFIG_SUITE - Should NOT get Config information by invalid Group Id', async () => { 
         await request(app)
             .get('/config?group=' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
 
         await request(app)
             .get('/config?group=INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500)
+            .send().expect(500);
     })
 
     test('CONFIG_SUITE - Should get Config information by Id', async () => {
         let response = await request(app)
             .get('/config/' + configId1 + '?resolveComponents=true')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(String(response.body._id)).toEqual(String(config1Document._id))
-        expect(response.body.key).toEqual(config1Document.key)
-        expect(String(response.body.group)).toEqual(String(config1Document.group))
-        expect(response.body.activated[EnvType.DEFAULT]).toEqual(config1Document.activated.get(EnvType.DEFAULT))
+        expect(String(response.body._id)).toEqual(String(config1Document._id));
+        expect(response.body.key).toEqual(config1Document.key);
+        expect(String(response.body.group)).toEqual(String(config1Document.group));
+        expect(response.body.activated[EnvType.DEFAULT]).toEqual(config1Document.activated.get(EnvType.DEFAULT));
 
         // Adding new Config
         response = await request(app)
@@ -152,24 +152,24 @@ describe('Testing fetch configuration info', () => {
                 key: 'NEW_CONFIG456',
                 description: 'Description of my new Config',
                 group: groupConfigId
-            }).expect(201)
+            }).expect(201);
 
         response = await request(app)
             .get('/config/' + response.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
     })
 
     test('CONFIG_SUITE - Should not found Config information by Id', async () => {
         await request(app)
             .get('/config/' + 'NOTEXIST')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500)
+            .send().expect(500);
 
         await request(app)
             .get('/config/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
     })
 })
 
@@ -180,54 +180,54 @@ describe('Testing configuration deletion', () => {
         await request(app)
             .delete('/config/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
 
         await request(app)
             .delete('/config/WRONG_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500)
+            .send().expect(500);
     })
 
     test('CONFIG_SUITE - Should delete Config', async () => {
         // DB validation Before deleting
-        let domain = await Domain.findById(domainId)
-        expect(domain).not.toBeNull()
+        let domain = await Domain.findById(domainId).lean();
+        expect(domain).not.toBeNull();
 
-        let group = await GroupConfig.findById(groupConfigId)
-        expect(group).not.toBeNull()
+        let group = await GroupConfig.findById(groupConfigId).lean();
+        expect(group).not.toBeNull();
 
-        let config1 = await Config.findById(configId1)
-        expect(config1).not.toBeNull()
+        let config1 = await Config.findById(configId1).lean();
+        expect(config1).not.toBeNull();
 
-        let config2 = await Config.findById(configId2)
-        expect(config2).not.toBeNull()
+        let config2 = await Config.findById(configId2).lean();
+        expect(config2).not.toBeNull();
 
-        let configStrategy = await ConfigStrategy.findById(configStrategyId)
-        expect(configStrategy).not.toBeNull()
+        let configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
+        expect(configStrategy).not.toBeNull();
 
         await request(app)
             .delete('/config/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        const admin = await Admin.findById(adminMasterAccountId)
-        expect(admin).not.toBeNull()
+        const admin = await Admin.findById(adminMasterAccountId).lean();
+        expect(admin).not.toBeNull();
 
         // DB validation After - Verify deleted dependencies
-        domain = await Domain.findById(domainId)
-        expect(domain).not.toBeNull()
+        domain = await Domain.findById(domainId).lean();
+        expect(domain).not.toBeNull();
 
-        group = await GroupConfig.findById(groupConfigId)
-        expect(group).not.toBeNull()
+        group = await GroupConfig.findById(groupConfigId).lean();
+        expect(group).not.toBeNull();
 
-        config1 = await Config.findById(configId1)
-        expect(config1).toBeNull()
+        config1 = await Config.findById(configId1).lean();
+        expect(config1).toBeNull();
 
-        config2 = await Config.findById(configId2)
-        expect(config2).not.toBeNull()
+        config2 = await Config.findById(configId2).lean();
+        expect(config2).not.toBeNull();
 
-        configStrategy = await ConfigStrategy.findById(configStrategyId)
-        expect(configStrategy).toBeNull()
+        configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
+        expect(configStrategy).toBeNull();
     })
 })
 
@@ -236,7 +236,7 @@ describe('Testing update info', () => {
 
     test('CONFIG_SUITE - Should update Config info', async () => {
 
-        let config = await Config.findById(configId1);
+        let config = await Config.findById(configId1).lean();
         expect(config).not.toBeNull();
 
         await request(app)
@@ -248,7 +248,7 @@ describe('Testing update info', () => {
             }).expect(200);
         
         // DB validation - verify flag updated
-        config = await Config.findById(configId1);
+        config = await Config.findById(configId1).lean();
         expect(config).not.toBeNull();
         expect(config.key).toEqual('NEWKEY');
         expect(config.description).toEqual('New description');
@@ -269,21 +269,21 @@ describe('Testing update info', () => {
             .send({
                 activated: false,
                 owner: 'I_SHOULD_NOT_UPDATE_THIS'
-            }).expect(400)
+            }).expect(400);
 
         await request(app)
             .patch('/config/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
-            }).expect(404)
+            }).expect(404);
 
         await request(app)
             .patch('/config/WRONG_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
-            }).expect(500)
+            }).expect(500);
     })
 
     test('CONFIG_SUITE - Should update Config environment status - default', async () => {
@@ -299,8 +299,8 @@ describe('Testing update info', () => {
         expect(response.body.activated[EnvType.DEFAULT]).toEqual(false);
 
         // DB validation - verify status updated
-        const config = await Config.findById(configId1)
-        expect(config.activated.get(EnvType.DEFAULT)).toEqual(false);
+        const config = await Config.findById(configId1).lean();
+        expect(config.activated[EnvType.DEFAULT]).toEqual(false);
     })
 })
 
@@ -318,7 +318,7 @@ describe('Testing Environment status change', () => {
             .send({
                 name: 'QA',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         const response = await request(app)
             .patch('/config/updateStatus/' + configId1)
@@ -330,9 +330,9 @@ describe('Testing Environment status change', () => {
         expect(response.body.activated['QA']).toEqual(true);
 
         // DB validation - verify status updated
-        let config = await Config.findById(configId1)
-        expect(config.activated.get(EnvType.DEFAULT)).toEqual(true);
-        expect(config.activated.get('QA')).toEqual(true);
+        let config = await Config.findById(configId1).lean();
+        expect(config.activated[EnvType.DEFAULT]).toEqual(true);
+        expect(config.activated['QA']).toEqual(true);
 
         // Inactivating QA. Default environment should stay activated
         await request(app)
@@ -342,9 +342,9 @@ describe('Testing Environment status change', () => {
                 QA: false
             }).expect(200);
 
-        config = await Config.findById(configId1)
-        expect(config.activated.get(EnvType.DEFAULT)).toEqual(true);
-        expect(config.activated.get('QA')).toEqual(false);
+        config = await Config.findById(configId1).lean();
+        expect(config.activated[EnvType.DEFAULT]).toEqual(true);
+        expect(config.activated['QA']).toEqual(false);
     })
 
     test('CONFIG_SUITE - Should NOT update Config environment status - Config not fould', async () => {
@@ -382,7 +382,7 @@ describe('Testing Environment status change', () => {
             .send({
                 name: 'QA1',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
         
         await request(app)
             .patch('/config/updateStatus/' + configId1)
@@ -391,8 +391,8 @@ describe('Testing Environment status change', () => {
                 QA1: true
             }).expect(200);
 
-        let config = await Config.findById(configId1)
-        expect(config.activated.get('QA1')).toEqual(true);
+        let config = await Config.findById(configId1).lean();
+        expect(config.activated['QA1']).toEqual(true);
 
         await request(app)
             .patch('/config/removeStatus/' + configId1)
@@ -402,8 +402,8 @@ describe('Testing Environment status change', () => {
             }).expect(200);
 
         // DB validation - verify status updated
-        config = await Config.findById(configId1)
-        expect(config.activated.get('QA1')).toEqual(undefined);
+        config = await Config.findById(configId1).lean();
+        expect(config.activated['QA1']).toEqual(undefined);
     })
 
     test('CONFIG_SUITE - Should record changes on history collection', async () => {
@@ -414,34 +414,34 @@ describe('Testing Environment status change', () => {
                 key: 'TEST_HIST_RECORD',
                 description: 'Description of my new Config',
                 group: groupConfigId
-            }).expect(201)
+            }).expect(201);
         
         const configId = response.body._id
         response = await request(app)
                 .get('/config/history/' + configId)
                 .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-                .send().expect(200)
+                .send().expect(200);
         
-        expect(response.body).toEqual([])
+        expect(response.body).toEqual([]);
 
         await request(app)
             .patch('/config/' + configId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
-            }).expect(200)
+            }).expect(200);
 
         response = await request(app)
             .get('/config/history/' + configId + '?sortBy=createdAt:desc')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body).not.toEqual([])
+        expect(response.body).not.toEqual([]);
 
         // DB validation
-        let history = await History.find({ elementId: configId })
-        expect(history[0].oldValue.get('description')).toEqual('Description of my new Config')
-        expect(history[0].newValue.get('description')).toEqual('New description')
+        let history = await History.find({ elementId: configId }).lean();
+        expect(history[0].oldValue['description']).toEqual('Description of my new Config')
+        expect(history[0].newValue['description']).toEqual('New description')
 
         await request(app)
             .patch('/config/updateStatus/' + configId)
@@ -451,45 +451,45 @@ describe('Testing Environment status change', () => {
             }).expect(200);
         
         // DB validation
-        history = await History.find({ elementId: configId })
-        expect(history.length).toEqual(2)
+        history = await History.find({ elementId: configId }).lean();
+        expect(history.length).toEqual(2);
     })
 
     test('CONFIG_SUITE - Should NOT list changes by invalid Config Id', async () => {
         await request(app)
             .get('/config/history/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
 
         await request(app)
             .get('/config/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500)
+            .send().expect(500);
     })
 
     test('CONFIG_SUITE - Should NOT delete history by invalid Config Id', async () => {
         await request(app)
             .delete('/config/history/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
 
         await request(app)
             .delete('/config/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500)
+            .send().expect(500);
     })
 
     test('CONFIG_SUITE - Should delete history from a Config element', async () => {
-        let history = await History.find({ elementId: configId1 })
-        expect(history.length > 0).toEqual(true)
+        let history = await History.find({ elementId: configId1 }).lean();
+        expect(history.length > 0).toEqual(true);
 
         await request(app)
             .delete('/config/history/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        history = await History.find({ elementId: configId1 })
-        expect(history.length > 0).toEqual(false)
+        history = await History.find({ elementId: configId1 }).lean();
+        expect(history.length > 0).toEqual(false);
     })
 
     test('CONFIG_SUITE - Should NOT remove Config environment status', async () => {
@@ -500,7 +500,7 @@ describe('Testing Environment status change', () => {
             .send({
                 name: 'QA3',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         await request(app)
             .patch('/config/updateStatus/' + configId1)
@@ -533,9 +533,9 @@ describe('Testing Environment status change', () => {
                 env: 'QA3'
             }).expect(404);
 
-        const config = await Config.findById(configId1)
-        expect(config.activated.get(EnvType.DEFAULT)).toEqual(true);
-        expect(config.activated.get('QA3')).toEqual(true);
+        const config = await Config.findById(configId1).lean();
+        expect(config.activated[EnvType.DEFAULT]).toEqual(true);
+        expect(config.activated['QA3']).toEqual(true);
     })
 })
 
@@ -548,7 +548,7 @@ describe('Testing component association', () => {
                 name: 'my-web-app-for-my-config',
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
     })
 
     test('CONFIG_SUITE - Should associate component to a config', async () => {
@@ -559,18 +559,18 @@ describe('Testing component association', () => {
                 name: 'NewComponent',
                 description: 'Description of my component',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         await request(app)
             .patch('/config/addComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: responseComponent.body.component._id
-            }).expect(200)
+            }).expect(200);
 
         // DB validation - document updated
-        const config = await Config.findById(configId1)
-        expect(config.components.includes(responseComponent.body.component._id)).toBe(true)
+        const config = await Config.findById(configId1);
+        expect(config.components.includes(responseComponent.body.component._id)).toBe(true);
     })
 
     test('CONFIG_SUITE - Should associate multiple components to a config', async () => {
@@ -581,7 +581,7 @@ describe('Testing component association', () => {
                 name: 'NewComponent1',
                 description: 'Description of my component 1',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         const responseComponent2 = await request(app)
             .post('/component/create')
@@ -590,7 +590,7 @@ describe('Testing component association', () => {
                 name: 'NewComponent2',
                 description: 'Description of my component 2',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         await request(app)
             .patch('/config/updateComponents/' + configId1)
@@ -600,11 +600,11 @@ describe('Testing component association', () => {
                     responseComponent1.body.component._id,
                     responseComponent2.body.component._id
                 ]
-            }).expect(200)
+            }).expect(200);
 
         // DB validation - document updated
-        const config = await Config.findById(configId1)
-        expect(config.components.length >= 2).toBe(true)
+        const config = await Config.findById(configId1).lean();
+        expect(config.components.length >= 2).toBe(true);
     })
 
     test('CONFIG_SUITE - Should NOT associate multiple components to a config - One does not exist', async () => {
@@ -615,7 +615,7 @@ describe('Testing component association', () => {
                 name: 'LonelyComponent',
                 description: 'Description of my component',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         const responseUpdate = await request(app)
             .patch('/config/updateComponents/' + configId1)
@@ -625,7 +625,7 @@ describe('Testing component association', () => {
                     responseComponent1.body._id,
                     new mongoose.Types.ObjectId()
                 ]
-            }).expect(404)
+            }).expect(404);
 
         expect(responseUpdate.body.error).toEqual('One or more component was not found');
     })
@@ -636,7 +636,7 @@ describe('Testing component association', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 components: [ new mongoose.Types.ObjectId() ]
-            }).expect(404)
+            }).expect(404);
     })
 
     test('CONFIG_SUITE - Should NOT associate component to a config - Component not found', async () => {
@@ -645,9 +645,9 @@ describe('Testing component association', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: new mongoose.Types.ObjectId()
-            }).expect(404)
+            }).expect(404);
         
-        expect(response.body.error).toBe('Component not found')
+        expect(response.body.error).toBe('Component not found');
     })
 
     test('CONFIG_SUITE - Should NOT associate component to a config - Component already exists', async () => {
@@ -658,23 +658,23 @@ describe('Testing component association', () => {
                 name: 'NewComponent-Added-2x',
                 description: 'Description of my component',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         await request(app)
             .patch('/config/addComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: responseComponent.body.component._id
-            }).expect(200)
+            }).expect(200);
 
         const responseAdd = await request(app)
             .patch('/config/addComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: responseComponent.body.component._id
-            }).expect(400)
+            }).expect(400);
         
-        expect(responseAdd.body.error).toBe('Component NewComponent-Added-2x already exists')
+        expect(responseAdd.body.error).toBe('Component NewComponent-Added-2x already exists');
     })
 
     test('CONFIG_SUITE - Should NOT associate component to a config - Config not found', async () => {
@@ -683,14 +683,14 @@ describe('Testing component association', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: new mongoose.Types.ObjectId()
-            }).expect(500)
+            }).expect(500);
 
         await request(app)
             .patch('/config/addComponent/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: new mongoose.Types.ObjectId()
-            }).expect(404)
+            }).expect(404);
     })
 
     test('CONFIG_SUITE - Should NOT desassociate component from a config - Component not found', async () => {
@@ -699,7 +699,7 @@ describe('Testing component association', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: new mongoose.Types.ObjectId()
-            }).expect(404)
+            }).expect(404);
     })
 
     test('CONFIG_SUITE - Should NOT desassociate component from a config - Config not found', async () => {
@@ -708,14 +708,14 @@ describe('Testing component association', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: new mongoose.Types.ObjectId()
-            }).expect(500)
+            }).expect(500);
 
         await request(app)
             .patch('/config/removeComponent/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: new mongoose.Types.ObjectId()
-            }).expect(404)
+            }).expect(404);
     })
 
     test('CONFIG_SUITE - Should desassociate component from a config', async () => {
@@ -726,37 +726,37 @@ describe('Testing component association', () => {
                 name: 'Will_be_removed_later',
                 description: 'Will be removed later',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         await request(app)
             .patch('/config/addComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: responseComponent.body.component._id
-            }).expect(200)
+            }).expect(200);
 
         await request(app)
             .patch('/config/removeComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: responseComponent.body.component._id
-            }).expect(200)
+            }).expect(200);
 
         // DB validation - document updated
-        const config = await Config.findById(configId1)
-        expect(config.components.includes(responseComponent.body.component._id)).toEqual(false)
+        const config = await Config.findById(configId1).lean();
+        expect(config.components.includes(responseComponent.body.component._id)).toEqual(false);
     })
 
     test('CONFIG_SUITE - Should remove records from history after deleting element', async () => {
-        let history = await History.find({ elementId: configId1 })
-        expect(history.length > 0).toEqual(true)
+        let history = await History.find({ elementId: configId1 }).lean();
+        expect(history.length > 0).toEqual(true);
         await request(app)
             .delete('/config/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
         history = await History.find({ elementId: configId1 })
-        expect(history.length).toEqual(0)
+        expect(history.length).toEqual(0);
     })
 })
 
