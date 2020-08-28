@@ -23,7 +23,7 @@ import {
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
-    await mongoose.disconnect()
+    await mongoose.disconnect();
 })
 
 describe('Testing Group insertion', () => {
@@ -40,7 +40,7 @@ describe('Testing Group insertion', () => {
             }).expect(201);
 
         // DB validation - document created
-        const group = await GroupConfig.findById(response.body._id);
+        const group = await GroupConfig.findById(response.body._id).lean();
         expect(group).not.toBeNull();
 
         // Response validation
@@ -67,7 +67,7 @@ describe('Testing Group insertion', () => {
                 name: 'New Group Config',
                 description: 'Description of my new Group Config',
                 domain: new mongoose.Types.ObjectId()
-            }).expect(404)
+            }).expect(404);
             
         expect(response.body.error).toBe('Domain not found')
 
@@ -78,7 +78,7 @@ describe('Testing Group insertion', () => {
                 name: 'New Group Config',
                 description: 'Description of my new Group Config',
                 domain: 'WRONG_ID_VALUE'
-            }).expect(500)
+            }).expect(500);
     })
 })
 
@@ -89,14 +89,14 @@ describe('Testing fetch Group info', () => {
         let response = await request(app)
             .get('/groupconfig?domain=' + domainId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body.length).toEqual(1)
+        expect(response.body.length).toEqual(1);
 
-        expect(String(response.body[0]._id)).toEqual(String(groupConfigDocument._id))
-        expect(response.body[0].name).toEqual(groupConfigDocument.name)
-        expect(String(response.body[0].owner)).toEqual(String(groupConfigDocument.owner))
-        expect(response.body[0].activated[EnvType.DEFAULT]).toEqual(groupConfigDocument.activated.get(EnvType.DEFAULT))
+        expect(String(response.body[0]._id)).toEqual(String(groupConfigDocument._id));
+        expect(response.body[0].name).toEqual(groupConfigDocument.name);
+        expect(String(response.body[0].owner)).toEqual(String(groupConfigDocument.owner));
+        expect(response.body[0].activated[EnvType.DEFAULT]).toEqual(groupConfigDocument.activated.get(EnvType.DEFAULT));
 
         // Adding new Group Config
         response = await request(app)
@@ -106,45 +106,45 @@ describe('Testing fetch Group info', () => {
                 name: 'New Group Config 2',
                 description: 'Description of my new Group Config 2',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         // DB validation - document created
-        const group = await GroupConfig.findById(response.body._id)
-        expect(group).not.toBeNull()
+        const group = await GroupConfig.findById(response.body._id).lean();
+        expect(group).not.toBeNull();
 
         response = await request(app)
             .get('/groupconfig?domain=' + domainId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body.length).toEqual(2)
+        expect(response.body.length).toEqual(2);
 
         // Query filter tests
         response = await request(app)
             .get('/groupconfig?domain=' + domainId + '&limit=1')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body.length).toEqual(1)
+        expect(response.body.length).toEqual(1);
 
         response = await request(app)
             .get('/groupconfig?domain=' + domainId + '&sortBy=createdAt:desc')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body.length).toEqual(2)
+        expect(response.body.length).toEqual(2);
     })
 
     test('GROUP_SUITE - Should get Group Config information by Id', async () => {
         let response = await request(app)
             .get('/groupconfig/' + groupConfigId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(String(response.body._id)).toEqual(String(groupConfigDocument._id))
-        expect(response.body.name).toEqual(groupConfigDocument.name)
-        expect(String(response.body.owner)).toEqual(String(groupConfigDocument.owner))
-        expect(response.body.activated[EnvType.DEFAULT]).toEqual(groupConfigDocument.activated.get(EnvType.DEFAULT))
+        expect(String(response.body._id)).toEqual(String(groupConfigDocument._id));
+        expect(response.body.name).toEqual(groupConfigDocument.name);
+        expect(String(response.body.owner)).toEqual(String(groupConfigDocument.owner));
+        expect(response.body.activated[EnvType.DEFAULT]).toEqual(groupConfigDocument.activated.get(EnvType.DEFAULT));
 
         // Adding new Group Config
         response = await request(app)
@@ -154,90 +154,90 @@ describe('Testing fetch Group info', () => {
                 name: 'New Group Config 3',
                 description: 'Description of my new Group Config 3',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         response = await request(app)
             .get('/groupconfig/' + response.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
     })
 
     test('GROUP_SUITE - Should NOT get Group Config information by Id', async () => {
         await request(app)
             .get('/groupconfig/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
 
         await request(app)
             .get('/groupconfig/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500)
+            .send().expect(500);
     })
 
     test('GROUP_SUITE - Should NOT found Group Config information by Id', async () => {
         await request(app)
             .get('/groupconfig?domain=' + 'WRONG_ID_VALUE')
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send().expect(500)
+            .send().expect(500);
 
         await request(app)
             .get('/groupconfig?domain=' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
     })
 
     test('GROUP_SUITE - Should NOT delete Group Config by invalid Group Id', async () => {
         await request(app)
             .delete('/groupconfig/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500)
+            .send().expect(500);
 
         await request(app)
             .delete('/groupconfig/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
     })
 
     test('GROUP_SUITE - Should delete Group Config', async () => {
         // DB validation Before deleting
-        let domain = await Domain.findById(domainId)
-        expect(domain).not.toBeNull()
+        let domain = await Domain.findById(domainId).lean();
+        expect(domain).not.toBeNull();
 
-        let group = await GroupConfig.findById(groupConfigId)
-        expect(group).not.toBeNull()
+        let group = await GroupConfig.findById(groupConfigId).lean();
+        expect(group).not.toBeNull();
 
-        let config1 = await Config.findById(configId1)
-        expect(config1).not.toBeNull()
+        let config1 = await Config.findById(configId1).lean();
+        expect(config1).not.toBeNull();
 
-        let config2 = await Config.findById(configId2)
-        expect(config2).not.toBeNull()
+        let config2 = await Config.findById(configId2).lean();
+        expect(config2).not.toBeNull();
 
-        let configStrategy = await ConfigStrategy.findById(configStrategyId)
-        expect(configStrategy).not.toBeNull()
+        let configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
+        expect(configStrategy).not.toBeNull();
 
         await request(app)
             .delete('/groupconfig/' + groupConfigId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        const admin = await Admin.findById(adminMasterAccountId)
-        expect(admin).not.toBeNull()
+        const admin = await Admin.findById(adminMasterAccountId).lean();
+        expect(admin).not.toBeNull();
 
         // DB validation After - Verify deleted dependencies
-        domain = await Domain.findById(domainId)
-        expect(domain).not.toBeNull()
+        domain = await Domain.findById(domainId).lean();
+        expect(domain).not.toBeNull();
 
-        group = await GroupConfig.findById(groupConfigId)
-        expect(group).toBeNull()
+        group = await GroupConfig.findById(groupConfigId).lean();
+        expect(group).toBeNull();
 
-        config1 = await Config.findById(configId1)
-        expect(config1).toBeNull()
+        config1 = await Config.findById(configId1).lean();
+        expect(config1).toBeNull();
 
-        config2 = await Config.findById(configId2)
-        expect(config2).toBeNull()
+        config2 = await Config.findById(configId2).lean();
+        expect(config2).toBeNull();
 
-        configStrategy = await ConfigStrategy.findById(configStrategyId)
-        expect(configStrategy).toBeNull()
+        configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
+        expect(configStrategy).toBeNull();
     })
 })
 
@@ -246,7 +246,7 @@ describe('Testing update Group info', () => {
 
     test('GROUP_SUITE - Should update Group Config info', async () => {
 
-        let group = await GroupConfig.findById(groupConfigId);
+        let group = await GroupConfig.findById(groupConfigId).lean();
         expect(group).not.toBeNull();
 
         await request(app)
@@ -257,7 +257,7 @@ describe('Testing update Group info', () => {
             }).expect(200);
         
         // DB validation - verify data updated
-        group = await GroupConfig.findById(groupConfigId);
+        group = await GroupConfig.findById(groupConfigId).lean();
         expect(group).not.toBeNull();
         expect(group.name).toEqual('Updated Group Name');
 
@@ -279,7 +279,7 @@ describe('Testing update Group info', () => {
         .send({
             name: 'Updated Group Name',
             owner: 'I_SHOULD_NOT_UPDATE_THIS'
-        }).expect(400)
+        }).expect(400);
     })
 
     test('GROUP_SUITE - Should NOT update an unknown Group Config', async () => {
@@ -288,14 +288,14 @@ describe('Testing update Group info', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'Updated Group Name'
-            }).expect(500)
+            }).expect(500);
 
         await request(app)
             .patch('/groupconfig/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'Updated Group Name'
-            }).expect(404)
+            }).expect(404);
     })
 
     test('GROUP_SUITE - Should update Group environment status - default', async () => {
@@ -311,45 +311,45 @@ describe('Testing update Group info', () => {
         expect(response.body.activated[EnvType.DEFAULT]).toEqual(false);
 
         // DB validation - verify status updated
-        const group = await GroupConfig.findById(groupConfigId)
-        expect(group.activated.get(EnvType.DEFAULT)).toEqual(false);
+        const group = await GroupConfig.findById(groupConfigId).lean();
+        expect(group.activated[EnvType.DEFAULT]).toEqual(false);
     })
 
     test('GROUP_SUITE - Should NOT list changes by invalid Group Id', async () => {
         await request(app)
             .get('/groupconfig/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500)
+            .send().expect(500);
 
         await request(app)
             .get('/groupconfig/history/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
     })
 
     test('GROUP_SUITE - Should NOT delete history by invalid Group Id', async () => {
         await request(app)
             .delete('/groupconfig/history/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
 
         await request(app)
             .delete('/groupconfig/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500)
+            .send().expect(500);
     })
 
     test('GROUP_SUITE - Should delete history from a Group element', async () => {
-        let history = await History.find({ elementId: groupConfigId })
-        expect(history.length > 0).toEqual(true)
+        let history = await History.find({ elementId: groupConfigId }).lean();
+        expect(history.length > 0).toEqual(true);
 
         await request(app)
             .delete('/groupconfig/history/' + groupConfigId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        history = await History.find({ elementId: groupConfigId })
-        expect(history.length > 0).toEqual(false)
+        history = await History.find({ elementId: groupConfigId }).lean();
+        expect(history.length > 0).toEqual(false);
     })
 
     test('GROUP_SUITE - Should record changes on history collection', async () => {
@@ -360,34 +360,34 @@ describe('Testing update Group info', () => {
                 name: 'Group Record Test',
                 description: 'Description of my new Group Config',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
         
-        const groupId = response.body._id
+        const groupId = response.body._id;
         response = await request(app)
                 .get('/groupconfig/history/' + groupId)
                 .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-                .send().expect(200)
+                .send().expect(200);
         
-        expect(response.body).toEqual([])
+        expect(response.body).toEqual([]);
 
         await request(app)
             .patch('/groupconfig/' + groupId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
-            }).expect(200)
+            }).expect(200);
 
         response = await request(app)
             .get('/groupconfig/history/' + groupId + '?sortBy=createdAt:desc')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body).not.toEqual([])
+        expect(response.body).not.toEqual([]);
 
         // DB validation
-        let history = await History.find({ elementId: groupId })
-        expect(history[0].oldValue.get('description')).toEqual('Description of my new Group Config')
-        expect(history[0].newValue.get('description')).toEqual('New description')
+        let history = await History.find({ elementId: groupId }).lean();
+        expect(history[0].oldValue['description']).toEqual('Description of my new Group Config');
+        expect(history[0].newValue['description']).toEqual('New description');
 
         await request(app)
             .patch('/groupconfig/updateStatus/' + groupId)
@@ -397,8 +397,8 @@ describe('Testing update Group info', () => {
             }).expect(200);
         
         // DB validation
-        history = await History.find({ elementId: groupId })
-        expect(history.length).toEqual(2)
+        history = await History.find({ elementId: groupId }).lean();
+        expect(history.length).toEqual(2);
     })
 })
 
@@ -416,7 +416,7 @@ describe('Testing envrionment status change #1', () => {
             .send({
                 name: 'QA',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         const response = await request(app)
             .patch('/groupconfig/updateStatus/' + groupConfigId)
@@ -428,9 +428,9 @@ describe('Testing envrionment status change #1', () => {
         expect(response.body.activated['QA']).toEqual(true);
 
         // DB validation - verify status updated
-        let group = await GroupConfig.findById(groupConfigId)
-        expect(group.activated.get(EnvType.DEFAULT)).toEqual(true);
-        expect(group.activated.get('QA')).toEqual(true);
+        let group = await GroupConfig.findById(groupConfigId).lean();
+        expect(group.activated[EnvType.DEFAULT]).toEqual(true);
+        expect(group.activated['QA']).toEqual(true);
 
         // Inactivating QA. Default environment should stay activated
         await request(app)
@@ -440,9 +440,9 @@ describe('Testing envrionment status change #1', () => {
                 QA: false
             }).expect(200);
 
-        group = await GroupConfig.findById(groupConfigId)
-        expect(group.activated.get(EnvType.DEFAULT)).toEqual(true);
-        expect(group.activated.get('QA')).toEqual(false);
+        group = await GroupConfig.findById(groupConfigId).lean();
+        expect(group.activated[EnvType.DEFAULT]).toEqual(true);
+        expect(group.activated['QA']).toEqual(false);
     })
 
     test('GROUP_SUITE - Should NOT update Group environment status - Invalid Group Id', async () => {
@@ -463,7 +463,7 @@ describe('Testing envrionment status change #1', () => {
 })
 
 describe('Testing environment status change #2', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('GROUP_SUITE - Should remove Group environment status', async () => {
         // Creating QA Environment...
@@ -473,7 +473,7 @@ describe('Testing environment status change #2', () => {
             .send({
                 name: 'QA',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
         
         await request(app)
             .patch('/groupconfig/updateStatus/' + groupConfigId)
@@ -482,8 +482,8 @@ describe('Testing environment status change #2', () => {
                 QA: true
             }).expect(200);
 
-        let group = await GroupConfig.findById(groupConfigId)
-        expect(group.activated.get('QA')).toEqual(true);
+        let group = await GroupConfig.findById(groupConfigId).lean();
+        expect(group.activated['QA']).toEqual(true);
 
         await request(app)
             .patch('/groupconfig/removeStatus/' + groupConfigId)
@@ -493,8 +493,8 @@ describe('Testing environment status change #2', () => {
             }).expect(200);
 
         // DB validation - verify status updated
-        group = await GroupConfig.findById(groupConfigId)
-        expect(group.activated.get('QA')).toEqual(undefined);
+        group = await GroupConfig.findById(groupConfigId).lean();
+        expect(group.activated['QA']).toEqual(undefined);
     })
 
     test('GROUP_SUITE - Should NOT remove Group environment status', async () => {
@@ -505,7 +505,7 @@ describe('Testing environment status change #2', () => {
             .send({
                 name: 'QA1',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         await request(app)
             .patch('/groupconfig/updateStatus/' + groupConfigId)
@@ -530,20 +530,20 @@ describe('Testing environment status change #2', () => {
                 env: 'QA1'
             }).expect(400);
 
-        const group = await GroupConfig.findById(groupConfigId)
-        expect(group.activated.get(EnvType.DEFAULT)).toEqual(true);
-        expect(group.activated.get('QA1')).toEqual(true);
+        const group = await GroupConfig.findById(groupConfigId).lean();
+        expect(group.activated[EnvType.DEFAULT]).toEqual(true);
+        expect(group.activated['QA1']).toEqual(true);
     })
 
     test('GROUP_SUITE - Should remove records from history after deleting element', async () => {
-        let history = await History.find({ elementId: groupConfigId })
-        expect(history.length > 0).toEqual(true)
+        let history = await History.find({ elementId: groupConfigId }).lean();
+        expect(history.length > 0).toEqual(true);
         await request(app)
             .delete('/groupconfig/' + groupConfigId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        history = await History.find({ elementId: groupConfigId })
-        expect(history.length).toEqual(0)
+        history = await History.find({ elementId: groupConfigId }).lean();
+        expect(history.length).toEqual(0);
     })
 })

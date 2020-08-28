@@ -25,39 +25,39 @@ import { EnvType } from '../src/models/environment';
 import { adminMasterAccountId } from './fixtures/db_api';
 
 const changeStrategy = async (strategyId, newOperation, status, environment) => {
-    const strategy = await ConfigStrategy.findById(strategyId)
-    strategy.operation = newOperation ? newOperation : strategy.operation
-    strategy.activated.set(environment, status !== undefined ? status : strategy.activated.get(environment))
-    strategy.updatedBy = adminMasterAccountId
-    await strategy.save()
+    const strategy = await ConfigStrategy.findById(strategyId);
+    strategy.operation = newOperation ? newOperation : strategy.operation;
+    strategy.activated.set(environment, status !== undefined ? status : strategy.activated.get(environment));
+    strategy.updatedBy = adminMasterAccountId;
+    await strategy.save();
 }
 
 const changeConfigStatus = async (configId, status, environment) => {
-    const config = await Config.findById(configId)
-    config.activated.set(environment, status !== undefined ? status : config.activated.get(environment))
-    config.updatedBy = adminMasterAccountId
-    await config.save()
+    const config = await Config.findById(configId);
+    config.activated.set(environment, status !== undefined ? status : config.activated.get(environment));
+    config.updatedBy = adminMasterAccountId;
+    await config.save();
 }
 
 const changeGroupConfigStatus = async (groupConfigId, status, environment) => {
-    const groupConfig = await GroupConfig.findById(groupConfigId)
-    groupConfig.activated.set(environment, status !== undefined ? status : groupConfig.activated.get(environment))
-    groupConfig.updatedBy = adminMasterAccountId
-    await groupConfig.save()
+    const groupConfig = await GroupConfig.findById(groupConfigId);
+    groupConfig.activated.set(environment, status !== undefined ? status : groupConfig.activated.get(environment));
+    groupConfig.updatedBy = adminMasterAccountId;
+    await groupConfig.save();
 }
 
 const changeDomainStatus = async (domainId, status, environment) => {
-    const domain = await Domain.findById(domainId)
-    domain.activated.set(environment, status !== undefined ? status : domain.activated.get(environment))
-    domain.updatedBy = adminMasterAccountId
-    await domain.save()
+    const domain = await Domain.findById(domainId);
+    domain.activated.set(environment, status !== undefined ? status : domain.activated.get(environment));
+    domain.updatedBy = adminMasterAccountId;
+    await domain.save();
 }
 
 beforeAll(setupDatabase)
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
-    await mongoose.disconnect()
+    await mongoose.disconnect();
 })
 
 describe("Testing criteria [GraphQL] ", () => {
@@ -71,9 +71,9 @@ describe("Testing criteria [GraphQL] ", () => {
                 domain: domainDocument.name,
                 component: component1.name,
                 environment: EnvType.DEFAULT
-            }).expect(200)
+            }).expect(200);
 
-        token = response.body.token
+        token = response.body.token;
     })
 
     afterAll(setupDatabase)
@@ -180,7 +180,7 @@ describe("Testing criteria [GraphQL] ", () => {
                 domain: domainDocument.name,
                 component: component1.name,
                 environment: 'UNKNOWN ENVIRONMENT'
-            }).expect(200)
+            }).expect(200);
 
         await request(app)
             .post('/graphql')
@@ -195,7 +195,7 @@ describe("Testing criteria [GraphQL] ", () => {
                     }
                 }  
             `})
-            .expect(200)
+            .expect(200);
     })
 
     test('CLIENT_SUITE - Should NOT return on Flat view resolved by an unknown Config Key', (done) => {
@@ -345,8 +345,8 @@ describe("Testing criteria [GraphQL] ", () => {
                 domain: domainDocument.name,
                 component: component1.name,
                 environment: 'QA'
-            }).expect(200)
-        qaToken = responseToken.body.token
+            }).expect(200);
+        qaToken = responseToken.body.token;
 
         await changeConfigStatus(configId, true, 'QA');
         const response = await request(app)
@@ -456,8 +456,8 @@ describe("Testing criteria [GraphQL] ", () => {
     })
 
     test('CLIENT_SUITE - Should return false due to Domain deactivation', async () => {
-        await changeGroupConfigStatus(groupConfigId, true, EnvType.DEFAULT)
-        await changeDomainStatus(domainId, false, EnvType.DEFAULT)
+        await changeGroupConfigStatus(groupConfigId, true, EnvType.DEFAULT);
+        await changeDomainStatus(domainId, false, EnvType.DEFAULT);
         const response = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
@@ -492,9 +492,9 @@ describe("Testing domain", () => {
                 domain: domainDocument.name,
                 component: component1.name,
                 environment: EnvType.DEFAULT
-            }).expect(200)
+            }).expect(200);
 
-        token = response.body.token
+        token = response.body.token;
     })
 
     afterAll(setupDatabase)
@@ -734,9 +734,9 @@ describe("Testing criteria [REST] ", () => {
                 domain: domainDocument.name,
                 component: component1.name,
                 environment: EnvType.DEFAULT
-            }).expect(200)
+            }).expect(200);
 
-        token = response.body.token
+        token = response.body.token;
     })
 
     test('CLIENT_SUITE - Should return success on a entry-based CRITERIA response', (done) => {
@@ -759,7 +759,7 @@ describe("Testing criteria [REST] ", () => {
                 expect(body.reason).toEqual('Success');
                 expect(body.result).toBe(true);
                 done();
-            })
+            });
     })
 
     test('CLIENT_SUITE - Should NOT return success on a entry-based CRITERIA response - Component not registered', async (done) => {
@@ -875,7 +875,7 @@ describe("Testing criteria [REST] ", () => {
         const responseNewApiKey = await request(app)
             .get('/component/generateApiKey/' + component1._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(201)
+            .send().expect(201);
 
         const secondResponse = await request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
@@ -890,7 +890,7 @@ describe("Testing criteria [REST] ", () => {
                         strategy: StrategiesType.NETWORK,
                         input: '10.0.0.3'
                     }]})
-            .expect(401)
+            .expect(401);
 
         expect(secondResponse.body.error).toEqual('Invalid API token.');
 
@@ -901,9 +901,9 @@ describe("Testing criteria [REST] ", () => {
                 domain: domainDocument.name,
                 component: component1.name,
                 environment: EnvType.DEFAULT
-            }).expect(200)
+            }).expect(200);
 
-        token = responseNewToken.body.token
+        token = responseNewToken.body.token;
 
         await request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
@@ -918,7 +918,7 @@ describe("Testing criteria [REST] ", () => {
                         strategy: StrategiesType.NETWORK,
                         input: '10.0.0.3'
                     }]})
-            .expect(200)
+            .expect(200);
         
     })
 
@@ -930,7 +930,7 @@ describe("Testing criteria [REST] ", () => {
                 domain: domainDocument.name,
                 component: component1.name,
                 environment: EnvType.DEFAULT
-            }).expect(401)
+            }).expect(401);
     })
 
     test('CLIENT_SUITE - Should return that snapshot version is outdated - status = false', (done) => {

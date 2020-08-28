@@ -51,7 +51,7 @@ describe('Testing Admin insertion', () => {
             }).expect(201);
 
         // DB validation - document created
-        const admin = await Admin.findById(response.body.admin._id);
+        const admin = await Admin.findById(response.body.admin._id).lean();
         expect(admin).not.toBeNull();
 
         //used at: ADMIN_SUITE - Should confirm access to a new Admin
@@ -72,7 +72,7 @@ describe('Testing Admin insertion', () => {
 
     test('ADMIN_SUITE - Should NOT login before access confirmation sent via Email', async () => {
         // given
-        let admin = await Admin.findById(signedupUser);
+        let admin = await Admin.findById(signedupUser).lean();
         expect(admin).not.toBeNull();
         expect(admin.active).toEqual(false);
 
@@ -87,7 +87,7 @@ describe('Testing Admin insertion', () => {
 
     test('ADMIN_SUITE - Should confirm access to a new Admin', async () => {
         // given
-        let admin = await Admin.findById(signedupUser);
+        let admin = await Admin.findById(signedupUser).lean();
         expect(admin).not.toBeNull();
         expect(admin.active).toEqual(false);
 
@@ -97,13 +97,13 @@ describe('Testing Admin insertion', () => {
             .send().expect(201);
 
         // DB validation - document updated
-        admin = await Admin.findById(signedupUser);
+        admin = await Admin.findById(signedupUser).lean();
         expect(admin.active).toEqual(true);
     })
 
     test('ADMIN_SUITE - Should login after access confirmation', async () => {
         // given
-        let admin = await Admin.findById(signedupUser);
+        let admin = await Admin.findById(signedupUser).lean();
         expect(admin).not.toBeNull();
         expect(admin.active).toEqual(true);
 
@@ -131,7 +131,7 @@ describe('Testing Admin insertion', () => {
         axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
 
         // test
-        let admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true });
+        let admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true }).lean();
         expect(admin).not.toBeNull();
         expect(admin.code).toBeNull();
 
@@ -142,7 +142,7 @@ describe('Testing Admin insertion', () => {
             }).expect(200);
 
         // DB validation - document obtained
-        admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true });
+        admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true }).lean();
         expect(admin).not.toBeNull();
         expect(admin.code).not.toBeNull();
 
@@ -159,7 +159,7 @@ describe('Testing Admin insertion', () => {
         axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
 
         // test
-        let admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true });
+        let admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true }).lean();
         expect(admin).not.toBeNull();
         expect(admin.code).not.toBeNull();
 
@@ -278,7 +278,7 @@ describe('Testing Admin insertion', () => {
             .send().expect(201);
 
         // DB validation - document created
-        const admin = await Admin.findById(response.body.admin._id);
+        const admin = await Admin.findById(response.body.admin._id).lean();
         expect(admin).not.toBeNull();
         expect(admin._gitid).toEqual("123456789");
 
@@ -316,7 +316,7 @@ describe('Testing Admin insertion', () => {
             .send().expect(201);
 
         // DB validation - document created
-        const admin = await Admin.findById(response.body.admin._id);
+        const admin = await Admin.findById(response.body.admin._id).lean();
         expect(admin).not.toBeNull();
         expect(admin._bitbucketid).toEqual("123456789");
 
@@ -465,17 +465,17 @@ describe('Testing Admin insertion', () => {
             .send({
                 email: adminAccount.email,
                 password: adminAccount.password
-            }).expect(200)
+            }).expect(200);
 
-        const token = responseLogin.body.jwt.token
-        const refreshToken = responseLogin.body.jwt.refreshToken
+        const token = responseLogin.body.jwt.token;
+        const refreshToken = responseLogin.body.jwt.refreshToken;
 
-        expect(token).not.toBeNull()
-        expect(refreshToken).not.toBeNull()
+        expect(token).not.toBeNull();
+        expect(refreshToken).not.toBeNull();
 
         //DB validation
-        let admin = await Admin.findById(adminAccount._id)
-        expect(admin.token).toEqual(refreshToken)
+        let admin = await Admin.findById(adminAccount._id).lean();
+        expect(admin.token).toEqual(refreshToken);
 
         await new Promise(resolve => setTimeout(resolve, 1000));
         const responseRefresh = await request(app)
@@ -483,16 +483,16 @@ describe('Testing Admin insertion', () => {
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 refreshToken
-            }).expect(200)
+            }).expect(200);
 
-        expect(responseRefresh.body.token).not.toBeNull()
-        expect(responseRefresh.body.refreshToken).not.toBeNull()
-        expect(responseRefresh.body.token).not.toEqual(token)
-        expect(responseRefresh.body.refreshToken).not.toEqual(refreshToken)
+        expect(responseRefresh.body.token).not.toBeNull();
+        expect(responseRefresh.body.refreshToken).not.toBeNull();
+        expect(responseRefresh.body.token).not.toEqual(token);
+        expect(responseRefresh.body.refreshToken).not.toEqual(refreshToken);
 
         //DB validation
-        admin = await Admin.findById(adminAccount._id)
-        expect(admin.token).toEqual(responseRefresh.body.refreshToken)
+        admin = await Admin.findById(adminAccount._id).lean();
+        expect(admin.token).toEqual(responseRefresh.body.refreshToken);
     })
 
     test('ADMIN_SUITE - Should NOT renew access - using the same refreshToken', async () => {
@@ -501,29 +501,29 @@ describe('Testing Admin insertion', () => {
             .send({
                 email: adminAccount.email,
                 password: adminAccount.password
-            }).expect(200)
+            }).expect(200);
 
-        const token = responseLogin.body.jwt.token
-        const refreshToken = responseLogin.body.jwt.refreshToken
+        const token = responseLogin.body.jwt.token;
+        const refreshToken = responseLogin.body.jwt.refreshToken;
 
-        expect(token).not.toBeNull()
-        expect(refreshToken).not.toBeNull()
+        expect(token).not.toBeNull();
+        expect(refreshToken).not.toBeNull();
 
         let responseRefresh = await request(app)
             .post('/admin/refresh/me')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 refreshToken
-            }).expect(200)
+            }).expect(200);
 
         responseRefresh = await request(app)
             .post('/admin/refresh/me')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 refreshToken
-            }).expect(401)
+            }).expect(401);
 
-        expect(responseRefresh.body.error).toEqual('Unable to refresh token.')
+        expect(responseRefresh.body.error).toEqual('Unable to refresh token.');
     })
 
     test('ADMIN_SUITE - Should lost credentials if logged multiple times', async () => {
@@ -532,14 +532,14 @@ describe('Testing Admin insertion', () => {
             .send({
                 email: adminAccount.email,
                 password: adminAccount.password
-            }).expect(200)
+            }).expect(200);
         
         const firstToken = responseLogin.body.jwt.token;
 
         await request(app)
             .get('/admin/me')
             .set('Authorization', `Bearer ${firstToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
         await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -549,14 +549,14 @@ describe('Testing Admin insertion', () => {
             .send({
                 email: adminAccount.email,
                 password: adminAccount.password
-            }).expect(200)
+            }).expect(200);
 
         const secondRefreshToken = responseLogin.body.jwt.refreshToken;
 
         await request(app)
             .get('/admin/me')
             .set('Authorization', `Bearer ${firstToken}`)
-            .send().expect(401)
+            .send().expect(401);
         
         // Refreshing should not work as well
         await request(app)
@@ -564,7 +564,7 @@ describe('Testing Admin insertion', () => {
             .set('Authorization', `Bearer ${firstToken}`)
             .send({
                 refreshToken: secondRefreshToken
-            }).expect(401)
+            }).expect(401);
     })
 
     test('ADMIN_SUITE - Should NOT renew access - invalid Token', async () => {
@@ -573,27 +573,27 @@ describe('Testing Admin insertion', () => {
             .send({
                 email: adminAccount.email,
                 password: adminAccount.password
-            }).expect(200)
+            }).expect(200);
 
-        const refreshToken = responseLogin.body.jwt.refreshToken
+        const refreshToken = responseLogin.body.jwt.refreshToken;
 
         let responseRefresh = await request(app)
             .post('/admin/refresh/me')
             .set('Authorization', `Bearer INVALID_TOKEN`)
             .send({
                 refreshToken
-            }).expect(401)
+            }).expect(401);
 
-        expect(responseRefresh.body.error).toEqual('Unable to refresh token.')
+        expect(responseRefresh.body.error).toEqual('Unable to refresh token.');
     })
 
     test('ADMIN_SUITE - Should return token expired', async () => {
-        const tempToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET || 'test_secret', { expiresIn: '0s' })
+        const tempToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET || 'test_secret', { expiresIn: '0s' });
 
         let response = await request(app)
             .get('/admin/me')
             .set('Authorization', `Bearer ${tempToken}`)
-            .send().expect(401)
+            .send().expect(401);
 
         // After login, it should just renew
         response = await request(app)
@@ -601,12 +601,12 @@ describe('Testing Admin insertion', () => {
             .send({
                 email: adminAccount.email,
                 password: adminAccount.password
-            }).expect(200)
+            }).expect(200);
 
         await request(app)
             .get('/admin/me')
             .set('Authorization', `Bearer ${response.body.jwt.token}`)
-            .send().expect(200)
+            .send().expect(200);
     })
 })
 
@@ -619,10 +619,10 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 email: adminAccount.email,
                 password: adminAccount.password
-            }).expect(200)
+            }).expect(200);
 
-        const admin = await Admin.findById(adminAccountId)
-        expect(response.body.jwt.refreshToken).toBe(admin.token)
+        const admin = await Admin.findById(adminAccountId).lean();
+        expect(response.body.jwt.refreshToken).toBe(admin.token);
     })
 
     test('ADMIN_SUITE - Should not login non-existent admin', async () => {
@@ -631,7 +631,7 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 email: adminMasterAccount.email,
                 password: 'wrongpassword'
-            }).expect(401)
+            }).expect(401);
     })
 
     test('ADMIN_SUITE - Should not login with wrong email format', async () => {
@@ -649,17 +649,17 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 email: adminMasterAccount.email,
                 password: adminMasterAccount.password
-            }).expect(200)
+            }).expect(200);
 
         const response = await request(app)
             .get('/admin/me')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
-            .expect(200)
+            .expect(200);
 
         // Response validation
-        expect(response.body.name).toBe(adminMasterAccount.name)
-        expect(response.body.email).toBe(adminMasterAccount.email)
+        expect(response.body.name).toBe(adminMasterAccount.name);
+        expect(response.body.email).toBe(adminMasterAccount.email);
     })
 
     test('ADMIN_SUITE - Should get admin profile given an Admin ID', async () => {
@@ -668,17 +668,17 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 email: adminMasterAccount.email,
                 password: adminMasterAccount.password
-            }).expect(200)
+            }).expect(200);
 
         const response = await request(app)
             .get('/admin/' + adminAccountId)
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
-            .expect(200)
+            .expect(200);
 
         // Response validation
-        expect(response.body.name).toBe(adminAccount.name)
-        expect(response.body.email).toBe(adminAccount.email)
+        expect(response.body.name).toBe(adminAccount.name);
+        expect(response.body.email).toBe(adminAccount.email);
     })
 
     test('ADMIN_SUITE - Should NOT get admin profile given an wrong Admin ID', async () => {
@@ -687,13 +687,13 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 email: adminMasterAccount.email,
                 password: adminMasterAccount.password
-            }).expect(200)
+            }).expect(200);
 
         await request(app)
             .get('/admin/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
-            .expect(404)
+            .expect(404);
     })
 
     test('ADMIN_SUITE - Should NOT get admin profile given an invalid Admin ID', async () => {
@@ -702,20 +702,20 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 email: adminMasterAccount.email,
                 password: adminMasterAccount.password
-            }).expect(200)
+            }).expect(200);
 
         await request(app)
             .get('/admin/INVALID_ID')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
-            .expect(400)
+            .expect(400);
     })
 
     test('ADMIN_SUITE - Should not get profile for unauthenticated admin', async () => {
         await request(app)
             .get('/admin/me')
             .send()
-            .expect(401)
+            .expect(401);
     })
 
     test('ADMIN_SUITE - Should update/me valid admin field', async () => {
@@ -724,7 +724,7 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 email: adminMasterAccount.email,
                 password: adminMasterAccount.password
-            }).expect(200)
+            }).expect(200);
 
         await request(app)
             .patch('/admin/me')
@@ -732,9 +732,9 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 name: 'Updated Name'
             })
-            .expect(200)
-        let admin = await Admin.findById(adminMasterAccountId)
-        expect(admin.name).toEqual('Updated Name')
+            .expect(200);
+        let admin = await Admin.findById(adminMasterAccountId).lean();
+        expect(admin.name).toEqual('Updated Name');
 
         // Validating regular Admin credential
         responseLogin = await request(app)
@@ -742,7 +742,7 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 email: adminAccount.email,
                 password: adminAccount.password
-            }).expect(200)
+            }).expect(200);
 
         await request(app)
             .patch('/admin/me')
@@ -750,10 +750,10 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 name: 'Updated Name'
             })
-            .expect(200)
+            .expect(200);
 
-        admin = await Admin.findById(adminAccountId)
-        expect(admin.name).toEqual('Updated Name')
+        admin = await Admin.findById(adminAccountId).lean();
+        expect(admin.name).toEqual('Updated Name');
     })
 
     test('ADMIN_SUITE - Should NOT update/me admin fields', async () => {
@@ -762,7 +762,7 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 email: adminMasterAccount.email,
                 password: adminMasterAccount.password
-            }).expect(200)
+            }).expect(200);
 
         await request(app)
             .patch('/admin/me')
@@ -770,7 +770,7 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 _id: new mongoose.Types.ObjectId()
             })
-            .expect(400)
+            .expect(400);
     })
 
     test('ADMIN_SUITE - Should logout valid admin', async () => {
@@ -779,16 +779,16 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 email: adminMasterAccount.email,
                 password: adminMasterAccount.password
-            }).expect(200)
+            }).expect(200);
 
         await request(app)
             .post('/admin/logout')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
-            .expect(200)
+            .expect(200);
 
-        const admin = await Admin.findById(adminMasterAccountId)
-        expect(admin.token).toBeNull()
+        const admin = await Admin.findById(adminMasterAccountId).lean();
+        expect(admin.token).toBeNull();
     })
 })
 
@@ -831,8 +831,8 @@ describe('Testing Admin logout', () => {
             .send()
             .expect(200);
 
-        const admin = await Admin.findById(adminMasterAccountId)
-        expect(admin).toBeNull()
+        const admin = await Admin.findById(adminMasterAccountId).lean();
+        expect(admin).toBeNull();
     })
 })
 
@@ -846,20 +846,20 @@ describe('Testing Admin collaboration endpoint', () => {
             .send({
                 email: adminMasterAccount.email,
                 password: adminMasterAccount.password
-            }).expect(200)
+            }).expect(200);
 
         await request(app)
             .patch('/team/member/add/' + teamId)
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 member: adminMasterAccountId
-            }).expect(200)
+            }).expect(200);
             
         let response = await request(app)
             .get('/admin/collaboration')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
-            .expect(200)
+            .expect(200);
 
         expect(response.body.length).toEqual(1);
 
@@ -868,13 +868,13 @@ describe('Testing Admin collaboration endpoint', () => {
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 member: adminMasterAccountId
-            }).expect(200)
+            }).expect(200);
 
         response = await request(app)
             .get('/admin/collaboration')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
-            .expect(200)
+            .expect(200);
 
         expect(response.body.length).toEqual(0);
     })
@@ -885,21 +885,21 @@ describe('Testing Admin collaboration endpoint', () => {
             .send({
                 email: adminMasterAccount.email,
                 password: adminMasterAccount.password
-            }).expect(200)
+            }).expect(200);
 
         await request(app)
             .patch('/team/member/add/' + team1Id)
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 member: adminAccountId
-            }).expect(200)
+            }).expect(200);
 
         responseLogin = await request(app)
             .post('/admin/login')
             .send({
                 email: adminAccount.email,
                 password: adminAccount.password
-            }).expect(200)
+            }).expect(200);
 
         const response = await request(app)
             .post('/admin/collaboration/permission')
@@ -912,7 +912,7 @@ describe('Testing Admin collaboration endpoint', () => {
                     name: 'Optional Group Name Here'
                 }
             })
-            .expect(200)
+            .expect(200);
 
         expect(response.body.length > 0).toEqual(true);
 
@@ -942,7 +942,7 @@ describe('Testing Admin collaboration endpoint', () => {
             }).expect(200);
             
         //verify
-        let teams = await Team.find({ members: adminMasterAccountId });
+        let teams = await Team.find({ members: adminMasterAccountId }).lean();
         teams.forEach(team => {
             expect(team.members[0]).toEqual(adminMasterAccountId);
         });
@@ -953,7 +953,7 @@ describe('Testing Admin collaboration endpoint', () => {
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send().expect(200);
 
-        teams = await Team.find({ members: adminMasterAccountId });
+        teams = await Team.find({ members: adminMasterAccountId }).lean();
         teams.forEach(team => {
             expect(team.members[0]).toBeNull();
         });
@@ -1009,7 +1009,7 @@ describe('Testing Admin collaboration endpoint', () => {
             }).expect(200);
             
         //verify
-        let teams = await Team.find({ members: adminMasterAccountId });
+        let teams = await Team.find({ members: adminMasterAccountId }).lean();
         teams.forEach(team => {
             expect(team.members[0]).toEqual(adminMasterAccountId);
         });

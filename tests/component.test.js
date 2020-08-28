@@ -14,7 +14,7 @@ import { Config } from '../src/models/config';
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
-    await mongoose.disconnect()
+    await mongoose.disconnect();
 })
 
 describe('Insertion tests', () => {
@@ -30,15 +30,15 @@ describe('Insertion tests', () => {
                 name: 'my-web-app',
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         // DB validation - document created
-        const component = await Component.findById(response.body.component._id)
-        expect(component).not.toBeNull()
+        const component = await Component.findById(response.body.component._id).lean();
+        expect(component).not.toBeNull();
 
         // Response validation
-        expect(response.body.component.name).toBe('my-web-app')
-        component1Id = response.body.component._id
+        expect(response.body.component.name).toBe('my-web-app');
+        component1Id = response.body.component._id;
     })
 
     test('COMPONENT_SUITE - Should NOT create a new Component - Component already exist', async () => {
@@ -49,9 +49,9 @@ describe('Insertion tests', () => {
                 name: 'my-web-app',
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
-            }).expect(400)
+            }).expect(400);
 
-        expect(response.body.error).toBe(`Unable to complete the operation. Component 'my-web-app' already exist for this Domain`)
+        expect(response.body.error).toBe(`Unable to complete the operation. Component 'my-web-app' already exist for this Domain`);
     })
 
     test('COMPONENT_SUITE - Should NOT create a new Component - Domain not found', async () => {
@@ -62,7 +62,7 @@ describe('Insertion tests', () => {
                 name: 'my-web-app',
                 description: 'This is my Web App using this wonderful API',
                 domain: 'FAKE_DOMAIN'
-            }).expect(400)
+            }).expect(400);
     })
 
     test('COMPONENT_SUITE - Should NOT create a new Component - Name too short', async () => {
@@ -73,32 +73,32 @@ describe('Insertion tests', () => {
                 name: 'C',
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
-            }).expect(422)
+            }).expect(422);
     })
 
     test('COMPONENT_SUITE - Should generate a valid API Key for a Component', async () => {
         const response = await request(app)
             .get('/component/generateApiKey/' + component1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(201)
+            .send().expect(201);
 
-        expect(response.body.apiKey).not.toBeNull()
+        expect(response.body.apiKey).not.toBeNull();
         // DB validation - current Domain token should not be as the same as the generated
-        const component = await Component.findById(component1Id).lean()
-        const isMatch = await bcrypt.compare(response.body.apiKey, component.apihash)
-        expect(isMatch).toEqual(true)
+        const component = await Component.findById(component1Id).lean();
+        const isMatch = await bcrypt.compare(response.body.apiKey, component.apihash);
+        expect(isMatch).toEqual(true);
     })
 
     test('COMPONENT_SUITE - Should NOT generate an API Key for an inexistent Component', async () => {
         await request(app)
             .get('/component/generateApiKey/INVALID_COMPONENT_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400)
+            .send().expect(400);
 
         await request(app)
             .get('/component/generateApiKey/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
     })
 })
 
@@ -114,55 +114,55 @@ describe('Reading tests', () => {
                 name: 'COMPONENT_1',
                 description: 'Component 1 for reading test',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
-        component1Id = response.body.component._id
+        component1Id = response.body.component._id;
     })
 
     test('COMPONENT_SUITE - Should read all Components from a Domain', async () => {
         const response = await request(app)
             .get('/component?domain=' + domainId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body[0].name).toBe('COMPONENT_1')
+        expect(response.body[0].name).toBe('COMPONENT_1');
     })
 
     test('COMPONENT_SUITE - Should read one single Component', async () => {
         const response = await request(app)
             .get('/component/' + component1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body.name).toBe('COMPONENT_1')
+        expect(response.body.name).toBe('COMPONENT_1');
     })
 
     test('COMPONENT_SUITE - Should NOT read Component - Invalid Id', async () => {
         await request(app)
             .get('/component/NOT_FOUND')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400)
+            .send().expect(400);
     })
 
     test('COMPONENT_SUITE - Should NOT read Component - Not found', async () => {
         await request(app)
             .get('/component/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
     })
 
     test('COMPONENT_SUITE - Should NOT read Component - Invalid Domain Id', async () => {
         await request(app)
             .get('/component?domain=INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500)
+            .send().expect(500);
     })
 
     test('COMPONENT_SUITE - Should NOT read Component - Domain Id not specified', async () => {
         await request(app)
             .get('/component?domain=')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400)
+            .send().expect(400);
     })
 })
 
@@ -177,22 +177,22 @@ describe('Updating tests', () => {
                 name: 'my-web-app-to-be-updated',
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
         
         // DB validation - document created
-        let component = await Component.findById(response.body.component._id)
-        expect(component.description).toBe('This is my Web App using this wonderful API')
+        let component = await Component.findById(response.body.component._id).lean();
+        expect(component.description).toBe('This is my Web App using this wonderful API');
 
         response = await request(app)
             .patch('/component/' + response.body.component._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Wow, this is my updated description'
-            }).expect(200)
+            }).expect(200);
 
         // DB validation - document updated
-        component = await Component.findById(response.body._id)
-        expect(component.description).toBe('Wow, this is my updated description')
+        component = await Component.findById(response.body._id).lean();
+        expect(component.description).toBe('Wow, this is my updated description');
     })
 
     test('COMPONENT_SUITE - Should NOT update a Component - Invalid Component Id/Not found', async () => {
@@ -203,21 +203,21 @@ describe('Updating tests', () => {
                 name: 'CannotUpdateThis',
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         await request(app)
             .patch('/component/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Wow, this should be my updated description, only not'
-            }).expect(400)
+            }).expect(400);
 
         await request(app)
             .patch('/component/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Wow, this should be my updated description, only not'
-            }).expect(404)
+            }).expect(404);
 
     })
 })
@@ -233,7 +233,7 @@ describe('Deletion tests', () => {
                 name: 'my-web-app-to-be-deleted',
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         //Adding component to a Config. It should be removed after deleting
         await request(app)
@@ -241,19 +241,19 @@ describe('Deletion tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: response.body.component._id
-            }).expect(200)
+            }).expect(200);
 
-        const configsToRemoveFrom = await Config.find({ components: { $in: [response.body.component._id] } });
-        expect(configsToRemoveFrom[0]._id).toEqual(configId1)
+        const configsToRemoveFrom = await Config.find({ components: { $in: [response.body.component._id] } }).lean();
+        expect(configsToRemoveFrom[0]._id).toEqual(configId1);
 
         response = await request(app)
             .delete('/component/' + response.body.component._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
         // DB validation - document deleted
-        const component = await Component.findById(response.body._id)
-        expect(component).toBeNull()
+        const component = await Component.findById(response.body._id).lean();
+        expect(component).toBeNull();
     })
 
     test('COMPONENT_SUITE - Should NOT delete a Component - Invalid Component Id/Not found', async () => {
@@ -264,17 +264,17 @@ describe('Deletion tests', () => {
                 name: 'CannotDeleteThis',
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
-            }).expect(201)
+            }).expect(201);
 
         await request(app)
             .delete('/component/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400)
+            .send().expect(400);
 
         await request(app)
             .delete('/component/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404)
+            .send().expect(404);
     })
 
 })
