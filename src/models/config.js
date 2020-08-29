@@ -5,12 +5,12 @@ import { ConfigStrategy } from './config-strategy';
 import { EnvType } from './environment';
 import { recordHistory } from './common/index';
 
-const RelayMethods = Object.freeze({
+export const RelayMethods = Object.freeze({
     POST: 'POST',
     GET: 'GET'
 });
 
-const RelayTypes = Object.freeze({
+export const RelayTypes = Object.freeze({
     VALIDATION: 'VALIDATION',
     NOTIFICATION: 'NOTIFICATION'
 });

@@ -1,11 +1,14 @@
 import { EnvType } from '../models/environment';
 import Domain from '../models/domain';
 import GroupConfig from '../models/group-config';
-import { Config } from '../models/config';
+import { Config, RelayTypes} from '../models/config';
 import { addMetrics } from '../models/metric';
 import { ConfigStrategy, processOperation } from '../models/config-strategy';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { verifyOwnership } from '../routers/common/index';
+import { resolveNotification, resolveValidation } from './relay/index';
+
+export const resolveConfigByKey = async (domain, key) => await Config.findOne({ domain, key }, null, { lean: true });
 
 export function resolveEnvStatus(source) {
     const key = Object.keys(source.activated);
@@ -99,12 +102,14 @@ export async function resolveDomain(_id, name, activated, context) {
     const args = {};
 
     if (_id) { args._id = _id; }
-    if (name) { args.name = name; }
-
+    if (name) { 
+        args.name = name; 
+        args.owner = context.admin._id;
+    }
+    
     let domain = await Domain.findOne({ ...args }).lean();
-
     if (activated !== undefined) {
-        if (domain.activated[`${context.environment}`] !== activated) {
+        if (domain.activated[context.environment] !== activated) {
             return null;
         }
     }
@@ -136,22 +141,45 @@ async function checkConfigStrategies (configId, strategyFilter) {
     return strategies;
 }
 
+
+async function resolveRelay(config, environment, entry, response) {
+    try {
+        if (config.relay && config.relay.activated[environment]) {
+            if (config.relay.type === RelayTypes.NOTIFICATION) {
+                resolveNotification(config.relay.endpoint[environment], config.relay.method, entry,
+                    config.relay.auth_prefix, config.relay.auth_token[environment]);
+            } else {
+                const relayResponse = await resolveValidation(config.relay.endpoint[environment], config.relay.method, entry,
+                    config.relay.auth_prefix, config.relay.auth_token[environment]);
+                
+                response.result = relayResponse.result;
+                response.reason = relayResponse.result ? 'Success' : 'Relay does not agree';
+                response.message = relayResponse.message;
+            }
+        }
+    } catch (e) {
+        if (config.relay.type === RelayTypes.VALIDATION) {
+            response.result = false;
+            response.reason = 'Relay service could not be reached';
+            response.message = e.message;
+        }
+    }
+}
+
 export async function resolveCriteria(config, context, strategyFilter) {
     context.config_id = config._id;
     const environment = context.environment;
-
-    let domain;
-    let group;
-    let strategies
+    let domain, group, strategies
 
     await Promise.all([
         checkDomain(context.domain), 
         checkGroup(config._id), 
-        checkConfigStrategies(config._id, strategyFilter)]).then(result => {
-            domain = result[0];
-            group = result[1];
-            strategies = result[2];
-        });
+        checkConfigStrategies(config._id, strategyFilter)
+    ]).then(result => {
+        domain = result[0];
+        group = result[1];
+        strategies = result[2];
+    });
     
     let response = {
         domain,
@@ -161,46 +189,47 @@ export async function resolveCriteria(config, context, strategyFilter) {
         reason: 'Success'
     };
 
-    // Check flags
-    if (config.activated[`${environment}`] === undefined ? !config.activated[`${EnvType.DEFAULT}`] : !config.activated[`${environment}`]) {
-        response.result = false;
-        response.reason = 'Config disabled';
-    } else if (group.activated[`${environment}`] === undefined ? !group.activated[`${EnvType.DEFAULT}`] : !group.activated[`${environment}`]) {
-        response.result = false;
-        response.reason = 'Group disabled';
-    } else if (domain.activated[`${environment}`] === undefined ? !domain.activated[`${EnvType.DEFAULT}`] : !domain.activated[`${environment}`]) {
-        response.result = false;
-        response.reason = 'Domain disabled';
-    }
-    
-    // Check strategies
-    if (response.result && strategies) {
-        for (var i = 0; i < strategies.length; i++) {
-            if (!strategies[i].activated[`${environment}`]) {
-                continue;
-            }
-
-            const input = context.entry ? context.entry.filter(e => e.strategy == strategies[i].strategy) : []
-            if (input.length) {
-                if (!processOperation(strategies[i].strategy, strategies[i].operation, input[0].input, strategies[i].values)) {
-                    response.result = false;
-                    response.reason = `Strategy '${strategies[i].strategy}' does not agree`;
-                    break;
+    try {
+        // Check flags
+        if (config.activated[environment] === undefined ? 
+            !config.activated[EnvType.DEFAULT] : !config.activated[environment]) {
+            throw new Error('Config disabled');
+        } else if (group.activated[environment] === undefined ? 
+            !group.activated[EnvType.DEFAULT] : !group.activated[environment]) {
+            throw new Error('Group disabled');
+        } else if (domain.activated[environment] === undefined ? 
+            !domain.activated[EnvType.DEFAULT] : !domain.activated[environment]) {
+            throw new Error('Domain disabled');
+        }
+        
+        // Check strategies
+        if (strategies) {
+            for (var i = 0; i < strategies.length; i++) {
+                if (!strategies[i].activated[environment]) {
+                    continue;
                 }
-            } else {
-                response.result = false;
-                response.reason = `Strategy '${strategies[i].strategy}' did not receive any input`;
-                break;
+    
+                const input = context.entry ? context.entry.filter(e => e.strategy == strategies[i].strategy) : [];
+                if (input.length) {
+                    if (!processOperation(strategies[i].strategy, strategies[i].operation, input[0].input, strategies[i].values)) {
+                        throw new Error(`Strategy '${strategies[i].strategy}' does not agree`);
+                    }
+                } else {
+                    throw new Error(`Strategy '${strategies[i].strategy}' did not receive any input`);
+                }
             }
         }
-    }
 
-    const bypassMetric = context.bypassMetric ? context.bypassMetric === 'true' : false;
-    if (!bypassMetric && process.env.METRICS_ACTIVATED === 'true') {
-        addMetrics(context, response);
+        // Check relay
+        await resolveRelay(config, environment, context.entry, response);
+    } catch (e) {
+        response.result = false;
+        response.reason = e.message;
+    } finally {
+        const bypassMetric = context.bypassMetric ? context.bypassMetric === 'true' : false;
+        if (!bypassMetric && process.env.METRICS_ACTIVATED === 'true') {
+            addMetrics(context, response);
+        }
+        return response;
     }
-
-    return response;
 }
-
-export const resolveConfigByKey = async (domain, key) => await Config.findOne({ domain, key }, null, { lean: true });

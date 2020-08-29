@@ -19,10 +19,12 @@ import {
     domainId,
     domainDocument,
     configStrategyUSERId,
-    component1
+    component1,
+    adminAccountId
 } from './fixtures/db_client';
 import { EnvType } from '../src/models/environment';
 import { adminMasterAccountId } from './fixtures/db_api';
+import Admin from '../src/models/admin';
 
 const changeStrategy = async (strategyId, newOperation, status, environment) => {
     const strategy = await ConfigStrategy.findById(strategyId);
@@ -505,7 +507,7 @@ describe("Testing domain", () => {
             .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
-                    domain(name: "Domain") { name version description activated
+                    domain(_id: "${domainId}") { name version description activated
                         group(activated: true) { name description activated
                             config(activated: true) { key description activated
                                 strategies(activated: true) { strategy activated operation  values }
@@ -574,7 +576,7 @@ describe("Testing domain", () => {
             .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
-                    domain(name: "Domain") { name version description activated
+                    domain(_id: "${domainId}") { name version description activated
                         group(activated: true) { name description activated
                             config(activated: true) { key description activated
                                 strategies(activated: false) { strategy activated operation values }
@@ -641,7 +643,7 @@ describe("Testing domain", () => {
             .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
-                    domain(name: "Domain") { name description activated
+                    domain(_id: "${domainId}") { name description activated
                         group(activated: false) { name description activated
                             config(activated: false) { key description activated
                                 strategies(activated: false) { strategy activated operation values }
@@ -677,7 +679,7 @@ describe("Testing domain", () => {
             .set('Authorization', `Bearer ${token}`)
             .send({ query: `
                 {
-                    domain(name: "Domain", activated: true) { name description activated
+                    domain(_id: "${domainId}", activated: true) { name description activated
                         group(activated: true) { name description activated
                             config(activated: false) { key description activated
                                 strategies(activated: false) { strategy activated operation values }
@@ -1028,7 +1030,7 @@ describe("Testing domain [Adm-GraphQL] ", () => {
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({ query: `
                 {
-                    domain(name: "Domain", environment: "default") { name description statusByEnv { env value }
+                    domain(_id: "${domainId}", environment: "default") { name description statusByEnv { env value }
                         group { name description statusByEnv { env value }
                             config { key description statusByEnv { env value }
                                 strategies { strategy statusByEnv { env value } operation  values }
@@ -1132,6 +1134,56 @@ describe("Testing domain [Adm-GraphQL] ", () => {
                         {"name":"Group Test","description":"Test Group","statusByEnv":[{"env":"default","value":true}]}],
                         "config":[
                             {"key":"TEST_CONFIG_KEY","description":"Test config 1","statusByEnv":[{"env":"default","value":true}]}],"strategies":null}}}`;
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                done();
+            })
+    })
+
+    test('CLIENT_SUITE - Should NOT return domain structure for an excluded team member', async (done) => {
+        //given
+        const admin = await Admin.findById(adminAccountId);
+        admin.teams = [];
+        await admin.save();
+        
+        request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send({ query: `
+                {
+                    domain(_id: "${domainId}", environment: "default") { name description statusByEnv { env value }
+                        group { name description statusByEnv { env value }
+                            config { key description statusByEnv { env value }
+                                strategies { strategy statusByEnv { env value } operation  values }
+                            }
+                        }
+                    }
+                }
+            `})
+            .expect(200)
+            .end((err, res) => {
+                const expected = `{"data":{"domain":null}}`;
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                done();
+            })
+    })
+
+    test('CLIENT_SUITE - Should NOT return domain Flat-structure for am excluded team member', (done) => {
+        request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send({ query: `
+            {
+                configuration(domain: "${domainId}", key: "${keyConfig}", environment: "default") {
+                    domain { name description statusByEnv { env value } }
+                    group { name description statusByEnv { env value } }
+                    config { key description statusByEnv { env value } }
+                    strategies { strategy operation values statusByEnv { env value } }
+                }
+            }
+            `})
+            .expect(200)
+            .end((err, res) => {
+                const expected = `{"data":{"configuration":{"domain":null,"group":null,"config":null,"strategies":null}}}`;
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
             })

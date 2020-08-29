@@ -25,6 +25,7 @@
     "test-config": "env-cmd -e test jest -t 'CONFIG_SUITE' --collect-coverage",
     "test-strategy": "env-cmd -e test jest -t 'STRATEGY_SUITE' --collect-coverage",
     "test-client": "env-cmd -e test jest -t 'CLIENT_SUITE' --collect-coverage",
+    "test-relay": "env-cmd -e test jest -t 'RELAY_SUITE' --collect-coverage",
     "test-metric": "env-cmd -e test jest -t 'METRIC_SUITE' --collect-coverage",
     "test-team": "env-cmd -e test jest -t 'TEAM_SUITE' --collect-coverage",
     "test-role": "env-cmd -e test jest -t 'ROLE_SUITE' --collect-coverage",
