@@ -268,7 +268,7 @@ router.get('/metric/data/', [
 
         const skip = parseInt((process.env.METRICS_MAX_PAGE * parseInt(req.query.page)) - process.env.METRICS_MAX_PAGE);
         const metrics = await Metric.find({ ...args }, 
-            'config component entry result reason group environment date -_id', {
+            'config component entry result reason message group environment date -_id', {
                 skip,
                 limit: parseInt(process.env.METRICS_MAX_PAGE)
             }).sort(req.query.sortBy ? req.query.sortBy.replace(';', ' ') : 'date')
