@@ -230,6 +230,7 @@ export async function resolveCriteria(config, context, strategyFilter) {
         if (!bypassMetric && process.env.METRICS_ACTIVATED === 'true') {
             addMetrics(context, response);
         }
-        return response;
     }
+
+    return response;
 }
