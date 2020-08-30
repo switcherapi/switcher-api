@@ -58,6 +58,10 @@ const configSchema = new mongoose.Schema({
         required: true,
         ref: 'Admin'
     },
+    disable_metrics: {
+        type: Map,
+        of: Boolean
+    },
     updatedBy: {
         type: String
     },

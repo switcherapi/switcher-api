@@ -178,7 +178,7 @@ router.delete('/config/:id', auth, async (req, res) => {
 })
 
 router.patch('/config/:id', auth,
-    verifyInputUpdateParameters(['key', 'description', 'relay']), async (req, res) => {
+    verifyInputUpdateParameters(['key', 'description', 'relay', 'disable_metrics']), async (req, res) => {
     try {
         let config = await Config.findById(req.params.id);
  
@@ -192,6 +192,13 @@ router.patch('/config/:id', auth,
             if (configFound) {
                 return res.status(400).send({ error: `Config ${req.body.key} already exist` });
             }
+        }
+
+        if (req.body.disable_metrics) {
+            const updateMetrics = Object.keys(req.body.disable_metrics);
+            await checkEnvironmentStatusChange(req, res, config.domain, req.body.disable_metrics);
+            Object.keys(req.body.disable_metrics[updateMetrics])
+                .forEach((map) => config.disable_metrics[updateMetrics].set(map, req.body.disable_metrics[updateMetrics][map]));
         }
 
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
