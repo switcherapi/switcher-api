@@ -47,6 +47,10 @@ export async function removeConfigStatus(config, environmentName) {
             config.relay.auth_token.delete(environmentName);
         }
 
+        if (config.disable_metrics) {
+            config.disable_metrics.delete(environmentName);
+        }
+
         return await config.save();
     } catch (e) {
         throw new Error(e.message);

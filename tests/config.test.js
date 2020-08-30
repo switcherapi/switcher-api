@@ -780,7 +780,7 @@ describe('Testing relay association', () => {
     };
 
     test('CONFIG_SUITE - Should configure new Relay', async () => {
-        const responseComponent = await request(app)
+        await request(app)
             .patch(`/config/updateRelay/${configId1}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(bodyRelayProd).expect(200);
@@ -962,6 +962,66 @@ describe('Testing relay association', () => {
             .send().expect(200);
         
         expect(response.body).toMatchObject({ methods: [ 'POST', 'GET' ], types: [ 'VALIDATION', 'NOTIFICATION' ] });
+    })
+
+})
+
+describe('Testing disable metrics', () => {
+
+    test('CONFIG_SUITE - Should disable metrics for production environment', async () => {
+        await request(app)
+            .patch(`/config/${configId1}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                disable_metrics: {
+                    default: true
+                }
+            }).expect(200);
+
+        // DB validation - document updated
+        const config = await Config.findById(configId1).lean();
+        expect(config.disable_metrics['default']).toEqual(true);
+    })
+
+    test('CONFIG_SUITE - Should NOT disable metrics for an unknown environment', async () => {
+        const response = await request(app)
+            .patch(`/config/${configId1}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                disable_metrics: {
+                    unknown: true
+                }
+            }).expect(500);
+
+        expect(response.body.error).toEqual('Invalid updates');
+    })
+
+    test('CONFIG_SUITE - Should reset disabled metric flag when reseting environment', async () => {
+        //given
+        await request(app)
+            .patch(`/config/${configId1}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                disable_metrics: {
+                    development: true
+                }
+            }).expect(200);
+
+        // DB validation - document updated
+        let config = await Config.findById(configId1).lean();
+        expect(config.disable_metrics['development']).toEqual(true);
+
+        //test
+        await request(app)
+            .patch('/config/removeStatus/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                env: 'development'
+            }).expect(200);
+
+        // DB validation - document updated
+        config = await Config.findById(configId1).lean();
+        expect(config.disable_metrics['development']).toEqual(undefined);
     })
 
 })

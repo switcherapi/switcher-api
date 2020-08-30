@@ -25,6 +25,7 @@ import {
 import { EnvType } from '../src/models/environment';
 import { adminMasterAccountId } from './fixtures/db_api';
 import Admin from '../src/models/admin';
+import { Metric } from '../src/models/metric';
 
 const changeStrategy = async (strategyId, newOperation, status, environment) => {
     const strategy = await ConfigStrategy.findById(strategyId);
@@ -37,6 +38,16 @@ const changeStrategy = async (strategyId, newOperation, status, environment) => 
 const changeConfigStatus = async (configId, status, environment) => {
     const config = await Config.findById(configId);
     config.activated.set(environment, status !== undefined ? status : config.activated.get(environment));
+    config.updatedBy = adminMasterAccountId;
+    await config.save();
+}
+
+const changeConfigDisableMetricFlag = async (configId, status, environment) => {
+    const config = await Config.findById(configId);
+    if (!config.disable_metrics)
+        config.disable_metrics = new Map;
+
+    config.disable_metrics.set(environment, status);
     config.updatedBy = adminMasterAccountId;
     await config.save();
 }
@@ -480,6 +491,51 @@ describe("Testing criteria [GraphQL] ", () => {
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
+    })
+
+    test('CLIENT_SUITE - Should not add to metrics when Config has disabled metric flag = true', async () => {
+        //given
+        await changeConfigStatus(configId, true, EnvType.DEFAULT);
+
+        //add one metric data
+        await request(app)
+            .post('/graphql')
+            .set('Authorization', `Bearer ${token}`)
+            .send({ query: `
+                {
+                    criteria(
+                        key: "${keyConfig}", 
+                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
+                                { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
+                        ) { response { result reason } }
+                }  
+            `})
+            .expect(200);
+
+        //get total of metric data
+        const numMetricData = await Metric.find({ config: configId }).countDocuments();
+
+        //disable metrics
+        await changeConfigDisableMetricFlag(configId, true, EnvType.DEFAULT);
+
+        //call again
+        await request(app)
+            .post('/graphql')
+            .set('Authorization', `Bearer ${token}`)
+            .send({ query: `
+                {
+                    criteria(
+                        key: "${keyConfig}", 
+                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
+                                { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
+                        ) { response { result reason } }
+                }  
+            `})
+            .expect(200);
+
+        //test
+        const afterNumMetricData = await Metric.find({ config: configId }).countDocuments();
+        expect(numMetricData === afterNumMetricData).toBe(true);
     })
 })
 

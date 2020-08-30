@@ -166,6 +166,13 @@ async function resolveRelay(config, environment, entry, response) {
     }
 }
 
+function isMetricDisabled(config, environment) {
+    if (config.disable_metrics && config.disable_metrics[environment]) {
+        return config.disable_metrics[environment];
+    }
+    return false;
+}
+
 export async function resolveCriteria(config, context, strategyFilter) {
     context.config_id = config._id;
     const environment = context.environment;
@@ -227,7 +234,8 @@ export async function resolveCriteria(config, context, strategyFilter) {
         response.reason = e.message;
     } finally {
         const bypassMetric = context.bypassMetric ? context.bypassMetric === 'true' : false;
-        if (!bypassMetric && process.env.METRICS_ACTIVATED === 'true') {
+        if (!bypassMetric && process.env.METRICS_ACTIVATED === 'true' && 
+            !isMetricDisabled(config, environment)) {
             addMetrics(context, response);
         }
     }
