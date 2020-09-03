@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Domain from './domain';
 import { Team } from './team';
+import { notifyAcCreation, notifyAcDeletion } from '../external/switcher-api-facade';
 
 const adminSchema = new mongoose.Schema({
     name: {
@@ -166,10 +167,19 @@ adminSchema.pre('save', async function (next) {
 
     if (admin.isModified('password')) {
         admin.password = await bcrypt.hash(admin.password, 8);
+        notifyAcCreation(admin._id);
     }
-
+    
     next();
 })
+
+adminSchema.post('save', function(error, doc, next) {
+    if (error.name === 'MongoError' && error.code === 11000) {
+        return next(new Error('Account is already registered.'));
+    }
+    
+    next(error);
+});
 
 adminSchema.pre('remove', async function (next) {
     var ObjectId = (require('mongoose').Types.ObjectId);
@@ -188,6 +198,7 @@ adminSchema.pre('remove', async function (next) {
         await teams[i].save();
     }
 
+    notifyAcDeletion(admin._id);
     next();
 })
 

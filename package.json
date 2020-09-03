@@ -32,7 +32,8 @@
     "test-unit-strategy": "env-cmd -e test jest -t 'UNIT_STRATEGY' --collect-coverage",
     "test-unit-team": "env-cmd -e test jest -t 'UNIT_TEAM_ROLE_SUITE' --collect-coverage",
     "test-unit-metric": "env-cmd -e test jest -t 'UNIT_ROUTER_METRIC' --collect-coverage",
-    "test-unit-router-index": "env-cmd -e test jest -t 'UNIT_ROUTER_INDEX' --collect-coverage"
+    "test-unit-router-index": "env-cmd -e test jest -t 'UNIT_ROUTER_INDEX' --collect-coverage",
+    "test-unit-api": "env-cmd -e test jest -t 'UNIT_API_FACADE' --collect-coverage"
   },
   "keywords": [
     "feature",
@@ -58,6 +59,7 @@
     "mongodb": "^3.3.3",
     "mongoose": "^5.7.9",
     "multer": "^1.4.2",
+    "switcher-client": "^2.0.5",
     "validator": "^12.0.0"
   },
   "devDependencies": {

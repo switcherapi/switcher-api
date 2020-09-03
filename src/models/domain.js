@@ -13,7 +13,7 @@ const domainSchema = new mongoose.Schema({
         required: true,
         unique: true,
         trim: true,
-        minlength: 5,
+        minlength: 5
     },
     description: {
         type: String,
@@ -121,6 +121,14 @@ domainSchema.pre('save', async function (next) {
     await recordDomainHistory(domain, this.modifiedPaths());
     next();
 })
+
+domainSchema.post('save', function(error, doc, next) {
+    if (error.name === 'MongoError' && error.code === 11000) {
+        return next(new Error('The domain name is already in use.'));
+    }
+
+    next(error);
+});
 
 const Domain = mongoose.model('Domain', domainSchema);
 

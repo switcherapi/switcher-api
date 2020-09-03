@@ -6,6 +6,7 @@ import { auth } from '../middleware/auth';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { removeGroupStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError, formatInput } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
+import { checkGroup } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
@@ -39,6 +40,7 @@ router.post('/groupconfig/create', auth, async (req, res) => {
             return res.status(404).send({ error: 'Domain not found' });
         }
 
+        await checkGroup(domain);
         groupconfig = await verifyOwnership(req.admin, groupconfig, domain._id, ActionTypes.CREATE, RouterTypes.GROUP);
         updateDomainVersion(domain._id);
         await groupconfig.save();

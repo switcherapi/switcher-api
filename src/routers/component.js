@@ -5,6 +5,7 @@ import { verifyInputUpdateParameters } from '../middleware/validators';
 import { check, validationResult } from 'express-validator';
 import Component from '../models/component';
 import { ActionTypes, RouterTypes } from '../models/role';
+import { checkComponent } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
@@ -23,6 +24,7 @@ router.post('/component/create', auth, [
     });
 
     try {
+        await checkComponent(req.body.domain);
         component.name = formatInput(component.name);
         component = await verifyOwnership(req.admin, component, req.body.domain, ActionTypes.CREATE, RouterTypes.COMPONENT);
         const apiKey = await component.generateApiKey();

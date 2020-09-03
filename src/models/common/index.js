@@ -1,4 +1,5 @@
 import History from '../history';
+import { checkHistory } from '../../external/switcher-api-facade';
 
 function checkDifference(oldValues, newValues, oldDocument, newDocument, 
     defaultIgnoredFields, keyArr, keys, pos) {
@@ -54,6 +55,9 @@ export async function recordHistory(modifiedField, oldDocument, newDocument, dom
     const oldValues = new Map();
     const newValues = new Map();
     const defaultIgnoredFields = ['_id', 'updatedAt'];
+
+    if (!await checkHistory(domainId))
+        return;
 
     if (ignoredFields.length) {
         ignoredFields.forEach(field => defaultIgnoredFields.push(field))

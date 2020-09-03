@@ -626,6 +626,76 @@ describe("Testing domain", () => {
             })
     })
 
+    test('CLIENT_SUITE - Should return the Domain structure - Just using environment', (done) => {
+        // Domain will be resolved while identifying the component
+        request(app)
+            .post('/graphql')
+            .set('Authorization', `Bearer ${token}`)
+            .send({ query: `
+                {
+                    domain(name: "${domainDocument.name}", environment: "${EnvType.DEFAULT}") { name version description activated
+                        group(activated: true) { name description activated
+                            config(activated: true) { key description activated
+                                strategies(activated: true) { strategy activated operation  values }
+                                components
+                            }
+                        }
+                    }
+                }
+            `})
+            .expect(200)
+            .end((err, res) => {
+                const expected = `
+                        {
+                            "data":{
+                               "domain":
+                                  {
+                                     "name":"Domain",
+                                     "description":"Test Domain",
+                                     "activated":true,
+                                     "group":[
+                                        {
+                                           "name":"Group Test",
+                                           "description":"Test Group",
+                                           "activated":true,
+                                           "config":[
+                                              {
+                                                 "key":"TEST_CONFIG_KEY",
+                                                 "description":"Test config 1",
+                                                 "activated":true,
+                                                 "strategies":[
+                                                    {
+                                                       "strategy":"VALUE_VALIDATION",
+                                                       "activated":true,
+                                                       "operation":"EXIST",
+                                                       "values":[
+                                                          "USER_1",
+                                                          "USER_2",
+                                                          "USER_3"
+                                                       ]
+                                                    },
+                                                    {
+                                                       "strategy":"NETWORK_VALIDATION",
+                                                       "activated":true,
+                                                       "operation":"EXIST",
+                                                       "values":[
+                                                          "10.0.0.0/24"
+                                                       ]
+                                                    }
+                                                 ]
+                                              }
+                                           ]
+                                        }
+                                     ]
+                                  }
+                            }
+                        }`;
+                
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                done();
+            })
+    })
+
     test('CLIENT_SUITE - Should return the Domain structure - Disabling strategies (resolver test)', (done) => {
         request(app)
             .post('/graphql')
