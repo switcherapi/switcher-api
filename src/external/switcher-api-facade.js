@@ -6,15 +6,14 @@ import { FeatureUnavailableError } from '../routers/common';
 import Component from '../models/component';
 import { Environment, EnvType } from '../models/environment';
 import { Team } from '../models/team';
-import { compareSync } from 'bcrypt';
 
 const apiKey = process.env.SWITCHER_API_KEY;
 const environment = process.env.SWITCHER_API_ENVIRONMENT;
-const domain = process.env.SWITCHER_API_DOMAIN;
+const domainName = process.env.SWITCHER_API_DOMAIN;
 const url = process.env.SWITCHER_API_URL;
 const component = 'switcherapi';
 
-const switcher = new Switcher(url, apiKey, domain, component, environment);
+const switcher = new Switcher(url, apiKey, domainName, component, environment);
 
 function switcherFlagResult(flag, message) {
     if (!flag) {
