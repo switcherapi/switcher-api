@@ -60,6 +60,19 @@ describe('Testing Domain insertion', () => {
                 description: 'Description of my new Domain'
             }).expect(400);
     })
+
+    test('DOMAIN_SUITE - Should NOT create a new Domain - Already exists', async () => {
+        const response = await request(app)
+            .post('/domain/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'New Domain',
+                description: 'Description of my new Domain'
+            }).expect(400);
+
+        // Response validation
+        expect(response.body.error).toBe('The domain name is already in use.');
+    })
 })
 
 describe('Testing fect Domain info', () => {

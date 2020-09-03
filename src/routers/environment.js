@@ -14,6 +14,7 @@ import {
     formatInput
 } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
+import { checkEnvironment } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
@@ -49,6 +50,7 @@ router.post('/environment/create', auth, async (req, res) => {
     });
 
     try {
+        await checkEnvironment(req.body.domain);
         environment.name = formatInput(environment.name);
         environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.CREATE, RouterTypes.ENVIRONMENT);
 

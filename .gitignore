@@ -8,3 +8,4 @@ test-report.xml
 package-lock.json
 dist
 build
+snapshot

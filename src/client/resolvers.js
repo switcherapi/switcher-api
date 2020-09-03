@@ -7,6 +7,7 @@ import { ConfigStrategy, processOperation } from '../models/config-strategy';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { verifyOwnership } from '../routers/common/index';
 import { resolveNotification, resolveValidation } from './relay/index';
+import { checkExecution } from '../external/switcher-api-facade';
 
 export const resolveConfigByKey = async (domain, key) => await Config.findOne({ domain, key }, null, { lean: true });
 
@@ -102,9 +103,13 @@ export async function resolveDomain(_id, name, activated, context) {
     const args = {};
 
     if (_id) { args._id = _id; }
-    if (name) { 
-        args.name = name; 
-        args.owner = context.admin._id;
+    if (name) {
+        if (context.admin) {
+            args.name = name; 
+            args.owner = context.admin._id;
+        } else {
+            args._id = context.domain;
+        }
     }
     
     let domain = await Domain.findOne({ ...args }).lean();
@@ -197,6 +202,8 @@ export async function resolveCriteria(config, context, strategyFilter) {
     };
 
     try {
+        await checkExecution(domain);
+
         // Check flags
         if (config.activated[environment] === undefined ? 
             !config.activated[EnvType.DEFAULT] : !config.activated[environment]) {

@@ -208,11 +208,21 @@ export class NotFoundError extends Error {
     }
 }
 
+export class FeatureUnavailableError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = this.constructor.name;
+        Error.captureStackTrace(this, this.constructor);
+    }
+}
+
 export function responseException(res, err, code) {
     if (err instanceof PermissionError) {
         res.status(401).send({ error: err.message, code: 401 });
     } else if (err instanceof NotFoundError) {
         res.status(404).send({ error: err.message });
+    } else if (err instanceof FeatureUnavailableError) {
+        res.status(500).send({ error: err.message });
     } else {
         res.status(code).send({ error: err.message });
     }

@@ -8,6 +8,7 @@ import { auth } from '../middleware/auth';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { removeConfigStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError, formatInput } from './common/index'
 import { ActionTypes, RouterTypes } from '../models/role';
+import { checkSwitcher } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
@@ -29,6 +30,7 @@ router.post('/config/create', auth, async (req, res) => {
             return res.status(404).send({ error: 'Group Config not found' });
         }
 
+        await checkSwitcher(group);
         let config = await Config.findOne({ key: req.body.key, group: group._id, domain: group.domain });
 
         if (config) {

@@ -8,14 +8,15 @@ import { verifyOwnership, responseException, NotFoundError } from './common/inde
 import Admin from '../models/admin';
 import TeamInvite from '../models/team-invite';
 import Domain from '../models/domain';
+import { checkTeam } from '../external/switcher-api-facade';
 
-const router = new express.Router()
+const router = new express.Router();
 
 async function verifyRequestedTeam(teamId, admin, action) {
-    let team = await Team.findById(teamId)
+    let team = await Team.findById(teamId);
         
     if (!team) {
-        throw new NotFoundError('Team not found')
+        throw new NotFoundError('Team not found');
     }
 
     return await verifyOwnership(admin, team, team.domain, action, RouterTypes.ADMIN);
@@ -23,17 +24,17 @@ async function verifyRequestedTeam(teamId, admin, action) {
 
 async function addMemberToTeam(admin, team) {
     if (!admin) {
-        throw new NotFoundError('User not found')
+        throw new NotFoundError('User not found');
     }
 
     if (admin.teams.includes(team._id)) {
-        throw new Error(`User '${admin.name}' already joined in '${team.name}'`)
+        throw new Error(`User '${admin.name}' already joined in '${team.name}'`);
     }
 
-    team.members.push(admin._id)
-    admin.teams.push(team._id)
-    await team.save()
-    await admin.save()
+    team.members.push(admin._id);
+    admin.teams.push(team._id);
+    await team.save();
+    await admin.save();
 }
 
 router.post('/team/create', auth, [
@@ -49,6 +50,7 @@ router.post('/team/create', auth, [
     })
 
     try {
+        await checkTeam(team.domain);
         team = await verifyOwnership(req.admin, team, team.domain, ActionTypes.CREATE, RouterTypes.ADMIN);
 
         if (req.query.defaultActions) {
@@ -59,10 +61,10 @@ router.post('/team/create', auth, [
             }
         }
 
-        await team.save()
-        res.status(201).send(team)
+        await team.save();
+        res.status(201).send(team);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
@@ -73,7 +75,7 @@ router.get('/team', auth, async (req, res) => {
     if (!req.query.domain) {
         return res.status(500).send({
             error: 'Please, specify the \'domain\' id'
-        })
+        });
     }
 
     try {
@@ -84,48 +86,48 @@ router.get('/team', auth, async (req, res) => {
                 sort: {
                     name: req.query.sort === 'desc' ? -1 : 1
                 }
-            }).lean()
+            }).lean();
 
-        teams = await verifyOwnership(req.admin, teams, req.query.domain, ActionTypes.READ, RouterTypes.ADMIN)
+        teams = await verifyOwnership(req.admin, teams, req.query.domain, ActionTypes.READ, RouterTypes.ADMIN);
 
-        res.send(teams)
+        res.send(teams);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
 router.get('/team/:id', auth, async (req, res) => {
     try {
-        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.READ)
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.READ);
 
         if (req.query.resolveMembers) {
-            await team.populate({ path: 'members_list' }).execPopulate()
+            await team.populate({ path: 'members_list' }).execPopulate();
         }
 
-        res.send(team)
+        res.send(team);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
 router.patch('/team/:id', auth, verifyInputUpdateParameters(['name', 'active']), async (req, res) => {
     try {
-        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
-        req.updates.forEach((update) => team[update] = req.body[update])
-        await team.save()
-        res.send(team)
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE);
+        req.updates.forEach((update) => team[update] = req.body[update]);
+        await team.save();
+        res.send(team);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
 router.delete('/team/:id', auth, async (req, res) => {
     try {
-        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.DELETE)
-        await team.remove()
-        res.send(team)
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.DELETE);
+        await team.remove();
+        res.send(team);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
@@ -166,7 +168,7 @@ router.get('/team/member/invite/:id', auth, async (req, res) => {
         }).execPopulate();
 
         const team = teamInvite.team;
-        const domain = await Domain.findById(team[0].domain);
+        const domain = await Domain.findById(team[0].domain).lean();
         res.send({
             team: team[0].name,
             domain: domain.name
@@ -178,7 +180,7 @@ router.get('/team/member/invite/:id', auth, async (req, res) => {
 
 router.get('/team/member/invite/pending/:id', auth, async (req, res) => {
     try {
-        const teamInvites = await TeamInvite.find({ teamid: req.params.id });
+        const teamInvites = await TeamInvite.find({ teamid: req.params.id }).lean();
         res.send(teamInvites);
     } catch (e) {
         responseException(res, e, 400);
@@ -230,80 +232,65 @@ router.delete('/team/member/invite/remove/:id/:request_id', auth, async (req, re
     }
 })
 
-// Deprecated
-// router.patch('/team/member/invite/:id', auth, verifyInputUpdateParameters(['email']), async (req, res) => {
-//     try {
-//         const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
-
-//         const email = req.body.email.trim()
-//         const admin = await Admin.findOne({ email });
-
-//         await addMemberToTeam(admin, team)
-//         res.send(admin)
-//     } catch (e) {
-//         responseException(res, e, 400)
-//     }
-// })
-
 router.patch('/team/member/add/:id', auth, verifyInputUpdateParameters(['member']), async (req, res) => {
     try {
-        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE);
 
-        const member = req.body.member.trim()
+        const member = req.body.member.trim();
         const admin = await Admin.findById(member);
 
-        await addMemberToTeam(admin, team)
-        res.send(admin)
+        await addMemberToTeam(admin, team);
+        res.send(admin);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
 router.patch('/team/member/remove/:id', auth, verifyInputUpdateParameters(['member']), async (req, res) => {
     try {
-        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE);
 
-        const member = req.body.member.trim()
+        const member = req.body.member.trim();
         const admin = await Admin.findById(member);
 
         if (!admin) {
-            return res.status(404).send({ error: 'Member not found' })
+            return res.status(404).send({ error: 'Member not found' });
         }
 
-        let indexTeam = admin.teams.indexOf(team._id)
+        let indexTeam = admin.teams.indexOf(team._id);
         if (indexTeam < 0) {
-            return res.status(404).send({ error: `Member '${admin.name}' does not belong to '${team.name}'` })
+            return res.status(404).send({ error: `Member '${admin.name}' does not belong to '${team.name}'` });
         }
 
-        admin.teams.splice(indexTeam)
-        indexTeam = team.members.indexOf(team._id)
-        team.members.splice(indexTeam, 1)
+        admin.teams.splice(indexTeam);
+        indexTeam = team.members.indexOf(team._id);
+        team.members.splice(indexTeam, 1);
 
-        await team.save()
-        await admin.save()
-        res.send(admin)
+        await team.save();
+        await admin.save();
+        res.send(admin);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 
 router.patch('/team/role/remove/:id', auth, verifyInputUpdateParameters(['role']), async (req, res) => {
     try {
-        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE)
-        const role = await Role.findById(req.body.role.trim())
+        const team = await verifyRequestedTeam(req.params.id, req.admin, ActionTypes.UPDATE);
+        const role = await Role.findById(req.body.role.trim());
         
         if (!role) {
-            return res.status(404).send({ error: 'Role not found' })
+            return res.status(404).send({ error: 'Role not found' });
         }
 
-        const indexRoles = team.roles.indexOf(role._id)
+        const indexRoles = team.roles.indexOf(role._id);
 
         await Role.deleteOne({ _id: req.body.role });
-        team.roles.splice(indexRoles, 1)
-        await team.save()
-        res.send(team)
+        team.roles.splice(indexRoles, 1);
+        await team.save();
+        res.send(team);
     } catch (e) {
-        responseException(res, e, 400)
+        responseException(res, e, 400);
     }
 })
 

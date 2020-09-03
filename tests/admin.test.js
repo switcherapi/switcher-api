@@ -70,6 +70,31 @@ describe('Testing Admin insertion', () => {
         axiosPostStub.restore();
     })
 
+    test('ADMIN_SUITE - Should NOT signup a new Admin - Already exists', async () => {
+        // mock
+        axiosPostStub.restore();
+        axiosPostStub = sinon.stub(axios, 'post');
+
+        // given
+        const mockedRecaptchaResponse = { data: { success: true } };
+        axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
+
+        // test
+        const response = await request(app)
+            .post('/admin/signup')
+            .send({
+                name: 'New Admin',
+                email: 'new_admin@mail.com',
+                password: '12312312312',
+                token: 'GOOGLE_RECAPTCHA_TOKEN'
+            }).expect(400);
+
+        expect(response.body.error).toBe('Account is already registered.');
+
+        // restore
+        axiosPostStub.restore();
+    })
+
     test('ADMIN_SUITE - Should NOT login before access confirmation sent via Email', async () => {
         // given
         let admin = await Admin.findById(signedupUser).lean();

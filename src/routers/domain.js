@@ -11,11 +11,13 @@ import GroupConfig from '../models/group-config';
 import { Config } from '../models/config';
 import { ConfigStrategy } from '../models/config-strategy';
 import Component from '../models/component';
+import { checkDomain } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
 router.post('/domain/create', auth, async (req, res) => {
     try {
+        await checkDomain(req);
         let domain = new Domain({
             ...req.body,
             owner: req.admin._id
@@ -31,7 +33,7 @@ router.post('/domain/create', auth, async (req, res) => {
         await domain.save();
         res.status(201).send(domain);
     } catch (e) {
-        res.status(400).send(e);
+        responseException(res, e, 400);
     }
 })
 

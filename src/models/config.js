@@ -4,6 +4,7 @@ import History from './history';
 import { ConfigStrategy } from './config-strategy';
 import { EnvType } from './environment';
 import { recordHistory } from './common/index';
+import { checkMetrics } from '../external/switcher-api-facade';
 
 export const RelayMethods = Object.freeze({
     POST: 'POST',
@@ -161,9 +162,10 @@ configSchema.pre('remove', async function (next) {
 })
 
 configSchema.pre('save', async function (next) {
-    const config = this
+    const config = this;
     await config.populate({ path: 'component_list' }).execPopulate();
     await recordConfigHistory(config.toJSON(), this.modifiedPaths());
+    await checkMetrics(config);
     next();
 })
 

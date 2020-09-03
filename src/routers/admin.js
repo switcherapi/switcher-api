@@ -10,6 +10,7 @@ import { getBitBucketToken, getBitBucketUserInfo } from '../external/oauth-bitbu
 import { validate_token } from '../external/google-recaptcha';
 import { sendAuthCode, sendAccountRecoveryCode } from '../external/sendgrid';
 import Domain from '../models/domain';
+import { checkAdmin } from '../external/switcher-api-facade';
 
 const router = new express.Router()
 
@@ -24,6 +25,7 @@ router.post('/admin/signup', [
     }
 
     try {
+        await checkAdmin(req.body.email);
         await validate_token(req);
         const admin = new Admin(req.body);
         const code = await admin.generateAuthCode();
@@ -32,7 +34,7 @@ router.post('/admin/signup', [
         sendAuthCode(admin.email, admin.name, code);
         res.status(201).send({ admin });
     } catch (e) {
-        res.status(400).send({ error: e.message });
+        responseException(res, e, 400);
     }
 })
 
@@ -63,6 +65,7 @@ router.post('/admin/github/auth', async (req, res) => {
         let admin = await Admin.findUserByGitId(userInfo.id);
 
         if (!admin) {
+            await checkAdmin(`@github_${userInfo.id}`);
             admin = new Admin({
                 name: userInfo.name,
                 email: userInfo.email,
@@ -90,6 +93,7 @@ router.post('/admin/bitbucket/auth', async (req, res) => {
         let admin = await Admin.findUserByBitBucketId(userInfo.id);
 
         if (!admin) {
+            await checkAdmin(`@bitbucket_${userInfo.id}`);
             admin = new Admin({
                 name: userInfo.name,
                 email: userInfo.email,
