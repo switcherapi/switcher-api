@@ -72,6 +72,7 @@ export function formatInput(input,
     options = { toUpper: false, toLower: false, autoUnderscore: false, allowSpace: false }) {
 
     const regexStr = options.autoUnderscore ? /^[a-zA-Z0-9_\- ]*$/ : 
+        // eslint-disable-next-line no-useless-escape
         options.allowSpace ? /^[-a-zA-Z0-9_\- ]*$/ : /^[a-zA-Z0-9_\-]*$/;
 
     if (!input.match(regexStr)) {
@@ -133,7 +134,7 @@ async function verifyRoles(team, element, action, routerType) {
 }
 
 async function verifyRolesCascade(team, element, action, routerType) {
-    let orStatement = []
+    let orStatement = [];
     if (routerType === RouterTypes.DOMAIN) {
         orStatement = [
             { router: routerType },

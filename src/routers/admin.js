@@ -12,7 +12,7 @@ import { sendAuthCode, sendAccountRecoveryCode } from '../external/sendgrid';
 import Domain from '../models/domain';
 import { checkAdmin } from '../external/switcher-api-facade';
 
-const router = new express.Router()
+const router = new express.Router();
 
 router.post('/admin/signup', [
     check('name').isLength({ min: 2 }),
@@ -36,7 +36,7 @@ router.post('/admin/signup', [
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.post('/admin/signup/authorization', async (req, res) => {
     try {
@@ -55,7 +55,7 @@ router.post('/admin/signup/authorization', async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.post('/admin/github/auth', async (req, res) => {
     try {
@@ -72,7 +72,7 @@ router.post('/admin/github/auth', async (req, res) => {
                 _gitid: userInfo.id,
                 _avatar: userInfo.avatar,
                 password: Math.random().toString(36).slice(-8)
-            })
+            });
             await admin.save();
         } else {
             admin._avatar = userInfo.avatar;
@@ -83,7 +83,7 @@ router.post('/admin/github/auth', async (req, res) => {
     } catch (e) {
         res.status(401).send({ error: e.message });
     }
-})
+});
 
 router.post('/admin/bitbucket/auth', async (req, res) => {
     try {
@@ -111,7 +111,7 @@ router.post('/admin/bitbucket/auth', async (req, res) => {
     } catch (e) {
         res.status(401).send({ error: e.message });
     }
-})
+});
 
 router.post('/admin/login', [
     check('email').isEmail(),
@@ -129,7 +129,7 @@ router.post('/admin/login', [
     } catch (e) {
         res.status(401).send({ error: 'Invalid email/password' });
     }
-})
+});
 
 router.post('/admin/login/request/recovery', 
     check('email').isEmail(), async (req, res) => {
@@ -147,7 +147,7 @@ router.post('/admin/login/request/recovery',
     }
 
     res.status(200).send({ message: 'Request received' });
-})
+});
 
 router.post('/admin/login/recovery', async (req, res) => {
     try {
@@ -165,22 +165,22 @@ router.post('/admin/login/recovery', async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.post('/admin/logout', auth, async (req, res) => {
     req.admin.token = null;
     await req.admin.save();
     res.send();
-})
+});
 
 router.post('/admin/refresh/me', authRefreshToken, async (req, res) => {
     res.status(200).send(req.jwt);
-})
+});
 
 router.get('/admin/me', auth, async (req, res) => {
     await req.admin.populate({ path: 'team_list' }).execPopulate();
     res.send(req.admin);
-})
+});
 
 router.post('/admin/collaboration/permission', auth, async (req, res) => {
     const element = {
@@ -188,7 +188,7 @@ router.post('/admin/collaboration/permission', auth, async (req, res) => {
         name: req.body.element.name,
         key: req.body.element.key,
         strategy: req.body.element.strategy
-    }
+    };
 
     let result = [];
     for (let index = 0; index < req.body.action.length; index++) {
@@ -207,13 +207,13 @@ router.post('/admin/collaboration/permission', auth, async (req, res) => {
     }
     
     res.send(result);
-})
+});
 
 router.get('/admin/collaboration', auth, async (req, res) => {
     await req.admin.populate({ path: 'team_list' }).execPopulate();
     const domains = req.admin.team_list.map(adm => adm.domain.toString());
     res.send(Array.from(new Set(domains)));
-})
+});
 
 router.get('/admin/:id', auth, async (req, res) => {
     try {
@@ -227,7 +227,7 @@ router.get('/admin/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.delete('/admin/me', auth, async (req, res) => {
     try {
@@ -241,13 +241,13 @@ router.delete('/admin/me', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/admin/me', auth, verifyInputUpdateParameters(['name', 'email', 'password']), async (req, res) => {
     req.updates.forEach((update) => req.admin[update] = req.body[update]);
     await req.admin.save();
     res.send(req.admin);
-})
+});
 
 router.patch('/admin/me/team/leave/:domainid', [check('domainid').isMongoId()], auth, async (req, res) => {
     try {
@@ -276,6 +276,6 @@ router.patch('/admin/me/team/leave/:domainid', [check('domainid').isMongoId()], 
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 export default router;

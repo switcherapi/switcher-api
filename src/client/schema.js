@@ -22,9 +22,9 @@ const queryType = new GraphQLObjectType({
                 }
             },
             resolve: async (source, { key, entry, bypassMetric }, context) => {
-                context.entry = entry
-                context.bypassMetric = bypassMetric
-                return resolveConfigByKey(context.domain, key)
+                context.entry = entry;
+                context.bypassMetric = bypassMetric;
+                return resolveConfigByKey(context.domain, key);
             }
         },
         domain: {
@@ -40,7 +40,7 @@ const queryType = new GraphQLObjectType({
                     type: GraphQLBoolean,
                     resolve: (source, args, { environment }) => {
                         return source.activated.get(environment) === undefined ? 
-                            source.activated.get(EnvType.DEFAULT) : source.activated.get(environment)
+                            source.activated.get(EnvType.DEFAULT) : source.activated.get(environment);
                     }
                 },
                 environment: {
@@ -51,7 +51,7 @@ const queryType = new GraphQLObjectType({
                 if (environment) {
                     context.environment = environment;
                 }
-                return await resolveDomain(_id, name, activated, context)
+                return await resolveDomain(_id, name, activated, context);
             }
         },
         configuration: {
@@ -79,20 +79,20 @@ const queryType = new GraphQLObjectType({
                     context.environment = environment;
                     context.domain = context.domain || domain;
                     if (key) {
-                        return resolveFlatConfigurationByConfig(key, context.domain)
+                        return resolveFlatConfigurationByConfig(key, context.domain);
                     }
 
                     if (group) {
-                        return resolveFlatConfigurationTypeByGroup(group, context.domain)
+                        return resolveFlatConfigurationTypeByGroup(group, context.domain);
                     }
                 }
             }
         },
     }
-})
+});
 
 const schema = new GraphQLSchema({
   query: queryType
-})
+});
 
 export default schema;

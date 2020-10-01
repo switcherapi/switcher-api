@@ -5,7 +5,7 @@ import History from './history';
 import { Metric } from '../models/metric';
 import { Team } from './team';
 import { EnvType, Environment } from './environment';
-import { recordHistory } from './common/index'
+import { recordHistory } from './common/index';
 
 const domainSchema = new mongoose.Schema({
     name: {
@@ -42,50 +42,50 @@ const domainSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true
-})
+});
 
 domainSchema.virtual('groupConfig', {
     ref: 'GroupConfig',
     localField: '_id',
     foreignField: 'domain'
-})
+});
 
 domainSchema.virtual('config', {
     ref: 'Config',
     localField: '_id',
     foreignField: 'domain'
-})
+});
 
 domainSchema.virtual('configStrategy', {
     ref: 'ConfigStrategy',
     localField: '_id',
     foreignField: 'domain'
-})
+});
 
 domainSchema.virtual('environment', {
     ref: 'Environment',
     localField: '_id',
     foreignField: 'domain'
-})
+});
 
 domainSchema.virtual('team', {
     ref: 'Team',
     localField: '_id',
     foreignField: 'domain'
-})
+});
 
 domainSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret, options) {
+    transform: function (doc, ret) {
         if (ret.updatedAt || ret.createdAt) {
             ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
             ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
         }
         return ret;
     }
-}
+};
 
 domainSchema.pre('remove', async function (next) {
     var ObjectId = (require('mongoose').Types.ObjectId);
@@ -107,7 +107,7 @@ domainSchema.pre('remove', async function (next) {
     await Metric.deleteMany({ domain: new ObjectId(domain._id) });
 
     next();
-})
+});
 
 async function recordDomainHistory(domain, modifiedField) {
     if (domain.__v !== undefined && modifiedField.length) {
@@ -120,7 +120,7 @@ domainSchema.pre('save', async function (next) {
     const domain = this;
     await recordDomainHistory(domain, this.modifiedPaths());
     next();
-})
+});
 
 domainSchema.post('save', function(error, doc, next) {
     if (error.name === 'MongoError' && error.code === 11000) {

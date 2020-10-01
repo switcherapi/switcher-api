@@ -4,7 +4,7 @@ import GroupConfig from '../models/group-config';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeGroupStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError, formatInput } from './common/index'
+import { removeGroupStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError, formatInput } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { checkGroup } from '../external/switcher-api-facade';
 
@@ -48,7 +48,7 @@ router.post('/groupconfig/create', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 // GET /groupconfig?limit=10&skip=20
 // GET /groupconfig?sortBy=createdAt:desc
@@ -85,7 +85,7 @@ router.get('/groupconfig', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.get('/groupconfig/:id', auth, async (req, res) => {
     try {
@@ -101,7 +101,7 @@ router.get('/groupconfig/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 // GET /groupconfig/ID?sortBy=date:desc
 // GET /groupconfig/ID?limit=10&skip=20
@@ -133,7 +133,7 @@ router.get('/groupconfig/history/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.delete('/groupconfig/history/:id', auth, async (req, res) => {
     try {
@@ -150,7 +150,7 @@ router.delete('/groupconfig/history/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.delete('/groupconfig/:id', auth, async (req, res) => {
     try {
@@ -168,7 +168,7 @@ router.delete('/groupconfig/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.patch('/groupconfig/:id', auth, 
     verifyInputUpdateParameters(['name', 'description']), async (req, res) => {
@@ -192,7 +192,7 @@ router.patch('/groupconfig/:id', auth,
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.patch('/groupconfig/updateStatus/:id', auth, async (req, res) => {
     try {
@@ -207,7 +207,7 @@ router.patch('/groupconfig/updateStatus/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.patch('/groupconfig/removeStatus/:id', auth, async (req, res) => {
     try {
@@ -218,6 +218,6 @@ router.patch('/groupconfig/removeStatus/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 export default router;

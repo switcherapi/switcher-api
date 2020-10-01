@@ -59,7 +59,7 @@ const StrategyRequirementDefinition = [
         operations: [OperationsType.EXIST, OperationsType.NOT_EXIST, OperationsType.EQUAL, OperationsType.NOT_EQUAL],
         format: 'Hint: NOT/EQUAL forces \\b (delimiter) flag'
     }
-]
+];
 
 const OperationValuesValidation = [
     {
@@ -126,7 +126,7 @@ export function strategyRequirements(strategy) {
         strategy,
         operationsAvailable,
         operationRequirements
-    }
+    };
 }
 
 export function processOperation(strategy, operation, input, values) {
@@ -148,10 +148,10 @@ export function processOperation(strategy, operation, input, values) {
 
 function processNETWORK(operation, input, values) {
 
-    const cidrRegex = '^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$';
+    const cidrRegex = /^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$/;
     
     switch(operation) {
-        case OperationsType.EXIST:
+        case OperationsType.EXIST: {
             for (var i = 0; i < values.length; i++) {
                 if (values[i].match(cidrRegex)) {
                     const cidr = new IPCIDR(values[i]);
@@ -163,7 +163,8 @@ function processNETWORK(operation, input, values) {
                 }
             }
             break;
-        case OperationsType.NOT_EXIST:
+        }
+        case OperationsType.NOT_EXIST: {
             const result = values.filter(element => {
                 if (element.match(cidrRegex)) {
                     const cidr = new IPCIDR(element);
@@ -173,8 +174,9 @@ function processNETWORK(operation, input, values) {
                 } else {
                     return values.includes(input);
                 }
-            })
+            });
             return result.length === 0;
+        }
     }
 
     return false;
@@ -320,13 +322,13 @@ const configStrategySchema = new mongoose.Schema({
     }
 }, {
     timestamps: true
-})
+});
 
 configStrategySchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret, options) {
+    transform: function (doc, ret) {
         if (ret.updatedAt || ret.createdAt) {
             ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
             ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
@@ -336,7 +338,7 @@ configStrategySchema.options.toJSON = {
         }
         return ret;
     }
-}
+};
 
 configStrategySchema.pre('remove', async function (next) {
     const strategyConfig = this;
@@ -384,7 +386,7 @@ configStrategySchema.pre('save', async function (next) {
     await recordStrategyHistory(strategyConfig, this.modifiedPaths());
 
     next();
-})
+});
 
 Object.assign(configStrategySchema.statics, { StrategiesType, OperationsType });
 

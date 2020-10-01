@@ -28,13 +28,13 @@ export const strategyType = new GraphQLObjectType({
             type: GraphQLBoolean,
             resolve: (source, args, { environment }) => {
                 return source.activated[`${environment}`] === undefined ? 
-                    source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`]
+                    source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`];
             }
         },
         statusByEnv: {
             type: GraphQLList(envStatus),
             resolve: (source) => {
-                return resolveEnvStatus(source)
+                return resolveEnvStatus(source);
             }
         },
         operation: {
@@ -44,7 +44,7 @@ export const strategyType = new GraphQLObjectType({
             type: GraphQLList(GraphQLString)
         }
     }
-})
+});
 
 export const configType = new GraphQLObjectType({
     name: 'Config',
@@ -62,13 +62,13 @@ export const configType = new GraphQLObjectType({
             type: GraphQLBoolean,
             resolve: (source, args, { environment }) => {
                 return source.activated[`${environment}`] === undefined ? 
-                    source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`]
+                    source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`];
             }
         },
         statusByEnv: {
             type: GraphQLList(envStatus),
             resolve: (source) => {
-                return resolveEnvStatus(source)
+                return resolveEnvStatus(source);
             }
         },
         strategies: {
@@ -87,7 +87,7 @@ export const configType = new GraphQLObjectType({
                     type: GraphQLBoolean,
                     resolve: (source, args, { environment }) => {
                         return source.activated[`${environment}`] === undefined ? 
-                            source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`]
+                            source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`];
                     }
                 }
             },
@@ -102,7 +102,7 @@ export const configType = new GraphQLObjectType({
             }
         }
     }
-})
+});
 
 export const groupConfigType = new GraphQLObjectType({
     name: 'Group',
@@ -120,13 +120,13 @@ export const groupConfigType = new GraphQLObjectType({
             type: GraphQLBoolean,
             resolve: (source, args, { environment }) => {
                 return source.activated[`${environment}`] === undefined ? 
-                    source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`]
+                    source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`];
             }
         },
         statusByEnv: {
             type: GraphQLList(envStatus),
             resolve: (source) => {
-                return resolveEnvStatus(source)
+                return resolveEnvStatus(source);
             }
         },
         config: {
@@ -142,7 +142,7 @@ export const groupConfigType = new GraphQLObjectType({
                     type: GraphQLBoolean,
                     resolve: (source, args, { environment }) => {
                         return source.activated[`${environment}`] === undefined ? 
-                            source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`]
+                            source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`];
                     }
                 }
             },
@@ -151,7 +151,7 @@ export const groupConfigType = new GraphQLObjectType({
             }
         }
     }
-})
+});
 
 export const domainType = new GraphQLObjectType({
     name: 'Domain',
@@ -173,13 +173,13 @@ export const domainType = new GraphQLObjectType({
             type: GraphQLBoolean,
             resolve: (source, args, { environment }) => {
                 return source.activated[`${environment}`] === undefined ? 
-                    source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`]
+                    source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`];
             }
         },
         statusByEnv: {
             type: GraphQLList(envStatus),
             resolve: (source) => {
-                return resolveEnvStatus(source)
+                return resolveEnvStatus(source);
             }
         },
         group: {
@@ -195,7 +195,7 @@ export const domainType = new GraphQLObjectType({
                     type: GraphQLBoolean,
                     resolve: (source, args, { environment }) => {
                         return source.activated[`${environment}`] === undefined ? 
-                            source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`]
+                            source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`];
                     }
                 }
             },
@@ -204,7 +204,7 @@ export const domainType = new GraphQLObjectType({
             }
         }
     }
-})
+});
 
 export const flatConfigurationType = new GraphQLObjectType({
     name: 'FlatConfiguration',
@@ -212,26 +212,26 @@ export const flatConfigurationType = new GraphQLObjectType({
         domain: {
             type: domainType,
             resolve: async (source, args, context) => {
-                return resolveFlatDomain(source, context)
+                return resolveFlatDomain(source, context);
             }
         },
         group: {
             type: GraphQLList(groupConfigType),
             resolve: async (source, args, context) => {
-                return resolveFlatGroupConfig(source, context)
+                return resolveFlatGroupConfig(source, context);
             }
         },
         config: {
             type: GraphQLList(configType),
             resolve: async (source, args, context) => {
-                return resolveFlatConfig(source, context)
+                return resolveFlatConfig(source, context);
             }
         },
         strategies: {
             type: GraphQLList(strategyType),
             resolve: async (source, args, context) => {
-                return resolveFlatConfigStrategy(source, context)
+                return resolveFlatConfigStrategy(source, context);
             }
         }
     }
-})
+});

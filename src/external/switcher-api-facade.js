@@ -92,7 +92,7 @@ export async function checkTeam(domain) {
 }
 
 //deactivated - risk of recursive deadlock
-export async function checkExecution(domain) {
+export async function checkExecution(/*domain*/) {
     // if (process.env.SWITCHER_API_ENABLE != 'true')
     //     return;
 
@@ -114,7 +114,7 @@ export async function checkMetrics(config) {
             config.disable_metrics.set(EnvType.DEFAULT, true);
         }
 
-        config.activated.forEach((value, key, map) => {
+        config.activated.forEach((value, key) => {
             config.disable_metrics.set(key, true);
         });
     }

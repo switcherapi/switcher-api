@@ -43,10 +43,10 @@ export function verifyInputUpdateParameters(allowedUpdates) {
         const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
         if (!isValidOperation) {
-            return res.status(400).send({ error: `Invalid update parameters` });
+            return res.status(400).send({ error: 'Invalid update parameters' });
         }
 
         req.updates = updates;
         next();
-    }
+    };
 }

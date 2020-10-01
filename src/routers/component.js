@@ -33,7 +33,7 @@ router.post('/component/create', auth, [
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.get('/component/generateApiKey/:component/', auth, async (req, res) => {
     try {
@@ -52,7 +52,7 @@ router.get('/component/generateApiKey/:component/', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 // GET /component?domain=ID&limit=10&skip=20
 // GET /component?domain=ID&sort=desc
@@ -77,11 +77,11 @@ router.get('/component', auth, async (req, res) => {
 
         // components = await verifyOwnership(req.admin, components, req.query.domain, ActionTypes.READ, RouterTypes.COMPONENT);
 
-        res.send(components)
+        res.send(components);
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.get('/component/:id', auth, async (req, res) => {
     try {
@@ -97,7 +97,7 @@ router.get('/component/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/component/:id', auth, verifyInputUpdateParameters(['name', 'description']), async (req, res) => {
     const errors = validationResult(req);
@@ -121,7 +121,7 @@ router.patch('/component/:id', auth, verifyInputUpdateParameters(['name', 'descr
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.delete('/component/:id', auth, async (req, res) => {
     try {
@@ -138,6 +138,6 @@ router.delete('/component/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 export default router;

@@ -5,7 +5,7 @@ import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { check, validationResult } from 'express-validator';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeDomainStatus, verifyOwnership, responseException, NotFoundError, formatInput } from './common/index'
+import { removeDomainStatus, verifyOwnership, responseException, NotFoundError, formatInput } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
 import GroupConfig from '../models/group-config';
 import { Config } from '../models/config';
@@ -35,7 +35,7 @@ router.post('/domain/create', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 // GET /domain?limit=10&skip=20
 // GET /domain?sortBy=createdAt:desc
@@ -60,7 +60,7 @@ router.get('/domain', auth, async (req, res) => {
     } catch (e) {
         res.status(500).send();
     }
-})
+});
 
 router.get('/domain/:id', auth, async (req, res) => {
     try {
@@ -76,7 +76,7 @@ router.get('/domain/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 // GET /domain/ID?sortBy=date:desc
 // GET /domain/ID?limit=10&skip=20
@@ -108,7 +108,7 @@ router.get('/domain/history/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.delete('/domain/history/:id', auth, async (req, res) => {
     try {
@@ -126,7 +126,7 @@ router.delete('/domain/history/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.delete('/domain/:id', auth, async (req, res) => {
     try {
@@ -143,7 +143,7 @@ router.delete('/domain/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.patch('/domain/transfer/request', [check('domain').isMongoId()], auth, async (req, res) => {
     try {
@@ -164,7 +164,7 @@ router.patch('/domain/transfer/request', [check('domain').isMongoId()], auth, as
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/domain/transfer/accept', [check('domain').isMongoId()], auth, async (req, res) => {
     try {
@@ -193,7 +193,7 @@ router.patch('/domain/transfer/accept', [check('domain').isMongoId()], auth, asy
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/domain/:id', auth,
     verifyInputUpdateParameters(['description']), async (req, res) => {
@@ -214,7 +214,7 @@ router.patch('/domain/:id', auth,
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.patch('/domain/updateStatus/:id', auth, async (req, res) => {
     try {
@@ -236,7 +236,7 @@ router.patch('/domain/updateStatus/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/domain/removeStatus/:id', auth, async (req, res) => {
     try {
@@ -254,6 +254,6 @@ router.patch('/domain/removeStatus/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 export default router;

@@ -1,7 +1,7 @@
-require("@babel/register") ({
-    presets: ["@babel/preset-env"]
+require('@babel/register') ({
+    presets: ['@babel/preset-env']
 });
-require("babel-polyfill");
+require('babel-polyfill');
 
 // Import the rest of our application.
-module.exports = require('./index.js')
+module.exports = require('./index.js');

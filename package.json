@@ -72,6 +72,7 @@
     "babel-polyfill": "^6.26.0",
     "coveralls": "^3.0.9",
     "env-cmd": "^10.0.1",
+    "eslint": "^7.10.0",
     "jest": "^24.9.0",
     "jest-sonar-reporter": "^2.0.0",
     "nodemon": "^1.19.4",

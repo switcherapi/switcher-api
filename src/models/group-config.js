@@ -3,7 +3,7 @@ import moment from 'moment';
 import { Config } from './config';
 import History from './history';
 import { EnvType } from '../models/environment';
-import { recordHistory } from './common/index'
+import { recordHistory } from './common/index';
 
 const groupConfigSchema = new mongoose.Schema({
     name: {
@@ -36,20 +36,20 @@ const groupConfigSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true
-})
+});
 
 groupConfigSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret, options) {
+    transform: function (doc, ret) {
         if (ret.updatedAt || ret.createdAt) {
             ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
             ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
         }
         return ret;
     }
-}
+};
 
 async function recordGroupHistory(group, modifiedField) {
     if (group.__v !== undefined && modifiedField.length) {
@@ -62,7 +62,7 @@ groupConfigSchema.virtual('config', {
     ref: 'Config',
     localField: '_id',
     foreignField: 'group'
-})
+});
 
 groupConfigSchema.pre('remove', async function (next) {
     var ObjectId = (require('mongoose').Types.ObjectId);
@@ -76,13 +76,13 @@ groupConfigSchema.pre('remove', async function (next) {
 
     await History.deleteMany({ domainId: group.domain, elementId: group._id });
     next();
-})
+});
 
 groupConfigSchema.pre('save', async function (next) {
     const group = this;
     await recordGroupHistory(group, this.modifiedPaths());
     next();
-})
+});
 
 const GroupConfig = mongoose.model('GroupConfig', groupConfigSchema);
 

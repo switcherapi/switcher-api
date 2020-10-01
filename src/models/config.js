@@ -96,7 +96,7 @@ const configSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true
-})
+});
 
 configSchema.index({ key: 1 });
 
@@ -104,13 +104,13 @@ configSchema.virtual('component_list', {
     ref: 'Component',
     localField: 'components',
     foreignField: '_id'
-})
+});
 
 configSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret, options) {
+    transform: function (doc, ret) {
         if (ret.updatedAt || ret.createdAt) {
             ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
             ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
@@ -133,7 +133,7 @@ configSchema.options.toJSON = {
         }
         return ret;
     }
-}
+};
 
 async function recordConfigHistory(config, modifiedField) {
     if (config.__v !== undefined && modifiedField.length) {
@@ -147,7 +147,7 @@ configSchema.virtual('configStrategy', {
     ref: 'ConfigStrategy',
     localField: '_id',
     foreignField: 'config'
-})
+});
 
 configSchema.pre('remove', async function (next) {
     const config = this;
@@ -159,7 +159,7 @@ configSchema.pre('remove', async function (next) {
     
     await History.deleteMany({ domainId: config.domain, elementId: config._id });
     next();
-})
+});
 
 configSchema.pre('save', async function (next) {
     const config = this;
@@ -167,7 +167,7 @@ configSchema.pre('save', async function (next) {
     await recordConfigHistory(config.toJSON(), this.modifiedPaths());
     await checkMetrics(config);
     next();
-})
+});
 
 export const Config = mongoose.model('Config', configSchema);
 

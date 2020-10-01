@@ -26,32 +26,32 @@ const teamSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Admin'
     }]
-})
+});
 
 teamSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret, options) {
+    transform: function (doc, ret) {
         if (ret.members_list) {
             ret.members = ret.members_list;
             delete ret.members_list;
         }
         return ret;
     }
-}
+};
 
 teamSchema.virtual('members_list', {
     ref: 'Admin',
     localField: 'members',
     foreignField: '_id'
-})
+});
 
 export async function addDefaultRole(action, team) {
     const roleAllRouter = new Role({
         action,
         router: RouterTypes.ALL
-    })
+    });
     await roleAllRouter.save();
     team.roles.push(roleAllRouter._id);
 }
@@ -62,19 +62,19 @@ const existTeam = async (team) => {
         return foundTeam.length > 0;
     }
     return false;
-}
+};
 
 teamSchema.pre('validate', async function (next) {
-    const team = this
+    const team = this;
 
     // Verify if team already exist
     if (await existTeam(team)) {
-        const err = new Error(`Unable to complete the operation. Team '${team.name}' already exist for this Domain`)
+        const err = new Error(`Unable to complete the operation. Team '${team.name}' already exist for this Domain`);
         next(err);
     }
 
     next();
-})
+});
 
 teamSchema.pre('remove', async function (next) {
     const team = this;
@@ -85,9 +85,9 @@ teamSchema.pre('remove', async function (next) {
         const indexValue = member.teams.indexOf(team._id);
         member.teams.splice(indexValue, 1);
         member.save();
-    })
+    });
 
     next();
-})
+});
 
 export const Team = mongoose.model('Team', teamSchema);

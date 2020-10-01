@@ -13,7 +13,7 @@ export const strategyInputType = new GraphQLInputObjectType({
             type: GraphQLNonNull(GraphQLString)
         }
     }
-})
+});
 
 export const responseType = new GraphQLObjectType({
     name: 'Result',
@@ -34,7 +34,7 @@ export const responseType = new GraphQLObjectType({
             type: GraphQLList(strategyType)
         }
     }
-})
+});
 
 export const criteriaType = new GraphQLObjectType({
     name: 'Criteria',
@@ -46,14 +46,14 @@ export const criteriaType = new GraphQLObjectType({
             type: GraphQLBoolean,
             resolve: (source, args, { environment }) => {
                 return source.activated[`${environment}`] === undefined ? 
-                    source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`]
+                    source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`];
             }
         },
         response: {
             type: responseType,
             resolve: (source, params, context) => {
-                return resolveCriteria(source, context)
+                return resolveCriteria(source, context);
             }
         }
     }
-})
+});

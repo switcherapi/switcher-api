@@ -24,31 +24,31 @@ const environmentSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true
-})
+});
 
 environmentSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret, options) {
+    transform: function (doc, ret) {
         if (ret.updatedAt || ret.createdAt) {
-            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss')
-            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss')
+            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
+            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
         }
-        return ret
+        return ret;
     }
-}
+};
 
 environmentSchema.pre('validate', async function (next) {
-    const { name, domain } = this
-    const existEnv = await Environment.findOne({ name, domain })
+    const { name, domain } = this;
+    const existEnv = await Environment.findOne({ name, domain });
     
     if (existEnv) {
-        const err = new Error(`Unable to complete the operation. Environment '${name}' already exist for this Domain`)
+        const err = new Error(`Unable to complete the operation. Environment '${name}' already exist for this Domain`);
         next(err);
     }
 
-    next()
-})
+    next();
+});
 
-export const Environment = mongoose.model('Environment', environmentSchema)
+export const Environment = mongoose.model('Environment', environmentSchema);
