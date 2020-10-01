@@ -48,7 +48,7 @@ const RouterKeySpec = [
 ];
 
 export function getKeysByRouter(router) {
-    const foundRouterSpec = Object.values(RouterKeySpec).find(routerSpec => routerSpec.router === router)
+    const foundRouterSpec = Object.values(RouterKeySpec).find(routerSpec => routerSpec.router === router);
 
     if (!foundRouterSpec) {
         throw new NotFoundError(`Router '${router}' not found. You might want one of these: ${Object.values(RouterTypes)}`);
@@ -56,7 +56,7 @@ export function getKeysByRouter(router) {
 
     return {
         key: foundRouterSpec.key
-    }
+    };
 }
 
 const roleSchema = new mongoose.Schema({
@@ -82,7 +82,7 @@ const roleSchema = new mongoose.Schema({
     values: [{
         type: String
     }]
-})
+});
 
 export function checkActionType(actions) {
     for (let index = 0; index < actions.length; index++) {
@@ -92,4 +92,4 @@ export function checkActionType(actions) {
     }
 }
 
-export const Role = mongoose.model('Role', roleSchema)
+export const Role = mongoose.model('Role', roleSchema);

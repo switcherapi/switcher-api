@@ -12,7 +12,7 @@ import {
     verifyOwnership,
     responseException,
     formatInput
-} from './common/index'
+} from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { checkEnvironment } from '../external/switcher-api-facade';
 
@@ -27,7 +27,7 @@ async function removeEnvironmentFromElements(environment) {
     const configs = await Config.find({ domain: environment.domain });
     if (configs.length) {
         configs.forEach(async function(config) {
-            await removeConfigStatus(config, environment.name)
+            await removeConfigStatus(config, environment.name);
         });
     }
 
@@ -35,7 +35,7 @@ async function removeEnvironmentFromElements(environment) {
     if (groupConfigs.length) {
         groupConfigs.forEach(async function(group) {
             await removeGroupStatus(group, environment.name);
-        })
+        });
     }
 
     const domain = await Domain.findById(environment.domain);
@@ -59,12 +59,12 @@ router.post('/environment/create', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 // GET /environment?domain=ID&limit=10&skip=20
 // GET /environment?domain=ID&sort=desc
 // GET /environment?domain=ID
-router.get("/environment", auth, async (req, res) => {
+router.get('/environment', auth, async (req, res) => {
     if (!req.query.domain) {
         return res.status(500).send({
             error: 'Please, specify the \'domain\' id'
@@ -88,7 +88,7 @@ router.get("/environment", auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.get('/environment/:id', auth, async (req, res) => {
     try {
@@ -104,7 +104,7 @@ router.get('/environment/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.delete('/environment/:id', auth, async (req, res) => {
     try {
@@ -127,7 +127,7 @@ router.delete('/environment/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/environment/recover/:id', auth, async (req, res) => {
     try {
@@ -145,6 +145,6 @@ router.patch('/environment/recover/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 export default router;

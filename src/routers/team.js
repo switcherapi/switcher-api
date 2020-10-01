@@ -47,7 +47,7 @@ router.post('/team/create', auth, [
 
     let team = new Team({
         ...req.body
-    })
+    });
 
     try {
         await checkTeam(team.domain);
@@ -66,7 +66,7 @@ router.post('/team/create', auth, [
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 // GET /team?domain=ID&limit=10&skip=20
 // GET /team?domain=ID&sort=desc
@@ -94,7 +94,7 @@ router.get('/team', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.get('/team/:id', auth, async (req, res) => {
     try {
@@ -108,7 +108,7 @@ router.get('/team/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/team/:id', auth, verifyInputUpdateParameters(['name', 'active']), async (req, res) => {
     try {
@@ -119,7 +119,7 @@ router.patch('/team/:id', auth, verifyInputUpdateParameters(['name', 'active']),
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.delete('/team/:id', auth, async (req, res) => {
     try {
@@ -129,7 +129,7 @@ router.delete('/team/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.post('/team/member/invite/:id', auth, verifyInputUpdateParameters(['email']), async (req, res) => {
     try {
@@ -153,7 +153,7 @@ router.post('/team/member/invite/:id', auth, verifyInputUpdateParameters(['email
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.get('/team/member/invite/:id', auth, async (req, res) => {
     try {
@@ -176,7 +176,7 @@ router.get('/team/member/invite/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.get('/team/member/invite/pending/:id', auth, async (req, res) => {
     try {
@@ -185,7 +185,7 @@ router.get('/team/member/invite/pending/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.post('/team/member/invite/accept/:request_id', auth, async (req, res) => {
     try {
@@ -213,7 +213,7 @@ router.post('/team/member/invite/accept/:request_id', auth, async (req, res) => 
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.delete('/team/member/invite/remove/:id/:request_id', auth, async (req, res) => {
     try {
@@ -230,7 +230,7 @@ router.delete('/team/member/invite/remove/:id/:request_id', auth, async (req, re
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/team/member/add/:id', auth, verifyInputUpdateParameters(['member']), async (req, res) => {
     try {
@@ -244,7 +244,7 @@ router.patch('/team/member/add/:id', auth, verifyInputUpdateParameters(['member'
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/team/member/remove/:id', auth, verifyInputUpdateParameters(['member']), async (req, res) => {
     try {
@@ -272,7 +272,7 @@ router.patch('/team/member/remove/:id', auth, verifyInputUpdateParameters(['memb
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/team/role/remove/:id', auth, verifyInputUpdateParameters(['role']), async (req, res) => {
     try {
@@ -292,6 +292,6 @@ router.patch('/team/role/remove/:id', auth, verifyInputUpdateParameters(['role']
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 export default router;

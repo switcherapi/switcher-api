@@ -60,7 +60,7 @@ export async function recordHistory(modifiedField, oldDocument, newDocument, dom
         return;
 
     if (ignoredFields.length) {
-        ignoredFields.forEach(field => defaultIgnoredFields.push(field))
+        ignoredFields.forEach(field => defaultIgnoredFields.push(field));
     }
     
     modifiedField.forEach(keys => {

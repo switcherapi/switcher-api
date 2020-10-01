@@ -14,13 +14,13 @@ const teamInviteSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true
-})
+});
 
 teamInviteSchema.virtual('team', {
     ref: 'Team',
     localField: 'teamid',
     foreignField: '_id'
-})
+});
 
 const TeamInvite = mongoose.model('TeamInvite', teamInviteSchema);
 

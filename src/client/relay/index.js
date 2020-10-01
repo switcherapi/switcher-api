@@ -20,7 +20,7 @@ export async function resolveValidation(url, method, entry, auth_prefix, auth_to
     return {
         result: response.data.result,
         message: response.data.message
-    }
+    };
 }
 
 async function post(url, data, headers) {

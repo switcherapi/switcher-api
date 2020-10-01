@@ -50,43 +50,43 @@ const adminSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true
-})
+});
 
 adminSchema.virtual('domain', {
     ref: 'Domain',
     localField: '_id',
     foreignField: 'owner'
-})
+});
 
 adminSchema.virtual('groupConfig', {
     ref: 'GroupConfig',
     localField: '_id',
     foreignField: 'owner'
-})
+});
 
 adminSchema.virtual('config', {
     ref: 'config',
     localField: '_id',
     foreignField: 'owner'
-})
+});
 
 adminSchema.virtual('configStrategy', {
     ref: 'ConfigStrategy',
     localField: '_id',
     foreignField: 'owner'
-})
+});
 
 adminSchema.virtual('team_list', {
     ref: 'Team',
     localField: 'teams',
     foreignField: '_id'
-})
+});
 
 adminSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret, options) {
+    transform: function (doc, ret) {
         if (ret.updatedAt || ret.createdAt) {
             ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
             ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
@@ -102,7 +102,7 @@ adminSchema.options.toJSON = {
         delete ret.code;
         return ret;
     }
-}
+};
 
 adminSchema.methods.generateAuthToken = async function () {
     const admin = this;
@@ -123,13 +123,13 @@ adminSchema.methods.generateAuthToken = async function () {
         token,
         refreshToken
     };
-}
+};
 
 adminSchema.methods.generateAuthCode = async function () {
     const admin = this;
     admin.code = Math.random().toString(36).slice(-8);
     return admin.code;
-}
+};
 
 adminSchema.statics.findByCredentials = async (email, password) => {
     const admin = await Admin.findOne({ email, active: true });
@@ -145,22 +145,22 @@ adminSchema.statics.findByCredentials = async (email, password) => {
     }
 
     return admin;
-}
+};
 
 adminSchema.statics.findUserByAuthCode = async (code, active) => {
     const admin = await Admin.findOne({ code, active });
     return admin;
-}
+};
 
 adminSchema.statics.findUserByGitId = async (_gitid) => {
     const admin = await Admin.findOne({ _gitid });
     return admin;
-}
+};
 
 adminSchema.statics.findUserByBitBucketId = async (_bitbucketid) => {
     const admin = await Admin.findOne({ _bitbucketid });
     return admin;
-}
+};
 
 adminSchema.pre('save', async function (next) {
     const admin = this;
@@ -171,7 +171,7 @@ adminSchema.pre('save', async function (next) {
     }
     
     next();
-})
+});
 
 adminSchema.post('save', function(error, doc, next) {
     if (error.name === 'MongoError' && error.code === 11000) {
@@ -200,7 +200,7 @@ adminSchema.pre('remove', async function (next) {
 
     notifyAcDeletion(admin._id);
     next();
-})
+});
 
 const Admin = mongoose.model('Admin', adminSchema);
 

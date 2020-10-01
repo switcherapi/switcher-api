@@ -4,7 +4,7 @@ import { checkConfig, checkConfigComponent } from '../middleware/validators';
 import { appAuth, appGenerateCredentials } from '../middleware/auth';
 import { resolveCriteria, checkDomain } from '../client/resolvers';
 
-const router = new express.Router()
+const router = new express.Router();
 
 // GET /check?key=KEY
 // GET /check?key=KEY&showReason=true
@@ -35,7 +35,7 @@ router.post('/criteria', appAuth, checkConfig, checkConfigComponent, async (req,
     } catch (e) {
         res.status(500).send({ error: e.message });
     }
-})
+});
 
 router.get('/criteria/snapshot_check/:version', appAuth, async (req, res) => {
     try {
@@ -54,7 +54,7 @@ router.get('/criteria/snapshot_check/:version', appAuth, async (req, res) => {
     } catch (e) {
         res.status(500).send({ error: e.message });
     }
-})
+});
 
 router.post('/criteria/auth', appGenerateCredentials, async (req, res) => {
     try {
@@ -63,6 +63,6 @@ router.post('/criteria/auth', appGenerateCredentials, async (req, res) => {
     } catch (e) {
         res.status(400).send({ error: e.message });
     }
-})
+});
 
 export default router;

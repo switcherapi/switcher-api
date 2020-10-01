@@ -32,13 +32,13 @@ const componentSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true
-})
+});
 
 componentSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret, options) {
+    transform: function (doc, ret) {
         if (ret.updatedAt || ret.createdAt) {
             ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
             ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
@@ -46,7 +46,7 @@ componentSchema.options.toJSON = {
         delete ret.apihash;
         return ret;
     }
-}
+};
 
 componentSchema.methods.generateApiKey = async function () {
     const component = this;
@@ -56,7 +56,7 @@ componentSchema.methods.generateApiKey = async function () {
     await component.save();
 
     return apiKey;
-}
+};
 
 componentSchema.methods.generateAuthToken = async function (environment) {
     const component = this;
@@ -72,7 +72,7 @@ componentSchema.methods.generateAuthToken = async function (environment) {
     }), process.env.JWT_SECRET, options);
 
     return token;
-}
+};
 
 componentSchema.statics.findByCredentials = async (domainName, componentName, apiKey) => {
     const domain = await Domain.findOne({ name: domainName });
@@ -92,7 +92,7 @@ componentSchema.statics.findByCredentials = async (domainName, componentName, ap
         component,
         domain
     };
-}
+};
 
 const existComponent = async (component) => {
     if (component.__v === undefined) {
@@ -100,7 +100,7 @@ const existComponent = async (component) => {
         return foundComponent.length > 0;
     }
     return false;
-}
+};
 
 componentSchema.pre('validate', async function (next) {
     const component = this;
@@ -112,21 +112,21 @@ componentSchema.pre('validate', async function (next) {
     }
 
     next();
-})
+});
 
 componentSchema.pre('remove', async function (next) {
-    const component = this
+    const component = this;
     
     const configsToRemoveFrom = await Config.find({ components: { $in: [component._id] } });
     configsToRemoveFrom.forEach(config => {
         const indexValue = config.components.indexOf(component._id);
         config.components.splice(indexValue, 1);
         config.save();
-    })
+    });
 
-    next()
-})
+    next();
+});
 
-const Component = mongoose.model('Component', componentSchema)
+const Component = mongoose.model('Component', componentSchema);
 
 export default Component;

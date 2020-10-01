@@ -99,7 +99,7 @@ function buildStatistics(aggregatedData, dataKey, timeframe = false) {
                 [`${result}`]: data.total,
                 [`${!data.result ? 'positive' : 'negative'}`]: 0,
                 total: data.total
-            }
+            };
             if (!timeframe) {
                 const aggregatedDateData = aggregatedData
                     .filter(dateEntry => dateEntry[`${dataKey}`] === data[`${dataKey}`]);
@@ -146,10 +146,10 @@ async function aggregateComponents(aggregatorFilter, dateGroupPattern, result) {
         },
         {
             $lookup: {
-                from: "components",
-                localField: "component",
-                foreignField: "id",
-                as: "components"
+                from: 'components',
+                localField: 'component',
+                foreignField: 'id',
+                as: 'components'
             }
         },
         {
@@ -157,9 +157,9 @@ async function aggregateComponents(aggregatorFilter, dateGroupPattern, result) {
                 count: 1,
                 components: {
                     $filter: {
-                        input: "$components",
-                        as: "component",
-                        cond: { $eq: ["$$component.name", '$_id.component'] },
+                        input: '$components',
+                        as: 'component',
+                        cond: { $eq: ['$$component.name', '$_id.component'] },
                     }
                 }
             }
@@ -194,13 +194,13 @@ async function aggregateSwitchers(aggregatorFilter, dateGroupPattern, result) {
                 count: { $sum: 1 }
             }
         },
-        { $addFields: { convertedId: { $toObjectId: "$_id.config" } } },
+        { $addFields: { convertedId: { $toObjectId: '$_id.config' } } },
         {
             $lookup: {
-                from: "configs",
-                localField: "config",
-                foreignField: "id",
-                as: "switchers"
+                from: 'configs',
+                localField: 'config',
+                foreignField: 'id',
+                as: 'switchers'
             }
         },
         {
@@ -208,9 +208,9 @@ async function aggregateSwitchers(aggregatorFilter, dateGroupPattern, result) {
                 count: 1,
                 switchers: {
                     $filter: {
-                        input: "$switchers",
-                        as: "switcher",
-                        cond: { $eq: ["$$switcher._id", '$convertedId'] },
+                        input: '$switchers',
+                        as: 'switcher',
+                        cond: { $eq: ['$$switcher._id', '$convertedId'] },
                     }
                 }
             }
@@ -281,7 +281,7 @@ router.get('/metric/data/', [
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.get('/metric/statistics/', [
     check('domainid').isMongoId(),
@@ -323,7 +323,7 @@ router.get('/metric/statistics/', [
         responseException(res, e, 500);
     }
 
-})
+});
 
 router.delete('/metric', [
     check('domainid').isMongoId(),
@@ -347,6 +347,6 @@ router.delete('/metric', [
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 export default router;

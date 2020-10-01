@@ -57,7 +57,7 @@ router.post('/configstrategy/create', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 // GET /configstrategy?limit=10&skip=20
 // GET /configstrategy?sortBy=createdAt:desc
@@ -95,7 +95,7 @@ router.get('/configstrategy', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.get('/configstrategy/:id', auth, async (req, res) => {
     try {
@@ -111,7 +111,7 @@ router.get('/configstrategy/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 // GET /configstrategy/ID?sortBy=date:desc
 // GET /configstrategy/ID?limit=10&skip=20
@@ -143,7 +143,7 @@ router.get('/configstrategy/history/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.delete('/configstrategy/history/:id', auth, async (req, res) => {
     try {
@@ -160,7 +160,7 @@ router.delete('/configstrategy/history/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.get('/configstrategy/req/:strategy', auth, (req, res) => {
     try {
@@ -168,13 +168,13 @@ router.get('/configstrategy/req/:strategy', auth, (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.get('/configstrategy/spec/strategies', auth, (req, res) => {
     res.send({
         strategiesAvailable: Object.values(StrategiesType)
     });
-})
+});
 
 router.delete('/configstrategy/:id', auth, async (req, res) => {
     try {
@@ -192,7 +192,7 @@ router.delete('/configstrategy/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.patch('/configstrategy/:id', auth, 
     verifyInputUpdateParameters(['description', 'values', 'operation']), async (req, res) => {
@@ -213,7 +213,7 @@ router.patch('/configstrategy/:id', auth,
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/configstrategy/addval/:id', auth,
     verifyInputUpdateParameters(['value']), async (req, res) => {
@@ -237,7 +237,7 @@ router.patch('/configstrategy/addval/:id', auth,
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/configstrategy/updateval/:id', auth,
     verifyInputUpdateParameters(['oldvalue', 'newvalue']), async (req, res) => {
@@ -277,7 +277,7 @@ router.patch('/configstrategy/updateval/:id', auth,
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/configstrategy/removeval/:id', auth,
     verifyInputUpdateParameters(['value']),  async (req, res) => {
@@ -301,7 +301,7 @@ router.patch('/configstrategy/removeval/:id', auth,
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 // GET /configstrategy/values:id?sort=true
 // GET /configstrategy/values:id?limit=10&skip=20
@@ -330,14 +330,14 @@ router.get('/configstrategy/values/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.patch('/configstrategy/updateStatus/:id', auth, async (req, res) => {
     try {
         let updates = Object.keys(req.body);
 
         if (updates.length > 1) {
-            return res.status(400).send({ error: `You can only update one environment at time` });
+            return res.status(400).send({ error: 'You can only update one environment at time' });
         }
 
         let configStrategy = await ConfigStrategy.findById(req.params.id);
@@ -360,6 +360,6 @@ router.patch('/configstrategy/updateStatus/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 export default router;

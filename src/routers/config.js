@@ -6,7 +6,7 @@ import { Config, relayOptions } from '../models/config';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeConfigStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError, formatInput } from './common/index'
+import { removeConfigStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError, formatInput } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { checkSwitcher } from '../external/switcher-api-facade';
 
@@ -52,7 +52,7 @@ router.post('/config/create', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 // GET /config?group=ID&limit=10&skip=20
 // GET /config?group=ID&sortBy=createdAt:desc
@@ -89,7 +89,7 @@ router.get('/config', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 // GET /config/ID?resolveComponents=true
 router.get('/config/:id', auth, async (req, res) => {
@@ -110,7 +110,7 @@ router.get('/config/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 // GET /config/ID?sortBy=date:desc
 // GET /config/ID?limit=10&skip=20
@@ -142,7 +142,7 @@ router.get('/config/history/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.delete('/config/history/:id', auth, async (req, res) => {
     try {
@@ -159,7 +159,7 @@ router.delete('/config/history/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.delete('/config/:id', auth, async (req, res) => {
     try {
@@ -177,7 +177,7 @@ router.delete('/config/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.patch('/config/:id', auth,
     verifyInputUpdateParameters(['key', 'description', 'relay', 'disable_metrics']), async (req, res) => {
@@ -214,7 +214,7 @@ router.patch('/config/:id', auth,
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.patch('/config/updateRelay/:id', auth, async (req, res) => {
     try {
@@ -244,7 +244,7 @@ router.patch('/config/updateRelay/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/config/updateStatus/:id', auth, async (req, res) => {
     try {
@@ -266,7 +266,7 @@ router.patch('/config/updateStatus/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/config/removeStatus/:id', auth, async (req, res) => {
     try {
@@ -284,7 +284,7 @@ router.patch('/config/removeStatus/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/config/addComponent/:id', auth, async (req, res) => {
     try {
@@ -292,7 +292,7 @@ router.patch('/config/addComponent/:id', auth, async (req, res) => {
         const component = await Component.findById(req.body.component);
 
         if (!component) {
-            return res.status(404).send({ error: `Component not found` });
+            return res.status(404).send({ error: 'Component not found' });
         }
 
         if (config.components.includes(component._id)) {
@@ -307,7 +307,7 @@ router.patch('/config/addComponent/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.patch('/config/removeComponent/:id', auth, async (req, res) => {
     try {
@@ -315,7 +315,7 @@ router.patch('/config/removeComponent/:id', auth, async (req, res) => {
         const component = await Component.findById(req.body.component);
 
         if (!component) {
-            return res.status(404).send({ error: `Component not found` });
+            return res.status(404).send({ error: 'Component not found' });
         }
 
         config.updatedBy = req.admin.email;
@@ -327,7 +327,7 @@ router.patch('/config/removeComponent/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.patch('/config/updateComponents/:id', auth, async (req, res) => {
     try {
@@ -336,7 +336,7 @@ router.patch('/config/updateComponents/:id', auth, async (req, res) => {
         const components = await Component.find({ _id: { $in: componentIds } });
 
         if (components.length != req.body.components.length) {
-            return res.status(404).send({ error: `One or more component was not found` });
+            return res.status(404).send({ error: 'One or more component was not found' });
         }
 
         config.updatedBy = req.admin.email;
@@ -347,7 +347,7 @@ router.patch('/config/updateComponents/:id', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 400);
     }
-})
+});
 
 router.patch('/config/removeRelay/:id/:env', auth, async (req, res) => {
     try {
@@ -377,10 +377,10 @@ router.patch('/config/removeRelay/:id/:env', auth, async (req, res) => {
     } catch (e) {
         responseException(res, e, 500);
     }
-})
+});
 
 router.get('/config/spec/relay', auth, (req, res) => {
     res.send(relayOptions());
-})
+});
 
 export default router;

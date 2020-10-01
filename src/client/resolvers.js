@@ -181,7 +181,7 @@ function isMetricDisabled(config, environment) {
 export async function resolveCriteria(config, context, strategyFilter) {
     context.config_id = config._id;
     const environment = context.environment;
-    let domain, group, strategies
+    let domain, group, strategies;
 
     await Promise.all([
         checkDomain(context.domain), 

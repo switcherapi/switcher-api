@@ -1,10 +1,10 @@
-import { Config } from "../models/config";
-import GroupConfig from "../models/group-config";
-import Domain from "../models/domain";
-import Component from "../models/component";
+import { Config } from '../models/config';
+import GroupConfig from '../models/group-config';
+import Domain from '../models/domain';
+import Component from '../models/component';
 import { ConfigStrategy } from '../models/config-strategy';
-import { verifyOwnership } from "../routers/common";
-import { ActionTypes, RouterTypes } from "../models/role";
+import { verifyOwnership } from '../routers/common';
+import { ActionTypes, RouterTypes } from '../models/role';
 
 export async function resolveFlatConfigurationByConfig(key, domainId) {
     const config = await Config.find({ key, domain: domainId }).lean();

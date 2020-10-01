@@ -43,20 +43,20 @@ const metricSchema = new mongoose.Schema({
         type: Date,
         required: true
     }
-})
+});
 
 metricSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret, options) {
+    transform: function (doc, ret) {
         ret.date = moment(ret.date).format('YYYY-MM-DD HH:mm:ss');
         if (!ret.id) {
             delete ret.id;
         }
         return ret;
     }
-}
+};
 
 export function addMetrics(context, response) {
     const metric = new Metric({
