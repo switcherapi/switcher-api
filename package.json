@@ -53,6 +53,7 @@
     "express-validator": "^6.3.0",
     "graphql": "^14.5.8",
     "graphql-tag": "^2.10.1",
+    "helmet": "^4.1.1",
     "ip-cidr": "^2.0.6",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.24.0",
