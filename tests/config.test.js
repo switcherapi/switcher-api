@@ -12,23 +12,21 @@ import {
     setupDatabase,
     adminMasterAccountId,
     adminMasterAccountToken,
-    adminAccountToken,
     domainId,
     groupConfigId,
     configId1,
     config1Document,
     configId2,
     configStrategyId
- } from './fixtures/db_api';
-import { execute } from 'graphql';
+} from './fixtures/db_api';
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
-    await mongoose.disconnect()
-})
+    await mongoose.disconnect();
+});
 
 describe('Testing configuration insertion', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('CONFIG_SUITE - Should create a new Config', async () => {
         let response = await request(app)
@@ -57,8 +55,8 @@ describe('Testing configuration insertion', () => {
                 group: groupConfigId
             }).expect(400);
 
-        expect(response.body.error).toBe(`Config NEW_CONFIG already exist`);
-    })
+        expect(response.body.error).toBe('Config NEW_CONFIG already exist');
+    });
 
     test('CONFIG_SUITE - Should NOT create a new Config - with wrong group config Id', async () => {
         const response = await request(app)
@@ -68,9 +66,9 @@ describe('Testing configuration insertion', () => {
                 key: 'NEW_CONFIG',
                 description: 'Description of my new Config',
                 group: new mongoose.Types.ObjectId()
-            }).expect(404)
+            }).expect(404);
 
-        expect(response.body.error).toBe('Group Config not found')
+        expect(response.body.error).toBe('Group Config not found');
 
         await request(app)
             .post('/config/create')
@@ -79,12 +77,12 @@ describe('Testing configuration insertion', () => {
                 key: 'NEW_CONFIG',
                 description: 'Description of my new Config',
                 group: 'INVALID_VALUE_ID'
-            }).expect(400)
-    })
-})
+            }).expect(400);
+    });
+});
 
 describe('Testing fetch configuration info', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('CONFIG_SUITE - Should get Config information', async () => {
         let response = await request(app)
@@ -119,7 +117,7 @@ describe('Testing fetch configuration info', () => {
             .send().expect(200);
 
         expect(response.body.length).toEqual(3);
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT get Config information by invalid Group Id', async () => { 
         await request(app)
@@ -131,7 +129,7 @@ describe('Testing fetch configuration info', () => {
             .get('/config?group=INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500);
-    })
+    });
 
     test('CONFIG_SUITE - Should get Config information by Id', async () => {
         let response = await request(app)
@@ -158,7 +156,7 @@ describe('Testing fetch configuration info', () => {
             .get('/config/' + response.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
-    })
+    });
 
     test('CONFIG_SUITE - Should not found Config information by Id', async () => {
         await request(app)
@@ -170,11 +168,11 @@ describe('Testing fetch configuration info', () => {
             .get('/config/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
-    })
-})
+    });
+});
 
 describe('Testing configuration deletion', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('CONFIG_SUITE - Should NOT delete Config - Wrong and bad Id', async () => {
         await request(app)
@@ -186,7 +184,7 @@ describe('Testing configuration deletion', () => {
             .delete('/config/WRONG_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500);
-    })
+    });
 
     test('CONFIG_SUITE - Should delete Config', async () => {
         // DB validation Before deleting
@@ -228,11 +226,11 @@ describe('Testing configuration deletion', () => {
 
         configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
         expect(configStrategy).toBeNull();
-    })
-})
+    });
+});
 
 describe('Testing update info', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('CONFIG_SUITE - Should update Config info', async () => {
 
@@ -259,8 +257,8 @@ describe('Testing update info', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({ key: 'NEWKEY' }).expect(400);
 
-        expect(response.body.error).toEqual(`Config NEWKEY already exist`);
-    })
+        expect(response.body.error).toEqual('Config NEWKEY already exist');
+    });
 
     test('CONFIG_SUITE - Should NOT update Config info', async () => {
         await request(app)
@@ -284,7 +282,7 @@ describe('Testing update info', () => {
             .send({
                 description: 'New description'
             }).expect(500);
-    })
+    });
 
     test('CONFIG_SUITE - Should update Config environment status - default', async () => {
         expect(config1Document.activated.get(EnvType.DEFAULT)).toEqual(true);
@@ -301,11 +299,11 @@ describe('Testing update info', () => {
         // DB validation - verify status updated
         const config = await Config.findById(configId1).lean();
         expect(config.activated[EnvType.DEFAULT]).toEqual(false);
-    })
-})
+    });
+});
 
 describe('Testing Environment status change', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('CONFIG_SUITE - Should update Config environment status - QA', async () => {
         // QA Environment still does not exist
@@ -345,7 +343,7 @@ describe('Testing Environment status change', () => {
         config = await Config.findById(configId1).lean();
         expect(config.activated[EnvType.DEFAULT]).toEqual(true);
         expect(config.activated['QA']).toEqual(false);
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT update Config environment status - Config not fould', async () => {
         await request(app)
@@ -361,7 +359,7 @@ describe('Testing Environment status change', () => {
             .send({
                 default: false
             }).expect(404);
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT update Config environment status - Unknown environment name', async () => {
         const response = await request(app)
@@ -372,7 +370,7 @@ describe('Testing Environment status change', () => {
             }).expect(400);
             
         expect(response.body.error).toEqual('Invalid updates');
-    })
+    });
 
     test('CONFIG_SUITE - Should remove Config environment status', async () => {
         // Creating QA1 Environment...
@@ -404,7 +402,7 @@ describe('Testing Environment status change', () => {
         // DB validation - verify status updated
         config = await Config.findById(configId1).lean();
         expect(config.activated['QA1']).toEqual(undefined);
-    })
+    });
 
     test('CONFIG_SUITE - Should record changes on history collection', async () => {
         let response = await request(app)
@@ -416,7 +414,7 @@ describe('Testing Environment status change', () => {
                 group: groupConfigId
             }).expect(201);
         
-        const configId = response.body._id
+        const configId = response.body._id;
         response = await request(app)
                 .get('/config/history/' + configId)
                 .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -440,8 +438,8 @@ describe('Testing Environment status change', () => {
 
         // DB validation
         let history = await History.find({ elementId: configId }).lean();
-        expect(history[0].oldValue['description']).toEqual('Description of my new Config')
-        expect(history[0].newValue['description']).toEqual('New description')
+        expect(history[0].oldValue['description']).toEqual('Description of my new Config');
+        expect(history[0].newValue['description']).toEqual('New description');
 
         await request(app)
             .patch('/config/updateStatus/' + configId)
@@ -453,7 +451,7 @@ describe('Testing Environment status change', () => {
         // DB validation
         history = await History.find({ elementId: configId }).lean();
         expect(history.length).toEqual(2);
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT list changes by invalid Config Id', async () => {
         await request(app)
@@ -465,7 +463,7 @@ describe('Testing Environment status change', () => {
             .get('/config/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500);
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT delete history by invalid Config Id', async () => {
         await request(app)
@@ -477,7 +475,7 @@ describe('Testing Environment status change', () => {
             .delete('/config/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500);
-    })
+    });
 
     test('CONFIG_SUITE - Should delete history from a Config element', async () => {
         let history = await History.find({ elementId: configId1 }).lean();
@@ -490,7 +488,7 @@ describe('Testing Environment status change', () => {
 
         history = await History.find({ elementId: configId1 }).lean();
         expect(history.length > 0).toEqual(false);
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT remove Config environment status', async () => {
         // Creating QA3 Environment...
@@ -536,8 +534,8 @@ describe('Testing Environment status change', () => {
         const config = await Config.findById(configId1).lean();
         expect(config.activated[EnvType.DEFAULT]).toEqual(true);
         expect(config.activated['QA3']).toEqual(true);
-    })
-})
+    });
+});
 
 describe('Testing component association', () => {
     beforeAll(async () => {
@@ -549,7 +547,7 @@ describe('Testing component association', () => {
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
             }).expect(201);
-    })
+    });
 
     test('CONFIG_SUITE - Should associate component to a config', async () => {
         const responseComponent = await request(app)
@@ -571,7 +569,7 @@ describe('Testing component association', () => {
         // DB validation - document updated
         const config = await Config.findById(configId1);
         expect(config.components.includes(responseComponent.body.component._id)).toBe(true);
-    })
+    });
 
     test('CONFIG_SUITE - Should associate multiple components to a config', async () => {
         const responseComponent1 = await request(app)
@@ -605,7 +603,7 @@ describe('Testing component association', () => {
         // DB validation - document updated
         const config = await Config.findById(configId1).lean();
         expect(config.components.length >= 2).toBe(true);
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT associate multiple components to a config - One does not exist', async () => {
         const responseComponent1 = await request(app)
@@ -628,7 +626,7 @@ describe('Testing component association', () => {
             }).expect(404);
 
         expect(responseUpdate.body.error).toEqual('One or more component was not found');
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT associate multiple components to a config - Wrong Config Id', async () => {
         await request(app)
@@ -637,7 +635,7 @@ describe('Testing component association', () => {
             .send({
                 components: [ new mongoose.Types.ObjectId() ]
             }).expect(404);
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT associate component to a config - Component not found', async () => {
         const response = await request(app)
@@ -648,7 +646,7 @@ describe('Testing component association', () => {
             }).expect(404);
         
         expect(response.body.error).toBe('Component not found');
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT associate component to a config - Component already exists', async () => {
         const responseComponent = await request(app)
@@ -675,7 +673,7 @@ describe('Testing component association', () => {
             }).expect(400);
         
         expect(responseAdd.body.error).toBe('Component NewComponent-Added-2x already exists');
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT associate component to a config - Config not found', async () => {
         await request(app)
@@ -691,7 +689,7 @@ describe('Testing component association', () => {
             .send({
                 component: new mongoose.Types.ObjectId()
             }).expect(404);
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT desassociate component from a config - Component not found', async () => {
         await request(app)
@@ -700,7 +698,7 @@ describe('Testing component association', () => {
             .send({
                 component: new mongoose.Types.ObjectId()
             }).expect(404);
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT desassociate component from a config - Config not found', async () => {
         await request(app)
@@ -716,7 +714,7 @@ describe('Testing component association', () => {
             .send({
                 component: new mongoose.Types.ObjectId()
             }).expect(404);
-    })
+    });
 
     test('CONFIG_SUITE - Should desassociate component from a config', async () => {
         const responseComponent = await request(app)
@@ -745,7 +743,7 @@ describe('Testing component association', () => {
         // DB validation - document updated
         const config = await Config.findById(configId1).lean();
         expect(config.components.includes(responseComponent.body.component._id)).toEqual(false);
-    })
+    });
 
     test('CONFIG_SUITE - Should remove records from history after deleting element', async () => {
         let history = await History.find({ elementId: configId1 }).lean();
@@ -755,27 +753,27 @@ describe('Testing component association', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
-        history = await History.find({ elementId: configId1 })
+        history = await History.find({ elementId: configId1 });
         expect(history.length).toEqual(0);
-    })
-})
+    });
+});
 
 describe('Testing relay association', () => {
     beforeAll(setupDatabase);
 
     const bodyRelayProd = {
-        type: "VALIDATION",
-        description: "Validate input via external API",
+        type: 'VALIDATION',
+        description: 'Validate input via external API',
         activated: {
             default: true
         },
         endpoint: {
-            default: "http://localhost:3001"
+            default: 'http://localhost:3001'
         },
-        method: "GET",
-        auth_prefix: "Bearer",
+        method: 'GET',
+        auth_prefix: 'Bearer',
         auth_token: {
-            default: "123"
+            default: '123'
         }
     };
 
@@ -790,67 +788,67 @@ describe('Testing relay association', () => {
         expect(config.relay.activated['default']).toEqual(true);
         expect(config.relay.endpoint['default']).toBe('http://localhost:3001');
         expect(config.relay.auth_token['default']).toEqual('123');
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT configure new Relay - Config not found', async () => {
         await request(app)
             .patch(`/config/updateRelay/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(bodyRelayProd).expect(404);
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT configure new Relay - Environment does not exist', async () => {
         const response = await request(app)
             .patch(`/config/updateRelay/${configId1}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                type: "VALIDATION",
-                description: "Validate input via external API",
+                type: 'VALIDATION',
+                description: 'Validate input via external API',
                 activated: {
                     DOES_NOT_EXIST: true
                 },
                 endpoint: {
-                    DOES_NOT_EXIST: "http://localhost:3001"
+                    DOES_NOT_EXIST: 'http://localhost:3001'
                 },
-                method: "GET"
+                method: 'GET'
             }).expect(400);
         
         expect(response.body.error).toBe('Invalid updates');
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT configure new Relay - Invalid TYPE', async () => {
         await request(app)
             .patch(`/config/updateRelay/${configId1}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                type: "INVALID_TYPE",
-                description: "Validate input via external API",
+                type: 'INVALID_TYPE',
+                description: 'Validate input via external API',
                 activated: {
                     default: true
                 },
                 endpoint: {
-                    default: "http://localhost:3001"
+                    default: 'http://localhost:3001'
                 },
-                method: "GET"
+                method: 'GET'
             }).expect(400);
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT configure new Relay - Invalid METHOD', async () => {
         await request(app)
             .patch(`/config/updateRelay/${configId1}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                type: "NOTIFICATION",
-                description: "Notify external API",
+                type: 'NOTIFICATION',
+                description: 'Notify external API',
                 activated: {
                     default: true
                 },
                 endpoint: {
-                    default: "http://localhost:3001"
+                    default: 'http://localhost:3001'
                 },
-                method: "PATCH"
+                method: 'PATCH'
             }).expect(400);
-    })
+    });
 
     test('CONFIG_SUITE - Should configure new Relay on new envrironment', async () => {
         //given
@@ -872,10 +870,10 @@ describe('Testing relay association', () => {
                     development: true
                 },
                 endpoint: {
-                    development: "http://localhost:7000"
+                    development: 'http://localhost:7000'
                 },
                 auth_token: {
-                    development: "abcd"
+                    development: 'abcd'
                 }
             }).expect(200);
 
@@ -888,7 +886,7 @@ describe('Testing relay association', () => {
         expect(config.relay.activated['development']).toEqual(true);
         expect(config.relay.endpoint['development']).toBe('http://localhost:7000');
         expect(config.relay.auth_token['development']).toEqual('abcd');
-    })
+    });
 
     test('CONFIG_SUITE - Should remove configured Relay when reseting environment', async () => {
         //test
@@ -908,7 +906,7 @@ describe('Testing relay association', () => {
         expect(config.relay.activated['development']).toBe(undefined);
         expect(config.relay.endpoint['development']).toBe(undefined);
         expect(config.relay.auth_token['development']).toBe(undefined);
-    })
+    });
 
     test('CONFIG_SUITE - Should remove Relay from an environment', async () => {
         //given - adding development relay to be removed later on
@@ -920,10 +918,10 @@ describe('Testing relay association', () => {
                     development: true
                 },
                 endpoint: {
-                    development: "http://localhost:7000"
+                    development: 'http://localhost:7000'
                 },
                 auth_token: {
-                    development: "abcd"
+                    development: 'abcd'
                 }
             }).expect(200);
 
@@ -943,7 +941,7 @@ describe('Testing relay association', () => {
         expect(config.relay.activated['development']).toBe(undefined);
         expect(config.relay.endpoint['development']).toBe(undefined);
         expect(config.relay.auth_token['development']).toBe(undefined);
-    })
+    });
 
     test('CONFIG_SUITE - Should remove all Relays', async () => {
         await request(app)
@@ -953,7 +951,7 @@ describe('Testing relay association', () => {
         
         const config = await Config.findById(configId1).lean();
         expect(config.relay).toEqual({});
-    })
+    });
 
     test('CONFIG_SUITE - Should remove all Relays', async () => {
         const response = await request(app)
@@ -962,9 +960,9 @@ describe('Testing relay association', () => {
             .send().expect(200);
         
         expect(response.body).toMatchObject({ methods: [ 'POST', 'GET' ], types: [ 'VALIDATION', 'NOTIFICATION' ] });
-    })
+    });
 
-})
+});
 
 describe('Testing disable metrics', () => {
 
@@ -981,7 +979,7 @@ describe('Testing disable metrics', () => {
         // DB validation - document updated
         const config = await Config.findById(configId1).lean();
         expect(config.disable_metrics['default']).toEqual(true);
-    })
+    });
 
     test('CONFIG_SUITE - Should NOT disable metrics for an unknown environment', async () => {
         const response = await request(app)
@@ -994,7 +992,7 @@ describe('Testing disable metrics', () => {
             }).expect(500);
 
         expect(response.body.error).toEqual('Invalid updates');
-    })
+    });
 
     test('CONFIG_SUITE - Should reset disabled metric flag when reseting environment', async () => {
         //given
@@ -1022,6 +1020,6 @@ describe('Testing disable metrics', () => {
         // DB validation - document updated
         config = await Config.findById(configId1).lean();
         expect(config.disable_metrics['development']).toEqual(undefined);
-    })
+    });
 
-})
+});

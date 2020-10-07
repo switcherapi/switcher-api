@@ -6,7 +6,6 @@ import {
     setupDatabase,
     adminMasterAccountToken,
     domainId,
-    configId1,
     config1Document,
     adminAccountToken
 } from './fixtures/db_metrics';
@@ -14,7 +13,7 @@ import {
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
     await mongoose.disconnect();
-})
+});
 describe('Fetch overall statistics', () => {
     beforeAll(setupDatabase);
 
@@ -26,7 +25,7 @@ describe('Fetch overall statistics', () => {
 
         // Response validation
         expect(response.body).not.toBeNull();
-    })
+    });
 
     test('METRIC_SUITE - Should return only switcher statistics from a given Domain', async () => {
         const response = await request(app)
@@ -39,7 +38,7 @@ describe('Fetch overall statistics', () => {
         expect(response.body?.switchers.length > 0).toEqual(true);
         expect(response.body?.components).toEqual(undefined);
         expect(response.body?.reasons).toEqual(undefined);
-    })
+    });
 
     test('METRIC_SUITE - Should return only component statistics from a given Domain', async () => {
         const response = await request(app)
@@ -52,7 +51,7 @@ describe('Fetch overall statistics', () => {
         expect(response.body?.components.length > 0).toEqual(true);
         expect(response.body?.switchers).toEqual(undefined);
         expect(response.body?.reasons).toEqual(undefined);
-    })
+    });
 
     test('METRIC_SUITE - Should return statistics filtered by Switcher KEY', async () => {
         const response = await request(app)
@@ -63,7 +62,7 @@ describe('Fetch overall statistics', () => {
         // Response validation
         expect(response.body).not.toBeNull();
         expect(response.body.switchers[0].switcher).toEqual('KEY_1');
-    })
+    });
 
     test('METRIC_SUITE - Should return statistics filtered by Result', async () => {
         const response = await request(app)
@@ -75,7 +74,7 @@ describe('Fetch overall statistics', () => {
         expect(response.body).not.toBeNull();
         expect(response.body.switchers[0].negative).toEqual(0);
         expect(response.body.switchers[0].positive).toEqual(1);
-    })
+    });
 
     test('METRIC_SUITE - Should NOT return statistics filtered unknown Switcher KEY', async () => {
         const response = await request(app)
@@ -86,15 +85,15 @@ describe('Fetch overall statistics', () => {
         // Response validation
         expect(response.body).not.toBeNull();
         expect(response.body).toEqual({});
-    })
+    });
 
     test('METRIC_SUITE - Should NOT return statistics when no Domain is provided', async () => {
         await request(app)
-            .get(`/metric/statistics?statistics=all`)
+            .get('/metric/statistics?statistics=all')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
-    })
-})
+    });
+});
 
 describe('Fetch metrics', () => {
     beforeAll(setupDatabase);
@@ -107,24 +106,24 @@ describe('Fetch metrics', () => {
 
         // Response validation
         expect(response.body).not.toBeNull();
-    })
+    });
 
     test('METRIC_SUITE - Should NOT fetch records from a unknown Domain - Not Domain Id', async () => {
-        const response = await request(app)
+        await request(app)
             .get('/metric/data?domainid=UNKNOWN&page=1')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
-    })
+    });
 
     test('METRIC_SUITE - Should NOT fetch records - Invalid attribute for page', async () => {
-        const response = await request(app)
+        await request(app)
             .get(`/metric/data?domainid=${domainId}&page=test`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500);
-    })
+    });
 
     test('METRIC_SUITE - Should fetch records by KEY', async () => {
-        const args = `&page=1&key=KEY_2`;
+        const args = '&page=1&key=KEY_2';
         const response = await request(app)
             .get(`/metric/data?domainid=${domainId}${args}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -134,11 +133,11 @@ describe('Fetch metrics', () => {
         expect(response.body.data).not.toBeNull();
         response.body.data.forEach(e => {
             expect(e.config.key).toEqual('KEY_2');
-        })
-    })
+        });
+    });
 
     test('METRIC_SUITE - Should fetch records by Environment', async () => {
-        const args = `&page=1&environment=QA`;
+        const args = '&page=1&environment=QA';
         const response = await request(app)
             .get(`/metric/data?domainid=${domainId}${args}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -148,11 +147,11 @@ describe('Fetch metrics', () => {
         expect(response.body.data).not.toBeNull();
         response.body.data.forEach(e => {
             expect(e.config.key).toEqual('KEY_2');
-        })
-    })
+        });
+    });
 
     test('METRIC_SUITE - Should NOT fetch records by unknown KEY', async () => {
-        const args = `&page=1&key=UNKNOWN_KEY_2`;
+        const args = '&page=1&key=UNKNOWN_KEY_2';
         const response = await request(app)
             .get(`/metric/data?domainid=${domainId}${args}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -160,10 +159,10 @@ describe('Fetch metrics', () => {
             
         // Response validation
         expect(response.body).toEqual({});
-    })
+    });
 
     test('METRIC_SUITE - Should fetch records by COMPONENT', async () => {
-        const args = `&page=1&component=Component_1`;
+        const args = '&page=1&component=Component_1';
         const response = await request(app)
             .get(`/metric/data?domainid=${domainId}${args}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -173,11 +172,11 @@ describe('Fetch metrics', () => {
         expect(response.body.data).not.toBeNull();
         response.body.data.forEach(e => {
             expect(e.component).toEqual('Component_1');
-        })
-    })
+        });
+    });
 
     test('METRIC_SUITE - Should fetch records by RESULT', async () => {
-        const args = `&page=1&result=true`;
+        const args = '&page=1&result=true';
         const response = await request(app)
             .get(`/metric/data?domainid=${domainId}${args}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -187,11 +186,11 @@ describe('Fetch metrics', () => {
         expect(response.body.data).not.toBeNull();
         response.body.data.forEach(e => {
             expect(e.result).toEqual(true);
-        })
-    })
+        });
+    });
 
     test('METRIC_SUITE - Should fetch records by GROUP', async () => {
-        const args = `&page=1&group=GROUP 1`;
+        const args = '&page=1&group=GROUP 1';
         const response = await request(app)
             .get(`/metric/data?domainid=${domainId}${args}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -201,11 +200,11 @@ describe('Fetch metrics', () => {
         expect(response.body.data).not.toBeNull();
         response.body.data.forEach(e => {
             expect(e.group).toEqual('GROUP 1');
-        })
-    })
+        });
+    });
 
     test('METRIC_SUITE - Should fetch records by DATE AFTER', async () => {
-        const args = `&page=1&dateAfter=2019-12-14 17:30:00`;
+        const args = '&page=1&dateAfter=2019-12-14 17:30:00';
         const response = await request(app)
             .get(`/metric/data?domainid=${domainId}${args}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -215,11 +214,11 @@ describe('Fetch metrics', () => {
         expect(response.body.data).not.toBeNull();
         response.body.data.forEach(e => {
             expect(moment(e.date).isSameOrAfter('2019-12-14 17:30:00')).toEqual(true);
-        })
-    })
+        });
+    });
 
     test('METRIC_SUITE - Should fetch records by DATE BEFORE', async () => {
-        const args = `&page=1&dateBefore=2019-12-14 17:30:00`;
+        const args = '&page=1&dateBefore=2019-12-14 17:30:00';
         const response = await request(app)
             .get(`/metric/data?domainid=${domainId}${args}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -229,11 +228,11 @@ describe('Fetch metrics', () => {
         expect(response.body.data).not.toBeNull();
         response.body.data.forEach(e => {
             expect(moment(e.date).isSameOrBefore('2019-12-14 17:30:00')).toEqual(true);
-        })
-    })
+        });
+    });
 
     test('METRIC_SUITE - Should fetch records by DATE AFTER/BEFORE', async () => {
-        const args = `&page=1&dateAfter=2019-12-14 16:00:00&dateBefore=2019-12-14 17:30:00`;
+        const args = '&page=1&dateAfter=2019-12-14 16:00:00&dateBefore=2019-12-14 17:30:00';
         const response = await request(app)
             .get(`/metric/data?domainid=${domainId}${args}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -243,10 +242,10 @@ describe('Fetch metrics', () => {
         expect(response.body.data).not.toBeNull();
         response.body.data.forEach(e => {
             expect(moment(e.date).isSameOrBefore('2019-12-14 17:00:00')).toEqual(true);
-        })
-    })
+        });
+    });
 
-})
+});
 
 describe('Delete metrics', () => {
     beforeAll(setupDatabase);
@@ -256,24 +255,24 @@ describe('Delete metrics', () => {
             .delete(`/metric?domainid=${domainId}&key=INVALID_ID`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
-    })
+    });
 
     test('METRIC_SUITE - Should NOT delete metrics - Domain ID not provided', async () => {
         await request(app)
-            .delete(`/metric?key=INVALID_ID`)
+            .delete('/metric?key=INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
-    })
+    });
 
     test('METRIC_SUITE - Should NOT delete metrics - Permission denied', async () => {
         await request(app)
             .delete(`/metric?domainid=${domainId}&key=KEY_1`)
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(401);
-    })
+    });
 
     test('METRIC_SUITE - Should delete metrics', async () => {
-        const args = `&page=1&key=KEY_1`;
+        const args = '&page=1&key=KEY_1';
         let response = await request(app)
             .get(`/metric/data?domainid=${domainId}${args}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -283,7 +282,7 @@ describe('Delete metrics', () => {
         expect(response.body.data).not.toBeNull();
         response.body.data.forEach(e => {
             expect(e.config.key).toEqual('KEY_1');
-        })
+        });
 
         await request(app)
             .delete(`/metric?domainid=${domainId}&key=${config1Document.key}`)
@@ -297,6 +296,6 @@ describe('Delete metrics', () => {
             
         // Response validation
         expect(response.body.data).toEqual([]);
-    })
+    });
 
-})
+});

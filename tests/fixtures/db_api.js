@@ -16,52 +16,52 @@ import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models
 
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test_secret';
 
-export const adminMasterAccountId = new mongoose.Types.ObjectId()
-export const adminMasterAccountToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET)
+export const adminMasterAccountId = new mongoose.Types.ObjectId();
+export const adminMasterAccountToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET);
 export const adminMasterAccount = {
     _id: adminMasterAccountId,
     name: 'Master Admin',
     email: 'master@mail.com',
     password: '123123123123',
     active: true
-}
+};
 
-export const adminAccountId = new mongoose.Types.ObjectId()
-export const adminAccountToken = jwt.sign({ _id: adminAccountId }, process.env.JWT_SECRET)
+export const adminAccountId = new mongoose.Types.ObjectId();
+export const adminAccountToken = jwt.sign({ _id: adminAccountId }, process.env.JWT_SECRET);
 export const adminAccount = {
     _id: adminAccountId,
     name: 'Admin',
     email: 'admin@mail.com',
     password: 'asdasdasdasd',
     active: true
-}
+};
 
-export const domainId = new mongoose.Types.ObjectId()
+export const domainId = new mongoose.Types.ObjectId();
 export const domainDocument = {
     _id: domainId,
     name: 'Domain',
     description: 'Test Domain',
     activated: new Map().set(EnvType.DEFAULT, true),
     owner: adminMasterAccountId
-}
+};
 
-export const role1Id = new mongoose.Types.ObjectId()
+export const role1Id = new mongoose.Types.ObjectId();
 export const role1 = {
     _id: role1Id,
     action: ActionTypes.READ,
     active: true,
     router: RouterTypes.GROUP
-}
+};
 
-export const environment1Id = new mongoose.Types.ObjectId()
+export const environment1Id = new mongoose.Types.ObjectId();
 export const environment1 = {
     _id: environment1Id,
     name: EnvType.DEFAULT,
     domain: domainId,
     owner: adminMasterAccountId
-}
+};
 
-export const groupConfigId = new mongoose.Types.ObjectId()
+export const groupConfigId = new mongoose.Types.ObjectId();
 export const groupConfigDocument = {
     _id: groupConfigId,
     name: 'Group Test',
@@ -69,9 +69,9 @@ export const groupConfigDocument = {
     activated: new Map().set(EnvType.DEFAULT, true),
     owner: adminMasterAccountId,
     domain: domainId
-}
+};
 
-export const configId1 = new mongoose.Types.ObjectId()
+export const configId1 = new mongoose.Types.ObjectId();
 export const config1Document = {
     _id: configId1,
     key: 'TEST_CONFIG_KEY_1',
@@ -80,9 +80,9 @@ export const config1Document = {
     owner: adminMasterAccountId,
     group: groupConfigId,
     domain: domainId
-}
+};
 
-export const configId2 = new mongoose.Types.ObjectId()
+export const configId2 = new mongoose.Types.ObjectId();
 export const config2Document = {
     _id: configId2,
     key: 'TEST_CONFIG_KEY_2',
@@ -91,9 +91,9 @@ export const config2Document = {
     owner: adminMasterAccountId,
     group: groupConfigId,
     domain: domainId
-}
+};
 
-export const configStrategyId = new mongoose.Types.ObjectId()
+export const configStrategyId = new mongoose.Types.ObjectId();
 export const configStrategyDocument = {
     _id: configStrategyId,
     description: 'Test config strategy',
@@ -104,63 +104,63 @@ export const configStrategyDocument = {
     strategy: StrategiesType.VALUE,
     values: ['USER_1', 'USER_2', 'USER_3'],
     domain: domainId
-}
+};
 
-export const roleAll1Id = new mongoose.Types.ObjectId()
+export const roleAll1Id = new mongoose.Types.ObjectId();
 export const roleAll1 = {
     _id: roleAll1Id,
     action: ActionTypes.CREATE,
     active: true,
     router: RouterTypes.ALL
-}
+};
 
-export const roleAll2Id = new mongoose.Types.ObjectId()
+export const roleAll2Id = new mongoose.Types.ObjectId();
 export const roleAll2 = {
     _id: roleAll2Id,
     action: ActionTypes.READ,
     active: true,
     router: RouterTypes.ALL
-}
+};
 
-export const roleAll3Id = new mongoose.Types.ObjectId()
+export const roleAll3Id = new mongoose.Types.ObjectId();
 export const roleAll3 = {
     _id: roleAll3Id,
     action: ActionTypes.UPDATE,
     active: true,
     router: RouterTypes.ALL
-}
+};
 
-export const roleAll4Id = new mongoose.Types.ObjectId()
+export const roleAll4Id = new mongoose.Types.ObjectId();
 export const roleAll4 = {
     _id: roleAll4Id,
     action: ActionTypes.DELETE,
     active: true,
     router: RouterTypes.ALL
-}
+};
 
-export const teamId = new mongoose.Types.ObjectId()
+export const teamId = new mongoose.Types.ObjectId();
 export const team = {
     _id: teamId,
     domain: domainId,
     name: 'Team',
     active: true,
     roles: [roleAll1Id, roleAll2Id, roleAll3Id, roleAll4Id]
-}
+};
 
-export const team1Id = new mongoose.Types.ObjectId()
+export const team1Id = new mongoose.Types.ObjectId();
 export const team1 = {
     _id: team1Id,
     domain: domainId,
     name: 'Team 1',
     active: true,
     roles: [role1Id]
-}
+};
 
 export const teamInviteNoTeam = {
     _id: new mongoose.Types.ObjectId(),
     teamid: new mongoose.Types.ObjectId(),
     email: 'switcherapi@noreply.switcherapi.com'
-}
+};
 
 export const setupDatabase = async () => {
     await ConfigStrategy.deleteMany();
@@ -200,4 +200,4 @@ export const setupDatabase = async () => {
     await new Role(roleAll2).save();
     await new Role(roleAll3).save();
     await new Role(roleAll4).save();
-}
+};

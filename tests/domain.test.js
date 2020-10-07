@@ -14,7 +14,6 @@ import {
     adminMasterAccountToken,
     adminMasterAccount,
     adminAccountToken,
-    adminAccount,
     domainDocument,
     domainId,
     groupConfigId,
@@ -23,14 +22,12 @@ import {
     configStrategyId,
     environment1Id,
     adminAccountId
- } from './fixtures/db_api';
-import { Team } from '../src/models/team';
-import Component from '../src/models/component';
+} from './fixtures/db_api';
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
     await mongoose.disconnect();
-})
+});
 
 describe('Testing Domain insertion', () => {
     beforeAll(setupDatabase);
@@ -50,16 +47,16 @@ describe('Testing Domain insertion', () => {
 
         // Response validation
         expect(response.body.name).toBe('New Domain');
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT create a new Domain - Missing required params', async () => {
-        const response = await request(app)
+        await request(app)
             .post('/domain/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Domain'
             }).expect(400);
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT create a new Domain - Already exists', async () => {
         const response = await request(app)
@@ -72,8 +69,8 @@ describe('Testing Domain insertion', () => {
 
         // Response validation
         expect(response.body.error).toBe('The domain name is already in use.');
-    })
-})
+    });
+});
 
 describe('Testing fect Domain info', () => {
     beforeAll(setupDatabase);
@@ -117,7 +114,7 @@ describe('Testing fect Domain info', () => {
             .send().expect(200);
 
         expect(response.body.length).toEqual(1);
-    })
+    });
 
     test('DOMAIN_SUITE - Should get Domain information by Id', async () => {
         let response = await request(app)
@@ -143,7 +140,7 @@ describe('Testing fect Domain info', () => {
             .get('/domain/' + response.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT found Domain information by Id', async () => {
         await request(app)
@@ -155,7 +152,7 @@ describe('Testing fect Domain info', () => {
             .get('/domain/5dd05cfa98adc4285457e29a')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
-    })
+    });
 
     test('DOMAIN_SUITE - Should delete Domain', async () => {
         const responseLogin = await request(app)
@@ -210,7 +207,7 @@ describe('Testing fect Domain info', () => {
 
         environment = await Environment.findById(environment1Id).lean();
         expect(environment).toBeNull();
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT delete Domain', async () => {
         let responseLogin = await request(app)
@@ -229,8 +226,8 @@ describe('Testing fect Domain info', () => {
             .delete('/domain/INVALID_DOMAIN_ID')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send().expect(500);
-    })
-})
+    });
+});
 
 describe('Testing update Domain info', () => {
     beforeAll(setupDatabase);
@@ -256,7 +253,7 @@ describe('Testing update Domain info', () => {
         // DB validation - verify history record added
         history = await History.find({ elementId: domainId }).lean();
         expect(history.length > 0).toEqual(true);
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT update Domain info', async () => {
         await request(app)
@@ -272,7 +269,7 @@ describe('Testing update Domain info', () => {
             .send({
                 description: 'Description updated'
             }).expect(404);
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT update Domain name', async () => {
         await request(app)
@@ -281,7 +278,7 @@ describe('Testing update Domain info', () => {
             .send({
                 name: 'New Domain name'
             }).expect(400);
-    })
+    });
 
     test('DOMAIN_SUITE - Should update Domain environment status - default', async () => {
         expect(domainDocument.activated.get(EnvType.DEFAULT)).toEqual(true);
@@ -298,7 +295,7 @@ describe('Testing update Domain info', () => {
         // DB validation - verify status updated
         const domain = await Domain.findById(domainId).lean();
         expect(domain.activated[EnvType.DEFAULT]).toEqual(false);
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT update environment status given an unknown Domain ID ', async () => {
         await request(app)
@@ -314,7 +311,7 @@ describe('Testing update Domain info', () => {
             .send({
                 default: false
             }).expect(404);
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT update environment status given an unknown environment name', async () => {
         const response = await request(app)
@@ -325,21 +322,21 @@ describe('Testing update Domain info', () => {
             }).expect(400);
         
         expect(response.body.error).toEqual('Invalid updates');
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT read changes on history collection - Invalid Domain Id', async () => {
         await request(app)
             .get('/domain/history/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(400);
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT read changes on history collection - Domain not found', async () => {
         await request(app)
             .get('/domain/history/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT delete history by invalid Domain Id', async () => {
         await request(app)
@@ -351,7 +348,7 @@ describe('Testing update Domain info', () => {
             .delete('/domain/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500);
-    })
+    });
 
     test('DOMAIN_SUITE - Should delete history from a Domain element', async () => {
         let history = await History.find({ elementId: domainId }).lean();
@@ -364,7 +361,7 @@ describe('Testing update Domain info', () => {
 
         history = await History.find({ elementId: domainId }).lean();
         expect(history.length > 0).toEqual(false);
-    })
+    });
 
     test('DOMAIN_SUITE - Should record changes on history collection', async () => {
         let response = await request(app)
@@ -412,8 +409,8 @@ describe('Testing update Domain info', () => {
         // DB validation
         history = await History.find({ elementId: id }).lean();
         expect(history.length).toEqual(2);
-    })
-})
+    });
+});
 
 describe('Testing environment configurations', () => {
     beforeAll(setupDatabase);
@@ -464,7 +461,7 @@ describe('Testing environment configurations', () => {
         domain = await Domain.findById(domainId).lean();
         expect(domain.activated[EnvType.DEFAULT]).toEqual(true);
         expect(domain.activated['QA']).toEqual(false);
-    })
+    });
 
     test('DOMAIN_SUITE - Should remove Domain environment status', async () => {
         // Creating QA Environment...
@@ -496,7 +493,7 @@ describe('Testing environment configurations', () => {
         // DB validation - verify status updated
         domain = await Domain.findById(domainId).lean();
         expect(domain.activated['QA1']).toEqual(undefined);
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT remove Domain environment status', async () => {
         // Creating QA3 Environment...
@@ -542,8 +539,8 @@ describe('Testing environment configurations', () => {
         const domain = await Domain.findById(domainId).lean();
         expect(domain.activated[EnvType.DEFAULT]).toEqual(true);
         expect(domain.activated['QA3']).toEqual(true);
-    })
-})
+    });
+});
 
 describe('Testing transfer Domain', () => {
     beforeAll(setupDatabase);
@@ -555,7 +552,7 @@ describe('Testing transfer Domain', () => {
             .send({
                 domain: new mongoose.Types.ObjectId()
             }).expect(404);
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT request Domain to transfer - Invalid Domain ID', async () => {
         await request(app)
@@ -564,7 +561,7 @@ describe('Testing transfer Domain', () => {
             .send({
                 domain: 'NOT_VALID_ID'
             }).expect(422);
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT request Domain to transfer - Admin is not owner', async () => {
         await request(app)
@@ -573,7 +570,7 @@ describe('Testing transfer Domain', () => {
             .send({
                 domain: domainId
             }).expect(404);
-    })
+    });
 
     test('DOMAIN_SUITE - Should request/cancel Domain to transfer', async () => {
         await request(app)
@@ -598,7 +595,7 @@ describe('Testing transfer Domain', () => {
         //Verify transfer flag to be true
         domain = await Domain.findById(domainId).lean();
         expect(domain.transfer).toBe(null);
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT accept Domain to transfer - Domain not found', async () => {
         await request(app)
@@ -607,7 +604,7 @@ describe('Testing transfer Domain', () => {
             .send({
                 domain: new mongoose.Types.ObjectId()
             }).expect(404);
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT accept Domain to transfer - Invalid Domain ID', async () => {
         await request(app)
@@ -616,7 +613,7 @@ describe('Testing transfer Domain', () => {
             .send({
                 domain: 'NOT_VALID_ID'
             }).expect(422);
-    })
+    });
 
     test('DOMAIN_SUITE - Should NOT accept Domain to transfer - Domain not flagged to be transfered', async () => {
         await request(app)
@@ -625,7 +622,7 @@ describe('Testing transfer Domain', () => {
             .send({
                 domain: domainId
             }).expect(404);
-    })
+    });
 
     test('DOMAIN_SUITE - Should accept Domain to transfer', async () => {
         //given 'domainId' to be transfered
@@ -688,5 +685,5 @@ describe('Testing transfer Domain', () => {
         expect(configs > 0).toBe(true);
         expect(strategies > 0).toBe(true);
         expect(environment > 0).toBe(true);
-    })
-})
+    });
+});

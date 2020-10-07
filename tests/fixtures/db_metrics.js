@@ -19,7 +19,7 @@ export const adminMasterAccount = {
     email: 'metric@admin.com',
     password: '123123123123',
     active: true
-}
+};
 
 export const adminAccountId = new mongoose.Types.ObjectId();
 export const adminAccountToken = jwt.sign({ _id: adminAccountId }, process.env.JWT_SECRET);
@@ -29,7 +29,7 @@ export const adminAccount = {
     email: 'metric.admin@admin.com',
     password: '123123123123',
     active: true
-}
+};
 
 export const domainId = new mongoose.Types.ObjectId();
 export const domainDocument = {
@@ -38,7 +38,7 @@ export const domainDocument = {
     description: 'Test Domain',
     activated: new Map().set(EnvType.DEFAULT, true),
     owner: adminMasterAccountId
-}
+};
 
 export const groupConfigId = new mongoose.Types.ObjectId();
 export const groupConfigDocument = {
@@ -48,7 +48,7 @@ export const groupConfigDocument = {
     activated: new Map().set(EnvType.DEFAULT, true),
     owner: adminMasterAccountId,
     domain: domainId
-}
+};
 
 export const configId1 = new mongoose.Types.ObjectId();
 export const config1Document = {
@@ -60,7 +60,7 @@ export const config1Document = {
     owner: adminMasterAccountId,
     group: groupConfigId,
     domain: domainId
-}
+};
 
 export const configId2 = new mongoose.Types.ObjectId();
 export const config2Document = {
@@ -72,7 +72,7 @@ export const config2Document = {
     owner: adminMasterAccountId,
     group: groupConfigId,
     domain: domainId
-}
+};
 
 export const component1Id = new mongoose.Types.ObjectId();
 export const component1 = {
@@ -81,7 +81,7 @@ export const component1 = {
     description: 'Test app',
     domain: domainId,
     owner: adminMasterAccountId
-}
+};
 config1Document.components.push(component1Id);
 config2Document.components.push(component1Id);
 
@@ -95,7 +95,7 @@ export const entry1 = {
     environment: EnvType.DEFAULT,
     domain: domainId,
     date: '2019-12-14 17:00'
-}
+};
 
 export const entry2 = {
     _id: new mongoose.Types.ObjectId(),
@@ -107,7 +107,7 @@ export const entry2 = {
     environment: EnvType.DEFAULT,
     domain: domainId,
     date: '2019-12-14 18:00'
-}
+};
 
 export const entry3 = {
     _id: new mongoose.Types.ObjectId(),
@@ -119,7 +119,7 @@ export const entry3 = {
     environment: EnvType.DEFAULT,
     domain: domainId,
     date: '2019-12-14 19:00'
-}
+};
 
 export const entry4 = {
     _id: new mongoose.Types.ObjectId(),
@@ -131,7 +131,7 @@ export const entry4 = {
     environment: EnvType.DEFAULT,
     domain: domainId,
     date: '2019-12-14 20:00'
-}
+};
 
 export const entry5 = {
     _id: new mongoose.Types.ObjectId(),
@@ -143,7 +143,7 @@ export const entry5 = {
     environment: 'QA',
     domain: domainId,
     date: '2019-12-13 18:00'
-}
+};
 
 export const setupDatabase = async () => {
     await Metric.deleteMany();
@@ -175,4 +175,4 @@ export const setupDatabase = async () => {
     const hash = await bcrypt.hash(apiKey, 8);
     component1.apihash = hash;
     await new Component(component1).save();
-}
+};

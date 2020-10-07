@@ -12,7 +12,6 @@ import {
     setupDatabase,
     adminMasterAccountId,
     adminMasterAccountToken,
-    adminAccountToken,
     domainId,
     groupConfigId,
     configId1,
@@ -24,10 +23,10 @@ import {
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
     await mongoose.disconnect();
-})
+});
 
 describe('Testing strategy creation #1', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('STRATEGY_SUITE - Should create a new Config Strategy', async () => {
         const response = await request(app)
@@ -48,7 +47,7 @@ describe('Testing strategy creation #1', () => {
 
         // Response validation
         expect(response.body.description).toBe('Description of my new Config Strategy');
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Config not found', async () => {
         const response = await request(app)
@@ -64,7 +63,7 @@ describe('Testing strategy creation #1', () => {
             }).expect(404);
 
         expect(response.body.error).toBe('Config not found');
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Environment not found', async () => {
         const response = await request(app)
@@ -80,7 +79,7 @@ describe('Testing strategy creation #1', () => {
             }).expect(400);
 
         expect(response.body.error).toBe('Environment does not exist');
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Duplicated Strategy at the same configuration', async () => {
         const response = await request(app)
@@ -97,7 +96,7 @@ describe('Testing strategy creation #1', () => {
 
         expect(response.body.error)
             .toBe(`Unable to complete the operation. Strategy '${StrategiesType.VALUE}' already exist for this configuration and environment`);
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Operation not available', async () => {
         const response = await request(app)
@@ -114,7 +113,7 @@ describe('Testing strategy creation #1', () => {
 
         expect(response.body.error)
             .toBe(`Unable to complete the operation. The strategy '${StrategiesType.TIME}' needs BETWEEN,LOWER,GREATER as operation`);
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Wrong operation and strategies', async () => {
         await request(app)
@@ -138,11 +137,11 @@ describe('Testing strategy creation #1', () => {
                 values: ['192.168.0.1/16'],
                 config: configId2
             }).expect(400);
-    })
-})
+    });
+});
 
 describe('Testing strategy creation #2', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Number of values incorret', async () => {
         
@@ -306,11 +305,11 @@ describe('Testing strategy creation #2', () => {
         expect(response.body.error)
             .toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.BETWEEN}', are min: ${min} and max: ${max} values`);
 
-    })
-})
+    });
+});
 
 describe('Testing reading strategies #1', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('STRATEGY_SUITE - Should get Config Strategy information', async () => {
         let response = await request(app)
@@ -349,7 +348,7 @@ describe('Testing reading strategies #1', () => {
             .send().expect(200);
 
         expect(response.body.length).toEqual(2);
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT get Config Strategy information - Invalid Config Id', async () => {
         await request(app)
@@ -361,11 +360,11 @@ describe('Testing reading strategies #1', () => {
             .get('/configstrategy?config=INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500);
-    })
-})
+    });
+});
 
 describe('Testing reading strategies #2', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('STRATEGY_SUITE - Should get Config Strategy information by Id', async () => {
         let response = await request(app)
@@ -396,7 +395,7 @@ describe('Testing reading strategies #2', () => {
             .get('/configstrategy/' + response.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
-    })
+    });
 
     test('STRATEGY_SUITE - Should not found Config Strategy information by Id', async () => {
         await request(app)
@@ -408,7 +407,7 @@ describe('Testing reading strategies #2', () => {
             .get('/configstrategy/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
-    })
+    });
 
     test('STRATEGY_SUITE - Should delete Config Strategy', async () => {
         // DB validation Before deleting
@@ -450,7 +449,7 @@ describe('Testing reading strategies #2', () => {
 
         configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
         expect(configStrategy).toBeNull();
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT delete Config Strategy', async () => {
         await request(app)
@@ -462,11 +461,11 @@ describe('Testing reading strategies #2', () => {
             .delete('/configstrategy/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
-    })
-})
+    });
+});
 
 describe('Testing update strategies #1', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('STRATEGY_SUITE - Should update Config Strategy info', async () => {
 
@@ -484,7 +483,7 @@ describe('Testing update strategies #1', () => {
         configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
         expect(configStrategy).not.toBeNull();
         expect(configStrategy.description).toEqual('New description');
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT update Config Strategy info', async () => {
         await request(app)
@@ -494,7 +493,7 @@ describe('Testing update strategies #1', () => {
                 activated: false,
                 config: 'I_SHOULD_NOT_UPDATE_THIS'
             }).expect(400);
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT update by invalid Config Strategy Id', async () => {
         await request(app)
@@ -510,7 +509,7 @@ describe('Testing update strategies #1', () => {
             .send({
                 description: 'New description',
             }).expect(400);
-    })
+    });
 
     test('STRATEGY_SUITE - Should record changes on history collection', async () => {
         let response = await request(app)
@@ -562,7 +561,7 @@ describe('Testing update strategies #1', () => {
         // DB validation
         history = await History.find({ elementId: strategyId }).lean();
         expect(history.length).toEqual(2);
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT list changes by invalid Strategy Id', async () => {
         await request(app)
@@ -574,7 +573,7 @@ describe('Testing update strategies #1', () => {
             .get('/configstrategy/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500);
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT delete history by invalid Strategy Id', async () => {
         await request(app)
@@ -586,7 +585,7 @@ describe('Testing update strategies #1', () => {
             .delete('/configstrategy/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500);
-    })
+    });
 
     test('STRATEGY_SUITE - Should delete history from a Strategy element', async () => {
         let response = await request(app)
@@ -601,7 +600,7 @@ describe('Testing update strategies #1', () => {
                 env: EnvType.DEFAULT
             }).expect(201);
         
-        const strategyId = response.body._id
+        const strategyId = response.body._id;
         response = await request(app)
                 .get('/configstrategy/history/' + strategyId)
                 .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -626,7 +625,7 @@ describe('Testing update strategies #1', () => {
 
         history = await History.find({ elementId: strategyId }).lean();
         expect(history.length > 0).toEqual(false);
-    })
+    });
 
     test('STRATEGY_SUITE - Should return a specific strategy requirements', async () => {
         let response = await request(app)
@@ -635,7 +634,7 @@ describe('Testing update strategies #1', () => {
             .send().expect(200);
 
         expect(response.body.strategy).toEqual(StrategiesType.NETWORK);
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT return a specific strategy requirements', async () => {
         let response = await request(app)
@@ -645,7 +644,7 @@ describe('Testing update strategies #1', () => {
         
         expect(response.body.error)
             .toEqual(`Strategy 'WHO_AM_I_VALIDATION' not found. Please, try using: ${Object.values(StrategiesType)}`);
-    })
+    });
 
     test('STRATEGY_SUITE - Should return a list of strategies available', async () => {
         let response = await request(app)
@@ -654,7 +653,7 @@ describe('Testing update strategies #1', () => {
             .send().expect(200);
         
         expect(response.body.strategiesAvailable.length).not.toEqual(0);
-    })
+    });
 
     test('STRATEGY_SUITE - Should add new value to Strategy values', async () => {
         let response = await request(app)
@@ -670,7 +669,7 @@ describe('Testing update strategies #1', () => {
         const configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId }).lean();
         const foundExistingOne = configStrategy.values.find((element) => element === 'USER_4');
         expect('USER_4').toEqual(foundExistingOne);
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT add new value to Strategy values', async () => {
         let response = await request(app)
@@ -711,17 +710,17 @@ describe('Testing update strategies #1', () => {
                 .send({
                     value: 'USER_3'
                 }).expect(404);
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT update a values - Invalid Strategy Id', async () => {
-        let response = await request(app)
+        await request(app)
             .patch('/configstrategy/updateval/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 oldvalue: 'USER_3',
                 newvalue: 'USER_THREE'
             }).expect(400);
-    })
+    });
 
     test('STRATEGY_SUITE - Should update a value inside Strategy values', async () => {
         let response = await request(app)
@@ -741,11 +740,11 @@ describe('Testing update strategies #1', () => {
 
         const notFoundOldOne = configStrategy.values.find((element) => element === 'USER_3');
         expect(notFoundOldOne).toEqual(undefined);
-    })
-})
+    });
+});
 
 describe('Testing update strategies #2', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('STRATEGY_SUITE - Should NOT update a value inside Strategy values', async () => {
         await request(app)
@@ -792,7 +791,7 @@ describe('Testing update strategies #2', () => {
             .send().expect(400);
 
         expect(response.body.error).toEqual('Attributes \'oldvalue\' and \'newvalue\' must be assigned');
-    })
+    });
 
     test('STRATEGY_SUITE - Should remove a value from Strategy values', async () => {
         let configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId }).lean();
@@ -811,7 +810,7 @@ describe('Testing update strategies #2', () => {
         configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId }).lean();
         const notFoundOldOne = configStrategy.values.find((element) => element === 'USER_3');
         expect(notFoundOldOne).toEqual(undefined);
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT remove a value from an invalid Strategy', async () => {
         await request(app)
@@ -819,7 +818,7 @@ describe('Testing update strategies #2', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'USER_3'
-            }).expect(404)
+            }).expect(404);
 
         await request(app)
             .patch('/configstrategy/removeval/INVALID_ID')
@@ -827,7 +826,7 @@ describe('Testing update strategies #2', () => {
             .send({
                 value: 'USER_3'
             }).expect(400);
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT remove a value from Strategy values', async () => {
         let response = await request(app)
@@ -854,11 +853,11 @@ describe('Testing update strategies #2', () => {
             .send().expect(400);
 
         expect(response.body.error).toEqual('The attribute \'value\' must be assigned');
-    })
-})
+    });
+});
 
 describe('Testing fetch strategies', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('STRATEGY_SUITE - Should fetch all values from a specific Strategy', async () => {
         let response = await request(app)
@@ -881,7 +880,7 @@ describe('Testing fetch strategies', () => {
             .send().expect(200);
 
         expect(response.body).toEqual(configStrategyDocument.values.slice(1,configStrategyDocument.values.length));
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT fetch values from Strategy', async () => {
         await request(app)
@@ -893,7 +892,7 @@ describe('Testing fetch strategies', () => {
             .get('/configstrategy/values/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500);
-    })
+    });
 
     test('STRATEGY_SUITE - Should update Strategy environment status - default', async () => {
         expect(configStrategyDocument.activated.get(EnvType.DEFAULT)).toEqual(true);
@@ -910,12 +909,12 @@ describe('Testing fetch strategies', () => {
         // DB validation - verify status updated
         const strategy = await ConfigStrategy.findById(configStrategyId).lean();
         expect(strategy.activated[EnvType.DEFAULT]).toEqual(false);
-    })
+    });
 
-})
+});
 
 describe('Scenario: creating QA environment and modifying its status', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('STRATEGY_SUITE - Should update Strategy environment status - QA', async () => {
         // Creating QA Environment...
@@ -962,7 +961,7 @@ describe('Scenario: creating QA environment and modifying its status', () => {
 
         strategy = await ConfigStrategy.findById(newStrategy.body._id).lean();
         expect(strategy.activated['QA']).toEqual(false);
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT update Strategy environment status - Strategy not fould', async () => {
         await request(app)
@@ -978,7 +977,7 @@ describe('Scenario: creating QA environment and modifying its status', () => {
             .send({
                 default: false
             }).expect(404);
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT update Strategy environment status - More than one environemnt', async () => {
         const response = await request(app)
@@ -990,7 +989,7 @@ describe('Scenario: creating QA environment and modifying its status', () => {
             }).expect(400);
 
         expect(response.body.error).toEqual('You can only update one environment at time');
-    })
+    });
 
     test('STRATEGY_SUITE - Should NOT update Strategy environment status - Stragey does not exist on a specific environment', async () => {
         const response = await request(app)
@@ -1001,5 +1000,5 @@ describe('Scenario: creating QA environment and modifying its status', () => {
             }).expect(404);
 
         expect(response.body.error).toEqual('Strategy does not exist on this environment');
-    })
-})
+    });
+});

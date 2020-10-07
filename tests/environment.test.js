@@ -14,14 +14,13 @@ import {
     environment1Id,
     domainId,
     groupConfigId,
-    configId1,
-    configStrategyId
- } from './fixtures/db_api';
+    configId1
+} from './fixtures/db_api';
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
     await mongoose.disconnect();
-})
+});
 
 describe('Insertion tests', () => {
     beforeAll(setupDatabase);
@@ -41,7 +40,7 @@ describe('Insertion tests', () => {
 
         // Response validation
         expect(response.body.name).toBe('QA');
-    })
+    });
 
     test('ENV_SUITE - Should NOT create a new Environment - Permission denied', async () => {
         await request(app)
@@ -51,7 +50,7 @@ describe('Insertion tests', () => {
                 name: 'QA',
                 domain: domainId
             }).expect(401);
-    })
+    });
 
     test('ENV_SUITE - Should NOT create a new Environment - Environment already exist', async () => {
         const response = await request(app)
@@ -63,7 +62,7 @@ describe('Insertion tests', () => {
             }).expect(400);
 
         expect(response.body.error).toBe(`Unable to complete the operation. Environment '${EnvType.DEFAULT}' already exist for this Domain`);
-    })
+    });
 
     test('ENV_SUITE - Should NOT create a new Environment - Domain not found', async () => {
         await request(app)
@@ -73,8 +72,8 @@ describe('Insertion tests', () => {
                 name: 'DEV',
                 domain: 'FAKE_DOMAIN'
             }).expect(404);
-    })
-})
+    });
+});
 
 describe('Reading tests', () => {
     test('ENV_SUITE - Should read all Environments from a Domain', async () => {
@@ -85,7 +84,7 @@ describe('Reading tests', () => {
 
         const defaultEnv = response.body.filter(env => env.name === EnvType.DEFAULT);
         expect(defaultEnv[0].name).toBe(EnvType.DEFAULT);
-    })
+    });
 
     test('ENV_SUITE - Should read one single Environment', async () => {
         const response = await request(app)
@@ -94,15 +93,15 @@ describe('Reading tests', () => {
             .send().expect(200);
 
         expect(response.body.name).toBe(EnvType.DEFAULT);
-    })
+    });
 
     test('ENV_SUITE - Should NOT read Environment - Not found', async () => {
-        const response = await request(app)
+        await request(app)
             .get('/environment/NOT_FOUND')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(400);
-    })
-})
+    });
+});
 
 describe('Deletion tests', () => {
     beforeAll(setupDatabase);
@@ -119,12 +118,12 @@ describe('Deletion tests', () => {
         response = await request(app)
             .delete('/environment/' + response.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200)
+            .send().expect(200);
 
         // DB validation - document deleted
         const environment = await Environment.findById(response.body._id).lean();
         expect(environment).toBeNull();
-    })
+    });
 
     test('ENV_SUITE - Should NOT delete an Environment - default', async () => {
         const response = await request(app)
@@ -132,26 +131,26 @@ describe('Deletion tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(400);
 
-        expect(response.body.error).toBe(`Unable to delete this environment`)
+        expect(response.body.error).toBe('Unable to delete this environment');
         
         // DB validation - document deleted
         const environment = await Environment.findById(environment1._id).lean();
         expect(environment).not.toBeNull();
-    })
+    });
 
     test('ENV_SUITE - Should NOT delete an Environment - Invalid Env Id', async () => {
         await request(app)
             .delete('/environment/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(400);
-    })
+    });
 
     test('ENV_SUITE - Should NOT delete an Environment - Env not found', async () => {
         await request(app)
             .delete('/environment/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
-    })
+    });
 
     test('ENV_SUITE - Should NOT delete an Environment - Permission denied', async () => {
         let response = await request(app)
@@ -166,7 +165,7 @@ describe('Deletion tests', () => {
             .delete('/environment/' + response.body._id)
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(401);
-    })
+    });
 
     test('ENV_SUITE - Should recover an Environment', async () => {
         const envName = 'RecoverableEnvironment';
@@ -250,19 +249,19 @@ describe('Deletion tests', () => {
 
         strategy = await ConfigStrategy.findById(strategyEnv.body._id).lean();
         expect(strategy).toBeNull();
-    })
+    });
 
     test('ENV_SUITE - Should NOT recover an Environment - Invalid Env Id', async () => {
         await request(app)
             .patch('/environment/recover/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(400);
-    })
+    });
 
     test('ENV_SUITE - Should NOT recover an Environment - Env not found', async () => {
         await request(app)
             .patch('/environment/recover/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
-    })
-})
+    });
+});

@@ -21,7 +21,7 @@ describe('Test metric date range filters', () => {
     expect(aggregatorFilter.$match.$expr.$and.length > 0).toBe(true);
     expect(moment(args.date.$gte).format(dateFormat).toString()).toBe('2020-07-01 00:00:00');
     expect(moment(args.date.$lte).format(dateFormat).toString()).toBe('2020-08-01 00:00:00');
-  })
+  });
 
   test('UNIT_ROUTER_METRIC - Should build filter for YYYY-MM-DD given date - Daily', () => {
     //given
@@ -35,7 +35,7 @@ describe('Test metric date range filters', () => {
     expect(aggregatorFilter.$match.$expr.$and.length > 0).toBe(true);
     expect(moment(args.date.$gte).format(dateFormat).toString()).toBe('2020-07-01 00:00:00');
     expect(moment(args.date.$lte).format(dateFormat).toString()).toBe('2020-07-02 00:00:00');
-  })
+  });
 
   test('UNIT_ROUTER_METRIC - Should build filter for YYYY-MM-DD HH given date - Hourly', () => {
     //given
@@ -49,7 +49,7 @@ describe('Test metric date range filters', () => {
     expect(aggregatorFilter.$match.$expr.$and.length > 0).toBe(true);
     expect(moment(args.date.$gte).format(dateFormat).toString()).toBe('2020-07-01 10:00:00');
     expect(moment(args.date.$lte).format(dateFormat).toString()).toBe('2020-07-01 11:00:00');
-  })
+  });
 
   test('UNIT_ROUTER_METRIC - Should build filter for YYYY-MM-DD HH:mm given date - Timely (minute)', () => {
     //given
@@ -63,6 +63,6 @@ describe('Test metric date range filters', () => {
     expect(aggregatorFilter.$match.$expr.$and.length > 0).toBe(true);
     expect(moment(args.date.$gte).format(dateFormat).toString()).toBe('2020-07-01 10:30:00');
     expect(moment(args.date.$lte).format(dateFormat).toString()).toBe('2020-07-01 10:31:00');
-  })
+  });
 
-})
+});

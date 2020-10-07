@@ -13,19 +13,17 @@ import {
     adminAccount,
     teamId,
     domainId,
-    team1Id,
-    adminMasterAccountToken
+    team1Id
 } from './fixtures/db_api';
 import { Team } from '../src/models/team';
-import { ObjectId } from 'mongodb';
 
 afterAll(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
-    await mongoose.disconnect()
-})
+    await mongoose.disconnect();
+});
 
 describe('Testing Admin insertion', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     let axiosPostStub;
     let axiosGetStub;
@@ -68,7 +66,7 @@ describe('Testing Admin insertion', () => {
 
         // restore
         axiosPostStub.restore();
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT signup a new Admin - Already exists', async () => {
         // mock
@@ -93,7 +91,7 @@ describe('Testing Admin insertion', () => {
 
         // restore
         axiosPostStub.restore();
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT login before access confirmation sent via Email', async () => {
         // given
@@ -108,7 +106,7 @@ describe('Testing Admin insertion', () => {
                 email: admin.email,
                 password: '12312312312'
             }).expect(401);
-    })
+    });
 
     test('ADMIN_SUITE - Should confirm access to a new Admin', async () => {
         // given
@@ -117,14 +115,14 @@ describe('Testing Admin insertion', () => {
         expect(admin.active).toEqual(false);
 
         // test
-        const response = await request(app)
+        await request(app)
             .post(`/admin/signup/authorization?code=${admin.code}`)
             .send().expect(201);
 
         // DB validation - document updated
         admin = await Admin.findById(signedupUser).lean();
         expect(admin.active).toEqual(true);
-    })
+    });
 
     test('ADMIN_SUITE - Should login after access confirmation', async () => {
         // given
@@ -139,13 +137,13 @@ describe('Testing Admin insertion', () => {
                 email: admin.email,
                 password: '12312312312'
             }).expect(200);
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT confirm access to a new Admin - Invalid access code', async () => {
         await request(app)
-            .post(`/admin/signup/authorization?code=INVALID_CODE`)
+            .post('/admin/signup/authorization?code=INVALID_CODE')
             .send().expect(404);
-    })
+    });
 
     test('ADMIN_SUITE - Should request password recovery', async () => {
         // mock
@@ -160,7 +158,7 @@ describe('Testing Admin insertion', () => {
         expect(admin).not.toBeNull();
         expect(admin.code).toBeNull();
 
-        const response = await request(app)
+        await request(app)
             .post('/admin/login/request/recovery')
             .send({
                 email: 'new_admin@mail.com'
@@ -173,7 +171,7 @@ describe('Testing Admin insertion', () => {
 
         // restore
         axiosPostStub.restore();
-    })
+    });
 
     test('ADMIN_SUITE - Should reset admin password', async () => {
         // mock
@@ -212,7 +210,7 @@ describe('Testing Admin insertion', () => {
 
         // restore
         axiosPostStub.restore();
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT request password recovery - Invalid email', async () => {
         await request(app)
@@ -220,7 +218,7 @@ describe('Testing Admin insertion', () => {
             .send({
                 email: 'new_admin'
             }).expect(422);
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT reset admin password - Invalid code', async () => {
         // mock
@@ -241,7 +239,7 @@ describe('Testing Admin insertion', () => {
 
         // restore
         axiosPostStub.restore();
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT signup - Failed to validate reCaptcha', async () => {
         // mock
@@ -265,7 +263,7 @@ describe('Testing Admin insertion', () => {
 
         // restore
         axiosPostStub.restore();
-    })
+    });
 
     test('ADMIN_SUITE - Should NO signup - No token provided', async () => {
         const response = await request(app)
@@ -277,7 +275,7 @@ describe('Testing Admin insertion', () => {
             }).expect(400);
 
         expect(response.body.error).toEqual('Token is empty or invalid');
-    })
+    });
 
     test('ADMIN_SUITE - Should signup a new Admin - From GitHub', async () => {
         // mock
@@ -305,12 +303,12 @@ describe('Testing Admin insertion', () => {
         // DB validation - document created
         const admin = await Admin.findById(response.body.admin._id).lean();
         expect(admin).not.toBeNull();
-        expect(admin._gitid).toEqual("123456789");
+        expect(admin._gitid).toEqual('123456789');
 
         // restore
         axiosPostStub.restore();
         axiosGetStub.restore();
-    })
+    });
 
     test('ADMIN_SUITE - Should signup a new Admin - From BitBucket', async () => {
         // mock
@@ -331,7 +329,7 @@ describe('Testing Admin insertion', () => {
         bodyFormData.set('grant_type', 'authorization_code');
         bodyFormData.set('code', 'BITBUCKET_CODE');
 
-        axiosPostStub.calledWith('data', bodyFormData)
+        axiosPostStub.calledWith('data', bodyFormData);
         axiosPostStub.returns(Promise.resolve(mockedTokenData));
         axiosGetStub.returns(Promise.resolve(mockedUserData));
 
@@ -343,12 +341,12 @@ describe('Testing Admin insertion', () => {
         // DB validation - document created
         const admin = await Admin.findById(response.body.admin._id).lean();
         expect(admin).not.toBeNull();
-        expect(admin._bitbucketid).toEqual("123456789");
+        expect(admin._bitbucketid).toEqual('123456789');
 
         // restore
         axiosPostStub.restore();
         axiosGetStub.restore();
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT signup - invalid email format', async () => {
         await request(app)
@@ -359,7 +357,7 @@ describe('Testing Admin insertion', () => {
                 password: '12312312312',
                 token: 'GOOGLE_RECAPTCHA_TOKEN'
             }).expect(422);
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT signup - Access denied to GitHub User Info', async () => {
         // mock
@@ -377,12 +375,12 @@ describe('Testing Admin insertion', () => {
             .post('/admin/github/auth?code=GIT_CODE')
             .send().expect(401);
 
-        expect(response.body.error).toEqual("Failed to get GitHub user info");
+        expect(response.body.error).toEqual('Failed to get GitHub user info');
 
         // restore
         axiosPostStub.restore();
         axiosGetStub.restore();
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT signup - Access denied to GitHub Token', async () => {
         // mock
@@ -396,12 +394,12 @@ describe('Testing Admin insertion', () => {
             .post('/admin/github/auth?code=GIT_CODE')
             .send().expect(401);
 
-        expect(response.body.error).toEqual("Failed to get GitHub access token");
+        expect(response.body.error).toEqual('Failed to get GitHub access token');
 
         // restore
         axiosPostStub.restore();
         axiosGetStub.restore();
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT signup - Access denied to BitBucket User Info', async () => {
         // mock
@@ -410,19 +408,12 @@ describe('Testing Admin insertion', () => {
 
         // given
         const mockedTokenData = { data: { access_token: 'MOCKED_TOKEN' } };
-        const mockedUserData = { data: 
-            { 
-                account_id: 123456789,
-                nickname: 'bitbucketuser',
-                display_name: 'Mocked BitBucket User'
-            } 
-        };
 
         var bodyFormData = new URLSearchParams();
         bodyFormData.set('grant_type', 'authorization_code');
         bodyFormData.set('code', 'BITBUCKET_CODE');
 
-        axiosPostStub.calledWith('data', bodyFormData)
+        axiosPostStub.calledWith('data', bodyFormData);
         axiosPostStub.returns(Promise.resolve(mockedTokenData));
         axiosGetStub.throwsException();
 
@@ -431,12 +422,12 @@ describe('Testing Admin insertion', () => {
             .post('/admin/bitbucket/auth?code=BITBUCKET_CODE')
             .send().expect(401);
 
-        expect(response.body.error).toEqual("Failed to get BitBucket user info");
+        expect(response.body.error).toEqual('Failed to get BitBucket user info');
 
         // restore
         axiosPostStub.restore();
         axiosGetStub.restore();
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT signup - Access denied to BitBucket Token', async () => {
         // mock
@@ -450,12 +441,12 @@ describe('Testing Admin insertion', () => {
             .post('/admin/bitbucket/auth?code=BITBUCKET_CODE')
             .send().expect(401);
 
-        expect(response.body.error).toEqual("Failed to get BitBucket access token");
+        expect(response.body.error).toEqual('Failed to get BitBucket access token');
 
         // restore
         axiosPostStub.restore();
         axiosGetStub.restore();
-    })
+    });
 
     test('ADMIN_SUITE - Should login Master Admin', async () => {
         const response = await request(app)
@@ -463,26 +454,26 @@ describe('Testing Admin insertion', () => {
             .send({
                 email: adminMasterAccount.email,
                 password: adminMasterAccount.password
-            }).expect(200)
+            }).expect(200);
 
-        expect(response.body.token).not.toBeNull()
-    })
+        expect(response.body.token).not.toBeNull();
+    });
 
     test('ADMIN_SUITE - Should get Operation not found', async () => {
         const response = await request(app)
             .get('/fake_uri')
-            .send().expect(404)
+            .send().expect(404);
 
-        expect(response.body.error).toEqual('Operation not found')
-    })
+        expect(response.body.error).toEqual('Operation not found');
+    });
 
     test('ADMIN_SUITE - Should get All Good', async () => {
         const response = await request(app)
             .get('/check')
-            .send().expect(200)
+            .send().expect(200);
 
-        expect(response.body.message).toEqual('All good')
-    })
+        expect(response.body.message).toEqual('All good');
+    });
 
     test('ADMIN_SUITE - Should renew access', async () => {
         const responseLogin = await request(app)
@@ -518,7 +509,7 @@ describe('Testing Admin insertion', () => {
         //DB validation
         admin = await Admin.findById(adminAccount._id).lean();
         expect(admin.token).toEqual(responseRefresh.body.refreshToken);
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT renew access - using the same refreshToken', async () => {
         const responseLogin = await request(app)
@@ -549,7 +540,7 @@ describe('Testing Admin insertion', () => {
             }).expect(401);
 
         expect(responseRefresh.body.error).toEqual('Unable to refresh token.');
-    })
+    });
 
     test('ADMIN_SUITE - Should lost credentials if logged multiple times', async () => {
         let responseLogin = await request(app)
@@ -590,7 +581,7 @@ describe('Testing Admin insertion', () => {
             .send({
                 refreshToken: secondRefreshToken
             }).expect(401);
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT renew access - invalid Token', async () => {
         const responseLogin = await request(app)
@@ -604,13 +595,13 @@ describe('Testing Admin insertion', () => {
 
         let responseRefresh = await request(app)
             .post('/admin/refresh/me')
-            .set('Authorization', `Bearer INVALID_TOKEN`)
+            .set('Authorization', 'Bearer INVALID_TOKEN')
             .send({
                 refreshToken
             }).expect(401);
 
         expect(responseRefresh.body.error).toEqual('Unable to refresh token.');
-    })
+    });
 
     test('ADMIN_SUITE - Should return token expired', async () => {
         const tempToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET || 'test_secret', { expiresIn: '0s' });
@@ -632,11 +623,11 @@ describe('Testing Admin insertion', () => {
             .get('/admin/me')
             .set('Authorization', `Bearer ${response.body.jwt.token}`)
             .send().expect(200);
-    })
-})
+    });
+});
 
 describe('Testing Admin login and fetch', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('ADMIN_SUITE - Should login Admin', async () => {
         const response = await request(app)
@@ -648,7 +639,7 @@ describe('Testing Admin login and fetch', () => {
 
         const admin = await Admin.findById(adminAccountId).lean();
         expect(response.body.jwt.refreshToken).toBe(admin.token);
-    })
+    });
 
     test('ADMIN_SUITE - Should not login non-existent admin', async () => {
         await request(app)
@@ -657,7 +648,7 @@ describe('Testing Admin login and fetch', () => {
                 email: adminMasterAccount.email,
                 password: 'wrongpassword'
             }).expect(401);
-    })
+    });
 
     test('ADMIN_SUITE - Should not login with wrong email format', async () => {
         await request(app)
@@ -665,8 +656,8 @@ describe('Testing Admin login and fetch', () => {
             .send({
                 email: 'notemail',
                 password: 'password'
-            }).expect(422)
-    })
+            }).expect(422);
+    });
 
     test('ADMIN_SUITE - Should get profile for admin', async () => {
         const responseLogin = await request(app)
@@ -685,7 +676,7 @@ describe('Testing Admin login and fetch', () => {
         // Response validation
         expect(response.body.name).toBe(adminMasterAccount.name);
         expect(response.body.email).toBe(adminMasterAccount.email);
-    })
+    });
 
     test('ADMIN_SUITE - Should get admin profile given an Admin ID', async () => {
         const responseLogin = await request(app)
@@ -704,7 +695,7 @@ describe('Testing Admin login and fetch', () => {
         // Response validation
         expect(response.body.name).toBe(adminAccount.name);
         expect(response.body.email).toBe(adminAccount.email);
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT get admin profile given an wrong Admin ID', async () => {
         const responseLogin = await request(app)
@@ -719,7 +710,7 @@ describe('Testing Admin login and fetch', () => {
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
             .expect(404);
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT get admin profile given an invalid Admin ID', async () => {
         const responseLogin = await request(app)
@@ -734,14 +725,14 @@ describe('Testing Admin login and fetch', () => {
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
             .expect(400);
-    })
+    });
 
     test('ADMIN_SUITE - Should not get profile for unauthenticated admin', async () => {
         await request(app)
             .get('/admin/me')
             .send()
             .expect(401);
-    })
+    });
 
     test('ADMIN_SUITE - Should update/me valid admin field', async () => {
         let responseLogin = await request(app)
@@ -779,7 +770,7 @@ describe('Testing Admin login and fetch', () => {
 
         admin = await Admin.findById(adminAccountId).lean();
         expect(admin.name).toEqual('Updated Name');
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT update/me admin fields', async () => {
         const responseLogin = await request(app)
@@ -796,7 +787,7 @@ describe('Testing Admin login and fetch', () => {
                 _id: new mongoose.Types.ObjectId()
             })
             .expect(400);
-    })
+    });
 
     test('ADMIN_SUITE - Should logout valid admin', async () => {
         const responseLogin = await request(app)
@@ -814,11 +805,11 @@ describe('Testing Admin login and fetch', () => {
 
         const admin = await Admin.findById(adminMasterAccountId).lean();
         expect(admin.token).toBeNull();
-    })
-})
+    });
+});
 
 describe('Testing Admin logout', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('ADMIN_SUITE - Should NOT delete/me account - Domain must be deleted', async () => {
         const responseLogin = await request(app)
@@ -835,7 +826,7 @@ describe('Testing Admin logout', () => {
             .expect(400);
 
         expect(response.body.error).toEqual('This account has 1 Domain(s) that must be either deleted or transfered to another account.');
-    })
+    });
 
     test('ADMIN_SUITE - Should delete/me account for admin', async () => {
         const responseLogin = await request(app)
@@ -858,12 +849,12 @@ describe('Testing Admin logout', () => {
 
         const admin = await Admin.findById(adminMasterAccountId).lean();
         expect(admin).toBeNull();
-    })
-})
+    });
+});
 
 
 describe('Testing Admin collaboration endpoint', () => {
-    beforeAll(setupDatabase)
+    beforeAll(setupDatabase);
 
     test('ADMIN_SUITE - Should read domains in which a user is collaborating', async () => {
         const responseLogin = await request(app)
@@ -902,7 +893,7 @@ describe('Testing Admin collaboration endpoint', () => {
             .expect(200);
 
         expect(response.body.length).toEqual(0);
-    })
+    });
 
     test('ADMIN_SUITE - Should read credentials from an user', async () => {
         let responseLogin = await request(app)
@@ -947,7 +938,7 @@ describe('Testing Admin collaboration endpoint', () => {
         expect(update[0].result).toEqual('nok');
         const create = response.body.filter(credential => credential.action === 'CREATE');
         expect(create[0].result).toEqual('nok');
-    })
+    });
 
     test('ADMIN_SUITE - Should remove user from all teams given a specific Domain', async () => {
         //given - log user
@@ -982,7 +973,7 @@ describe('Testing Admin collaboration endpoint', () => {
         teams.forEach(team => {
             expect(team.members[0]).toBeNull();
         });
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT remove any user from teams given a not found Domain ID', async () => {
         //given - log user
@@ -998,7 +989,7 @@ describe('Testing Admin collaboration endpoint', () => {
             .patch('/admin/me/team/leave/' +  new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send().expect(404);
-    })
+    });
 
     test('ADMIN_SUITE - Should NOT remove any user from teams given a INVALID Domain ID', async () => {
         //given - log user
@@ -1014,7 +1005,7 @@ describe('Testing Admin collaboration endpoint', () => {
             .patch('/admin/me/team/leave/INVALID_ID')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send().expect(422);
-    })
+    });
 
     test('ADMIN_SUITE - Should remove user from all teams when user is deleted', async () => {
         //given - log user
@@ -1055,5 +1046,5 @@ describe('Testing Admin collaboration endpoint', () => {
         teams.forEach(team => {
             expect(team.members[0]).toBeNull();
         });
-    })
-})
+    });
+});
