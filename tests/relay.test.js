@@ -25,33 +25,33 @@ const changeStrategy = async (strategyId, newOperation, status, environment) => 
     strategy.activated.set(environment, status !== undefined ? status : strategy.activated.get(environment));
     strategy.updatedBy = adminMasterAccountId;
     await strategy.save();
-}
+};
 
 beforeAll(setupDatabase);
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
     await mongoose.disconnect();
-})
+});
 
-describe("Testing Switcher Relay", () => {
+describe('Testing Switcher Relay', () => {
 
     const bodyRelay = (method, type) => {
         return {
             type,
-            description: "Validate input via external API",
+            description: 'Validate input via external API',
             activated: {
                 default: true
             },
             endpoint: {
-                default: "http://localhost:3001"
+                default: 'http://localhost:3001'
             },
             method,
-            auth_prefix: "Bearer",
+            auth_prefix: 'Bearer',
             auth_token: {
-                default: "123"
+                default: '123'
             }
-        }
+        };
     };
 
     let token;
@@ -108,7 +108,7 @@ describe("Testing Switcher Relay", () => {
                 expect(body.result).toBe(true);
                 done();
             });
-    })
+    });
 
     test('RELAY_SUITE - Should return success when validating relay using POST method', async (done) => {
         //mock
@@ -146,7 +146,7 @@ describe("Testing Switcher Relay", () => {
                 expect(body.result).toBe(true);
                 done();
             });
-    })
+    });
 
     test('RELAY_SUITE - Should return success when notifying relay using GET method', async (done) => {
         //mock
@@ -184,7 +184,7 @@ describe("Testing Switcher Relay", () => {
                 expect(body.result).toBe(true);
                 done();
             });
-    })
+    });
 
     test('RELAY_SUITE - Should return success when notifying relay using POST method', async (done) => {
         //mock
@@ -222,7 +222,7 @@ describe("Testing Switcher Relay", () => {
                 expect(body.result).toBe(true);
                 done();
             });
-    })
+    });
 
     test('RELAY_SUITE - Should return success when validating relay using GET method - no input', async (done) => {
         //mock
@@ -254,7 +254,7 @@ describe("Testing Switcher Relay", () => {
                 expect(body.result).toBe(true);
                 done();
             });
-    })
+    });
 
     test('RELAY_SUITE - Should return success when validating relay using POST method - no input', async (done) => {
         //mock
@@ -286,7 +286,7 @@ describe("Testing Switcher Relay", () => {
                 expect(body.result).toBe(true);
                 done();
             });
-    })
+    });
 
     test('RELAY_SUITE - Should NOT return success when validating relay using GET method - Service exception', async (done) => {
         //mock
@@ -312,7 +312,7 @@ describe("Testing Switcher Relay", () => {
                 expect(body.result).toBe(false);
                 done();
             });
-    })
+    });
 
     test('RELAY_SUITE - Should NOT return success when validating relay using POST method - Service exception', async (done) => {
         //mock
@@ -338,6 +338,6 @@ describe("Testing Switcher Relay", () => {
                 expect(body.result).toBe(false);
                 done();
             });
-    })
+    });
 
-})
+});

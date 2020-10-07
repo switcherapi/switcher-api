@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
 import Admin from '../../src/models/admin';
 import Domain from '../../src/models/domain';
 import { Team } from '../../src/models/team';
@@ -9,25 +8,25 @@ import GroupConfig from '../../src/models/group-config';
 import { Config } from '../../src/models/config';
 import TeamInvite from '../../src/models/team-invite';
 
-export const adminMasterAccountId = new mongoose.Types.ObjectId()
+export const adminMasterAccountId = new mongoose.Types.ObjectId();
 export const adminMasterAccount = {
     _id: adminMasterAccountId,
     name: 'Owner Admin',
     email: 'owner@admin.com',
     password: '123123123123',
     active: true
-}
+};
 
-export const domainId = new mongoose.Types.ObjectId()
+export const domainId = new mongoose.Types.ObjectId();
 export const domainDocument = {
     _id: domainId,
     name: 'Team Domain',
     description: 'Team Domain',
     activated: new Map().set(EnvType.DEFAULT, true),
     owner: adminMasterAccountId
-}
+};
 
-export const groupConfigId = new mongoose.Types.ObjectId()
+export const groupConfigId = new mongoose.Types.ObjectId();
 export const groupConfigDocument = {
     _id: groupConfigId,
     name: 'Group Team Test',
@@ -35,9 +34,9 @@ export const groupConfigDocument = {
     activated: new Map().set(EnvType.DEFAULT, true),
     owner: adminMasterAccountId,
     domain: domainId
-}
+};
 
-export const groupConfig2Id = new mongoose.Types.ObjectId()
+export const groupConfig2Id = new mongoose.Types.ObjectId();
 export const groupConfig2Document = {
     _id: groupConfig2Id,
     name: 'Group Team Test 2',
@@ -45,10 +44,10 @@ export const groupConfig2Document = {
     activated: new Map().set(EnvType.DEFAULT, true),
     owner: adminMasterAccountId,
     domain: domainId
-}
+};
 
-export const keyConfig = 'CONFIG_TEAM_KEY'
-export const configId = new mongoose.Types.ObjectId()
+export const keyConfig = 'CONFIG_TEAM_KEY';
+export const configId = new mongoose.Types.ObjectId();
 export const configDocument = {
     _id: configId,
     key: keyConfig,
@@ -57,17 +56,17 @@ export const configDocument = {
     owner: adminMasterAccountId,
     group: groupConfigId,
     domain: domainId
-}
+};
 
-export const role1Id = new mongoose.Types.ObjectId()
+export const role1Id = new mongoose.Types.ObjectId();
 export const role1 = {
     _id: role1Id,
     action: ActionTypes.DELETE,
     active: true,
     router: RouterTypes.CONFIG
-}
+};
 
-export const role2Id = new mongoose.Types.ObjectId()
+export const role2Id = new mongoose.Types.ObjectId();
 export const role2 = {
     _id: role2Id,
     action: ActionTypes.READ,
@@ -75,9 +74,9 @@ export const role2 = {
     router: RouterTypes.GROUP,
     identifiedBy: KeyTypes.NAME,
     values: [groupConfig2Document.name]
-}
+};
 
-export const role3Id = new mongoose.Types.ObjectId()
+export const role3Id = new mongoose.Types.ObjectId();
 export const role3 = {
     _id: role3Id,
     action: ActionTypes.READ,
@@ -85,35 +84,35 @@ export const role3 = {
     router: RouterTypes.CONFIG,
     identifiedBy: KeyTypes.KEY,
     values: ['RANDOM_VALUE']
-}
+};
 
-export const role4Id = new mongoose.Types.ObjectId()
+export const role4Id = new mongoose.Types.ObjectId();
 export const role4 = {
     _id: role4Id,
     action: ActionTypes.READ,
     active: true,
     router: RouterTypes.ALL
-}
+};
 
-export const team1Id = new mongoose.Types.ObjectId()
+export const team1Id = new mongoose.Types.ObjectId();
 export const team1 = {
     _id: team1Id,
     domain: domainId,
     name: 'Team 1',
     active: true,
     roles: [role1Id, role2Id, role3Id]
-}
+};
 
-export const team2Id = new mongoose.Types.ObjectId()
+export const team2Id = new mongoose.Types.ObjectId();
 export const team2 = {
     _id: team2Id,
     domain: domainId,
     name: 'Team 2',
     active: true,
     roles: [role4Id]
-}
+};
 
-export const adminAccountId = new mongoose.Types.ObjectId()
+export const adminAccountId = new mongoose.Types.ObjectId();
 export const adminAccount = {
     _id: adminAccountId,
     name: 'Member Admin',
@@ -121,9 +120,9 @@ export const adminAccount = {
     password: '123123123123',
     active: true,
     teams: [team1Id]
-}
+};
 
-export const adminAccount2Id = new mongoose.Types.ObjectId()
+export const adminAccount2Id = new mongoose.Types.ObjectId();
 export const adminAccount2 = {
     _id: adminAccount2Id,
     name: 'Not Member Admin',
@@ -131,9 +130,9 @@ export const adminAccount2 = {
     password: '123123123123',
     active: true,
     teams: []
-}
+};
 
-export const adminAccount3Id = new mongoose.Types.ObjectId()
+export const adminAccount3Id = new mongoose.Types.ObjectId();
 export const adminAccount3 = {
     _id: adminAccount3Id,
     name: 'Member Admin 3',
@@ -141,7 +140,7 @@ export const adminAccount3 = {
     password: '123123123123',
     active: true,
     teams: [team2Id]
-}
+};
 
 export const setupDatabase = async () => {
     await Config.deleteMany();
@@ -167,4 +166,4 @@ export const setupDatabase = async () => {
     await new Role(role4).save();
     await new Team(team1).save();
     await new Team(team2).save();
-}
+};

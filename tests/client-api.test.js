@@ -33,14 +33,14 @@ const changeStrategy = async (strategyId, newOperation, status, environment) => 
     strategy.activated.set(environment, status !== undefined ? status : strategy.activated.get(environment));
     strategy.updatedBy = adminMasterAccountId;
     await strategy.save();
-}
+};
 
 const changeConfigStatus = async (configId, status, environment) => {
     const config = await Config.findById(configId);
     config.activated.set(environment, status !== undefined ? status : config.activated.get(environment));
     config.updatedBy = adminMasterAccountId;
     await config.save();
-}
+};
 
 const changeConfigDisableMetricFlag = async (configId, status, environment) => {
     const config = await Config.findById(configId);
@@ -50,31 +50,31 @@ const changeConfigDisableMetricFlag = async (configId, status, environment) => {
     config.disable_metrics.set(environment, status);
     config.updatedBy = adminMasterAccountId;
     await config.save();
-}
+};
 
 const changeGroupConfigStatus = async (groupConfigId, status, environment) => {
     const groupConfig = await GroupConfig.findById(groupConfigId);
     groupConfig.activated.set(environment, status !== undefined ? status : groupConfig.activated.get(environment));
     groupConfig.updatedBy = adminMasterAccountId;
     await groupConfig.save();
-}
+};
 
 const changeDomainStatus = async (domainId, status, environment) => {
     const domain = await Domain.findById(domainId);
     domain.activated.set(environment, status !== undefined ? status : domain.activated.get(environment));
     domain.updatedBy = adminMasterAccountId;
     await domain.save();
-}
+};
 
-beforeAll(setupDatabase)
+beforeAll(setupDatabase);
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
     await mongoose.disconnect();
-})
+});
 
-describe("Testing criteria [GraphQL] ", () => {
-    let token
+describe('Testing criteria [GraphQL] ', () => {
+    let token;
 
     beforeAll(async () => {
         const response = await request(app)
@@ -87,9 +87,9 @@ describe("Testing criteria [GraphQL] ", () => {
             }).expect(200);
 
         token = response.body.token;
-    })
+    });
 
-    afterAll(setupDatabase)
+    afterAll(setupDatabase);
 
     test('CLIENT_SUITE - Should return success on a simple CRITERIA response', (done) => {
         request(app)
@@ -113,8 +113,8 @@ describe("Testing criteria [GraphQL] ", () => {
                 
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return success on Flat view resolved by Group name', (done) => {
         request(app)
@@ -137,8 +137,8 @@ describe("Testing criteria [GraphQL] ", () => {
                 
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should NOT return on Flat view resolved by an unknown Group name', (done) => {
         request(app)
@@ -158,8 +158,8 @@ describe("Testing criteria [GraphQL] ", () => {
             .end((err, res) => {
                 expect(JSON.parse(res.text).data.configuration).toEqual(null);
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return success on Flat view resolved by Config Key', (done) => {
         request(app)
@@ -182,8 +182,8 @@ describe("Testing criteria [GraphQL] ", () => {
                 
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return success on Flat view resolved by Config Key - Uncovered environment, should look to production', async () => {
         const response = await request(app)
@@ -209,7 +209,7 @@ describe("Testing criteria [GraphQL] ", () => {
                 }  
             `})
             .expect(200);
-    })
+    });
 
     test('CLIENT_SUITE - Should NOT return on Flat view resolved by an unknown Config Key', (done) => {
         request(app)
@@ -229,8 +229,8 @@ describe("Testing criteria [GraphQL] ", () => {
             .end((err, res) => {
                 expect(JSON.parse(res.text).data.configuration).toEqual(null);
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Bad login input', (done) => {
         request(app)
@@ -254,8 +254,8 @@ describe("Testing criteria [GraphQL] ", () => {
                 
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Missing input', (done) => {
         request(app)
@@ -278,8 +278,8 @@ describe("Testing criteria [GraphQL] ", () => {
                 
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Invalid KEY', (done) => {
         request(app)
@@ -298,8 +298,8 @@ describe("Testing criteria [GraphQL] ", () => {
             .end((err, res) => {
                 expect(JSON.parse(res.text).data.criteria).toEqual(null);
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return config disabled for PRD environment while activated in QA', async () => {
         // Config enabled
@@ -323,10 +323,10 @@ describe("Testing criteria [GraphQL] ", () => {
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
-    })
+    });
 
     test('CLIENT_SUITE - It will be deactivated on default environment', async () => {
-        await changeConfigStatus(configId, false, EnvType.DEFAULT)
+        await changeConfigStatus(configId, false, EnvType.DEFAULT);
         const response = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
@@ -347,10 +347,10 @@ describe("Testing criteria [GraphQL] ", () => {
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
-    })
+    });
 
     test('CLIENT_SUITE - It will be activated on QA environment', async () => {
-        let qaToken
+        let qaToken;
         const responseToken = await request(app)
             .post('/criteria/auth')
             .set('switcher-api-key', `${apiKey}`)
@@ -382,10 +382,10 @@ describe("Testing criteria [GraphQL] ", () => {
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
-    })
+    });
 
     test('CLIENT_SUITE - Should return false after changing strategy operation', async () => {
-        let qaToken
+        let qaToken;
         const responseToken = await request(app)
             .post('/criteria/auth')
             .set('switcher-api-key', `${apiKey}`)
@@ -393,11 +393,11 @@ describe("Testing criteria [GraphQL] ", () => {
                 domain: domainDocument.name,
                 component: component1.name,
                 environment: 'QA'
-            }).expect(200)
-        qaToken = responseToken.body.token
+            }).expect(200);
+        qaToken = responseToken.body.token;
 
-        await changeStrategy(configStrategyUSERId, OperationsType.NOT_EXIST, true, 'QA')
-        await changeStrategy(configStrategyUSERId, undefined, false, EnvType.DEFAULT)
+        await changeStrategy(configStrategyUSERId, OperationsType.NOT_EXIST, true, 'QA');
+        await changeStrategy(configStrategyUSERId, undefined, false, EnvType.DEFAULT);
         const response = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${qaToken}`)
@@ -418,7 +418,7 @@ describe("Testing criteria [GraphQL] ", () => {
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
-    })
+    });
 
     test('CLIENT_SUITE - Should return success for default environment now, since the strategy has started being specific for QA environment', async () => {
         await changeConfigStatus(configId, true, EnvType.DEFAULT);
@@ -442,10 +442,10 @@ describe("Testing criteria [GraphQL] ", () => {
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
-    })
+    });
 
     test('CLIENT_SUITE - Should return false due to Group deactivation', async () => {
-        await changeGroupConfigStatus(groupConfigId, false, EnvType.DEFAULT)
+        await changeGroupConfigStatus(groupConfigId, false, EnvType.DEFAULT);
         const response = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
@@ -466,7 +466,7 @@ describe("Testing criteria [GraphQL] ", () => {
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
-    })
+    });
 
     test('CLIENT_SUITE - Should return false due to Domain deactivation', async () => {
         await changeGroupConfigStatus(groupConfigId, true, EnvType.DEFAULT);
@@ -491,7 +491,7 @@ describe("Testing criteria [GraphQL] ", () => {
             }`;
         
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
-    })
+    });
 
     test('CLIENT_SUITE - Should not add to metrics when Config has disabled metric flag = true', async () => {
         //given
@@ -536,11 +536,11 @@ describe("Testing criteria [GraphQL] ", () => {
         //test
         const afterNumMetricData = await Metric.find({ config: configId }).countDocuments();
         expect(numMetricData === afterNumMetricData).toBe(true);
-    })
-})
+    });
+});
 
-describe("Testing domain", () => {
-    let token
+describe('Testing domain', () => {
+    let token;
 
     beforeAll(async () => {
         const response = await request(app)
@@ -553,9 +553,9 @@ describe("Testing domain", () => {
             }).expect(200);
 
         token = response.body.token;
-    })
+    });
 
-    afterAll(setupDatabase)
+    afterAll(setupDatabase);
 
     test('CLIENT_SUITE - Should return the Domain structure', (done) => {
         request(app)
@@ -623,8 +623,8 @@ describe("Testing domain", () => {
                 
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return the Domain structure - Just using environment', (done) => {
         // Domain will be resolved while identifying the component
@@ -693,8 +693,8 @@ describe("Testing domain", () => {
                 
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return the Domain structure - Disabling strategies (resolver test)', (done) => {
         request(app)
@@ -760,8 +760,8 @@ describe("Testing domain", () => {
                     
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return the Domain structure - Disabling group config (resolver test)', (done) => {
         request(app)
@@ -796,8 +796,8 @@ describe("Testing domain", () => {
                 
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return the Domain structure - Disabling config (resolver test)', (done) => {
         request(app)
@@ -847,12 +847,12 @@ describe("Testing domain", () => {
 
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
-})
+            });
+    });
+});
 
-describe("Testing criteria [REST] ", () => {
-    let token
+describe('Testing criteria [REST] ', () => {
+    let token;
 
     beforeAll(async () => {
         const response = await request(app)
@@ -865,7 +865,7 @@ describe("Testing criteria [REST] ", () => {
             }).expect(200);
 
         token = response.body.token;
-    })
+    });
 
     test('CLIENT_SUITE - Should return success on a entry-based CRITERIA response', (done) => {
         request(app)
@@ -888,7 +888,7 @@ describe("Testing criteria [REST] ", () => {
                 expect(body.result).toBe(true);
                 done();
             });
-    })
+    });
 
     test('CLIENT_SUITE - Should NOT return success on a entry-based CRITERIA response - Component not registered', async (done) => {
         //given
@@ -934,8 +934,8 @@ describe("Testing criteria [REST] ", () => {
             .end((err, { body }) => {
                 expect(body.error).toEqual(`Component ${component.name} is not registered to ${keyConfig}`);
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Bad login input', (done) => {
         request(app)
@@ -953,16 +953,16 @@ describe("Testing criteria [REST] ", () => {
                     }]})
             .expect(200)
             .end((err, { body }) => {
-                expect(body.strategies).toBe(undefined)
+                expect(body.strategies).toBe(undefined);
                 expect(body.reason).toEqual(`Strategy '${StrategiesType.VALUE}' does not agree`);
                 expect(body.result).toBe(false);
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Invalid KEY', (done) => {
         request(app)
-            .post(`/criteria?key=INVALID_KEY&showReason=true`)
+            .post('/criteria?key=INVALID_KEY&showReason=true')
             .set('Authorization', `Bearer ${token}`)
             .send({
                 entry: [
@@ -975,10 +975,10 @@ describe("Testing criteria [REST] ", () => {
                         input: '10.0.0.3'
                     }]})
             .expect(404)
-            .end((err, RES) => {
+            .end(() => {
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should NOT return due to a API Key change, then it should return after renewing the token', async () => {
         const firstResponse = await request(app)
@@ -994,7 +994,7 @@ describe("Testing criteria [REST] ", () => {
                         strategy: StrategiesType.NETWORK,
                         input: '10.0.0.3'
                     }]})
-            .expect(200)
+            .expect(200);
     
         expect(firstResponse.body.strategies.length).toEqual(4);
         expect(firstResponse.body.reason).toEqual('Success');
@@ -1048,71 +1048,71 @@ describe("Testing criteria [REST] ", () => {
                     }]})
             .expect(200);
         
-    })
+    });
 
     test('CLIENT_SUITE - Should NOT return due to invalid API key provided', async () => {
         await request(app)
             .post('/criteria/auth')
-            .set('switcher-api-key', `INVALID_API_KEY`)
+            .set('switcher-api-key', 'INVALID_API_KEY')
             .send({
                 domain: domainDocument.name,
                 component: component1.name,
                 environment: EnvType.DEFAULT
             }).expect(401);
-    })
+    });
 
     test('CLIENT_SUITE - Should return that snapshot version is outdated - status = false', (done) => {
         request(app)
-            .get(`/criteria/snapshot_check/1`)
+            .get('/criteria/snapshot_check/1')
             .set('Authorization', `Bearer ${token}`)
             .send()
             .expect(200)
             .end((err, { body }) => {
                 expect(body.status).toEqual(false);
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return that snapshot version is updated - status = true', (done) => {
         request(app)
-            .get(`/criteria/snapshot_check/5`)
+            .get('/criteria/snapshot_check/5')
             .set('Authorization', `Bearer ${token}`)
             .send()
             .expect(200)
             .end((err, { body }) => {
                 expect(body.status).toEqual(true);
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return error when validating snapshot version - Version is not a number', (done) => {
         request(app)
-            .get(`/criteria/snapshot_check/ONLY_NUMBER_ALLOWED`)
+            .get('/criteria/snapshot_check/ONLY_NUMBER_ALLOWED')
             .set('Authorization', `Bearer ${token}`)
             .send()
             .expect(400)
             .end((err, { body }) => {
                 expect(body.error).toEqual('Wrong value for domain version');
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return error when validating snapshot version - Invalid token', (done) => {
         request(app)
-            .get(`/criteria/snapshot_check/5`)
-            .set('Authorization', `Bearer INVALID_TOKEN`)
+            .get('/criteria/snapshot_check/5')
+            .set('Authorization', 'Bearer INVALID_TOKEN')
             .send()
             .expect(500)
             .end((err, { body }) => {
                 expect(body.error).toEqual('Invalid API token.');
                 done();
-            })
-    })
-})
+            });
+    });
+});
 
-describe("Testing domain [Adm-GraphQL] ", () => {
+describe('Testing domain [Adm-GraphQL] ', () => {
 
-    afterAll(setupDatabase)
+    afterAll(setupDatabase);
 
     test('CLIENT_SUITE - Should return domain structure', (done) => {
         request(app)
@@ -1147,8 +1147,8 @@ describe("Testing domain [Adm-GraphQL] ", () => {
                             "strategies":[]}]}]}}}`;
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return domain structure for a team member', (done) => {
         request(app)
@@ -1178,8 +1178,8 @@ describe("Testing domain [Adm-GraphQL] ", () => {
                     `;
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return domain Flat-structure - By Switcher Key', (done) => {
         request(app)
@@ -1212,8 +1212,8 @@ describe("Testing domain [Adm-GraphQL] ", () => {
                                     {"strategy":"DATE_VALIDATION","operation":"GREATER","values":["2019-12-01T13:00"],"statusByEnv":[{"env":"default","value":false}]}]}}}`;
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return domain Flat-structure - By Group', (done) => {
         request(app)
@@ -1234,8 +1234,8 @@ describe("Testing domain [Adm-GraphQL] ", () => {
                 const result = JSON.parse(res.text);
                 expect(result.data.configuration.group[0].name).toEqual('Group Test');
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should return domain Flat-structure for a team member', (done) => {
         request(app)
@@ -1262,8 +1262,8 @@ describe("Testing domain [Adm-GraphQL] ", () => {
                             {"key":"TEST_CONFIG_KEY","description":"Test config 1","statusByEnv":[{"env":"default","value":true}]}],"strategies":null}}}`;
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should NOT return domain structure for an excluded team member', async (done) => {
         //given
@@ -1287,11 +1287,11 @@ describe("Testing domain [Adm-GraphQL] ", () => {
             `})
             .expect(200)
             .end((err, res) => {
-                const expected = `{"data":{"domain":null}}`;
+                const expected = '{"data":{"domain":null}}';
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
+            });
+    });
 
     test('CLIENT_SUITE - Should NOT return domain Flat-structure for am excluded team member', (done) => {
         request(app)
@@ -1309,9 +1309,9 @@ describe("Testing domain [Adm-GraphQL] ", () => {
             `})
             .expect(200)
             .end((err, res) => {
-                const expected = `{"data":{"configuration":{"domain":null,"group":null,"config":null,"strategies":null}}}`;
+                const expected = '{"data":{"configuration":{"domain":null,"group":null,"config":null,"strategies":null}}}';
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
-            })
-    })
-})
+            });
+    });
+});

@@ -1,5 +1,6 @@
-import mongoose from 'mongoose';
+// eslint-disable-next-line no-unused-vars
 import app from '../../src/app';
+import mongoose from 'mongoose';
 import GroupConfig from '../../src/models/group-config';
 import { Team } from '../../src/models/team';
 import { Role, ActionTypes, RouterTypes } from '../../src/models/role';
@@ -24,24 +25,24 @@ const changeRoleStatus = async (roleId, status) => {
     const role = await Role.findById(roleId);
     role.active = status;
     await role.save();
-}
+};
 
 const changeRoleAction = async (roleId, action) => {
     const role = await Role.findById(roleId);
     role.action = action;
     await role.save();
-}
+};
 
 const changeTeamStatus = async (teamId, status) => {
     const team = await Team.findById(teamId);
     team.active = status;
     await team.save();
-}
+};
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
     await mongoose.disconnect();
-})
+});
 
 describe('Success tests', () => {
     beforeAll(setupDatabase);
@@ -59,7 +60,7 @@ describe('Success tests', () => {
         } catch (e) {
             expect(e).toBeNull();
         }
-    })
+    });
 
     test('UNIT_TEAM_ROLE_SUITE - Should allow access - Member has permission to select group', async () => {
         try {
@@ -74,7 +75,7 @@ describe('Success tests', () => {
         } catch (e) {
             expect(e).toBeNull();
         }
-    })
+    });
 
     test('UNIT_TEAM_ROLE_SUITE - Should allow access - Member has permission to select just one of those', async () => {
         try {
@@ -92,7 +93,7 @@ describe('Success tests', () => {
         } catch (e) {
             expect(e).toBeNull();
         }
-    })
+    });
 
     test('UNIT_TEAM_ROLE_SUITE - Should allow access - Member has permission to delete', async () => {
         try {
@@ -107,7 +108,7 @@ describe('Success tests', () => {
         } catch (e) {
             expect(e).toBeNull();
         }
-    })
+    });
 
     test('UNIT_TEAM_ROLE_SUITE - Should allow access - Member has permission to select config', async () => {
         await changeRoleAction(role1Id, ActionTypes.READ);
@@ -128,7 +129,7 @@ describe('Success tests', () => {
             await changeRoleAction(role1Id, ActionTypes.DELETE);
             await changeRoleAction(role3Id, ActionTypes.READ);
         }
-    })
+    });
 
     test('UNIT_TEAM_ROLE_SUITE - Should allow access - Member has ALL select permissions', async () => {
         try {
@@ -137,7 +138,7 @@ describe('Success tests', () => {
                 groupConfig2Document, 
                 domainDocument, 
                 ActionTypes.READ, 
-                RouterTypes.GROUP)
+                RouterTypes.GROUP);
 
             expect(element._id).toEqual(groupConfig2Document._id);
 
@@ -173,9 +174,9 @@ describe('Success tests', () => {
         } catch (e) {
             expect(e).toBeNull();
         }
-    })
+    });
     
-})
+});
 
 describe('Error tests', () => {
 
@@ -196,7 +197,7 @@ describe('Error tests', () => {
         } finally {
             await changeRoleStatus(role2Id, true);
         }
-    })
+    });
 
     test('UNIT_TEAM_ROLE_SUITE - Should NOT allow access - Role not found', async () => {
         try {
@@ -211,7 +212,7 @@ describe('Error tests', () => {
         } catch (e) {
             expect(e).toEqual(new PermissionError(`Role not found for this operation: '${ActionTypes.CREATE}' - '${RouterTypes.GROUP}'`));
         }
-    })
+    });
 
     test('UNIT_TEAM_ROLE_SUITE - Should NOT allow access - Role does not match', async () => {
         try {
@@ -226,7 +227,7 @@ describe('Error tests', () => {
         } catch (e) {
             expect(e).toEqual(new Error('It was not possible to match the requiring element to the current role'));
         }
-    })
+    });
 
     test('UNIT_TEAM_ROLE_SUITE - Should NOT allow access - Member does not belong to a team', async () => {
         try {
@@ -241,7 +242,7 @@ describe('Error tests', () => {
         } catch (e) {
             expect(e).toEqual(new Error('It was not possible to find any team that allows you to proceed with this operation'));
         }
-    })
+    });
 
     test('UNIT_TEAM_ROLE_SUITE - Should NOT allow access - Team not active', async () => {
         await changeTeamStatus(team1Id, false);
@@ -260,6 +261,6 @@ describe('Error tests', () => {
         } finally {
             await changeTeamStatus(team1Id, true);
         }
-    })
+    });
 
-})
+});
