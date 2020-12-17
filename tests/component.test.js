@@ -7,8 +7,12 @@ import {
     setupDatabase,
     adminMasterAccountToken,
     domainId,
-    configId1
+    configId1,
+    adminMasterAccountId
  } from './fixtures/db_api';
+import { 
+    createDummyComponent, 
+    createDummyDomain } from './fixtures/db_factory';
 import { Config } from '../src/models/config';
 
 afterAll(async () => { 
@@ -18,10 +22,18 @@ afterAll(async () => {
 
 describe('Insertion tests', () => {
     let component1Id;
+    let dummyDomain;
 
-    beforeAll(setupDatabase);
+    beforeAll(async () => {
+        await setupDatabase();
+        dummyDomain = await createDummyDomain('Dummy Domain', adminMasterAccountId);
+    });
 
     test('COMPONENT_SUITE - Should create a new Component', async () => {
+        //given
+        await createDummyComponent('my-web-app', dummyDomain._id, adminMasterAccountId);
+
+        //test
         const response = await request(app)
             .post('/component/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)

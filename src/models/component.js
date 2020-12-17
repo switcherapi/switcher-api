@@ -94,9 +94,9 @@ componentSchema.statics.findByCredentials = async (domainName, componentName, ap
     };
 };
 
-const existComponent = async (component) => {
-    if (component.__v === undefined) {
-        const foundComponent = await Component.find({ name: component.name });
+const existComponent = async ({ domain, name, __v }) => {
+    if (__v === undefined) {
+        const foundComponent = await Component.find({ domain, name });
         return foundComponent.length > 0;
     }
     return false;
