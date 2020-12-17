@@ -25,7 +25,7 @@ export async function resolveValidation(url, method, entry, auth_prefix, auth_to
 
 async function post(url, data, headers) {
     try {
-        return axios.post(url, data, headers);
+        return await axios.post(url, data, headers);
     } catch (error) {
         throw new Error(`Failed to reach ${url} via POST`);
     }
@@ -33,7 +33,7 @@ async function post(url, data, headers) {
 
 async function get(url, data, headers) {
     try {
-        return axios.get(`${url}${data}`, headers);
+        return await axios.get(`${url}${data}`, headers);
     } catch (error) {
         throw new Error(`Failed to reach ${url} via GET`);
     }
