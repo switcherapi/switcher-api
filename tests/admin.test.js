@@ -259,7 +259,7 @@ describe('Testing Admin insertion', () => {
                 token: 'GOOGLE_RECAPTCHA_TOKEN'
             }).expect(400);
 
-        expect(response.body.error).toEqual('Failed to validate capatcha');
+        expect(response.body.error).toEqual('Failed to validate recaptcha');
 
         // restore
         axiosPostStub.restore();

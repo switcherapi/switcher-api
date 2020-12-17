@@ -16,7 +16,7 @@ export async function validate_token(req) {
         });
         
     if (!response.data.success) {
-        throw new GoogleRecaptchaError('Failed to validate capatcha');
+        throw new GoogleRecaptchaError('Failed to validate recaptcha');
     }
 }
 
