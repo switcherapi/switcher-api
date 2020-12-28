@@ -7,4 +7,5 @@ coverage
 test-report.xml
 dist
 build
+config
 snapshot
