@@ -15,7 +15,9 @@ import {
     team1,
     adminMasterAccountId,
     adminMasterAccount,
-    teamInviteNoTeam
+    teamInviteNoTeam,
+    adminAccountToken,
+    adminAccount
  } from './fixtures/db_api';
 
 afterAll(async () => { 
@@ -414,7 +416,7 @@ describe('Updating team members tests', () => {
     test('TEAM_SUITE - Should NOT accept invite - Team does not exist', async () => {
         const response = await request(app)
             .post('/team/member/invite/accept/' + teamInviteNoTeam._id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(400);
 
         expect(response.body.error).toEqual('Team does not exist anymore');
@@ -526,6 +528,43 @@ describe('Updating team members tests', () => {
         // DB validation
         const admin = await Admin.findById(adminAccountId).lean();
         expect(admin.teams.length).toBe(0);
+    });
+
+    test('TEAM_SUITE - Should remove a team member when account is deleted', async() => {
+        // given
+        // member invited
+        let response = await request(app)
+            .post('/team/member/invite/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                email: adminAccount.email
+            }).expect(201);
+
+        let teamInvite = await TeamInvite.findById(response.body._id).lean();
+
+        // given
+        // invite accepted
+        await request(app)
+            .post('/team/member/invite/accept/' + teamInvite._id)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send().expect(200);
+
+        // test
+        // Team has a new member
+        let team = await Team.findById(team1Id);
+        expect(team.members.length).toBe(1);
+
+        // given
+        // account being deleted
+        response = await request(app)
+            .delete('/admin/me')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send()
+            .expect(200);
+
+        // test
+        team = await Team.findById(team1Id);
+        expect(team.members.length).toBe(0);
     });
 });
 

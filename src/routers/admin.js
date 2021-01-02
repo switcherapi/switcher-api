@@ -2,8 +2,8 @@ import express from 'express';
 import Admin from '../models/admin';
 import { Team } from '../models/team';
 import { auth, authRefreshToken } from '../middleware/auth';
-import { verifyInputUpdateParameters } from '../middleware/validators';
-import { check, validationResult } from 'express-validator';
+import { validate, verifyInputUpdateParameters } from '../middleware/validators';
+import { check } from 'express-validator';
 import { responseException, verifyOwnership, NotFoundError } from './common';
 import { getGitToken, getGitUserInfo } from '../external/oauth-git';
 import { getBitBucketToken, getBitBucketUserInfo } from '../external/oauth-bitbucket';
@@ -18,12 +18,7 @@ router.post('/admin/signup', [
     check('name').isLength({ min: 2 }),
     check('email').isEmail(),
     check('password').isLength({ min: 5 })
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
-
+], validate,  async (req, res) => {
     try {
         await checkAdmin(req.body.email);
         await validate_token(req);
@@ -63,20 +58,8 @@ router.post('/admin/github/auth', async (req, res) => {
         const userInfo = await getGitUserInfo(token);
 
         let admin = await Admin.findUserByGitId(userInfo.id);
-
-        if (!admin) {
-            await checkAdmin(`@github_${userInfo.id}`);
-            admin = new Admin({
-                name: userInfo.name,
-                email: userInfo.email,
-                _gitid: userInfo.id,
-                _avatar: userInfo.avatar,
-                password: Math.random().toString(36).slice(-8)
-            });
-            await admin.save();
-        } else {
-            admin._avatar = userInfo.avatar;
-        }
+        admin = await Admin.createThirdPartyAccount(
+            admin, userInfo, 'github', '_gitid', checkAdmin);
     
         const jwt = await admin.generateAuthToken();
         res.status(201).send({ admin, jwt });
@@ -91,20 +74,8 @@ router.post('/admin/bitbucket/auth', async (req, res) => {
         const userInfo = await getBitBucketUserInfo(token);
 
         let admin = await Admin.findUserByBitBucketId(userInfo.id);
-
-        if (!admin) {
-            await checkAdmin(`@bitbucket_${userInfo.id}`);
-            admin = new Admin({
-                name: userInfo.name,
-                email: userInfo.email,
-                _bitbucketid: userInfo.id,
-                _avatar: userInfo.avatar,
-                password: Math.random().toString(36).slice(-8)
-            });
-            await admin.save();
-        } else {
-            admin._avatar = userInfo.avatar;
-        }
+        admin = await Admin.createThirdPartyAccount(
+            admin, userInfo, 'bitbucket', '_bitbucketid', checkAdmin);
     
         const jwt = await admin.generateAuthToken();
         res.status(201).send({ admin, jwt });
@@ -116,12 +87,7 @@ router.post('/admin/bitbucket/auth', async (req, res) => {
 router.post('/admin/login', [
     check('email').isEmail(),
     check('password').isLength({ min: 5 })
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
-
+], validate, async (req, res) => {
     try {
         const admin = await Admin.findByCredentials(req.body.email, req.body.password);
         const jwt = await admin.generateAuthToken();
@@ -132,12 +98,7 @@ router.post('/admin/login', [
 });
 
 router.post('/admin/login/request/recovery', 
-    check('email').isEmail(), async (req, res) => {
-        
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
+    check('email').isEmail(), validate, async (req, res) => {
 
     const admin = await Admin.findOne({ email: req.body.email });
     if (admin) {
@@ -233,7 +194,8 @@ router.delete('/admin/me', auth, async (req, res) => {
     try {
         const domains = await Domain.find({ owner: req.admin._id }).countDocuments();
         if (domains > 0) {
-            throw new Error(`This account has ${domains} Domain(s) that must be either deleted or transfered to another account.`);
+            throw new Error(
+                `This account has ${domains} Domain(s) that must be either deleted or transfered to another account.`);
         }
 
         await req.admin.remove();
@@ -243,19 +205,18 @@ router.delete('/admin/me', auth, async (req, res) => {
     }
 });
 
-router.patch('/admin/me', auth, verifyInputUpdateParameters(['name', 'email', 'password']), async (req, res) => {
+router.patch('/admin/me', verifyInputUpdateParameters(['name', 'email', 'password']), 
+    auth, async (req, res) => {
+
     req.updates.forEach((update) => req.admin[update] = req.body[update]);
     await req.admin.save();
     res.send(req.admin);
 });
 
-router.patch('/admin/me/team/leave/:domainid', [check('domainid').isMongoId()], auth, async (req, res) => {
+router.patch('/admin/me/team/leave/:domainid', [check('domainid').isMongoId()], 
+    validate, auth, async (req, res) => {
+        
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-
         const teams = await Team.find({ domain: req.params.domainid, members: req.admin.id });
 
         if (!teams.length) {
