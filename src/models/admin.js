@@ -162,6 +162,26 @@ adminSchema.statics.findUserByBitBucketId = async (_bitbucketid) => {
     return admin;
 };
 
+adminSchema.statics.createThirdPartyAccount = async (
+    admin, userInfo, platform, attributeIdName, checkAdmin) => {
+
+    if (!admin) {
+        await checkAdmin(`@${platform}_${userInfo.id}`);
+        admin = new Admin({
+            name: userInfo.name,
+            email: userInfo.email,
+            [`${attributeIdName}`]: userInfo.id,
+            _avatar: userInfo.avatar,
+            password: Math.random().toString(36).slice(-8)
+        });
+        await admin.save();
+    } else {
+        admin._avatar = userInfo.avatar;
+    }
+
+    return admin;
+};
+
 adminSchema.pre('save', async function (next) {
     const admin = this;
 

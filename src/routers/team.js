@@ -189,7 +189,8 @@ router.get('/team/member/invite/pending/:id', auth, async (req, res) => {
 
 router.post('/team/member/invite/accept/:request_id', auth, async (req, res) => {
     try {
-        const teamInvite = await TeamInvite.findById(req.params.request_id);
+        const teamInvite = await TeamInvite.findOne(
+            { _id: req.params.request_id, email: req.admin.email });
 
         if (!teamInvite) {
             throw new NotFoundError('Invite request not found');
@@ -208,6 +209,7 @@ router.post('/team/member/invite/accept/:request_id', auth, async (req, res) => 
             teamInvite.remove();
             res.send(admin);
         } else {
+            await teamInvite.remove();
             throw new Error('Team does not exist anymore');
         }
     } catch (e) {

@@ -1,3 +1,4 @@
+import { validationResult } from 'express-validator';
 import { Config } from '../models/config';
 import { Environment } from '../models/environment';
 import Component from '../models/component';
@@ -49,4 +50,13 @@ export function verifyInputUpdateParameters(allowedUpdates) {
         req.updates = updates;
         next();
     };
+}
+
+export function validate(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    next();
 }

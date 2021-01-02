@@ -104,7 +104,7 @@ describe('Insertion tests', () => {
         await request(app)
             .get('/component/generateApiKey/INVALID_COMPONENT_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
 
         await request(app)
             .get('/component/generateApiKey/' + new mongoose.Types.ObjectId())
@@ -152,7 +152,7 @@ describe('Reading tests', () => {
         await request(app)
             .get('/component/NOT_FOUND')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 
     test('COMPONENT_SUITE - Should NOT read Component - Not found', async () => {
@@ -173,7 +173,7 @@ describe('Reading tests', () => {
         await request(app)
             .get('/component?domain=')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 });
 
@@ -221,7 +221,7 @@ describe('Updating tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Wow, this should be my updated description, only not'
-            }).expect(400);
+            }).expect(422);
 
         await request(app)
             .patch('/component/' + new mongoose.Types.ObjectId())
@@ -280,7 +280,7 @@ describe('Deletion tests', () => {
         await request(app)
             .delete('/component/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
 
         await request(app)
             .delete('/component/' + new mongoose.Types.ObjectId())

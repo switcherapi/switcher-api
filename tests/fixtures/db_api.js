@@ -159,7 +159,7 @@ export const team1 = {
 export const teamInviteNoTeam = {
     _id: new mongoose.Types.ObjectId(),
     teamid: new mongoose.Types.ObjectId(),
-    email: 'switcherapi@noreply.switcherapi.com'
+    email: 'admin@mail.com'
 };
 
 export const setupDatabase = async () => {
