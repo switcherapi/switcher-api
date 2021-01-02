@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import Domain from './domain';
 import { Team } from './team';
@@ -167,12 +168,17 @@ adminSchema.statics.createThirdPartyAccount = async (
 
     if (!admin) {
         await checkAdmin(`@${platform}_${userInfo.id}`);
+
+        const hash = crypto.createHmac('sha256', process.env.JWT_SECRET)
+                   .update(`${Date.now()}`)
+                   .digest('hex');
+                   
         admin = new Admin({
             name: userInfo.name,
             email: userInfo.email,
             [`${attributeIdName}`]: userInfo.id,
             _avatar: userInfo.avatar,
-            password: Math.random().toString(36).slice(-8)
+            password: hash
         });
         await admin.save();
     } else {
