@@ -17,6 +17,7 @@ jobs:
         - npm test
         - sonar-scanner
     - stage: deploy to staging
+      if: branch = master
       script:
         - echo "Deploying to Staging"
       deploy:
@@ -29,7 +30,9 @@ stages:
   - test
   - deploy to staging
 
-after_success: npm run coveralls
+after_success: 
+  - test $TRAVIS_BRANCH = "master" &&
+    npm run coveralls
 
 services:
   - mongodb
