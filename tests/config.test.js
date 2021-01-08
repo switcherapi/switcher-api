@@ -162,7 +162,7 @@ describe('Testing fetch configuration info', () => {
         await request(app)
             .get('/config/' + 'NOTEXIST')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
 
         await request(app)
             .get('/config/' + new mongoose.Types.ObjectId())
@@ -183,7 +183,7 @@ describe('Testing configuration deletion', () => {
         await request(app)
             .delete('/config/WRONG_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
     });
 
     test('CONFIG_SUITE - Should delete Config', async () => {
@@ -281,7 +281,7 @@ describe('Testing update info', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
-            }).expect(500);
+            }).expect(422);
     });
 
     test('CONFIG_SUITE - Should update Config environment status - default', async () => {
@@ -351,7 +351,7 @@ describe('Testing Environment status change', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
-            }).expect(400);
+            }).expect(422);
 
         await request(app)
             .patch('/config/updateStatus/' + new mongoose.Types.ObjectId())
@@ -462,7 +462,7 @@ describe('Testing Environment status change', () => {
         await request(app)
             .get('/config/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
     });
 
     test('CONFIG_SUITE - Should NOT delete history by invalid Config Id', async () => {
@@ -474,7 +474,7 @@ describe('Testing Environment status change', () => {
         await request(app)
             .delete('/config/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
     });
 
     test('CONFIG_SUITE - Should delete history from a Config element', async () => {
@@ -521,7 +521,7 @@ describe('Testing Environment status change', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA3'
-            }).expect(400);
+            }).expect(422);
 
         // Config does not exist
         await request(app)
@@ -681,7 +681,7 @@ describe('Testing component association', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: new mongoose.Types.ObjectId()
-            }).expect(500);
+            }).expect(422);
 
         await request(app)
             .patch('/config/addComponent/' + new mongoose.Types.ObjectId())
@@ -706,7 +706,7 @@ describe('Testing component association', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: new mongoose.Types.ObjectId()
-            }).expect(500);
+            }).expect(422);
 
         await request(app)
             .patch('/config/removeComponent/' + new mongoose.Types.ObjectId())
@@ -989,7 +989,7 @@ describe('Testing disable metrics', () => {
                 disable_metrics: {
                     unknown: true
                 }
-            }).expect(500);
+            }).expect(400);
 
         expect(response.body.error).toEqual('Invalid updates');
     });

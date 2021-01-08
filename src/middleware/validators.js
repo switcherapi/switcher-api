@@ -2,6 +2,7 @@ import { validationResult } from 'express-validator';
 import { Config } from '../models/config';
 import { Environment } from '../models/environment';
 import Component from '../models/component';
+import { BadRequestError } from '../exceptions';
 
 export async function checkConfig(req, res, next) {
     const config = await Config.findOne({ domain: req.domain, key: req.query.key }).lean();
@@ -24,6 +25,7 @@ export async function checkConfigComponent(req, res, next) {
     next();
 }
 
+//@deprecated - use checkEnvironmentStatusChange_v2
 export async function checkEnvironmentStatusChange(req, res, domain, field) {
     const environment = await Environment.find({ domain }).select('name -_id');
     const updates = Object.keys(field || req.body);
@@ -33,6 +35,20 @@ export async function checkEnvironmentStatusChange(req, res, domain, field) {
 
     if (!isValidOperation) {
         throw new Error('Invalid updates');
+    }
+
+    return updates;
+}
+
+export async function checkEnvironmentStatusChange_v2(args, domain, field) {
+    const environment = await Environment.find({ domain }).select('name -_id');
+    const updates = Object.keys(field || args);
+    const isValidOperation = updates.every((update) => {
+        return environment.filter((e) => e.name === update).length > 0;
+    });
+
+    if (!isValidOperation) {
+        throw new BadRequestError('Invalid updates');
     }
 
     return updates;
