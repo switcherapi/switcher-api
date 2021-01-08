@@ -2,6 +2,10 @@ language: node_js
 node_js:
   - "12"
 
+branches:
+  only:
+  - master
+
 addons:
   sonarcloud:
     organization: "switcherapi"
@@ -15,9 +19,6 @@ jobs:
         - npm test
         - sonar-scanner
     - stage: deploy to staging
-      if: branch = master AND \
-          type IN (push)
-
       script:
         - echo "Deploying to Staging"
       deploy:
