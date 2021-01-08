@@ -193,6 +193,7 @@ function verifyIdentifiers(role, element) {
     throw new PermissionError('It was not possible to match the requiring element to the current role');
 }
 
+//@deprecated - moved to /exceptions
 export class PermissionError extends Error {
     constructor(message) {
         super(message);
@@ -201,6 +202,7 @@ export class PermissionError extends Error {
     }
 }
 
+//@deprecated - moved to /exceptions
 export class NotFoundError extends Error {
     constructor(message) {
         super(message);
@@ -209,6 +211,7 @@ export class NotFoundError extends Error {
     }
 }
 
+//@deprecated - moved to /exceptions
 export class FeatureUnavailableError extends Error {
     constructor(message) {
         super(message);

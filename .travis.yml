@@ -9,15 +9,15 @@ addons:
 
 jobs:
   include:
-    - stage: compile
+    - stage: compile and test
       script:
         - npm install
-    - stage: test
-      script:
         - npm test
         - sonar-scanner
     - stage: deploy to staging
-      if: branch = master
+      if: branch = master AND \
+          type IN (push)
+
       script:
         - echo "Deploying to Staging"
       deploy:
@@ -26,8 +26,7 @@ jobs:
         api_key: ${HEROKU_KEY}
 
 stages:
-  - compile
-  - test
+  - compile and test
   - deploy to staging
 
 after_success: 

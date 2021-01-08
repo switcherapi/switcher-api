@@ -18,7 +18,7 @@ router.post('/admin/signup', [
     check('name').isLength({ min: 2 }),
     check('email').isEmail(),
     check('password').isLength({ min: 5 })
-], validate,  async (req, res) => {
+], validate, async (req, res) => {
     try {
         await checkAdmin(req.body.email);
         await validate_token(req);
