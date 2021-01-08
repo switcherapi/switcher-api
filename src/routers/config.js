@@ -1,53 +1,32 @@
 import express from 'express';
+import { check } from 'express-validator';
 import mongoose from 'mongoose';
 import Component from '../models/component';
-import GroupConfig from '../models/group-config';
-import { Config, relayOptions } from '../models/config';
+import { relayOptions } from '../models/config';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
-import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeConfigStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError, formatInput } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { checkSwitcher } from '../external/switcher-api-facade';
+import { responseException } from '../exceptions';
+import {
+    validate,
+    verifyInputUpdateParameters } from '../middleware/validators';
+import { 
+    removeConfigStatus, 
+    verifyOwnership, 
+    updateDomainVersion } from './common/index';
+import { createConfig, deleteConfig, getConfigById, updateConfig, updateConfigRelay, updateConfigStatus } from '../controller/config';
+import { getGroupConfigById } from '../controller/group';
 
 const router = new express.Router();
 
 async function verifyAddComponentInput(configId, admin) {
-    const config = await Config.findById(configId);
-            
-    if (!config) {
-        throw new NotFoundError('Config not found');
-    }
-
+    const config = await getConfigById(configId);
     return await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
 }
 
 router.post('/config/create', auth, async (req, res) => {
     try {
-        const group = await GroupConfig.findById(req.body.group);
-
-        if (!group) {
-            return res.status(404).send({ error: 'Group Config not found' });
-        }
-
-        await checkSwitcher(group);
-        let config = await Config.findOne({ key: req.body.key, group: group._id, domain: group.domain });
-
-        if (config) {
-            return res.status(400).send({ error: `Config ${config.key} already exist` });
-        }
-    
-        config = new Config({
-            ...req.body,
-            domain: group.domain,
-            owner: req.admin._id
-        });
-
-        config.key = formatInput(config.key, { toUpper: true, autoUnderscore: true });
-        config = await verifyOwnership(req.admin, config, group.domain, ActionTypes.CREATE, RouterTypes.CONFIG);
-
-        await config.save();
-        updateDomainVersion(config.domain);
+        const config = await createConfig(req.body, req.admin);
         res.status(201).send(config);
     } catch (e) {
         responseException(res, e, 400);
@@ -66,12 +45,7 @@ router.get('/config', auth, async (req, res) => {
     }
 
     try {
-        const groupConfig = await GroupConfig.findById(req.query.group);
-
-        if (!groupConfig) {
-            return res.status(404).send();
-        }
-
+        const groupConfig = await getGroupConfigById(req.query.group);
         await groupConfig.populate({
             path: 'config',
             options: {
@@ -92,14 +66,10 @@ router.get('/config', auth, async (req, res) => {
 });
 
 // GET /config/ID?resolveComponents=true
-router.get('/config/:id', auth, async (req, res) => {
+router.get('/config/:id', [
+    check('id').isMongoId()], validate, auth, async (req, res) => {
     try {
-        let config = await Config.findById(req.params.id);
-
-        if (!config) {
-            return res.status(404).send();
-        }
-
+        let config = await getConfigById(req.params.id);
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
 
         if (req.query.resolveComponents) {
@@ -115,7 +85,8 @@ router.get('/config/:id', auth, async (req, res) => {
 // GET /config/ID?sortBy=date:desc
 // GET /config/ID?limit=10&skip=20
 // GET /config/ID
-router.get('/config/history/:id', auth, async (req, res) => {
+router.get('/config/history/:id', [
+    check('id').isMongoId()], validate, auth, async (req, res) => {
     const sort = {};
 
     if (req.query.sortBy) {
@@ -124,12 +95,7 @@ router.get('/config/history/:id', auth, async (req, res) => {
     }
 
     try {
-        const config = await Config.findById(req.params.id);
-
-        if (!config) {
-            return res.status(404).send();
-        }
-
+        const config = await getConfigById(req.params.id);
         const history = await History.find({ domainId: config.domain, elementId: config._id })
             .select('oldValue newValue updatedBy date -_id')
             .sort(sort)
@@ -144,16 +110,12 @@ router.get('/config/history/:id', auth, async (req, res) => {
     }
 });
 
-router.delete('/config/history/:id', auth, async (req, res) => {
+router.delete('/config/history/:id', [
+    check('id').isMongoId()], validate, auth, async (req, res) => {
     try {
-        const config = await Config.findById(req.params.id);
-
-        if (!config) {
-            return res.status(404).send();
-        }
-
+        const config = await getConfigById(req.params.id);
         await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
-        
+
         await History.deleteMany({ domainId: config.domain, elementId: config._id });
         res.send(config);
     } catch (e) {
@@ -161,121 +123,51 @@ router.delete('/config/history/:id', auth, async (req, res) => {
     }
 });
 
-router.delete('/config/:id', auth, async (req, res) => {
+router.delete('/config/:id', [
+    check('id').isMongoId()], validate, auth, async (req, res) => {
     try {
-        let config = await Config.findById(req.params.id);
-
-        if (!config) {
-            return res.status(404).send();
-        }
-
-        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG);
-
-        await config.remove();
-        updateDomainVersion(config.domain);
+        const config = await deleteConfig(req.params.id, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);
     }
 });
 
-router.patch('/config/:id', auth,
-    verifyInputUpdateParameters(['key', 'description', 'relay', 'disable_metrics']), async (req, res) => {
+router.patch('/config/:id', [
+    check('id').isMongoId()], validate, auth, verifyInputUpdateParameters([
+    'key', 'description', 'relay', 'disable_metrics']), async (req, res) => {
     try {
-        let config = await Config.findById(req.params.id);
- 
-        if (!config) {
-            return res.status(404).send();
-        }
-
-        if (req.body.key) {
-            const configFound = await Config.findOne({ key: req.body.key, group: config.group, domain: config.domain });
-    
-            if (configFound) {
-                return res.status(400).send({ error: `Config ${req.body.key} already exist` });
-            }
-        }
-
-        if (req.body.disable_metrics) {
-            const updateMetrics = Object.keys(req.body.disable_metrics);
-            await checkEnvironmentStatusChange(req, res, config.domain, req.body.disable_metrics);
-            Object.keys(req.body.disable_metrics[updateMetrics])
-                .forEach((map) => config.disable_metrics[updateMetrics].set(map, req.body.disable_metrics[updateMetrics][map]));
-        }
-
-        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
-        config.updatedBy = req.admin.email;
-
-        req.updates.forEach((update) => config[update] = req.body[update]);
-        config.key = formatInput(config.key, { toUpper: true, autoUnderscore: true });
-        await config.save();
-        updateDomainVersion(config.domain);
+        const config = await updateConfig(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);
     }
 });
 
-router.patch('/config/updateRelay/:id', auth, async (req, res) => {
+router.patch('/config/updateRelay/:id', [
+    check('id').isMongoId()], validate, auth, async (req, res) => {
     try {
-        let config = await Config.findById(req.params.id);
-        
-        if (!config) {
-            return res.status(404).send({ error: 'Config does not exist'});
-        }
-
-        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
-        config.updatedBy = req.admin.email;
-
-        for (let index = 0; index < Object.keys(req.body).length; index++) {
-            const update = Object.keys(req.body)[index];
-            if (config.relay[update] && 'activated endpoint auth_token'.indexOf(update) >= 0) {
-                await checkEnvironmentStatusChange(req, res, config.domain, req.body[update]);
-                Object.keys(req.body[update]).forEach((map) =>
-                    config.relay[update].set(map, req.body[update][map]));
-            } else {
-                config.relay[update] = req.body[update];
-            }
-        }
-        
-        await config.save();
-        updateDomainVersion(config.domain);
+        let config = await updateConfigRelay(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 400);
     }
 });
 
-router.patch('/config/updateStatus/:id', auth, async (req, res) => {
+router.patch('/config/updateStatus/:id', [
+    check('id').isMongoId()], validate,auth, async (req, res) => {
     try {
-        let config = await Config.findById(req.params.id);
-        
-        if (!config) {
-            return res.status(404).send({ error: 'Config does not exist'});
-        }
-
-        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
-        config.updatedBy = req.admin.email;
-
-        const updates = await checkEnvironmentStatusChange(req, res, config.domain);
-        
-        updates.forEach((update) => config.activated.set(update, req.body[update]));
-        await config.save();
-        updateDomainVersion(config.domain);
+        let config = await updateConfigStatus(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 400);
     }
 });
 
-router.patch('/config/removeStatus/:id', auth, async (req, res) => {
+router.patch('/config/removeStatus/:id', [
+    check('id').isMongoId()], validate,auth, async (req, res) => {
     try {
-        let config = await Config.findById(req.params.id);
-
-        if (!config) {
-            return res.status(404).send({ error: 'Config does not exist'});
-        }
-
+        let config = await getConfigById(req.params.id);
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
         config.updatedBy = req.admin.email;
 
@@ -286,7 +178,8 @@ router.patch('/config/removeStatus/:id', auth, async (req, res) => {
     }
 });
 
-router.patch('/config/addComponent/:id', auth, async (req, res) => {
+router.patch('/config/addComponent/:id', [
+    check('id').isMongoId()], validate,auth, async (req, res) => {
     try {
         const config = await verifyAddComponentInput(req.params.id, req.admin);
         const component = await Component.findById(req.body.component);
@@ -309,7 +202,8 @@ router.patch('/config/addComponent/:id', auth, async (req, res) => {
     }
 });
 
-router.patch('/config/removeComponent/:id', auth, async (req, res) => {
+router.patch('/config/removeComponent/:id', [
+    check('id').isMongoId()], validate,auth, async (req, res) => {
     try {
         const config = await verifyAddComponentInput(req.params.id, req.admin);
         const component = await Component.findById(req.body.component);
@@ -329,7 +223,8 @@ router.patch('/config/removeComponent/:id', auth, async (req, res) => {
     }
 });
 
-router.patch('/config/updateComponents/:id', auth, async (req, res) => {
+router.patch('/config/updateComponents/:id', [
+    check('id').isMongoId()], validate,auth, async (req, res) => {
     try {
         const config = await verifyAddComponentInput(req.params.id, req.admin);
         const componentIds = req.body.components.map(component => mongoose.Types.ObjectId(component));
@@ -349,14 +244,11 @@ router.patch('/config/updateComponents/:id', auth, async (req, res) => {
     }
 });
 
-router.patch('/config/removeRelay/:id/:env', auth, async (req, res) => {
+router.patch('/config/removeRelay/:id/:env', [
+    check('id').isMongoId(),
+    check('env').isLength({ min: 1 })], validate,auth, async (req, res) => {
     try {
-        let config = await Config.findById(req.params.id);
-        
-        if (!config) {
-            return res.status(404).send({ error: 'Config does not exist'});
-        }
-
+        let config = await getConfigById(req.params.id);
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG);
         config.updatedBy = req.admin.email;
 
