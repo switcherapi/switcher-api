@@ -19,6 +19,7 @@ jobs:
         - npm test
         - sonar-scanner
     - stage: deploy to staging
+      if: type NOT IN (pull_request)
       script:
         - echo "Deploying to Staging"
       deploy:
