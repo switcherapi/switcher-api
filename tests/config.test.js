@@ -943,6 +943,13 @@ describe('Testing relay association', () => {
         expect(config.relay.auth_token['development']).toBe(undefined);
     });
 
+    test('CONFIG_SUITE - Should NOT remove Relays - Config not found', async () => {
+        await request(app)
+            .patch(`/config/removeRelay/${new mongoose.Types.ObjectId()}/default`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404);
+    });
+
     test('CONFIG_SUITE - Should remove all Relays', async () => {
         await request(app)
             .patch(`/config/removeRelay/${configId1}/default`)
@@ -953,7 +960,7 @@ describe('Testing relay association', () => {
         expect(config.relay).toEqual({});
     });
 
-    test('CONFIG_SUITE - Should remove all Relays', async () => {
+    test('CONFIG_SUITE - Should get Relay specs', async () => {
         const response = await request(app)
             .get('/config/spec/relay')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)

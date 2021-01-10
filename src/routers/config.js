@@ -1,7 +1,5 @@
 import express from 'express';
 import { check } from 'express-validator';
-import mongoose from 'mongoose';
-import Component from '../models/component';
 import { relayOptions } from '../models/config';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
@@ -10,23 +8,15 @@ import { responseException } from '../exceptions';
 import {
     validate,
     verifyInputUpdateParameters } from '../middleware/validators';
-import { 
-    removeConfigStatus, 
-    verifyOwnership, 
-    updateDomainVersion } from './common/index';
-import { createConfig, deleteConfig, getConfigById, updateConfig, updateConfigRelay, updateConfigStatus } from '../controller/config';
+import { verifyOwnership } from './common/index';
+import * as Controller from '../controller/config';
 import { getGroupConfigById } from '../controller/group';
 
 const router = new express.Router();
 
-async function verifyAddComponentInput(configId, admin) {
-    const config = await getConfigById(configId);
-    return await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
-}
-
 router.post('/config/create', auth, async (req, res) => {
     try {
-        const config = await createConfig(req.body, req.admin);
+        const config = await Controller.createConfig(req.body, req.admin);
         res.status(201).send(config);
     } catch (e) {
         responseException(res, e, 400);
@@ -69,7 +59,7 @@ router.get('/config', auth, async (req, res) => {
 router.get('/config/:id', [
     check('id').isMongoId()], validate, auth, async (req, res) => {
     try {
-        let config = await getConfigById(req.params.id);
+        let config = await Controller.getConfigById(req.params.id);
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
 
         if (req.query.resolveComponents) {
@@ -95,7 +85,7 @@ router.get('/config/history/:id', [
     }
 
     try {
-        const config = await getConfigById(req.params.id);
+        const config = await Controller.getConfigById(req.params.id);
         const history = await History.find({ domainId: config.domain, elementId: config._id })
             .select('oldValue newValue updatedBy date -_id')
             .sort(sort)
@@ -113,7 +103,7 @@ router.get('/config/history/:id', [
 router.delete('/config/history/:id', [
     check('id').isMongoId()], validate, auth, async (req, res) => {
     try {
-        const config = await getConfigById(req.params.id);
+        const config = await Controller.getConfigById(req.params.id);
         await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
 
         await History.deleteMany({ domainId: config.domain, elementId: config._id });
@@ -126,7 +116,7 @@ router.delete('/config/history/:id', [
 router.delete('/config/:id', [
     check('id').isMongoId()], validate, auth, async (req, res) => {
     try {
-        const config = await deleteConfig(req.params.id, req.admin);
+        const config = await Controller.deleteConfig(req.params.id, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);
@@ -137,7 +127,7 @@ router.patch('/config/:id', [
     check('id').isMongoId()], validate, auth, verifyInputUpdateParameters([
     'key', 'description', 'relay', 'disable_metrics']), async (req, res) => {
     try {
-        const config = await updateConfig(req.params.id, req.body, req.admin);
+        const config = await Controller.updateConfig(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);
@@ -147,7 +137,7 @@ router.patch('/config/:id', [
 router.patch('/config/updateRelay/:id', [
     check('id').isMongoId()], validate, auth, async (req, res) => {
     try {
-        let config = await updateConfigRelay(req.params.id, req.body, req.admin);
+        let config = await Controller.updateConfigRelay(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 400);
@@ -157,7 +147,7 @@ router.patch('/config/updateRelay/:id', [
 router.patch('/config/updateStatus/:id', [
     check('id').isMongoId()], validate,auth, async (req, res) => {
     try {
-        let config = await updateConfigStatus(req.params.id, req.body, req.admin);
+        let config = await Controller.updateConfigStatus(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 400);
@@ -167,12 +157,8 @@ router.patch('/config/updateStatus/:id', [
 router.patch('/config/removeStatus/:id', [
     check('id').isMongoId()], validate,auth, async (req, res) => {
     try {
-        let config = await getConfigById(req.params.id);
-        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
-        config.updatedBy = req.admin.email;
-
-        updateDomainVersion(config.domain);
-        res.send(await removeConfigStatus(config, req.body.env));
+        const config = await Controller.updateConfigStatusEnv(req.params.id, req.body.env, req.admin);
+        res.send(config);
     } catch (e) {
         responseException(res, e, 400);
     }
@@ -181,21 +167,7 @@ router.patch('/config/removeStatus/:id', [
 router.patch('/config/addComponent/:id', [
     check('id').isMongoId()], validate,auth, async (req, res) => {
     try {
-        const config = await verifyAddComponentInput(req.params.id, req.admin);
-        const component = await Component.findById(req.body.component);
-
-        if (!component) {
-            return res.status(404).send({ error: 'Component not found' });
-        }
-
-        if (config.components.includes(component._id)) {
-            return res.status(400).send({ error:  `Component ${component.name} already exists` });
-        }
-
-        config.updatedBy = req.admin.email;
-        config.components.push(component._id);
-        await config.save();
-        updateDomainVersion(config.domain);
+        const config = await Controller.addComponent(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);
@@ -205,18 +177,7 @@ router.patch('/config/addComponent/:id', [
 router.patch('/config/removeComponent/:id', [
     check('id').isMongoId()], validate,auth, async (req, res) => {
     try {
-        const config = await verifyAddComponentInput(req.params.id, req.admin);
-        const component = await Component.findById(req.body.component);
-
-        if (!component) {
-            return res.status(404).send({ error: 'Component not found' });
-        }
-
-        config.updatedBy = req.admin.email;
-        const indexComponent = config.components.indexOf(req.body.component);
-        config.components.splice(indexComponent, 1);
-        await config.save();
-        updateDomainVersion(config.domain);
+        const config = await Controller.removeComponent(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);
@@ -226,18 +187,7 @@ router.patch('/config/removeComponent/:id', [
 router.patch('/config/updateComponents/:id', [
     check('id').isMongoId()], validate,auth, async (req, res) => {
     try {
-        const config = await verifyAddComponentInput(req.params.id, req.admin);
-        const componentIds = req.body.components.map(component => mongoose.Types.ObjectId(component));
-        const components = await Component.find({ _id: { $in: componentIds } });
-
-        if (components.length != req.body.components.length) {
-            return res.status(404).send({ error: 'One or more component was not found' });
-        }
-
-        config.updatedBy = req.admin.email;
-        config.components = componentIds;
-        await config.save();
-        updateDomainVersion(config.domain);
+        const config = await Controller.updateComponent(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 400);
@@ -248,23 +198,7 @@ router.patch('/config/removeRelay/:id/:env', [
     check('id').isMongoId(),
     check('env').isLength({ min: 1 })], validate,auth, async (req, res) => {
     try {
-        let config = await getConfigById(req.params.id);
-        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG);
-        config.updatedBy = req.admin.email;
-
-        if (config.relay.activated && config.relay.activated.get(req.params.env) != undefined) {
-            if (config.relay.activated.size > 1) {
-                config.relay.activated.delete(req.params.env);
-                config.relay.endpoint.delete(req.params.env);
-                config.relay.auth_token.delete(req.params.env);
-            } else {
-                config.relay = {};
-            }
-
-            await config.save();
-            updateDomainVersion(config.domain);
-        }
- 
+        let config = await Controller.removeRelay(req.params.id, req.params.env, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);
