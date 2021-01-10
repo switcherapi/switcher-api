@@ -1,11 +1,18 @@
+import mongoose from 'mongoose';
 import { response } from './common';
 import { Config } from '../models/config';
-import { formatInput, updateDomainVersion, verifyOwnership } from '../routers/common';
+import { formatInput, removeConfigStatus, updateDomainVersion, verifyOwnership } from '../routers/common';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { getGroupConfigById } from './group';
 import { checkSwitcher } from '../external/switcher-api-facade';
-import { BadRequestError } from '../exceptions';
+import { BadRequestError, NotFoundError } from '../exceptions';
 import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';
+import { getComponentById, getComponents } from './component';
+
+async function verifyAddComponentInput(configId, admin) {
+    const config = await getConfigById(configId);
+    return await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
+}
 
 export async function getConfigById(id) {
     let config = await Config.findById(id);
@@ -123,6 +130,82 @@ export async function updateConfigStatus(id, args, admin) {
     updates.forEach((update) => config.activated.set(update, args[update]));
     await config.save();
     updateDomainVersion(config.domain);
+
+    return config;
+}
+
+export async function updateConfigStatusEnv(id, env, admin) {
+    let config = await getConfigById(id);
+    config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
+    config.updatedBy = admin.email;
+
+    updateDomainVersion(config.domain);
+    return await removeConfigStatus(config, env);
+}
+
+export async function addComponent(id, args, admin) {
+    const config = await verifyAddComponentInput(id, admin);
+    const component = await getComponentById(args.component);
+
+    if (config.components.includes(component._id)) {
+        throw new BadRequestError(`Component ${component.name} already exists`);
+    }
+
+    config.updatedBy = admin.email;
+    config.components.push(component._id);
+    await config.save();
+    updateDomainVersion(config.domain);
+
+    return config;
+}
+
+export async function removeComponent(id, args, admin) {
+    const config = await verifyAddComponentInput(id, admin);
+    await getComponentById(args.component);
+
+    config.updatedBy = admin.email;
+    const indexComponent = config.components.indexOf(args.component);
+    config.components.splice(indexComponent, 1);
+    await config.save();
+    updateDomainVersion(config.domain);
+
+    return config;
+}
+
+export async function updateComponent(id, args, admin) {
+    const config = await verifyAddComponentInput(id, admin);
+    const componentIds = args.components.map(component => mongoose.Types.ObjectId(component));
+    const components = await getComponents({ _id: { $in: componentIds } });
+
+    if (components.length != args.components.length) {
+        throw new NotFoundError('One or more component was not found');
+    }
+
+    config.updatedBy = admin.email;
+    config.components = componentIds;
+    await config.save();
+    updateDomainVersion(config.domain);
+
+    return config;
+}
+
+export async function removeRelay(id, env, admin) {
+    let config = await getConfigById(id);
+    config = await verifyOwnership(admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG);
+    config.updatedBy = admin.email;
+
+    if (config.relay.activated && config.relay.activated.get(env) != undefined) {
+        if (config.relay.activated.size > 1) {
+            config.relay.activated.delete(env);
+            config.relay.endpoint.delete(env);
+            config.relay.auth_token.delete(env);
+        } else {
+            config.relay = {};
+        }
+
+        await config.save();
+        updateDomainVersion(config.domain);
+    }
 
     return config;
 }
