@@ -1,49 +1,19 @@
 import express from 'express';
-import Domain from '../models/domain';
-import GroupConfig from '../models/group-config';
+import { check } from 'express-validator';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
-import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeGroupStatus, verifyOwnership, updateDomainVersion, responseException, NotFoundError, formatInput } from './common/index';
+import { validate, verifyInputUpdateParameters } from '../middleware/validators';
+import { verifyOwnership } from './common/index';
+import { responseException } from '../exceptions';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { checkGroup } from '../external/switcher-api-facade';
+import * as Controller from '../controller/group-config';
+import { getDomainById } from '../controller/domain';
 
 const router = new express.Router();
 
-async function verifyGroupInput(groupId, admin) {
-    let groupconfig = await GroupConfig.findById(groupId);
-        
-    if (!groupconfig) {
-        throw new NotFoundError('GroupConfig does not exist');
-    }
-
-    return await verifyOwnership(admin, groupconfig, groupconfig.domain, ActionTypes.UPDATE, RouterTypes.GROUP);
-}
-
 router.post('/groupconfig/create', auth, async (req, res) => {
-    let groupconfig = new GroupConfig({
-        ...req.body,
-        owner: req.admin._id
-    });
-
     try {
-        groupconfig.name = formatInput(groupconfig.name, { allowSpace: true });
-        let group = await GroupConfig.findOne({ name: req.body.name, domain: req.body.domain });
-
-        if (group) {
-            return res.status(400).send({ error: `Group ${group.name} already exist` });
-        }
-
-        const domain = await Domain.findById(req.body.domain);
-
-        if (!domain) {
-            return res.status(404).send({ error: 'Domain not found' });
-        }
-
-        await checkGroup(domain);
-        groupconfig = await verifyOwnership(req.admin, groupconfig, domain._id, ActionTypes.CREATE, RouterTypes.GROUP);
-        updateDomainVersion(domain._id);
-        await groupconfig.save();
+        const groupconfig = await Controller.createGroup(req.body, req.admin);
         res.status(201).send(groupconfig);
     } catch (e) {
         responseException(res, e, 500);
@@ -62,12 +32,7 @@ router.get('/groupconfig', auth, async (req, res) => {
     }
 
     try {
-        const domain = await Domain.findById(req.query.domain);
-
-        if (!domain) {
-            return res.status(404).send({ error: 'Domain not found' });
-        }
-
+        const domain = await getDomainById(req.query.domain);
         await domain.populate({
             path: 'groupConfig',
             options: {
@@ -78,7 +43,6 @@ router.get('/groupconfig', auth, async (req, res) => {
         }).execPopulate();
 
         let groups = domain.groupConfig;
-
         groups = await verifyOwnership(req.admin, groups, domain._id, ActionTypes.READ, RouterTypes.GROUP, true);
 
         res.send(groups);
@@ -87,14 +51,10 @@ router.get('/groupconfig', auth, async (req, res) => {
     }
 });
 
-router.get('/groupconfig/:id', auth, async (req, res) => {
+router.get('/groupconfig/:id', [
+    check('id').isMongoId()], validate, auth, async (req, res) => {
     try {
-        let groupconfig = await GroupConfig.findById(req.params.id);
-
-        if (!groupconfig) {
-            return res.status(404).send({ error: 'Group not found' });
-        }
-
+        let groupconfig = await Controller.getGroupConfigById(req.params.id);
         groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP);
 
         res.send(groupconfig);
@@ -106,7 +66,8 @@ router.get('/groupconfig/:id', auth, async (req, res) => {
 // GET /groupconfig/ID?sortBy=date:desc
 // GET /groupconfig/ID?limit=10&skip=20
 // GET /groupconfig/ID
-router.get('/groupconfig/history/:id', auth, async (req, res) => {
+router.get('/groupconfig/history/:id', [
+    check('id').isMongoId()], validate, auth, async (req, res) => {
     const sort = {};
 
     if (req.query.sortBy) {
@@ -115,12 +76,7 @@ router.get('/groupconfig/history/:id', auth, async (req, res) => {
     }
 
     try {
-        const groupconfig = await GroupConfig.findById(req.params.id);
-
-        if (!groupconfig) {
-            return res.status(404).send();
-        }
-
+        const groupconfig = await Controller.getGroupConfigById(req.params.id);
         const history = await History.find({ domainId: groupconfig.domain, elementId: groupconfig._id })
             .select('oldValue newValue updatedBy date -_id')
             .sort(sort)
@@ -135,14 +91,10 @@ router.get('/groupconfig/history/:id', auth, async (req, res) => {
     }
 });
 
-router.delete('/groupconfig/history/:id', auth, async (req, res) => {
+router.delete('/groupconfig/history/:id', [
+    check('id').isMongoId()], validate, auth, async (req, res) => {
     try {
-        const groupconfig = await GroupConfig.findById(req.params.id);
-
-        if (!groupconfig) {
-            return res.status(404).send();
-        }
-
+        const groupconfig = await Controller.getGroupConfigById(req.params.id);
         await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
 
         await History.deleteMany({ domainId: groupconfig.domain, elementId: groupconfig._id });
@@ -152,71 +104,44 @@ router.delete('/groupconfig/history/:id', auth, async (req, res) => {
     }
 });
 
-router.delete('/groupconfig/:id', auth, async (req, res) => {
+router.delete('/groupconfig/:id', [
+    check('id').isMongoId()], validate, auth, async (req, res) => {
     try {
-        let groupconfig = await GroupConfig.findById(req.params.id);
-
-        if (!groupconfig) {
-            return res.status(404).send({ error: 'Group not found' });
-        }
-
-        groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.DELETE, RouterTypes.GROUP);
-
-        await groupconfig.remove();
-        updateDomainVersion(groupconfig.domain);
+        let groupconfig = await Controller.deleteGroup(req.params.id, req.admin);
         res.send(groupconfig);
     } catch (e) {
         responseException(res, e, 500);
     }
 });
 
-router.patch('/groupconfig/:id', auth, 
+router.patch('/groupconfig/:id', [
+    check('id').isMongoId()], validate, auth, 
     verifyInputUpdateParameters(['name', 'description']), async (req, res) => {
     try {
-        const groupconfig = await verifyGroupInput(req.params.id, req.admin);
-        groupconfig.updatedBy = req.admin.email;
-
-        if (req.body.name) {
-            let groupFound = await GroupConfig.findOne({ name: req.body.name, domain: groupconfig.domain });
-    
-            if (groupFound) {
-                return res.status(400).send({ error: `Group ${req.body.name} already exist` });
-            }
-        }
-
-        req.updates.forEach((update) => groupconfig[update] = req.body[update]);
-        groupconfig.name = formatInput(groupconfig.name, { allowSpace: true });
-        await groupconfig.save();
-        updateDomainVersion(groupconfig.domain);
+        const groupconfig = await Controller.updateGroup(req.params.id, req.body, req.admin);
         res.send(groupconfig);
     } catch (e) {
         responseException(res, e, 500);
     }
 });
 
-router.patch('/groupconfig/updateStatus/:id', auth, async (req, res) => {
+router.patch('/groupconfig/updateStatus/:id', [
+    check('id').isMongoId()], validate, auth, async (req, res) => {
     try {
-        const groupconfig = await verifyGroupInput(req.params.id, req.admin);
-        groupconfig.updatedBy = req.admin.email;
-
-        const updates = await checkEnvironmentStatusChange(req, res, groupconfig.domain);
-        updates.forEach((update) => groupconfig.activated.set(update, req.body[update]));
-        await groupconfig.save();
-        updateDomainVersion(groupconfig.domain);
+        const groupconfig = await Controller.updateGroupStatusEnv(req.params.id, req.body, req.admin);
         res.send(groupconfig);
     } catch (e) {
         responseException(res, e, 500);
     }
 });
 
-router.patch('/groupconfig/removeStatus/:id', auth, async (req, res) => {
+router.patch('/groupconfig/removeStatus/:id', [
+    check('id').isMongoId()], validate, auth, async (req, res) => {
     try {
-        const groupconfig = await verifyGroupInput(req.params.id, req.admin);
-        groupconfig.updatedBy = req.admin.email;
-        updateDomainVersion(groupconfig.domain);
-        res.send(await removeGroupStatus(groupconfig, req.body.env));
+        const groupconfig = await Controller.removeGroupStatusEnv(req.params.id, req.body, req.admin);
+        res.send(groupconfig);
     } catch (e) {
-        responseException(res, e, 400);
+        responseException(res, e, 500);
     }
 });
 
