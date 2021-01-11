@@ -171,7 +171,7 @@ describe('Testing fetch Group info', () => {
         await request(app)
             .get('/groupconfig/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
     });
 
     test('GROUP_SUITE - Should NOT found Group Config information by Id', async () => {
@@ -190,7 +190,7 @@ describe('Testing fetch Group info', () => {
         await request(app)
             .delete('/groupconfig/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
 
         await request(app)
             .delete('/groupconfig/' + new mongoose.Types.ObjectId())
@@ -288,7 +288,7 @@ describe('Testing update Group info', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'Updated Group Name'
-            }).expect(500);
+            }).expect(422);
 
         await request(app)
             .patch('/groupconfig/' + new mongoose.Types.ObjectId())
@@ -319,7 +319,7 @@ describe('Testing update Group info', () => {
         await request(app)
             .get('/groupconfig/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
 
         await request(app)
             .get('/groupconfig/history/' + new mongoose.Types.ObjectId())
@@ -336,7 +336,7 @@ describe('Testing update Group info', () => {
         await request(app)
             .delete('/groupconfig/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
     });
 
     test('GROUP_SUITE - Should delete history from a Group element', async () => {
@@ -451,7 +451,7 @@ describe('Testing envrionment status change #1', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
-            }).expect(500);
+            }).expect(422);
 
         await request(app)
             .patch('/groupconfig/updateStatus/' + new mongoose.Types.ObjectId())
@@ -520,7 +520,7 @@ describe('Testing environment status change #2', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: EnvType.DEFAULT
-            }).expect(400);
+            }).expect(500);
 
         // Group does not exist
         await request(app)
@@ -528,7 +528,7 @@ describe('Testing environment status change #2', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA1'
-            }).expect(400);
+            }).expect(422);
 
         const group = await GroupConfig.findById(groupConfigId).lean();
         expect(group.activated[EnvType.DEFAULT]).toEqual(true);
