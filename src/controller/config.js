@@ -3,7 +3,7 @@ import { response } from './common';
 import { Config } from '../models/config';
 import { formatInput, removeConfigStatus, updateDomainVersion, verifyOwnership } from '../routers/common';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { getGroupConfigById } from './group';
+import { getGroupConfigById } from './group-config';
 import { checkSwitcher } from '../external/switcher-api-facade';
 import { BadRequestError, NotFoundError } from '../exceptions';
 import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';
@@ -134,7 +134,7 @@ export async function updateConfigStatus(id, args, admin) {
     return config;
 }
 
-export async function updateConfigStatusEnv(id, env, admin) {
+export async function removeConfigStatusEnv(id, env, admin) {
     let config = await getConfigById(id);
     config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
     config.updatedBy = admin.email;

@@ -10,7 +10,7 @@ import {
     verifyInputUpdateParameters } from '../middleware/validators';
 import { verifyOwnership } from './common/index';
 import * as Controller from '../controller/config';
-import { getGroupConfigById } from '../controller/group';
+import { getGroupConfigById } from '../controller/group-config';
 
 const router = new express.Router();
 
@@ -157,7 +157,7 @@ router.patch('/config/updateStatus/:id', [
 router.patch('/config/removeStatus/:id', [
     check('id').isMongoId()], validate,auth, async (req, res) => {
     try {
-        const config = await Controller.updateConfigStatusEnv(req.params.id, req.body.env, req.admin);
+        const config = await Controller.removeConfigStatusEnv(req.params.id, req.body.env, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 400);
