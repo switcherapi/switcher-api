@@ -96,27 +96,32 @@ describe('Testing fetch configuration info', () => {
         expect(response.body[0].key).toEqual(config1Document.key);
         expect(String(response.body[0].owner)).toEqual(String(config1Document.owner));
         expect(response.body[0].activated[EnvType.DEFAULT]).toEqual(config1Document.activated.get(EnvType.DEFAULT));
+    });
 
-        // Adding new Config
-        response = await request(app)
-            .post('/config/create')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                key: 'NEW_CONFIG123',
-                description: 'Description of my new Config',
-                group: groupConfigId
-            }).expect(201);
+    test('CONFIG_SUITE - Should get Configs by sorting ascending and descending', async () => {
+        // given a config that was sent to the past
+        const configKey1 = await Config.findOne({ key: 'TEST_CONFIG_KEY_1' });
+        let pastDate = new Date(configKey1.createdAt);
+        pastDate.setDate(pastDate.getDate() - 2);
+        configKey1.createdAt = pastDate;
+        configKey1.updatedBy = adminMasterAccountId;
+        await configKey1.save();
 
-        // DB validation - document created
-        const config = await Config.findById(response.body._id).lean();
-        expect(config).not.toBeNull();
-
-        response = await request(app)
+        // test descending
+        let response = await request(app)
             .get('/config?group=' + groupConfigId + '&sortBy=createdAt:desc')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
-        expect(response.body.length).toEqual(3);
+        expect(response.body[0].createdAt > response.body[1].createdAt).toBe(true);
+
+        // test ascending
+        response = await request(app)
+            .get('/config?group=' + groupConfigId + '&sortBy=createdAt:asc')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        expect(response.body[0].createdAt < response.body[1].createdAt).toBe(true);
     });
 
     test('CONFIG_SUITE - Should NOT get Config information by invalid Group Id', async () => { 
