@@ -5,7 +5,7 @@ import { Environment, EnvType } from '../models/environment';
 import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
 import { ConfigStrategy, strategyRequirements, StrategiesType } from '../models/config-strategy';
 import { auth } from '../middleware/auth';
-import { verifyOwnership, updateDomainVersion, responseException, NotFoundError } from './common/index';
+import { verifyOwnership, updateDomainVersion, responseException, NotFoundError, sortBy } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
 
 const router = new express.Router();
@@ -63,13 +63,6 @@ router.post('/configstrategy/create', auth, async (req, res) => {
 // GET /configstrategy?sortBy=createdAt:desc
 // GET /configstrategy?config=ID&env=QA
 router.get('/configstrategy', auth, async (req, res) => {
-    const sort = {};
-
-    if (req.query.sortBy) {
-        const parts = req.query.sortBy.split(':');
-        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
-    }
-
     try {
         const config = await Config.findById(req.query.config);
 
@@ -82,7 +75,7 @@ router.get('/configstrategy', auth, async (req, res) => {
             options: {
                 limit: parseInt(req.query.limit),
                 skip: parseInt(req.query.skip),
-                sort
+                sort: sortBy(req.query)
             }
         }).execPopulate();
         
@@ -117,13 +110,6 @@ router.get('/configstrategy/:id', auth, async (req, res) => {
 // GET /configstrategy/ID?limit=10&skip=20
 // GET /configstrategy/ID
 router.get('/configstrategy/history/:id', auth, async (req, res) => {
-    const sort = {};
-
-    if (req.query.sortBy) {
-        const parts = req.query.sortBy.split(':');
-        sort[`${parts[0]}`] = parts[1] === 'desc' ? -1 : 1;
-    }
-
     try {
         const configStrategy = await ConfigStrategy.findById(req.params.id);
 
@@ -133,7 +119,7 @@ router.get('/configstrategy/history/:id', auth, async (req, res) => {
 
         const history = await History.find({ domainId: configStrategy.domain, elementId: configStrategy._id })
             .select('oldValue newValue updatedBy date -_id')
-            .sort(sort)
+            .sort(sortBy(req.query))
             .limit(parseInt(req.query.limit))
             .skip(parseInt(req.query.skip));
 

@@ -3,7 +3,7 @@ import { check } from 'express-validator';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
-import { verifyOwnership } from './common/index';
+import { sortBy, verifyOwnership } from './common/index';
 import { responseException } from '../exceptions';
 import { ActionTypes, RouterTypes } from '../models/role';
 import * as Controller from '../controller/group-config';
@@ -24,13 +24,6 @@ router.post('/groupconfig/create', auth, async (req, res) => {
 // GET /groupconfig?sortBy=createdAt:desc
 // GET /groupconfig?domain=ID
 router.get('/groupconfig', auth, async (req, res) => {
-    const sort = {};
-
-    if (req.query.sortBy) {
-        const parts = req.query.sortBy.split(':');
-        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
-    }
-
     try {
         const domain = await getDomainById(req.query.domain);
         await domain.populate({
@@ -38,7 +31,7 @@ router.get('/groupconfig', auth, async (req, res) => {
             options: {
                 limit: parseInt(req.query.limit),
                 skip: parseInt(req.query.skip),
-                sort
+                sort: sortBy(req.query)
             }
         }).execPopulate();
 
@@ -68,18 +61,11 @@ router.get('/groupconfig/:id', [
 // GET /groupconfig/ID
 router.get('/groupconfig/history/:id', [
     check('id').isMongoId()], validate, auth, async (req, res) => {
-    const sort = {};
-
-    if (req.query.sortBy) {
-        const parts = req.query.sortBy.split(':');
-        sort[`${parts[0]}`] = parts[1] === 'desc' ? -1 : 1;
-    }
-
     try {
         const groupconfig = await Controller.getGroupConfigById(req.params.id);
         const history = await History.find({ domainId: groupconfig.domain, elementId: groupconfig._id })
             .select('oldValue newValue updatedBy date -_id')
-            .sort(sort)
+            .sort(sortBy(req.query))
             .limit(parseInt(req.query.limit))
             .skip(parseInt(req.query.skip));
 

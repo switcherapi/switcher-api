@@ -8,7 +8,7 @@ import { responseException } from '../exceptions';
 import {
     validate,
     verifyInputUpdateParameters } from '../middleware/validators';
-import { verifyOwnership } from './common/index';
+import { sortBy, verifyOwnership } from './common/index';
 import * as Controller from '../controller/config';
 import { getGroupConfigById } from '../controller/group-config';
 
@@ -27,13 +27,6 @@ router.post('/config/create', auth, async (req, res) => {
 // GET /config?group=ID&sortBy=createdAt:desc
 // GET /config?group=ID
 router.get('/config', auth, async (req, res) => {
-    const sort = {};
-
-    if (req.query.sortBy) {
-        const parts = req.query.sortBy.split(':');
-        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
-    }
-
     try {
         const groupConfig = await getGroupConfigById(req.query.group);
         await groupConfig.populate({
@@ -41,14 +34,13 @@ router.get('/config', auth, async (req, res) => {
             options: {
                 limit: parseInt(req.query.limit),
                 skip: parseInt(req.query.skip),
-                sort
+                sort: sortBy(req.query)
             }
         }).execPopulate();
 
         let configs = groupConfig.config;
 
         configs = await verifyOwnership(req.admin, configs, groupConfig.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
-
         res.send(configs);
     } catch (e) {
         responseException(res, e, 500);
@@ -77,18 +69,11 @@ router.get('/config/:id', [
 // GET /config/ID
 router.get('/config/history/:id', [
     check('id').isMongoId()], validate, auth, async (req, res) => {
-    const sort = {};
-
-    if (req.query.sortBy) {
-        const parts = req.query.sortBy.split(':');
-        sort[`${parts[0]}`] = parts[1] === 'desc' ? -1 : 1;
-    }
-
     try {
         const config = await Controller.getConfigById(req.params.id);
         const history = await History.find({ domainId: config.domain, elementId: config._id })
             .select('oldValue newValue updatedBy date -_id')
-            .sort(sort)
+            .sort(sortBy(req.query))
             .limit(parseInt(req.query.limit))
             .skip(parseInt(req.query.skip));
 

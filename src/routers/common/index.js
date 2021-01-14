@@ -92,6 +92,17 @@ export function formatInput(input,
     return input.trim();
 }
 
+export function sortBy(args) {
+    const sort = {};
+
+    if (args.sortBy) {
+        const parts = args.sortBy.split(':');
+        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
+    }
+
+    return sort;
+}
+
 export async function verifyOwnership(admin, element, domainId, action, routerType, cascade = false) {
     const domain = await Domain.findById(domainId);
     if (!domain) {
