@@ -3,7 +3,7 @@ import History from './history';
 import { recordHistory } from './common/index';
 import moment from 'moment';
 import IPCIDR from 'ip-cidr';
-import { NotFoundError } from '../routers/common';
+import { NotFoundError } from '../exceptions';
 
 export const StrategiesType = Object.freeze({
     NETWORK: 'NETWORK_VALIDATION',

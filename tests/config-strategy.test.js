@@ -401,7 +401,7 @@ describe('Testing reading strategies #2', () => {
         await request(app)
             .get('/configstrategy/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
 
         await request(app)
             .get('/configstrategy/' + new mongoose.Types.ObjectId())
@@ -455,7 +455,7 @@ describe('Testing reading strategies #2', () => {
         await request(app)
             .delete('/configstrategy/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
 
         await request(app)
             .delete('/configstrategy/' + new mongoose.Types.ObjectId())
@@ -485,7 +485,7 @@ describe('Testing update strategies #1', () => {
         expect(configStrategy.description).toEqual('New description');
     });
 
-    test('STRATEGY_SUITE - Should NOT update Config Strategy info', async () => {
+    test('STRATEGY_SUITE - Should NOT update Config Strategy - Invalid Config Id', async () => {
         await request(app)
             .patch('/configstrategy/' + configStrategyId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -495,20 +495,22 @@ describe('Testing update strategies #1', () => {
             }).expect(400);
     });
 
-    test('STRATEGY_SUITE - Should NOT update by invalid Config Strategy Id', async () => {
+    test('STRATEGY_SUITE - Should NOT update Config Strategy - Invalid Strategy Id', async () => {
+        await request(app)
+            .patch('/configstrategy/INVALID_ID')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                description: 'New description',
+            }).expect(422);
+    });
+
+    test('STRATEGY_SUITE - Should NOT update Config Strategy - Config Strategy Id not found', async () => {
         await request(app)
             .patch('/configstrategy/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description',
             }).expect(404);
-
-        await request(app)
-            .patch('/configstrategy/INVALID_ID')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                description: 'New description',
-            }).expect(400);
     });
 
     test('STRATEGY_SUITE - Should record changes on history collection', async () => {
@@ -572,7 +574,7 @@ describe('Testing update strategies #1', () => {
         await request(app)
             .get('/configstrategy/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
     });
 
     test('STRATEGY_SUITE - Should NOT delete history by invalid Strategy Id', async () => {
@@ -584,7 +586,7 @@ describe('Testing update strategies #1', () => {
         await request(app)
             .delete('/configstrategy/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
     });
 
     test('STRATEGY_SUITE - Should delete history from a Strategy element', async () => {
@@ -702,14 +704,14 @@ describe('Testing update strategies #1', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'USER_3'
-            }).expect(400);
+            }).expect(422);
 
-            await request(app)
-                .patch('/configstrategy/addval/' + new mongoose.Types.ObjectId())
-                .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-                .send({
-                    value: 'USER_3'
-                }).expect(404);
+        await request(app)
+            .patch('/configstrategy/addval/' + new mongoose.Types.ObjectId())
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                value: 'USER_3'
+            }).expect(404);
     });
 
     test('STRATEGY_SUITE - Should NOT update a values - Invalid Strategy Id', async () => {
@@ -719,7 +721,7 @@ describe('Testing update strategies #1', () => {
             .send({
                 oldvalue: 'USER_3',
                 newvalue: 'USER_THREE'
-            }).expect(400);
+            }).expect(422);
     });
 
     test('STRATEGY_SUITE - Should update a value inside Strategy values', async () => {
@@ -781,7 +783,7 @@ describe('Testing update strategies #2', () => {
             .send({
                 oldvalue: 'USER_3333333',
                 newvalue: 'USER_5'
-            }).expect(404);
+            }).expect(400);
 
         expect(response.body.error).toEqual('Old value \'USER_3333333\' not found');
 
@@ -825,7 +827,7 @@ describe('Testing update strategies #2', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'USER_3'
-            }).expect(400);
+            }).expect(422);
     });
 
     test('STRATEGY_SUITE - Should NOT remove a value from Strategy values', async () => {
@@ -834,7 +836,7 @@ describe('Testing update strategies #2', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'USER_44444'
-            }).expect(404);
+            }).expect(400);
 
         expect(response.body.error).toEqual('Value \'USER_44444\' does not exist');
 
@@ -891,7 +893,7 @@ describe('Testing fetch strategies', () => {
         await request(app)
             .get('/configstrategy/values/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
     });
 
     test('STRATEGY_SUITE - Should update Strategy environment status - default', async () => {
@@ -969,7 +971,7 @@ describe('Scenario: creating QA environment and modifying its status', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
-            }).expect(400);
+            }).expect(422);
 
         await request(app)
             .patch('/configstrategy/updateStatus/' + new mongoose.Types.ObjectId())
@@ -997,7 +999,7 @@ describe('Scenario: creating QA environment and modifying its status', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA: true
-            }).expect(404);
+            }).expect(400);
 
         expect(response.body.error).toEqual('Strategy does not exist on this environment');
     });
