@@ -1,11 +1,10 @@
 import express from 'express';
 import { auth } from '../middleware/auth';
-import { verifyOwnership, responseException, formatInput } from './common/index';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
-import { check } from 'express-validator';
+import { check, query } from 'express-validator';
 import Component from '../models/component';
-import { ActionTypes, RouterTypes } from '../models/role';
-import { checkComponent } from '../external/switcher-api-facade';
+import * as Controller from '../controller/component';
+import { responseException } from '../exceptions';
 
 const router = new express.Router();
 
@@ -13,17 +12,8 @@ router.post('/component/create', [
     check('name').isLength({ min: 2, max: 50 }),
     check('description').isLength({ min: 2, max: 500 })
 ], validate, auth, async (req, res) => {
-    let component = new Component({
-        ...req.body,
-        owner: req.admin._id
-    });
-
     try {
-        await checkComponent(req.body.domain);
-        component.name = formatInput(component.name);
-        component = await verifyOwnership(req.admin, component, req.body.domain, ActionTypes.CREATE, RouterTypes.COMPONENT);
-        const apiKey = await component.generateApiKey();
-        await component.save();
+        const { component, apiKey } = await Controller.createComponent(req.body, req.admin);
         res.status(201).send({ component, apiKey });
     } catch (e) {
         responseException(res, e, 400);
@@ -34,18 +24,7 @@ router.get('/component/generateApiKey/:component/', [
     check('component', 'Invalid Id for component').isMongoId()
 ], validate, auth, async (req, res) => {
     try {
-        let component = await Component.findById(req.params.component);
-
-        if (!component) {
-            return res.status(404).send();
-        }
-
-        component = await verifyOwnership(
-            req.admin, component, component.domain, ActionTypes.UPDATE, RouterTypes.COMPONENT);
-        component.updatedBy = req.admin.email;
-
-        const apiKey = await component.generateApiKey();
-        
+        const apiKey = await Controller.generateApiKey(req.params.component, req.admin);
         res.status(201).send({ apiKey });
     } catch (e) {
         responseException(res, e, 400);
@@ -55,13 +34,8 @@ router.get('/component/generateApiKey/:component/', [
 // GET /component?domain=ID&limit=10&skip=20
 // GET /component?domain=ID&sort=desc
 // GET /component?domain=ID
-router.get('/component', auth, async (req, res) => {
-    if (!req.query.domain) {
-        return res.status(422).send({
-            error: 'Please, specify the \'domain\' id'
-        });
-    }
-
+router.get('/component', [query('domain', 'Please, specify the \'domain\' id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
         let components = await Component.find({ domain: req.query.domain },
             ['_id', 'name', 'description'],
@@ -79,16 +53,10 @@ router.get('/component', auth, async (req, res) => {
     }
 });
 
-router.get('/component/:id', [
-    check('id', 'Invalid Id for component').isMongoId()
-], validate, auth, async (req, res) => {
+router.get('/component/:id', [check('id', 'Invalid Id for component').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
-        let component = await Component.findById(req.params.id);
-
-        if (!component) {
-            return res.status(404).send();
-        }
-
+        const component = await Controller.getComponentById(req.params.id);
         res.send(component);
     } catch (e) {
         responseException(res, e, 400);
@@ -99,20 +67,8 @@ router.patch('/component/:id', [
     check('id', 'Invalid Id for component').isMongoId()], 
     verifyInputUpdateParameters(['name', 'description']),
     validate, auth, async (req, res) => {
-
     try {
-        let component = await Component.findById(req.params.id);
- 
-        if (!component) {
-            return res.status(404).send();
-        }
-
-        component = await verifyOwnership(
-            req.admin, component, component.domain, ActionTypes.UPDATE, RouterTypes.COMPONENT);
-
-        req.updates.forEach((update) => component[update] = req.body[update]);
-        component.name = formatInput(component.name);
-        await component.save();
+        const component = await Controller.updateComponent(req.params.id, req.body, req.admin);
         res.send(component);
     } catch (e) {
         responseException(res, e, 400);
@@ -122,18 +78,8 @@ router.patch('/component/:id', [
 router.delete('/component/:id', [
     check('id', 'Invalid Id for component').isMongoId()], 
     validate, auth, async (req, res) => {
-
     try {
-        let component = await Component.findById(req.params.id);
-
-        if (!component) {
-            return res.status(404).send();
-        }
-
-        component = await verifyOwnership(
-            req.admin, component, component.domain, ActionTypes.DELETE, RouterTypes.COMPONENT);
-
-        await component.remove();
+        const component = await Controller.deleteComponent(req.params.id, req.admin);
         res.send(component);
     } catch (e) {
         responseException(res, e, 400);
