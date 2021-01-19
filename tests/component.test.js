@@ -100,12 +100,14 @@ describe('Insertion tests', () => {
         expect(isMatch).toEqual(true);
     });
 
-    test('COMPONENT_SUITE - Should NOT generate an API Key for an inexistent Component', async () => {
+    test('COMPONENT_SUITE - Should NOT generate an API Key for', async () => {
+        // Invalid component ID
         await request(app)
             .get('/component/generateApiKey/INVALID_COMPONENT_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
 
+        // Not found component ID
         await request(app)
             .get('/component/generateApiKey/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -166,7 +168,7 @@ describe('Reading tests', () => {
         await request(app)
             .get('/component?domain=INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
     });
 
     test('COMPONENT_SUITE - Should NOT read Component - Domain Id not specified', async () => {
