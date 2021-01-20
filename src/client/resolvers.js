@@ -8,6 +8,7 @@ import { ActionTypes, RouterTypes } from '../models/role';
 import { verifyOwnership } from '../routers/common/index';
 import { resolveNotification, resolveValidation } from './relay/index';
 import { checkExecution } from '../external/switcher-api-facade';
+import Component from '../models/component';
 
 export const resolveConfigByKey = async (domain, key) => await Config.findOne({ domain, key }, null, { lean: true });
 
@@ -18,7 +19,7 @@ export function resolveEnvStatus(source) {
     key.forEach(k => {
         arrStatus.push({
             env: k,
-            value: source.activated[`${k}`]
+            value: source.activated[k]
         });
     });
 
@@ -35,9 +36,9 @@ export async function resolveConfigStrategy(source, _id, strategy, operation, ac
     let strategies = await ConfigStrategy.find({ config: source._id, ...args }).lean();
     const environment = context.environment ? context.environment : EnvType.DEFAULT;
 
-    strategies = strategies.filter(s => s.activated[`${environment}`] !== undefined);
+    strategies = strategies.filter(s => s.activated[environment] !== undefined);
     if (activated !== undefined) {
-        strategies = strategies.filter(s => s.activated[`${environment}`] === activated);
+        strategies = strategies.filter(s => s.activated[environment] === activated);
     }
 
     try {
@@ -57,11 +58,12 @@ export async function resolveConfig(source, _id, key, activated, context) {
 
     if (_id) { args._id = _id; }
     if (key) { args.key = key; }
+    if (context._component) { args.components = context._component; }
 
     let configs = await Config.find({ group: source._id, ...args }).lean();
 
     if (activated !== undefined) {
-        configs = configs.filter(config => config.activated[`${context.environment}`] === activated);
+        configs = configs.filter(config => config.activated[context.environment] === activated);
     }
 
     try {
@@ -85,7 +87,7 @@ export async function resolveGroupConfig(source, _id, name, activated, context) 
     let groups = await GroupConfig.find({ domain: source._id, ...args }).lean();
 
     if (activated !== undefined) {
-        groups = groups.filter(group => group.activated[`${context.environment}`] === activated);
+        groups = groups.filter(group => group.activated[context.environment] === activated);
     }
 
     try {
@@ -96,7 +98,7 @@ export async function resolveGroupConfig(source, _id, name, activated, context) 
         return null;
     }
 
-    return groups;
+    return await resolveComponentsFirst(source, context, groups);
 }
 
 export async function resolveDomain(_id, name, activated, context) {
@@ -135,6 +137,30 @@ export async function checkDomain(domainId) {
     return domain;
 }
 
+/**
+ * Resolve components first is used by SDKs to filter only configurations in which the component
+ * exists resulting in a snapshot size reduction.
+ */
+async function resolveComponentsFirst(source, context, groups) {
+    if (context._component) {
+        const component = await Component.findOne({ domain: source._id, name: context._component });
+        const validGroups = [];
+
+        context._component = component?._id;
+        for (const group of groups) {
+            let configsLength = await Config.find({
+                 domain: source._id, group: group._id, components: context._component 
+            }).countDocuments();
+
+            if (configsLength) {
+                validGroups.push(group);
+            }
+        }
+        return validGroups;
+    }
+    return groups;
+}
+
 async function checkGroup(configId) {
     const config = await Config.findOne({ _id: configId }, null, { lean: true });
     const group = await GroupConfig.findOne({ _id: config.group }, null, { lean: true });
@@ -145,7 +171,6 @@ async function checkConfigStrategies (configId, strategyFilter) {
     const strategies = await ConfigStrategy.find({ config: configId }, strategyFilter).lean();
     return strategies;
 }
-
 
 async function resolveRelay(config, environment, entry, response) {
     try {

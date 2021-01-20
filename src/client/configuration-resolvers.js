@@ -35,7 +35,8 @@ export async function resolveFlatConfigStrategy(source, context) {
 
     try {
         if (context.admin) {
-            strategies = await verifyOwnership(context.admin, strategies, source.config[0].domain, ActionTypes.READ, RouterTypes.STRATEGY, true);
+            strategies = await verifyOwnership(
+                context.admin, strategies, source.config[0].domain, ActionTypes.READ, RouterTypes.STRATEGY, true);
         }
     } catch (e) {
         return null;
@@ -58,7 +59,8 @@ export async function resolveFlatConfig(source, context) {
 
     try {
         if (context.admin) {
-            configs = await verifyOwnership(context.admin, configs, domainId, ActionTypes.READ, RouterTypes.CONFIG, true);
+            configs = await verifyOwnership(
+                context.admin, configs, domainId, ActionTypes.READ, RouterTypes.CONFIG, true);
         }
     } catch (e) {
         return null;
@@ -78,7 +80,8 @@ export async function resolveFlatGroupConfig(source, context) {
 
     try {
         if (context.admin) {
-            group = await verifyOwnership(context.admin, group, group[0].domain, ActionTypes.READ, RouterTypes.GROUP, true);
+            group = await verifyOwnership(
+                context.admin, group, group[0].domain, ActionTypes.READ, RouterTypes.GROUP, true);
         }
     } catch (e) {
         return null;
@@ -96,7 +99,8 @@ export async function resolveFlatDomain(source, context) {
 
     try {
         if (context.admin) {
-            domain = await verifyOwnership(context.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN, true);
+            domain = await verifyOwnership(
+                context.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN, true);
         }
     } catch (e) {
         return null;

@@ -7,6 +7,11 @@ import GroupConfig from '../src/models/group-config';
 import { Config } from '../src/models/config';
 import Component from '../src/models/component';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../src/models/config-strategy';
+import { EnvType } from '../src/models/environment';
+import { adminMasterAccountId } from './fixtures/db_api';
+import Admin from '../src/models/admin';
+import { Metric } from '../src/models/metric';
+import * as graphqlUtils from './graphql-utils';
 import { 
     setupDatabase,
     adminMasterAccountToken,
@@ -22,10 +27,6 @@ import {
     component1,
     adminAccountId
 } from './fixtures/db_client';
-import { EnvType } from '../src/models/environment';
-import { adminMasterAccountId } from './fixtures/db_api';
-import Admin from '../src/models/admin';
-import { Metric } from '../src/models/metric';
 
 const changeStrategy = async (strategyId, newOperation, status, environment) => {
     const strategy = await ConfigStrategy.findById(strategyId);
@@ -95,22 +96,13 @@ describe('Testing criteria [GraphQL] ', () => {
         request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    criteria(
-                        key: "${keyConfig}", 
-                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
-                                { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { response { result reason } }
-                }  
-            `})
+            .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
+                [StrategiesType.VALUE, 'USER_1'], 
+                [StrategiesType.NETWORK, '10.0.0.3']]))
+            )
             .expect(200)
             .end((err, res) => {
-                const expected = `
-                    {
-                        "data": { "criteria": { "response": { "result": true, "reason": "Success" } } }
-                    }`;
-                
+                const expected = graphqlUtils.criteriaResult('true', 'Success');
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
             });
@@ -120,22 +112,10 @@ describe('Testing criteria [GraphQL] ', () => {
         request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    configuration(group: "Group Test") {
-                        domain { name description activated }
-                        group { name description activated }
-                        config { key description activated }
-                        strategies { strategy activated operation values }
-                    }
-                }  
-            `})
+            .send(graphqlUtils.configurationQuery([['group', 'Group Test']]))
             .expect(200)
             .end((err, res) => {
-                const expected = `
-                {"data":{"configuration":{"domain":{"name":"Domain","description":"Test Domain","activated":true},"group":[{"name":"Group Test","description":"Test Group","activated":true}],"config":[{"key":"TEST_CONFIG_KEY","description":"Test config 1","activated":true},{"key":"TEST_CONFIG_KEY_PRD_QA","description":"Test config 2 - Off in PRD and ON in QA","activated":false}],"strategies":null}}}`;
-                
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected100));
                 done();
             });
     });
@@ -144,16 +124,7 @@ describe('Testing criteria [GraphQL] ', () => {
         request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    configuration(group: "UNKNOWN GROUP NAME") {
-                        domain { name description activated }
-                        group { name description activated }
-                        config { key description activated }
-                        strategies { strategy activated operation values }
-                    }
-                }  
-            `})
+            .send(graphqlUtils.configurationQuery([['group', 'UNKNOWN GROUP NAME']]))
             .expect(200)
             .end((err, res) => {
                 expect(JSON.parse(res.text).data.configuration).toEqual(null);
@@ -165,22 +136,10 @@ describe('Testing criteria [GraphQL] ', () => {
         request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    configuration(key: "${keyConfig}") {
-                        domain { name description activated }
-                        group { name description activated }
-                        config { key description activated }
-                        strategies { strategy activated operation values }
-                    }
-                }  
-            `})
+            .send(graphqlUtils.configurationQuery([['key', keyConfig]]))
             .expect(200)
             .end((err, res) => {
-                const expected = `
-                {"data":{"configuration":{"domain":{"name":"Domain","description":"Test Domain","activated":true},"group":[{"name":"Group Test","description":"Test Group","activated":true}],"config":[{"key":"TEST_CONFIG_KEY","description":"Test config 1","activated":true}],"strategies":[{"strategy":"VALUE_VALIDATION","activated":true,"operation":"EXIST","values":["USER_1","USER_2","USER_3"]},{"strategy":"NETWORK_VALIDATION","activated":true,"operation":"EXIST","values":["10.0.0.0/24"]},{"strategy":"TIME_VALIDATION","activated":false,"operation":"BETWEEN","values":["13:00","14:00"]},{"strategy":"DATE_VALIDATION","activated":false,"operation":"GREATER","values":["2019-12-01T13:00"]}]}}}`;
-                
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected101));
                 done();
             });
     });
@@ -198,16 +157,7 @@ describe('Testing criteria [GraphQL] ', () => {
         await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${response.body.token}`)
-            .send({ query: `
-                {
-                    configuration(key: "${keyConfig}") {
-                        domain { name description activated }
-                        group { name description activated }
-                        config { key description activated }
-                        strategies { strategy activated operation values }
-                    }
-                }  
-            `})
+            .send(graphqlUtils.configurationQuery([['key', keyConfig]]))
             .expect(200);
     });
 
@@ -215,16 +165,7 @@ describe('Testing criteria [GraphQL] ', () => {
         request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    configuration(key: "UNKNOWN_CONFIG_KEY") {
-                        domain { name description activated }
-                        group { name description activated }
-                        config { key description activated }
-                        strategies { strategy activated operation values }
-                    }
-                }  
-            `})
+            .send(graphqlUtils.configurationQuery([['key', 'UNKNOWN_CONFIG_KEY']]))
             .expect(200)
             .end((err, res) => {
                 expect(JSON.parse(res.text).data.configuration).toEqual(null);
@@ -236,22 +177,13 @@ describe('Testing criteria [GraphQL] ', () => {
         request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    criteria(
-                        key: "${keyConfig}", 
-                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_4" },
-                                { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { response { result reason } }
-                }  
-            `})
+            .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
+                [StrategiesType.VALUE, 'USER_4'], 
+                [StrategiesType.NETWORK, '10.0.0.3']]))
+            )
             .expect(200)
             .end((err, res) => {
-                const expected = `
-                    {
-                        "data": { "criteria": { "response": { "result": false, "reason": "Strategy '${StrategiesType.VALUE}' does not agree" } } }
-                    }`;
-                
+                const expected = graphqlUtils.criteriaResult('false', `Strategy '${StrategiesType.VALUE}' does not agree`);
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
             });
@@ -261,21 +193,12 @@ describe('Testing criteria [GraphQL] ', () => {
         request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    criteria(
-                        key: "${keyConfig}", 
-                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_2" }]
-                        ) { response { result reason } }
-                }  
-            `})
+            .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
+                [StrategiesType.VALUE, 'USER_2']]))
+            )
             .expect(200)
             .end((err, res) => {
-                const expected = `
-                    {
-                        "data": { "criteria": { "response": { "result": false, "reason": "Strategy '${StrategiesType.NETWORK}' did not receive any input" } } }
-                    }`;
-                
+                const expected = graphqlUtils.criteriaResult('false', `Strategy '${StrategiesType.NETWORK}' did not receive any input`);
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
                 done();
             });
@@ -285,15 +208,10 @@ describe('Testing criteria [GraphQL] ', () => {
         request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    criteria(
-                        key: "INVALID_KEY", 
-                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
-                                { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { response { result reason } }
-                } 
-            `})
+            .send(graphqlUtils.criteriaQuery('INVALID_KEY', graphqlUtils.buildEntries([
+                [StrategiesType.VALUE, 'USER_1'],
+                [StrategiesType.NETWORK, '10.0.0.3']]))
+            )
             .expect(200)
             .end((err, res) => {
                 expect(JSON.parse(res.text).data.criteria).toEqual(null);
@@ -306,22 +224,13 @@ describe('Testing criteria [GraphQL] ', () => {
         const response = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    criteria(
-                        key: "${keyConfig}", 
-                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
-                                { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { response { result reason } }
-                }  
-            `})
+            .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
+                [StrategiesType.VALUE, 'USER_1'],
+                [StrategiesType.NETWORK, '10.0.0.3']]))
+            )
             .expect(200);
 
-        let expected = `
-            {
-                "data": { "criteria": { "response": { "result": true, "reason": "Success" } } }
-            }`;
-        
+        const expected = graphqlUtils.criteriaResult('true', 'Success');
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
     });
 
@@ -330,22 +239,13 @@ describe('Testing criteria [GraphQL] ', () => {
         const response = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    criteria(
-                        key: "${keyConfig}", 
-                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
-                                { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { response { result reason } }
-                }  
-            `})
+            .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
+                [StrategiesType.VALUE, 'USER_1'],
+                [StrategiesType.NETWORK, '10.0.0.3']]))
+            )
             .expect(200);
 
-        const expected = `
-            {
-                "data": { "criteria": { "response": { "result": false, "reason": "Config disabled" } } }
-            }`;
-        
+        const expected = graphqlUtils.criteriaResult('false', 'Config disabled');
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
     });
 
@@ -365,22 +265,13 @@ describe('Testing criteria [GraphQL] ', () => {
         const response = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${qaToken}`)
-            .send({ query: `
-                {
-                    criteria(
-                        key: "${keyConfig}", 
-                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
-                                { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { response { result reason } }
-                }  
-            `})
+            .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
+                [StrategiesType.VALUE, 'USER_1'],
+                [StrategiesType.NETWORK, '10.0.0.3']]))
+            )
             .expect(200);
 
-        const expected = `
-            {
-                "data": { "criteria": { "response": { "result": true, "reason": "Success" } } }
-            }`;
-        
+        const expected = graphqlUtils.criteriaResult('true', 'Success');
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
     });
 
@@ -401,22 +292,13 @@ describe('Testing criteria [GraphQL] ', () => {
         const response = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${qaToken}`)
-            .send({ query: `
-                {
-                    criteria(
-                        key: "${keyConfig}", 
-                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
-                                { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { response { result reason } }
-                }  
-            `})
+            .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
+                [StrategiesType.VALUE, 'USER_1'],
+                [StrategiesType.NETWORK, '10.0.0.3']]))
+            )
             .expect(200);
 
-        const expected = `
-            {
-                "data": { "criteria": { "response": { "result": false, "reason": "Strategy '${StrategiesType.VALUE}' does not agree" } } }
-            }`;
-        
+        const expected = graphqlUtils.criteriaResult('false', `Strategy '${StrategiesType.VALUE}' does not agree`);
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
     });
 
@@ -425,22 +307,13 @@ describe('Testing criteria [GraphQL] ', () => {
         const response = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    criteria(
-                        key: "${keyConfig}", 
-                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
-                                { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { response { result reason } }
-                }  
-            `})
+            .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
+                [StrategiesType.VALUE, 'USER_1'],
+                [StrategiesType.NETWORK, '10.0.0.3']]))
+            )
             .expect(200);
 
-        const expected = `
-            {
-                "data": { "criteria": { "response": { "result": true, "reason": "Success" } } }
-            }`;
-        
+        const expected = graphqlUtils.criteriaResult('true', 'Success');
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
     });
 
@@ -449,22 +322,13 @@ describe('Testing criteria [GraphQL] ', () => {
         const response = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    criteria(
-                        key: "${keyConfig}", 
-                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
-                                { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { response { result reason } }
-                }  
-            `})
+            .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
+                [StrategiesType.VALUE, 'USER_1'],
+                [StrategiesType.NETWORK, '10.0.0.3']]))
+            )
             .expect(200);
 
-        const expected = `
-            {
-                "data": { "criteria": { "response": { "result": false, "reason": "Group disabled" } } }
-            }`;
-        
+        const expected = graphqlUtils.criteriaResult('false', 'Group disabled');
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
     });
 
@@ -474,22 +338,13 @@ describe('Testing criteria [GraphQL] ', () => {
         const response = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    criteria(
-                        key: "${keyConfig}", 
-                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
-                                { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { response { result reason } }
-                }  
-            `})
+            .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
+                [StrategiesType.VALUE, 'USER_1'],
+                [StrategiesType.NETWORK, '10.0.0.3']]))
+            )
             .expect(200);
 
-        const expected = `
-            {
-                "data": { "criteria": { "response": { "result": false, "reason": "Domain disabled" } } }
-            }`;
-        
+        const expected = graphqlUtils.criteriaResult('false', 'Domain disabled');
         expect(JSON.parse(response.text)).toMatchObject(JSON.parse(expected));
     });
 
@@ -501,15 +356,10 @@ describe('Testing criteria [GraphQL] ', () => {
         await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    criteria(
-                        key: "${keyConfig}", 
-                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
-                                { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { response { result reason } }
-                }  
-            `})
+            .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
+                [StrategiesType.VALUE, 'USER_1'],
+                [StrategiesType.NETWORK, '10.0.0.3']]))
+            )
             .expect(200);
 
         //get total of metric data
@@ -522,15 +372,10 @@ describe('Testing criteria [GraphQL] ', () => {
         await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    criteria(
-                        key: "${keyConfig}", 
-                        entry: [{ strategy: "${StrategiesType.VALUE}", input: "USER_1" },
-                                { strategy: "${StrategiesType.NETWORK}", input: "10.0.0.3" }]
-                        ) { response { result reason } }
-                }  
-            `})
+            .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
+                [StrategiesType.VALUE, 'USER_1'],
+                [StrategiesType.NETWORK, '10.0.0.3']]))
+            )
             .expect(200);
 
         //test
@@ -561,67 +406,43 @@ describe('Testing domain', () => {
         request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    domain(_id: "${domainId}") { name version description activated
-                        group(activated: true) { name description activated
-                            config(activated: true) { key description activated
-                                strategies(activated: true) { strategy activated operation  values }
-                                components
-                            }
-                        }
-                    }
-                }
-            `})
+            .send(graphqlUtils.domainQuery([['_id', domainId]], true, true, true))
             .expect(200)
             .end((err, res) => {
-                const expected = `
-                        {
-                            "data":{
-                               "domain":
-                                  {
-                                     "name":"Domain",
-                                     "description":"Test Domain",
-                                     "activated":true,
-                                     "group":[
-                                        {
-                                           "name":"Group Test",
-                                           "description":"Test Group",
-                                           "activated":true,
-                                           "config":[
-                                              {
-                                                 "key":"TEST_CONFIG_KEY",
-                                                 "description":"Test config 1",
-                                                 "activated":true,
-                                                 "strategies":[
-                                                    {
-                                                       "strategy":"VALUE_VALIDATION",
-                                                       "activated":true,
-                                                       "operation":"EXIST",
-                                                       "values":[
-                                                          "USER_1",
-                                                          "USER_2",
-                                                          "USER_3"
-                                                       ]
-                                                    },
-                                                    {
-                                                       "strategy":"NETWORK_VALIDATION",
-                                                       "activated":true,
-                                                       "operation":"EXIST",
-                                                       "values":[
-                                                          "10.0.0.0/24"
-                                                       ]
-                                                    }
-                                                 ]
-                                              }
-                                           ]
-                                        }
-                                     ]
-                                  }
-                            }
-                        }`;
-                
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected102));
+                done();
+            });
+    });
+
+    test('CLIENT_SUITE - Should return 2 switchers when NOT filtered by Component', (done) => {
+        request(app)
+            .post('/graphql')
+            .set('Authorization', `Bearer ${token}`)
+            .send(graphqlUtils.domainQuery([
+                ['name', domainDocument.name], 
+                ['environment', EnvType.DEFAULT]])
+            )
+            .expect(200)
+            .end((err, res) => {
+                const result = JSON.parse(res.text);
+                expect(result.data.domain.group[0].config.length).toBe(2);
+                done();
+            });
+    });
+
+    test('CLIENT_SUITE - Should return 1 switcher when filtered by Component', (done) => {
+        request(app)
+            .post('/graphql')
+            .set('Authorization', `Bearer ${token}`)
+            .send(graphqlUtils.domainQuery([
+                ['name', domainDocument.name], 
+                ['environment', EnvType.DEFAULT],
+                ['_component', 'TestApp']])
+            )
+            .expect(200)
+            .end((err, res) => {
+                const result = JSON.parse(res.text);
+                expect(result.data.domain.group[0].config.length).toBe(1);
                 done();
             });
     });
@@ -631,67 +452,13 @@ describe('Testing domain', () => {
         request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    domain(name: "${domainDocument.name}", environment: "${EnvType.DEFAULT}") { name version description activated
-                        group(activated: true) { name description activated
-                            config(activated: true) { key description activated
-                                strategies(activated: true) { strategy activated operation  values }
-                                components
-                            }
-                        }
-                    }
-                }
-            `})
+            .send(graphqlUtils.domainQuery([
+                ['name', domainDocument.name], 
+                ['environment', EnvType.DEFAULT]], true, true, true)
+            )
             .expect(200)
             .end((err, res) => {
-                const expected = `
-                        {
-                            "data":{
-                               "domain":
-                                  {
-                                     "name":"Domain",
-                                     "description":"Test Domain",
-                                     "activated":true,
-                                     "group":[
-                                        {
-                                           "name":"Group Test",
-                                           "description":"Test Group",
-                                           "activated":true,
-                                           "config":[
-                                              {
-                                                 "key":"TEST_CONFIG_KEY",
-                                                 "description":"Test config 1",
-                                                 "activated":true,
-                                                 "strategies":[
-                                                    {
-                                                       "strategy":"VALUE_VALIDATION",
-                                                       "activated":true,
-                                                       "operation":"EXIST",
-                                                       "values":[
-                                                          "USER_1",
-                                                          "USER_2",
-                                                          "USER_3"
-                                                       ]
-                                                    },
-                                                    {
-                                                       "strategy":"NETWORK_VALIDATION",
-                                                       "activated":true,
-                                                       "operation":"EXIST",
-                                                       "values":[
-                                                          "10.0.0.0/24"
-                                                       ]
-                                                    }
-                                                 ]
-                                              }
-                                           ]
-                                        }
-                                     ]
-                                  }
-                            }
-                        }`;
-                
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected102));
                 done();
             });
     });
@@ -700,65 +467,10 @@ describe('Testing domain', () => {
         request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    domain(_id: "${domainId}") { name version description activated
-                        group(activated: true) { name description activated
-                            config(activated: true) { key description activated
-                                strategies(activated: false) { strategy activated operation values }
-                            }
-                        }
-                    }
-                }
-            `})
+            .send(graphqlUtils.domainQuery([['_id', domainId]], true, true, false))
             .expect(200)
             .end((err, res) => {
-                const expected = `
-                        {
-                            "data":{
-                               "domain":
-                                  {
-                                     "name":"Domain",
-                                     "description":"Test Domain",
-                                     "activated":true,
-                                     "group":[
-                                        {
-                                           "name":"Group Test",
-                                           "description":"Test Group",
-                                           "activated":true,
-                                           "config":[
-                                              {
-                                                 "key":"TEST_CONFIG_KEY",
-                                                 "description":"Test config 1",
-                                                 "activated":true,
-                                                 "strategies":[
-                                                    {
-                                                       "strategy":"TIME_VALIDATION",
-                                                       "activated":false,
-                                                       "operation":"BETWEEN",
-                                                       "values":[
-                                                          "13:00",
-                                                          "14:00"
-                                                       ]
-                                                    },
-                                                    {
-                                                       "strategy":"DATE_VALIDATION",
-                                                       "activated":false,
-                                                       "operation":"GREATER",
-                                                       "values":[
-                                                           "2019-12-01T13:00"
-                                                       ]
-                                                    }
-                                                 ]
-                                              }
-                                           ]
-                                        }
-                                     ]
-                                  }
-                            }
-                        }`;
-                    
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected103));
                 done();
             });
     });
@@ -767,34 +479,10 @@ describe('Testing domain', () => {
         request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    domain(_id: "${domainId}") { name description activated
-                        group(activated: false) { name description activated
-                            config(activated: false) { key description activated
-                                strategies(activated: false) { strategy activated operation values }
-                            }
-                        }
-                    }
-                }
-            `})
+            .send(graphqlUtils.domainQuery([['_id', domainId]], false, false, false))
             .expect(200)
             .end((err, res) => {
-                const expected = `
-                        {
-                            "data":
-                            {
-                               "domain":
-                                  {
-                                     "name":"Domain",
-                                     "description":"Test Domain",
-                                     "activated":true,
-                                     "group":[]
-                                  }
-                            }
-                         }`;
-                
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected104));
                 done();
             });
     });
@@ -803,49 +491,10 @@ describe('Testing domain', () => {
         request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send({ query: `
-                {
-                    domain(_id: "${domainId}", activated: true) { name description activated
-                        group(activated: true) { name description activated
-                            config(activated: false) { key description activated
-                                strategies(activated: false) { strategy activated operation values }
-                            }
-                        }
-                    }
-                }
-            `})
+            .send(graphqlUtils.domainQuery([['_id', domainId]], true, false, false))
             .expect(200)
             .end((err, res) => {
-                const expected = `
-                        {
-                            "data":{
-                               "domain":
-                                  {
-                                     "name":"Domain",
-                                     "description":"Test Domain",
-                                     "activated":true,
-                                     "group":[
-                                        {
-                                           "name":"Group Test",
-                                           "description":"Test Group",
-                                           "activated":true,
-                                           "config":[
-                                            {
-                                                "key":"${keyConfigPrdQA}",
-                                                "description":"Test config 2 - Off in PRD and ON in QA",
-                                                "activated":false,
-                                                "strategies":[
-                           
-                                                ]
-                                             }
-                                           ]
-                                        }
-                                     ]
-                                  }
-                            }
-                         }`;
-
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected105(keyConfigPrdQA)));
                 done();
             });
     });
@@ -1118,34 +767,10 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({ query: `
-                {
-                    domain(name: "Domain") { name description statusByEnv { env value }
-                        group { name description statusByEnv { env value }
-                            config { key description statusByEnv { env value }
-                                strategies { strategy statusByEnv { env value } operation  values }
-                            }
-                        }
-                    }
-                }
-            `})
+            .send(graphqlUtils.domainQuery([['name', 'Domain']]))
             .expect(200)
             .end((err, res) => {
-                const expected = `
-                    {"data":
-                    {"domain":{
-                        "name":"Domain","description":"Test Domain","statusByEnv":[{"env":"default","value":true}],
-                        "group":[{"name":"Group Test","description":"Test Group","statusByEnv":[{"env":"default","value":true}],
-                        "config":[
-                            {"key":"TEST_CONFIG_KEY","description":"Test config 1","statusByEnv":[{"env":"default","value":true}],
-                            "strategies":[
-                                {"strategy":"VALUE_VALIDATION","statusByEnv":[{"env":"default","value":true}],"operation":"EXIST","values":["USER_1","USER_2","USER_3"]},
-                                {"strategy":"NETWORK_VALIDATION","statusByEnv":[{"env":"default","value":true}],"operation":"EXIST","values":["10.0.0.0/24"]},
-                                {"strategy":"TIME_VALIDATION","statusByEnv":[{"env":"default","value":false}],"operation":"BETWEEN","values":["13:00","14:00"]},
-                                {"strategy":"DATE_VALIDATION","statusByEnv":[{"env":"default","value":false}],"operation":"GREATER","values":["2019-12-01T13:00"]}]},
-                            {"key":"TEST_CONFIG_KEY_PRD_QA","description":"Test config 2 - Off in PRD and ON in QA","statusByEnv":[{"env":"default","value":false},{"env":"QA","value":true}],
-                            "strategies":[]}]}]}}}`;
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected106));
                 done();
             });
     });
@@ -1154,29 +779,10 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send({ query: `
-                {
-                    domain(_id: "${domainId}", environment: "default") { name description statusByEnv { env value }
-                        group { name description statusByEnv { env value }
-                            config { key description statusByEnv { env value }
-                                strategies { strategy statusByEnv { env value } operation  values }
-                            }
-                        }
-                    }
-                }
-            `})
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]]))
             .expect(200)
             .end((err, res) => {
-                const expected = `
-                    {"data":
-                    {"domain":{"name":"Domain","description":"Test Domain","statusByEnv":[{"env":"default","value":true}],
-                    "group":[
-                        {"name":"Group Test","description":"Test Group","statusByEnv":[{"env":"default","value":true}],
-                        "config":[
-                            {"key":"TEST_CONFIG_KEY","description":"Test config 1","statusByEnv":[{"env":"default","value":true}],"strategies":null},
-                            {"key":"TEST_CONFIG_KEY_PRD_QA","description":"Test config 2 - Off in PRD and ON in QA","statusByEnv":[{"env":"default","value":false},{"env":"QA","value":true}],"strategies":null}]}]}}}
-                    `;
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected107));
                 done();
             });
     });
@@ -1185,32 +791,10 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({ query: `
-            {
-                configuration(domain: "${domainId}", key: "${keyConfig}") {
-                    domain { name description statusByEnv { env value } }
-                    group { name description statusByEnv { env value } }
-                    config { key description statusByEnv { env value } }
-                    strategies { strategy operation values statusByEnv { env value } }
-                }
-            }
-            `})
+            .send(graphqlUtils.configurationQuery([['domain', domainId], ['key', keyConfig]]))
             .expect(200)
             .end((err, res) => {
-                const expected = `
-                    {"data":
-                    {"configuration":
-                    {"domain":{"name":"Domain","description":"Test Domain","statusByEnv":[{"env":"default","value":true}]},
-                    "group":[
-                        {"name":"Group Test","description":"Test Group","statusByEnv":[{"env":"default","value":true}]}],
-                        "config":[
-                            {"key":"TEST_CONFIG_KEY","description":"Test config 1","statusByEnv":[{"env":"default","value":true}]}],
-                                "strategies":[
-                                    {"strategy":"VALUE_VALIDATION","operation":"EXIST","values":["USER_1","USER_2","USER_3"],"statusByEnv":[{"env":"default","value":true}]},
-                                    {"strategy":"NETWORK_VALIDATION","operation":"EXIST","values":["10.0.0.0/24"],"statusByEnv":[{"env":"default","value":true}]},
-                                    {"strategy":"TIME_VALIDATION","operation":"BETWEEN","values":["13:00","14:00"],"statusByEnv":[{"env":"default","value":false}]},
-                                    {"strategy":"DATE_VALIDATION","operation":"GREATER","values":["2019-12-01T13:00"],"statusByEnv":[{"env":"default","value":false}]}]}}}`;
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected108));
                 done();
             });
     });
@@ -1219,16 +803,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({ query: `
-            {
-                configuration(domain: "${domainId}", group: "Group Test") {
-                    domain { name description statusByEnv { env value } }
-                    group { name description statusByEnv { env value } }
-                    config { key description statusByEnv { env value } }
-                    strategies { strategy operation values statusByEnv { env value } }
-                }
-            }
-            `})
+            .send(graphqlUtils.configurationQuery([['domain', domainId], ['group', 'Group Test']]))
             .expect(200)
             .end((err, res) => {
                 const result = JSON.parse(res.text);
@@ -1241,26 +816,13 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send({ query: `
-            {
-                configuration(domain: "${domainId}", key: "${keyConfig}", environment: "default") {
-                    domain { name description statusByEnv { env value } }
-                    group { name description statusByEnv { env value } }
-                    config { key description statusByEnv { env value } }
-                    strategies { strategy operation values statusByEnv { env value } }
-                }
-            }
-            `})
+            .send(graphqlUtils.configurationQuery([
+                ['domain', domainId], 
+                ['key', keyConfig], 
+                ['environment', EnvType.DEFAULT]]))
             .expect(200)
             .end((err, res) => {
-                const expected = `
-                    {"data":
-                    {"configuration":{"domain":{"name":"Domain","description":"Test Domain","statusByEnv":[{"env":"default","value":true}]},
-                    "group":[
-                        {"name":"Group Test","description":"Test Group","statusByEnv":[{"env":"default","value":true}]}],
-                        "config":[
-                            {"key":"TEST_CONFIG_KEY","description":"Test config 1","statusByEnv":[{"env":"default","value":true}]}],"strategies":null}}}`;
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected109));
                 done();
             });
     });
@@ -1274,17 +836,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send({ query: `
-                {
-                    domain(_id: "${domainId}", environment: "default") { name description statusByEnv { env value }
-                        group { name description statusByEnv { env value }
-                            config { key description statusByEnv { env value }
-                                strategies { strategy statusByEnv { env value } operation  values }
-                            }
-                        }
-                    }
-                }
-            `})
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]]))
             .expect(200)
             .end((err, res) => {
                 const expected = '{"data":{"domain":null}}';
@@ -1297,16 +849,10 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send({ query: `
-            {
-                configuration(domain: "${domainId}", key: "${keyConfig}", environment: "default") {
-                    domain { name description statusByEnv { env value } }
-                    group { name description statusByEnv { env value } }
-                    config { key description statusByEnv { env value } }
-                    strategies { strategy operation values statusByEnv { env value } }
-                }
-            }
-            `})
+            .send(graphqlUtils.configurationQuery([
+                ['domain', domainId], 
+                ['key', keyConfig], 
+                ['environment', EnvType.DEFAULT]]))
             .expect(200)
             .end((err, res) => {
                 const expected = '{"data":{"configuration":{"domain":null,"group":null,"config":null,"strategies":null}}}';

@@ -11,7 +11,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d588267a-effd-4e44-a189-c4366083197f",
 						"exec": [
 							""
 						],
@@ -50,7 +49,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "b574ce7e-01d4-4e3a-a3dd-602b56844d39",
 						"exec": [
 							""
 						],
@@ -99,7 +97,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "dd03f569-7872-4f52-839d-910f37a84857",
 						"exec": [
 							"if (pm.response.code === 201) {",
 							"    pm.environment.set('authToken', pm.response.json().jwt.token)",
@@ -157,7 +154,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7ca62578-cf6e-4397-8322-e655149e3ae2",
 						"exec": [
 							"if (pm.response.code === 201) {",
 							"    pm.environment.set('authToken', pm.response.json().jwt.token)",
@@ -215,7 +211,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "7f2a0f31-3bc0-4a2e-87bd-bf530d734188",
 						"exec": [
 							"// if (pm.response.code === 201) {",
 							"//     pm.environment.set('authToken', pm.response.json().jwt.token)",
@@ -307,7 +302,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "00421dc9-53f8-493b-ac1b-9b71e2f59a64",
 						"exec": [
 							"if (pm.response.code === 200) {",
 							"    pm.environment.set('authToken', pm.response.json().jwt.token)",
@@ -359,7 +353,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "39c82702-212f-4116-8f05-a3b9b75b1b9b",
 						"exec": [
 							""
 						],
@@ -410,7 +403,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "0d50caf4-eba9-4ec6-ad4e-e7eca26cca42",
 						"exec": [
 							"if (pm.response.code === 201) {\r",
 							"    pm.environment.set('authToken', pm.response.json().jwt.token)\r",
@@ -480,7 +472,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d588267a-effd-4e44-a189-c4366083197f",
 						"exec": [
 							""
 						],
@@ -516,7 +507,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d588267a-effd-4e44-a189-c4366083197f",
 						"exec": [
 							""
 						],
@@ -552,7 +542,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d588267a-effd-4e44-a189-c4366083197f",
 						"exec": [
 							""
 						],
@@ -604,7 +593,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d588267a-effd-4e44-a189-c4366083197f",
 						"exec": [
 							""
 						],
@@ -640,7 +628,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d588267a-effd-4e44-a189-c4366083197f",
 						"exec": [
 							"if (pm.response.code === 200) {",
 							"    pm.environment.set('authToken', pm.response.json().token)",
@@ -984,7 +971,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "0548910c-25b2-4d52-bdbf-7fa38112939c",
 						"exec": [
 							"if (pm.response.code === 201) {",
 							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
@@ -1225,7 +1211,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							""
 						],
@@ -1278,7 +1263,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							"if (pm.response.code === 201) {",
 							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
@@ -1335,7 +1319,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							"if (pm.response.code === 201) {",
 							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
@@ -1392,7 +1375,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							""
 						],
@@ -1438,7 +1420,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							""
 						],
@@ -1484,7 +1465,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "df142016-2b6f-4e1c-b3d1-f53a58ba2994",
 						"exec": [
 							""
 						],
@@ -1532,7 +1512,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "72a132bb-99ba-479a-869c-0edd63ec02a5",
 						"exec": [
 							""
 						],
@@ -1581,7 +1560,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "47d26345-cd9b-49cf-8fee-f36a8b40e83c",
 						"exec": [
 							""
 						],
@@ -1631,7 +1609,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "01bcef61-ee52-48ef-9a04-dbea377cfeb2",
 						"exec": [
 							""
 						],
@@ -1682,7 +1659,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "04a061db-4f05-4113-9e5f-b1d0d3d40315",
 						"exec": [
 							""
 						],
@@ -1734,7 +1710,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							"if (pm.response.code === 201) {",
 							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
@@ -1791,7 +1766,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							"if (pm.response.code === 201) {",
 							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
@@ -1841,7 +1815,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							"if (pm.response.code === 201) {",
 							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
@@ -1898,7 +1871,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							""
 						],
@@ -1953,7 +1925,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							""
 						],
@@ -2000,7 +1971,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							"if (pm.response.code === 201) {",
 							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
@@ -2048,7 +2018,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							""
 						],
@@ -2103,7 +2072,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							""
 						],
@@ -2152,7 +2120,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							""
 						],
@@ -2201,7 +2168,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							""
 						],
@@ -2250,7 +2216,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							""
 						],
@@ -2301,7 +2266,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							""
 						],
@@ -2347,7 +2311,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							"if (pm.response.code === 201) {",
 							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
@@ -2404,7 +2367,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							"if (pm.response.code === 201) {",
 							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
@@ -2454,7 +2416,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "9f325d9c-7d0b-4eb4-abf9-3c44f039b415",
 						"exec": [
 							"if (pm.response.code === 201) {",
 							"    pm.environment.set('apiKey', pm.response.json().apiKey)",
@@ -4310,7 +4271,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "8ab93a37-7b36-47dc-b0e8-918d6c06e13d",
 						"exec": [
 							"if (pm.response.code === 200) {",
 							"    pm.environment.set('authClientToken', pm.response.json().token)",
@@ -4416,7 +4376,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{url}}/criteria?showReason=false&showStrategy=false&key=FEATURE01",
+					"raw": "{{url}}/criteria?showReason=true&showStrategy=true&bypassMetric=true&key=FEATURE01",
 					"host": [
 						"{{url}}"
 					],
@@ -4426,16 +4386,15 @@
 					"query": [
 						{
 							"key": "showReason",
-							"value": "false"
+							"value": "true"
 						},
 						{
 							"key": "showStrategy",
-							"value": "false"
+							"value": "true"
 						},
 						{
 							"key": "bypassMetric",
-							"value": "true",
-							"disabled": true
+							"value": "true"
 						},
 						{
 							"key": "key",
@@ -4564,7 +4523,6 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "8ee9de04-0218-4990-b430-bc0b1369df61",
 						"exec": [
 							""
 						],
@@ -4680,7 +4638,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "{\r\n    # domain(name: \"Switcher API\") {\r\n    domain(_id: \"5e0ece606f4f994eac9007ae\", environment: \"default\") {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        statusByEnv {\r\n            env\r\n            value\r\n        }\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                statusByEnv {\r\n                    env\r\n                    value\r\n                }\r\n                strategies {\r\n                    _id\r\n                    strategy\r\n                    activated\r\n                    statusByEnv {\r\n                        env\r\n                        value\r\n                    }\r\n                    operation\r\n                    values\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
+						"query": "{\r\n    # domain(name: \"Switcher API\") {\r\n    # domain(name: \"My Domain\", environment: \"default\", component: \"InventoryWS\") {\r\n    domain(_id: \"5e0ece606f4f994eac9007ae\", environment: \"default\") {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        statusByEnv {\r\n            env\r\n            value\r\n        }\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                statusByEnv {\r\n                    env\r\n                    value\r\n                }\r\n                strategies {\r\n                    _id\r\n                    strategy\r\n                    activated\r\n                    statusByEnv {\r\n                        env\r\n                        value\r\n                    }\r\n                    operation\r\n                    values\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
 						"variables": ""
 					}
 				},
@@ -4827,7 +4785,6 @@
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "0bfc6dbb-0184-4028-b804-070b98576b37",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -4837,13 +4794,11 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "68b0c760-c49f-4b63-b539-407b10329bf0",
 				"type": "text/javascript",
 				"exec": [
 					""
 				]
 			}
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
