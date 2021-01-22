@@ -5,6 +5,7 @@ coverage.html
 coverage
 .nyc_output
 test-report.xml
+package-lock.json
 dist
 build
 config
