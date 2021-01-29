@@ -1,36 +1,20 @@
 import express from 'express';
-import Domain from '../models/domain';
-import { Environment } from '../models/environment';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
-import { check, validationResult } from 'express-validator';
-import { checkEnvironmentStatusChange, verifyInputUpdateParameters } from '../middleware/validators';
-import { removeDomainStatus, verifyOwnership, responseException, NotFoundError, formatInput, sortBy } from './common/index';
+import { check } from 'express-validator';
+import { validate, verifyInputUpdateParameters } from '../middleware/validators';
+import { verifyOwnership, sortBy } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
-import GroupConfig from '../models/group-config';
-import { Config } from '../models/config';
-import { ConfigStrategy } from '../models/config-strategy';
-import Component from '../models/component';
 import { checkDomain } from '../external/switcher-api-facade';
+import * as Controller from '../controller/domain';
+import { responseException } from '../exceptions';
 
 const router = new express.Router();
 
 router.post('/domain/create', auth, async (req, res) => {
     try {
         await checkDomain(req);
-        let domain = new Domain({
-            ...req.body,
-            owner: req.admin._id
-        });
-
-        domain.name = formatInput(domain.name, { allowSpace: true });
-        const environment = new Environment({
-            domain: domain._id,
-            owner: req.admin._id
-        });
-
-        environment.save();
-        await domain.save();
+        const domain = await Controller.createDomain(req.body, req.admin);
         res.status(201).send(domain);
     } catch (e) {
         responseException(res, e, 400);
@@ -40,31 +24,22 @@ router.post('/domain/create', auth, async (req, res) => {
 // GET /domain?limit=10&skip=20
 // GET /domain?sortBy=createdAt:desc
 router.get('/domain', auth, async (req, res) => {
-    try {
-        await req.admin.populate({
-            path: 'domain',
-            options: {
-                limit: parseInt(req.query.limit),
-                skip: parseInt(req.query.skip),
-                sort: sortBy(req.query)
-            }
-        }).execPopulate();
-        res.send(req.admin.domain);
-    } catch (e) {
-        res.status(500).send();
-    }
+    await req.admin.populate({
+        path: 'domain',
+        options: {
+            limit: parseInt(req.query.limit),
+            skip: parseInt(req.query.skip),
+            sort: sortBy(req.query)
+        }
+    }).execPopulate();
+    res.send(req.admin.domain);
 });
 
-router.get('/domain/:id', auth, async (req, res) => {
+router.get('/domain/:id', [check('id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
-        let domain = await Domain.findById(req.params.id);
-
-        if (!domain) {
-            return res.status(404).send();
-        }
-
+        let domain = await Controller.getDomainById(req.params.id);
         domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN, true);
-        
         res.send(domain);
     } catch (e) {
         responseException(res, e, 400);
@@ -74,14 +49,10 @@ router.get('/domain/:id', auth, async (req, res) => {
 // GET /domain/ID?sortBy=date:desc
 // GET /domain/ID?limit=10&skip=20
 // GET /domain/ID
-router.get('/domain/history/:id', auth, async (req, res) => {
+router.get('/domain/history/:id', [check('id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
-        const domain = await Domain.findById(req.params.id);
-
-        if (!domain) {
-            return res.status(404).send();
-        }
-
+        const domain = await Controller.getDomainById(req.params.id);
         const history = await History.find({ elementId: domain._id })
             .select('oldValue newValue updatedBy date -_id')
             .sort(sortBy(req.query))
@@ -96,147 +67,71 @@ router.get('/domain/history/:id', auth, async (req, res) => {
     }
 });
 
-router.delete('/domain/history/:id', auth, async (req, res) => {
+router.delete('/domain/history/:id', [check('id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
-        const domain = await Domain.findById(req.params.id);
-
-        if (!domain) {
-            return res.status(404).send();
-        }
-
-        await verifyOwnership(req.admin, domain, domain._id, ActionTypes.DELETE, RouterTypes.ADMIN);
-
-        await History.deleteMany({ elementId: domain._id });
-
+        const domain = await Controller.deleteDomainHistory(req.params.id, req.admin);
         res.send(domain);
     } catch (e) {
         responseException(res, e, 500);
     }
 });
 
-router.delete('/domain/:id', auth, async (req, res) => {
+router.delete('/domain/:id', [check('id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
-        let domain = await Domain.findById(req.params.id);
-
-        if (!domain) {
-            return res.status(404).send();
-        }
-
-        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.DELETE, RouterTypes.DOMAIN);
-
-        await domain.remove();
+        let domain = await Controller.deleteDomain(req.params.id, req.admin);
         res.send(domain);
     } catch (e) {
         responseException(res, e, 500);
     }
 });
 
-router.patch('/domain/transfer/request', [check('domain').isMongoId()], auth, async (req, res) => {
+router.patch('/domain/transfer/request', [check('domain').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-        
-        let domain = await Domain.findOne({ _id: req.body.domain, owner: req.admin._id });
-        if (!domain) {
-            throw new NotFoundError('Domain does not exist');
-        }
-
-        domain.updatedBy = req.admin.email;
-        domain.transfer = domain.transfer ? null : true;
-        await domain.save();
+        let domain = await Controller.transferDomain(req.body, req.admin);
         res.send(domain);
     } catch (e) {
         responseException(res, e, 400);
     }
 });
 
-router.patch('/domain/transfer/accept', [check('domain').isMongoId()], auth, async (req, res) => {
+router.patch('/domain/transfer/accept', [check('domain').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-        
-        let domain = await Domain.findOne({ _id: req.body.domain, transfer: true });
-        if (!domain) {
-            throw new NotFoundError('Domain does not exist');
-        }
-        
-        domain.transfer = null;
-        domain.owner = req.admin._id;
-        await Promise.all([
-            GroupConfig.updateMany({ domain: domain._id }, { owner: req.admin._id }),
-            Config.updateMany({ domain: domain._id }, { owner: req.admin._id }),
-            ConfigStrategy.updateMany({ domain: domain._id }, { owner: req.admin._id }),
-            Component.updateMany({ domain: domain._id }, { owner: req.admin._id }),
-            Environment.updateMany({ domain: domain._id }, { owner: req.admin._id }),
-            domain.save()
-        ]);
-        
+        const domain = await Controller.transferDomainAccept(req.body, req.admin);
         res.send(domain);
     } catch (e) {
         responseException(res, e, 400);
     }
 });
 
-router.patch('/domain/:id', auth,
+router.patch('/domain/:id', [check('id').isMongoId()], validate, auth,
     verifyInputUpdateParameters(['description']), async (req, res) => {
     try {
-        let domain = await Domain.findById(req.params.id);
-
-        if (!domain) {
-            return res.status(404).send();
-        }
-
-        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN);
-        domain.updatedBy = req.admin.email;
-        domain.lastUpdate = Date.now();
-        
-        req.updates.forEach((update) => domain[update] = req.body[update]);
-        await domain.save();
+        const domain = await Controller.updateDomain(req.params.id, req.body, req.admin);
         res.send(domain);
     } catch (e) {
         responseException(res, e, 500);
     }
 });
 
-router.patch('/domain/updateStatus/:id', auth, async (req, res) => {
+router.patch('/domain/updateStatus/:id', [check('id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
-        let domain = await Domain.findById(req.params.id);
-
-        if (!domain) {
-            return res.status(404).send({ error: 'Domain does not exist' });
-        }
-
-        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN);
-        domain.updatedBy = req.admin.email;
-        domain.lastUpdate = Date.now();
-
-        const updates = await checkEnvironmentStatusChange(req, res, req.params.id);
-
-        updates.forEach((update) => domain.activated.set(update, req.body[update]));
-        await domain.save();
+        const domain = await Controller.updateDomainStatus(req.params.id, req.body, req.admin);
         res.send(domain);
     } catch (e) {
         responseException(res, e, 400);
     }
 });
 
-router.patch('/domain/removeStatus/:id', auth, async (req, res) => {
+router.patch('/domain/removeStatus/:id', [check('id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
-        let domain = await Domain.findById(req.params.id);
-        
-        if (!domain) {
-            return res.status(404).send({ error: 'Domain does not exist' });
-        }
-
-        domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN);
-        domain.updatedBy = req.admin.email;
-        domain.lastUpdate = Date.now();
-        
-        res.send(await removeDomainStatus(domain, req.body.env));
+        let domain = await Controller.removeDomainStatusEnv(req.params.id, req.body.env, req.admin);
+        res.send(domain);
     } catch (e) {
         responseException(res, e, 400);
     }
