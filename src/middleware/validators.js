@@ -25,21 +25,6 @@ export async function checkConfigComponent(req, res, next) {
     next();
 }
 
-//@deprecated - use checkEnvironmentStatusChange_v2
-export async function checkEnvironmentStatusChange(req, res, domain, field) {
-    const environment = await Environment.find({ domain }).select('name -_id');
-    const updates = Object.keys(field || req.body);
-    const isValidOperation = updates.every((update) => {
-        return environment.filter((e) => e.name === update).length > 0;
-    });
-
-    if (!isValidOperation) {
-        throw new Error('Invalid updates');
-    }
-
-    return updates;
-}
-
 export async function checkEnvironmentStatusChange_v2(args, domain, field) {
     const environment = await Environment.find({ domain }).select('name -_id');
     const updates = Object.keys(field || args);
