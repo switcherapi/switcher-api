@@ -144,12 +144,12 @@ describe('Testing fect Domain info', () => {
 
     test('DOMAIN_SUITE - Should NOT found Domain information by Id', async () => {
         await request(app)
-            .get('/domain/' + domainId + 'NOTEXIST')
+            .get('/domain/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
 
         await request(app)
-            .get('/domain/5dd05cfa98adc4285457e29a')
+            .get(`/domain/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
     });
@@ -218,14 +218,14 @@ describe('Testing fect Domain info', () => {
             }).expect(200);
 
         await request(app)
-            .delete('/domain/' + new mongoose.Types.ObjectId())
+            .delete(`/domain/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send().expect(404);
 
         await request(app)
             .delete('/domain/INVALID_DOMAIN_ID')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
-            .send().expect(500);
+            .send().expect(422);
     });
 });
 
@@ -261,10 +261,10 @@ describe('Testing update Domain info', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description updated'
-            }).expect(500);
+            }).expect(422);
 
         await request(app)
-            .patch('/domain/5dd05cfa98adc4285457e29a')
+            .patch(`/domain/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description updated'
@@ -303,10 +303,10 @@ describe('Testing update Domain info', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
-            }).expect(400);
+            }).expect(422);
 
         await request(app)
-            .patch('/domain/updateStatus/5dd05cfa98adc4285457e29a')
+            .patch(`/domain/updateStatus/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
@@ -328,26 +328,26 @@ describe('Testing update Domain info', () => {
         await request(app)
             .get('/domain/history/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 
     test('DOMAIN_SUITE - Should NOT read changes on history collection - Domain not found', async () => {
         await request(app)
-            .get('/domain/history/' + new mongoose.Types.ObjectId())
+            .get(`/domain/history/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
     });
 
     test('DOMAIN_SUITE - Should NOT delete history by invalid Domain Id', async () => {
         await request(app)
-            .delete('/domain/history/' + new mongoose.Types.ObjectId())
+            .delete(`/domain/history/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
 
         await request(app)
             .delete('/domain/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
     });
 
     test('DOMAIN_SUITE - Should delete history from a Domain element', async () => {
@@ -506,7 +506,7 @@ describe('Testing environment configurations', () => {
             }).expect(201);
 
         await request(app)
-            .patch('/domain/updateStatus/' + domainId)
+            .patch(`/domain/updateStatus/${domainId}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 QA3: true
@@ -514,7 +514,7 @@ describe('Testing environment configurations', () => {
 
         // default environment cannot be removed
         await request(app)
-            .patch('/domain/removeStatus/' + domainId)
+            .patch(`/domain/removeStatus/${domainId}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: EnvType.DEFAULT
@@ -526,11 +526,11 @@ describe('Testing environment configurations', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA3'
-            }).expect(400);
+            }).expect(422);
 
         // Domain does not exist
         await request(app)
-            .patch('/domain/removeStatus/' + new mongoose.Types.ObjectId())
+            .patch(`/domain/removeStatus/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 env: 'QA3'
