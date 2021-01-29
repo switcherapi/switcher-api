@@ -13,7 +13,8 @@ const domainName = process.env.SWITCHER_API_DOMAIN;
 const url = process.env.SWITCHER_API_URL;
 const component = 'switcherapi';
 
-const switcher = new Switcher(url, apiKey, domainName, component, environment);
+Switcher.buildContext({ url, apiKey, domain: domainName, component, environment });
+const switcher = Switcher.factory();
 
 function switcherFlagResult(flag, message) {
     if (!flag) {
