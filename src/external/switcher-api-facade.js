@@ -9,11 +9,11 @@ import { Team } from '../models/team';
 
 const apiKey = process.env.SWITCHER_API_KEY;
 const environment = process.env.SWITCHER_API_ENVIRONMENT;
-const domain = process.env.SWITCHER_API_DOMAIN;
+const domainName = process.env.SWITCHER_API_DOMAIN;
 const url = process.env.SWITCHER_API_URL;
 const component = 'switcherapi';
 
-Switcher.buildContext({ url, apiKey, domain, component, environment });
+Switcher.buildContext({ url, apiKey, domain: domainName, component, environment });
 const switcher = Switcher.factory();
 
 function switcherFlagResult(flag, message) {
