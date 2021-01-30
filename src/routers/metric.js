@@ -5,9 +5,10 @@ import { check, validationResult } from 'express-validator';
 import { auth } from '../middleware/auth';
 import { EnvType } from '../models/environment';
 import { Config } from '../models/config';
-import { verifyOwnership, responseException } from './common/index';
+import { verifyOwnership } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { ObjectId } from 'mongodb';
+import { responseException } from '../exceptions';
 
 const router = new express.Router();
 

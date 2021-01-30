@@ -2,10 +2,10 @@ import Switcher from 'switcher-client';
 import Domain from '../models/domain';
 import GroupConfig from '../models/group-config';
 import { Config } from '../models/config';
-import { FeatureUnavailableError } from '../routers/common';
 import Component from '../models/component';
 import { Environment, EnvType } from '../models/environment';
 import { Team } from '../models/team';
+import { FeatureUnavailableError } from '../exceptions';
 
 const apiKey = process.env.SWITCHER_API_KEY;
 const environment = process.env.SWITCHER_API_ENVIRONMENT;

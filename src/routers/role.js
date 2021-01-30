@@ -3,7 +3,8 @@ import { auth } from '../middleware/auth';
 import { Role, RouterTypes, ActionTypes, getKeysByRouter } from '../models/role';
 import { Team } from '../models/team';
 import { verifyInputUpdateParameters } from '../middleware/validators';
-import { NotFoundError, responseException, verifyOwnership } from './common';
+import { verifyOwnership } from './common';
+import { NotFoundError, responseException } from '../exceptions';
 
 const router = new express.Router();
 
