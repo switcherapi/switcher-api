@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import GroupConfig from '../../src/models/group-config';
 import { Team } from '../../src/models/team';
 import { Role, ActionTypes, RouterTypes } from '../../src/models/role';
-import { verifyOwnership, PermissionError } from '../../src/routers/common/index';
+import { verifyOwnership } from '../../src/routers/common/index';
 import { 
     setupDatabase, 
     adminMasterAccount,
@@ -20,6 +20,7 @@ import {
     team1Id,
     adminAccount3
  } from '../fixtures/db_team_role';
+import { PermissionError } from '../../src/exceptions';
 
 const changeRoleStatus = async (roleId, status) => {
     const role = await Role.findById(roleId);

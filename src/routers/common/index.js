@@ -1,3 +1,4 @@
+import { NotFoundError, PermissionError } from '../../exceptions';
 import { Environment, EnvType } from '../../models/environment';
 import Domain from '../../models/domain';
 import { Team } from '../../models/team';
@@ -202,43 +203,4 @@ function verifyIdentifiers(role, element) {
         return element;
     }
     throw new PermissionError('It was not possible to match the requiring element to the current role');
-}
-
-//@deprecated - moved to /exceptions
-export class PermissionError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = this.constructor.name;
-        Error.captureStackTrace(this, this.constructor);
-    }
-}
-
-//@deprecated - moved to /exceptions
-export class NotFoundError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = this.constructor.name;
-        Error.captureStackTrace(this, this.constructor);
-    }
-}
-
-//@deprecated - moved to /exceptions
-export class FeatureUnavailableError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = this.constructor.name;
-        Error.captureStackTrace(this, this.constructor);
-    }
-}
-
-export function responseException(res, err, code) {
-    if (err instanceof PermissionError) {
-        res.status(401).send({ error: err.message, code: 401 });
-    } else if (err instanceof NotFoundError) {
-        res.status(404).send({ error: err.message });
-    } else if (err instanceof FeatureUnavailableError) {
-        res.status(500).send({ error: err.message });
-    } else {
-        res.status(code).send({ error: err.message });
-    }
 }

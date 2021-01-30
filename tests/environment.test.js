@@ -97,9 +97,9 @@ describe('Reading tests', () => {
 
     test('ENV_SUITE - Should NOT read Environment - Not found', async () => {
         await request(app)
-            .get('/environment/NOT_FOUND')
+            .get('/environment/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 });
 
@@ -142,7 +142,7 @@ describe('Deletion tests', () => {
         await request(app)
             .delete('/environment/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 
     test('ENV_SUITE - Should NOT delete an Environment - Env not found', async () => {
@@ -255,7 +255,7 @@ describe('Deletion tests', () => {
         await request(app)
             .patch('/environment/recover/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 
     test('ENV_SUITE - Should NOT recover an Environment - Env not found', async () => {

@@ -1,4 +1,5 @@
 import express from 'express';
+import { check, query } from 'express-validator';
 import { Environment, EnvType } from '../models/environment';
 import GroupConfig from '../models/group-config';
 import { Config } from '../models/config';
@@ -10,11 +11,12 @@ import {
     removeGroupStatus,
     removeConfigStatus,
     verifyOwnership,
-    responseException,
     formatInput
 } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { checkEnvironment } from '../external/switcher-api-facade';
+import { responseException } from '../exceptions';
+import { validate } from '../middleware/validators';
 
 const router = new express.Router();
 
@@ -64,13 +66,8 @@ router.post('/environment/create', auth, async (req, res) => {
 // GET /environment?domain=ID&limit=10&skip=20
 // GET /environment?domain=ID&sort=desc
 // GET /environment?domain=ID
-router.get('/environment', auth, async (req, res) => {
-    if (!req.query.domain) {
-        return res.status(500).send({
-            error: 'Please, specify the \'domain\' id'
-        });
-    }
-
+router.get('/environment', [query('domain', 'Please, specify the \'domain\' id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
         let environments = await Environment.find({ domain: req.query.domain },
             ['_id', 'name'],
@@ -82,15 +79,14 @@ router.get('/environment', auth, async (req, res) => {
                 }
             });
 
-        // environments = await verifyOwnership(req.admin, environments, req.query.domain, ActionTypes.READ, RouterTypes.ENVIRONMENT)
-
         res.send(environments);
     } catch (e) {
         responseException(res, e, 500);
     }
 });
 
-router.get('/environment/:id', auth, async (req, res) => {
+router.get('/environment/:id', [check('id', 'Invalid Id for environment').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
         let environment = await Environment.findById(req.params.id);
 
@@ -98,15 +94,14 @@ router.get('/environment/:id', auth, async (req, res) => {
             return res.status(404).send();
         }
 
-        // environment = await verifyOwnership(req.admin, environment, environment.domain, ActionTypes.READ, RouterTypes.ENVIRONMENT)
-
         res.send(environment);
     } catch (e) {
         responseException(res, e, 400);
     }
 });
 
-router.delete('/environment/:id', auth, async (req, res) => {
+router.delete('/environment/:id', [check('id', 'Invalid Id for environment').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
         let environment = await Environment.findById(req.params.id);
 
@@ -129,7 +124,8 @@ router.delete('/environment/:id', auth, async (req, res) => {
     }
 });
 
-router.patch('/environment/recover/:id', auth, async (req, res) => {
+router.patch('/environment/recover/:id', [check('id', 'Invalid Id for environment').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
         let environment = await Environment.findById(req.params.id);
 

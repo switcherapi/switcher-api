@@ -4,13 +4,14 @@ import { Team } from '../models/team';
 import { auth, authRefreshToken } from '../middleware/auth';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { check } from 'express-validator';
-import { responseException, verifyOwnership, NotFoundError } from './common';
+import { verifyOwnership } from './common';
 import { getGitToken, getGitUserInfo } from '../external/oauth-git';
 import { getBitBucketToken, getBitBucketUserInfo } from '../external/oauth-bitbucket';
 import { validate_token } from '../external/google-recaptcha';
 import { sendAuthCode, sendAccountRecoveryCode } from '../external/sendgrid';
 import Domain from '../models/domain';
 import { checkAdmin } from '../external/switcher-api-facade';
+import { NotFoundError, responseException } from '../exceptions';
 
 const router = new express.Router();
 
