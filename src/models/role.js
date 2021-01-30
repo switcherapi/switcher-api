@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { NotFoundError } from '../routers/common';
+import { NotFoundError } from '../exceptions';
 
 export const ActionTypes = Object.freeze({
     ALL: 'ALL',

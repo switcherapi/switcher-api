@@ -4,11 +4,12 @@ import { check, validationResult } from 'express-validator';
 import { Team, addDefaultRole } from '../models/team';
 import { Role, checkActionType, ActionTypes, RouterTypes } from '../models/role';
 import { verifyInputUpdateParameters } from '../middleware/validators';
-import { verifyOwnership, responseException, NotFoundError } from './common/index';
+import { verifyOwnership } from './common/index';
 import Admin from '../models/admin';
 import TeamInvite from '../models/team-invite';
 import Domain from '../models/domain';
 import { checkTeam } from '../external/switcher-api-facade';
+import { NotFoundError, responseException } from '../exceptions';
 
 const router = new express.Router();
 
