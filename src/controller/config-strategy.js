@@ -3,9 +3,9 @@ import { ConfigStrategy } from '../models/config-strategy';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { updateDomainVersion, verifyOwnership } from '../routers/common';
 import { getConfigById } from './config';
-import { Environment } from '../models/environment';
 import { BadRequestError } from '../exceptions';
 import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';
+import { getEnvironment } from './environment';
 
 async function verifyStrategyValueInput(strategyId, value) {
     const configStrategy = await getStrategyById(strategyId);
@@ -29,10 +29,7 @@ export async function createStrategy(args, admin) {
         throw new BadRequestError('Must specify environment');
     }
 
-    const environment = await Environment.findOne({ name: args.env, domain: config.domain });
-    if (!environment) {
-        throw new BadRequestError('Environment does not exist');
-    }
+    const environment = await getEnvironment({ name: args.env, domain: config.domain });
 
     let configStrategy = new ConfigStrategy({
         ...args,

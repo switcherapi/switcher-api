@@ -75,10 +75,10 @@ describe('Testing strategy creation #1', () => {
                 operation: OperationsType.EQUAL,
                 values: ['192.168.0.1/16'],
                 config: configId1,
-                env: 'INVALID_ENVIRONMENT'
-            }).expect(400);
+                env: 'ENVIRONMENT_NOT_FOUND'
+            }).expect(404);
 
-        expect(response.body.error).toBe('Environment does not exist');
+        expect(response.body.error).toBe('Environment not found');
     });
 
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Duplicated Strategy at the same configuration', async () => {
