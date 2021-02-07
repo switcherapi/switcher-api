@@ -176,9 +176,9 @@ describe('Testing fetch Group info', () => {
 
     test('GROUP_SUITE - Should NOT found Group Config information by Id', async () => {
         await request(app)
-            .get('/groupconfig?domain=' + 'WRONG_ID_VALUE')
+            .get('/groupconfig?domain=INVALD_ID')
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
 
         await request(app)
             .get('/groupconfig?domain=' + new mongoose.Types.ObjectId())

@@ -141,7 +141,7 @@ describe('Reading tests', () => {
         await request(app)
             .get('/team?domain=INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 
     test('TEAM_SUITE - Should read one single Team', async () => {
@@ -164,14 +164,14 @@ describe('Reading tests', () => {
         await request(app)
             .get('/team/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 
     test('TEAM_SUITE - Should NOT read Team - Domain Id not provided', async () => {
         await request(app)
             .get('/team')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
     });
 });
 
@@ -215,7 +215,7 @@ describe('Updating tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 active: true
-            }).expect(400);
+            }).expect(422);
     });
 });
 
@@ -268,7 +268,7 @@ describe('Deletion tests', () => {
         await request(app)
             .delete('/team/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 });
 
@@ -316,7 +316,7 @@ describe('Updating team members tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
-            }).expect(200);
+            }).expect(201);
 
         // Should accept invitation
         await request(app)
@@ -337,7 +337,7 @@ describe('Updating team members tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
-            }).expect(400);
+            }).expect(422);
     });
 
     test('TEAM_SUITE - Should NOT get invitation request - Invalid Request ID', async () => {
@@ -346,7 +346,7 @@ describe('Updating team members tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
-            }).expect(400);
+            }).expect(422);
 
         await request(app)
             .get('/team/member/invite/' + new mongoose.Types.ObjectId())
@@ -377,7 +377,7 @@ describe('Updating team members tests', () => {
         await request(app)
             .get('/team/member/invite/pending')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 
     test('TEAM_SUITE - Should NOT remove team invitaion - TEAM INVITE REQUEST NOT FOUND', async () => {
@@ -586,7 +586,7 @@ describe('Updating team roles tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 role: role1Id
-            }).expect(400);
+            }).expect(422);
     });
 
     test('TEAM_SUITE - Should NOT remove a role - Invalid parameter', async () => {
