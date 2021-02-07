@@ -1,5 +1,5 @@
 import express from 'express';
-import { check } from 'express-validator';
+import { check, query } from 'express-validator';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
@@ -20,10 +20,11 @@ router.post('/groupconfig/create', auth, async (req, res) => {
     }
 });
 
-// GET /groupconfig?limit=10&skip=20
-// GET /groupconfig?sortBy=createdAt:desc
+// GET /groupconfig?domain=ID&limit=10&skip=20
+// GET /groupconfig?domain=ID&sortBy=createdAt:desc
 // GET /groupconfig?domain=ID
-router.get('/groupconfig', auth, async (req, res) => {
+router.get('/groupconfig', [query('domain', 'Please, specify the \'domain\' id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
         const domain = await getDomainById(req.query.domain);
         await domain.populate({
@@ -44,8 +45,8 @@ router.get('/groupconfig', auth, async (req, res) => {
     }
 });
 
-router.get('/groupconfig/:id', [
-    check('id').isMongoId()], validate, auth, async (req, res) => {
+router.get('/groupconfig/:id', [check('id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
         let groupconfig = await Controller.getGroupConfigById(req.params.id);
         groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP);
@@ -59,8 +60,8 @@ router.get('/groupconfig/:id', [
 // GET /groupconfig/ID?sortBy=date:desc
 // GET /groupconfig/ID?limit=10&skip=20
 // GET /groupconfig/ID
-router.get('/groupconfig/history/:id', [
-    check('id').isMongoId()], validate, auth, async (req, res) => {
+router.get('/groupconfig/history/:id', [check('id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
         const groupconfig = await Controller.getGroupConfigById(req.params.id);
         const history = await History.find({ domainId: groupconfig.domain, elementId: groupconfig._id })
@@ -77,8 +78,8 @@ router.get('/groupconfig/history/:id', [
     }
 });
 
-router.delete('/groupconfig/history/:id', [
-    check('id').isMongoId()], validate, auth, async (req, res) => {
+router.delete('/groupconfig/history/:id', [check('id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
         const groupconfig = await Controller.getGroupConfigById(req.params.id);
         await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
@@ -90,8 +91,8 @@ router.delete('/groupconfig/history/:id', [
     }
 });
 
-router.delete('/groupconfig/:id', [
-    check('id').isMongoId()], validate, auth, async (req, res) => {
+router.delete('/groupconfig/:id', [check('id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
         let groupconfig = await Controller.deleteGroup(req.params.id, req.admin);
         res.send(groupconfig);
@@ -100,8 +101,7 @@ router.delete('/groupconfig/:id', [
     }
 });
 
-router.patch('/groupconfig/:id', [
-    check('id').isMongoId()], validate, auth, 
+router.patch('/groupconfig/:id', [check('id').isMongoId()], validate, auth, 
     verifyInputUpdateParameters(['name', 'description']), async (req, res) => {
     try {
         const groupconfig = await Controller.updateGroup(req.params.id, req.body, req.admin);
@@ -111,8 +111,8 @@ router.patch('/groupconfig/:id', [
     }
 });
 
-router.patch('/groupconfig/updateStatus/:id', [
-    check('id').isMongoId()], validate, auth, async (req, res) => {
+router.patch('/groupconfig/updateStatus/:id', [check('id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
         const groupconfig = await Controller.updateGroupStatusEnv(req.params.id, req.body, req.admin);
         res.send(groupconfig);
@@ -121,8 +121,8 @@ router.patch('/groupconfig/updateStatus/:id', [
     }
 });
 
-router.patch('/groupconfig/removeStatus/:id', [
-    check('id').isMongoId()], validate, auth, async (req, res) => {
+router.patch('/groupconfig/removeStatus/:id', [check('id').isMongoId()], 
+    validate, auth, async (req, res) => {
     try {
         const groupconfig = await Controller.removeGroupStatusEnv(req.params.id, req.body, req.admin);
         res.send(groupconfig);
