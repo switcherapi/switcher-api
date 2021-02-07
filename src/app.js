@@ -5,6 +5,7 @@ import helmet from 'helmet';
 
 require('./db/mongoose');
 
+import mongoose from 'mongoose';
 import clientApiRouter from './routers/client-api';
 import adminRouter from './routers/admin';
 import environment from './routers/environment';
@@ -62,7 +63,19 @@ app.use('/adm-graphql', auth, graphqlHTTP({
 }));
 
 app.get('/check', (req, res) => {
-    res.status(200).send({ message: 'All good', code: 200 });
+    res.status(200).send({ 
+        message: 'All good',
+        code: 200,
+        attributes: {
+            env: process.env.ENV,
+            db_state: mongoose.connection.readyState,
+            switcherapi: process.env.SWITCHER_API_ENABLE,
+            history: process.env.HISTORY_ACTIVATED,
+            metrics: process.env.METRICS_ACTIVATED,
+            max_metrics_pages: process.env.METRICS_MAX_PAGE,
+            max_stretegy_op: process.env.MAX_EXIST_STRATEGYOPERATION
+        } 
+    });
 });
 
 app.get('*', (req, res) => {
