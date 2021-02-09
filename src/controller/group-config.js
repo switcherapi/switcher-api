@@ -17,6 +17,10 @@ export async function getGroupConfigById(id) {
     return response(group, 'Group Config not found');
 }
 
+export async function getGroupConfigs(where) {
+    return await GroupConfig.find(where);
+}
+
 export async function createGroup(args, admin) {
     let groupconfig = new GroupConfig({
         ...args,

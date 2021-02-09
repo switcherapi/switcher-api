@@ -32,6 +32,15 @@ export async function getTeamById(id) {
     return response(team, 'Team not found');
 }
 
+export async function getTeam(where) {
+    let team = await Team.findOne(where);
+    return response(team, 'Team not found');
+}
+
+export async function getTeams(where, lean = false) {
+    return lean ? await Team.find(where).lean() : await Team.find(where);
+}
+
 export async function getTeamInviteById(id) {
     let teamInvite = await TeamInvite.findById(id);
     return response(teamInvite, 'Invite request not found');

@@ -85,12 +85,12 @@ describe('Reading tests', () => {
         await request(app)
             .get('/role?team=INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 
     test('ROLE_SUITE - Should read one single Role', async () => {
         const response = await request(app)
-            .get('/role/' + roleId)
+            .get(`/role/${roleId}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
@@ -99,7 +99,7 @@ describe('Reading tests', () => {
 
     test('ROLE_SUITE - Should NOT read Role - Not found', async () => {
         await request(app)
-            .get('/role/' + new mongoose.Types.ObjectId())
+            .get(`/role/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
     });
@@ -108,14 +108,14 @@ describe('Reading tests', () => {
         await request(app)
             .get('/role/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 
     test('ROLE_SUITE - Should NOT read Role - Team Id not provided', async () => {
         await request(app)
             .get('/role')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
     });
 
     test('ROLE_SUITE - Should NOT read Roles - Team not found', async () => {
@@ -201,7 +201,7 @@ describe('Updating tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 active: true
-            }).expect(400);
+            }).expect(422);
     });
 });
 
@@ -245,7 +245,7 @@ describe('Deletion tests', () => {
         await request(app)
             .delete('/role/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 });
 
@@ -305,7 +305,7 @@ describe('Updating role values tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'NEW VALUE'
-            }).expect(400);
+            }).expect(422);
     });
 
     test('ROLE_SUITE - Should NOT add a value - Value not given', async () => {
@@ -348,7 +348,7 @@ describe('Updating role values tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 values: ['NEW VALUE 1', 'OLD VALUE']
-            }).expect(400);
+            }).expect(422);
     });
     
     test('ROLE_SUITE - Should NOT remove a value - Role not found', async () => {
@@ -366,7 +366,7 @@ describe('Updating role values tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'NEW VALUE'
-            }).expect(400);
+            }).expect(422);
     });
 
     test('ROLE_SUITE - Should NOT remove a value - Value not given', async () => {
@@ -390,7 +390,7 @@ describe('Updating role values tests', () => {
             .patch('/role/value/remove/' + role1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                value: 'I AM NOT EXIST'
+                value: 'NOT_EXISTING_VALUE'
             }).expect(404);
     });
 
