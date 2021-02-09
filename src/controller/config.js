@@ -19,6 +19,10 @@ export async function getConfigById(id) {
     return response(config, 'Config not found');
 }
 
+export async function getConfigs(where) {
+    return await Config.find(where);
+}
+
 export async function createConfig(args, admin) {
     // validates account plan permissions
     const group = await getGroupConfigById(args.group);
