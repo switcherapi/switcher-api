@@ -1,13 +1,13 @@
 import { BadRequestError } from '../exceptions';
 import { checkEnvironment } from '../external/switcher-api-facade';
-import { Config } from '../models/config';
 import { ConfigStrategy } from '../models/config-strategy';
-import Domain from '../models/domain';
 import { Environment, EnvType } from '../models/environment';
-import GroupConfig from '../models/group-config';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { formatInput, removeConfigStatus, removeDomainStatus, removeGroupStatus, verifyOwnership } from '../routers/common';
 import { response } from './common';
+import { getConfigs } from './config';
+import { getDomainById } from './domain';
+import { getGroupConfigs } from './group-config';
 
 async function removeEnvironmentFromElements(environment) {
     await ConfigStrategy.deleteMany({ domain: environment.domain, $or: [ 
@@ -15,21 +15,21 @@ async function removeEnvironmentFromElements(environment) {
         { activated: { [`${environment.name}`]: false } } 
     ] });
 
-    const configs = await Config.find({ domain: environment.domain });
+    const configs = await getConfigs({ domain: environment.domain });
     if (configs.length) {
         configs.forEach(async function(config) {
             await removeConfigStatus(config, environment.name);
         });
     }
 
-    const groupConfigs = await GroupConfig.find({ domain: environment.domain });
+    const groupConfigs = await getGroupConfigs({ domain: environment.domain });
     if (groupConfigs.length) {
         groupConfigs.forEach(async function(group) {
             await removeGroupStatus(group, environment.name);
         });
     }
 
-    const domain = await Domain.findById(environment.domain);
+    const domain = await getDomainById(environment.domain);
     await removeDomainStatus(domain, environment.name);
 }
 
