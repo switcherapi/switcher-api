@@ -11,7 +11,7 @@ import { getComponentById, getComponents } from './component';
 
 async function verifyAddComponentInput(configId, admin) {
     const config = await getConfigById(configId);
-    return await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
+    return verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
 }
 
 export async function getConfigById(id) {
@@ -107,8 +107,7 @@ export async function updateConfigRelay(id, args, admin) {
     config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
     config.updatedBy = admin.email;
 
-    for (let index = 0; index < Object.keys(args).length; index++) {
-        const update = Object.keys(args)[index];
+    for (const update of Object.keys(args)) {
         if (config.relay[update] && 'activated endpoint auth_token'.indexOf(update) >= 0) {
             await checkEnvironmentStatusChange_v2(args, config.domain, args[update]);
             Object.keys(args[update]).forEach((map) =>
@@ -144,7 +143,7 @@ export async function removeConfigStatusEnv(id, env, admin) {
     config.updatedBy = admin.email;
 
     updateDomainVersion(config.domain);
-    return await removeConfigStatus(config, env);
+    return removeConfigStatus(config, env);
 }
 
 export async function addComponent(id, args, admin) {

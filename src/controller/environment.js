@@ -52,9 +52,7 @@ export async function createEnvironment(args, admin) {
     await checkEnvironment(args.domain);
     environment.name = formatInput(environment.name);
     environment = await verifyOwnership(admin, environment, environment.domain, ActionTypes.CREATE, RouterTypes.ENVIRONMENT);
-
-    await environment.save();
-    return environment;
+    return environment.save();
 }
 
 export async function deleteEnvironment(id, admin) {
@@ -67,8 +65,7 @@ export async function deleteEnvironment(id, admin) {
     environment = await verifyOwnership(admin, environment, environment.domain, ActionTypes.DELETE, RouterTypes.ENVIRONMENT);
 
     await removeEnvironmentFromElements(environment);
-    await environment.remove();
-    return environment;
+    return environment.remove();
 }
 
 export async function recoverEnvironment(id, admin) {

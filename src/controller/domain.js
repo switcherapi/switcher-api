@@ -33,8 +33,7 @@ export async function createDomain(args, admin) {
     });
 
     environment.save();
-    await domain.save();
-    return domain;
+    return domain.save();
 }
 
 export async function deleteDomainHistory(id, admin) {
@@ -47,9 +46,7 @@ export async function deleteDomainHistory(id, admin) {
 export async function deleteDomain(id, admin) {
     let domain = await getDomainById(id);
     domain = await verifyOwnership(admin, domain, domain._id, ActionTypes.DELETE, RouterTypes.DOMAIN);
-
-    await domain.remove();
-    return domain;
+    return domain.remove();
 }
 
 export async function transferDomain(args, admin) {
@@ -86,8 +83,7 @@ export async function updateDomain(id, args, admin) {
     
     const updates = Object.keys(args);
     updates.forEach((update) => domain[update] = args[update]);
-    await domain.save();
-    return domain;
+    return domain.save();
 }
 
 export async function updateDomainStatus(id, args, admin) {
@@ -100,8 +96,7 @@ export async function updateDomainStatus(id, args, admin) {
     const updates = await checkEnvironmentStatusChange_v2(args, id);
 
     updates.forEach((update) => domain.activated.set(update, args[update]));
-    await domain.save();
-    return domain;
+    return domain.save();
 }
 
 export async function removeDomainStatusEnv(id, env, admin) {
