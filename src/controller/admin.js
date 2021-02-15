@@ -105,8 +105,7 @@ export async function logout(admin) {
 export async function updateAccount(args, admin) {
     const updates = Object.keys(args);
     updates.forEach((update) => admin[update] = args[update]);
-    await admin.save();
-    return admin;
+    return admin.save();
 }
 
 export async function leaveDomain(domainid, admin) {
@@ -136,6 +135,5 @@ export async function deleteAccount(admin) {
             `This account has ${domains} Domain(s) that must be either deleted or transfered to another account.`);
     }
 
-    await admin.remove();
-    return admin;
+    return admin.remove();
 }

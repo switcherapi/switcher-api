@@ -24,7 +24,7 @@ async function addMemberToTeam(admin, team) {
 
 export async function verifyRequestedTeam(teamId, admin, action) {
     let team = await getTeamById(teamId);
-    return await verifyOwnership(admin, team, team.domain, action, RouterTypes.ADMIN);
+    return verifyOwnership(admin, team, team.domain, action, RouterTypes.ADMIN);
 }
 
 export async function getTeamById(id) {
@@ -69,13 +69,12 @@ export async function createTeam(args, admin, defaultActions) {
     if (defaultActions) {
         const actions = defaultActions.split(',');
         checkActionType(actions);
-        for (let index = 0; index < actions.length; index++) {
-            await addDefaultRole(actions[index], team);
+        for (const action of actions) {
+            await addDefaultRole(action, team);
         }
     }
 
-    await team.save();
-    return team;
+    return team.save();
 }
 
 export async function updateTeam(args, id, admin) {
@@ -83,14 +82,12 @@ export async function updateTeam(args, id, admin) {
 
     const updates = Object.keys(args);
     updates.forEach((update) => team[update] = args[update]);
-    await team.save();
-    return team;
+    return team.save();
 }
 
 export async function deleteTeam(id, admin) {
     const team = await verifyRequestedTeam(id, admin, ActionTypes.DELETE);
-    await team.remove();
-    return team;
+    return team.remove();
 }
 
 export async function inviteMember(id, email, admin) {
@@ -133,9 +130,7 @@ export async function removeInvite(request_id, id, admin) {
     await verifyRequestedTeam(id, admin, ActionTypes.UPDATE);
 
     const teamInvite = await getTeamInviteById(request_id);
-    teamInvite.remove();
-
-    return teamInvite;
+    return teamInvite.remove();
 }
 
 export async function addTeamMember(member, id, admin) {
@@ -165,8 +160,7 @@ export async function removeTeamMember(member, id, admin) {
     team.members.splice(indexTeam, 1);
 
     await team.save();
-    await adminMember.save();
-    return adminMember;
+    return adminMember.save();
 }
 
 export async function removeTeamRole(role, id, admin) {
@@ -180,7 +174,6 @@ export async function removeTeamRole(role, id, admin) {
     const indexRoles = team.roles.indexOf(roleToRemove._id);
     await Role.deleteOne({ _id: role.trim() });
     team.roles.splice(indexRoles, 1);
-
-    await team.save();
-    return team;
+    
+    return team.save();
 }

@@ -9,7 +9,7 @@ import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';
 
 async function verifyGroupInput(groupId, admin) {
     let groupconfig = await getGroupConfigById(groupId);
-    return await verifyOwnership(admin, groupconfig, groupconfig.domain, ActionTypes.UPDATE, RouterTypes.GROUP);
+    return verifyOwnership(admin, groupconfig, groupconfig.domain, ActionTypes.UPDATE, RouterTypes.GROUP);
 }
 
 export async function getGroupConfigById(id) {
@@ -95,5 +95,5 @@ export async function removeGroupStatusEnv(id, args, admin) {
     const groupconfig = await verifyGroupInput(id, admin);
     groupconfig.updatedBy = admin.email;
     updateDomainVersion(groupconfig.domain);
-    return await removeGroupStatus(groupconfig, args.env);
+    return removeGroupStatus(groupconfig, args.env);
 }
