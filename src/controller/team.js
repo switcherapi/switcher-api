@@ -38,7 +38,7 @@ export async function getTeam(where) {
 }
 
 export async function getTeams(where, lean = false) {
-    return lean ? await Team.find(where).lean() : await Team.find(where);
+    return lean ? Team.find(where).lean() : Team.find(where);
 }
 
 export async function getTeamInviteById(id) {
@@ -47,7 +47,7 @@ export async function getTeamInviteById(id) {
 }
 
 export async function getTeamInvites(where) {
-    return await TeamInvite.find(where).lean();
+    return TeamInvite.find(where).lean();
 }
 
 export async function getTeamInvite(where, validate = true) {

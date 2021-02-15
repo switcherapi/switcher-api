@@ -15,8 +15,7 @@ export async function getAdminById(id) {
 }
 
 export async function getAdmin(where) {
-    const admin = await Admin.findOne(where);
-    return admin;
+    return Admin.findOne(where);
 }
 
 export async function signUp(args, remoteAddress) {
