@@ -6,14 +6,14 @@ import { getTeam, getTeams, verifyRequestedTeam } from './team';
 
 async function verifyRequestedTeamByRole(roleId, admin, action) {
     let team = await getTeam({ roles: roleId });
-    return await verifyOwnership(admin, team, team.domain, action, RouterTypes.ADMIN);
+    return verifyOwnership(admin, team, team.domain, action, RouterTypes.ADMIN);
 }
 
 async function verifyRoleValueInput(roleId, value) {
     if (!value) {
         throw new BadRequestError('The attribute \'value\' must be assigned');
     }
-    return await getRoleById(roleId);
+    return getRoleById(roleId);
 }
 
 export async function getRoleById(id, lean = false) {
@@ -22,7 +22,7 @@ export async function getRoleById(id, lean = false) {
 }
 
 export async function getRoles(where) {
-    return await Role.find(where).lean();
+    return Role.find(where).lean();
 }
 
 export async function createRole(args, teamId, admin) {
@@ -44,8 +44,7 @@ export async function updateRole(args, id, admin) {
 
     const updates = Object.keys(args);
     updates.forEach((update) => role[update] = args[update]);
-    await role.save();
-    return role;
+    return role.save();
 }
 
 export async function deleteRole(id, admin) {
@@ -59,8 +58,7 @@ export async function deleteRole(id, admin) {
         team.save();
     });
     
-    await role.remove();
-    return role;
+    return role.remove();
 }
 
 export async function addValue(args, id, admin) {
@@ -73,8 +71,7 @@ export async function addValue(args, id, admin) {
     }
 
     role.values.push(value);
-    await role.save();
-    return role;
+    return role.save();
 }
 
 export async function removeValue(args, id, admin) {
@@ -89,6 +86,5 @@ export async function removeValue(args, id, admin) {
     }
 
     role.values.splice(indexValue, 1);
-    await role.save();
-    return role;
+    return role.save();
 }

@@ -10,7 +10,7 @@ export async function getComponentById(id) {
 }
 
 export async function getComponents(where) {
-    return await Component.find(where);
+    return Component.find(where);
 }
 
 export async function createComponent(args, admin) {
@@ -36,17 +36,14 @@ export async function updateComponent(id, args, admin) {
     const updates = Object.keys(args);
     updates.forEach((update) => component[update] = args[update]);
     component.name = formatInput(component.name);
-    await component.save();
-    return component;
+    return component.save();
 }
 
 export async function deleteComponent(id, admin) {
     let component = await getComponentById(id);
     component = await verifyOwnership(
         admin, component, component.domain, ActionTypes.DELETE, RouterTypes.COMPONENT);
-
-    await component.remove();
-    return component;
+    return component.remove();
 }
 
 export async function generateApiKey(id, admin) {
@@ -54,7 +51,5 @@ export async function generateApiKey(id, admin) {
     component = await verifyOwnership(
         admin, component, component.domain, ActionTypes.UPDATE, RouterTypes.COMPONENT);
     component.updatedBy = admin.email;
-
-    const apiKey = await component.generateApiKey();
-    return apiKey;
+    return component.generateApiKey();
 }
