@@ -104,18 +104,12 @@ router.post('/admin/collaboration/permission', auth, async (req, res) => {
     };
 
     let result = [];
-    for (let index = 0; index < req.body.action.length; index++) {
+    for (const action_perm of req.body.action) {
         try {
-            await verifyOwnership(req.admin, element, req.body.domain, req.body.action[index], req.body.router);
-            result.push({
-                action: req.body.action[index],
-                result: 'ok'
-            });
+            await verifyOwnership(req.admin, element, req.body.domain, action_perm, req.body.router);
+            result.push({ action: action_perm, result: 'ok' });
         } catch (e) {
-            result.push({
-                action : req.body.action[index],
-                result: 'nok'
-            });
+            result.push({ action : action_perm, result: 'nok' });
         }
     }
     
