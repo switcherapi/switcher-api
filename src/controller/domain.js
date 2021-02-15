@@ -106,5 +106,5 @@ export async function removeDomainStatusEnv(id, env, admin) {
     domain.updatedBy = admin.email;
     domain.lastUpdate = Date.now();
     
-    return await removeDomainStatus(domain, env);
+    return removeDomainStatus(domain, env);
 }
