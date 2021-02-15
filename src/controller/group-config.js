@@ -18,7 +18,7 @@ export async function getGroupConfigById(id) {
 }
 
 export async function getGroupConfigs(where) {
-    return await GroupConfig.find(where);
+    return GroupConfig.find(where);
 }
 
 export async function createGroup(args, admin) {

@@ -20,7 +20,7 @@ export async function getConfigById(id) {
 }
 
 export async function getConfigs(where) {
-    return await Config.find(where);
+    return Config.find(where);
 }
 
 export async function createConfig(args, admin) {

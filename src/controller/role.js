@@ -22,7 +22,7 @@ export async function getRoleById(id, lean = false) {
 }
 
 export async function getRoles(where) {
-    return await Role.find(where).lean();
+    return Role.find(where).lean();
 }
 
 export async function createRole(args, teamId, admin) {

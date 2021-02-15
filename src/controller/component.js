@@ -10,7 +10,7 @@ export async function getComponentById(id) {
 }
 
 export async function getComponents(where) {
-    return await Component.find(where);
+    return Component.find(where);
 }
 
 export async function createComponent(args, admin) {
