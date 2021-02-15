@@ -15,7 +15,8 @@ export async function getAdminById(id) {
 }
 
 export async function getAdmin(where) {
-    return await Admin.findOne(where);
+    const admin = await Admin.findOne(where);
+    return admin;
 }
 
 export async function signUp(args, remoteAddress) {
@@ -115,13 +116,13 @@ export async function leaveDomain(domainid, admin) {
     if (!teams.length) {
         throw new NotFoundError('No team found for this given domain id');
     }
+    
+    for (const admin_team of teams) {
+        let indexMmeber = admin_team.members.indexOf(admin.id);
+        admin_team.members.splice(indexMmeber, 1);
+        await admin_team.save();
 
-    for (let i = 0; i < teams.length; i++) {
-        let indexMmeber = teams[i].members.indexOf(admin.id);
-        teams[i].members.splice(indexMmeber, 1);
-        await teams[i].save();
-
-        let indexTeam = admin.teams.indexOf(teams[i]._id);
+        let indexTeam = admin.teams.indexOf(admin_team._id);
         admin.teams.splice(indexTeam, 1);
         await admin.save();
     }
