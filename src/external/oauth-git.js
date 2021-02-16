@@ -13,8 +13,7 @@ export async function getGitToken(code) {
                 }
             });
         
-        const accessToken = response.data.access_token;
-        return accessToken;
+        return response.data.access_token;
     } catch (error) {
         throw new GitAuthError('Failed to get GitHub access token');
     }

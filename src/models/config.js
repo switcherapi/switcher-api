@@ -152,9 +152,11 @@ configSchema.virtual('configStrategy', {
 configSchema.pre('remove', async function (next) {
     const config = this;
     
-    const strategy = await ConfigStrategy.find({ config: config._id });
-    if (strategy) {
-        strategy.forEach(async (s) => await s.remove());
+    const strategies = await ConfigStrategy.find({ config: config._id });
+    if (strategies) {
+        for (const strategy of strategies) {
+            await strategy.remove();
+        }
     }
     
     await History.deleteMany({ domainId: config.domain, elementId: config._id });

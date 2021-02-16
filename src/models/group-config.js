@@ -65,13 +65,13 @@ groupConfigSchema.virtual('config', {
 });
 
 groupConfigSchema.pre('remove', async function (next) {
-    var ObjectId = (require('mongoose').Types.ObjectId);
-
     const group = this;
-    const config = await Config.find({ group: new ObjectId(group._id) });
+    const configs = await Config.find({ group: group._id });
 
-    if (config) {
-        config.forEach(async (c) => await c.remove());
+    if (configs) {
+        for (const config of configs) {
+            await config.remove();
+        }
     }
 
     await History.deleteMany({ domainId: group.domain, elementId: group._id });

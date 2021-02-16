@@ -149,18 +149,15 @@ adminSchema.statics.findByCredentials = async (email, password) => {
 };
 
 adminSchema.statics.findUserByAuthCode = async (code, active) => {
-    const admin = await Admin.findOne({ code, active });
-    return admin;
+    return Admin.findOne({ code, active });
 };
 
 adminSchema.statics.findUserByGitId = async (_gitid) => {
-    const admin = await Admin.findOne({ _gitid });
-    return admin;
+    return Admin.findOne({ _gitid });
 };
 
 adminSchema.statics.findUserByBitBucketId = async (_bitbucketid) => {
-    const admin = await Admin.findOne({ _bitbucketid });
-    return admin;
+    return Admin.findOne({ _bitbucketid });
 };
 
 adminSchema.statics.createThirdPartyAccount = async (
@@ -214,14 +211,15 @@ adminSchema.pre('remove', async function (next) {
     const domains = await Domain.find({ owner: new ObjectId(admin._id) });
 
     if (domains) {
-        domains.forEach(async (domain) => await domain.remove());
+        for (const domain of domains)
+            await domain.remove();
     }
 
     const teams = await Team.find({ members: admin._id });
-    for (let i = 0; i < teams.length; i++) {
-        let indexMmeber = teams[i].members.indexOf(admin._id);
-        teams[i].members.splice(indexMmeber, 1);
-        await teams[i].save();
+    for (const team of teams) {
+        let indexMmeber = team.members.indexOf(admin._id);
+        team.members.splice(indexMmeber, 1);
+        await team.save();
     }
 
     notifyAcDeletion(admin._id);

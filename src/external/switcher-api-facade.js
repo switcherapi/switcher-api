@@ -92,15 +92,10 @@ export async function checkTeam(domain) {
     ), 'Team limit has been reached.');
 }
 
-//deactivated - risk of recursive deadlock
-export async function checkExecution(/*domain*/) {
-    // if (process.env.SWITCHER_API_ENABLE != 'true')
-    //     return;
-
-    // switcherFlagResult(await switcher.isItOn('CRITERIA_USAGE', [
-    //     Switcher.StrategiesType.VALUE, domain.owner]
-    // ), 'Execution limit has been reached.');
-}
+/**
+ * deprecated
+ */
+export async function checkExecution() {}
 
 export async function checkMetrics(config) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
@@ -126,7 +121,7 @@ export async function checkHistory(domain) {
         return true;
 
     const { owner } = await Domain.findById(domain).lean();
-    return await switcher.isItOn('ELEMENT_CREATION', [
+    return switcher.isItOn('ELEMENT_CREATION', [
         Switcher.StrategiesType.VALUE, `history#${owner}`]);
 }
 

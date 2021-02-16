@@ -53,7 +53,7 @@ const queryType = new GraphQLObjectType({
             resolve: async (source, { _id, name, activated, environment, _component }, context) => {
                 if (environment) context.environment = environment;
                 if (_component) context._component = _component;
-                return await resolveDomain(_id, name, activated, context);
+                return resolveDomain(_id, name, activated, context);
             }
         },
         configuration: {
