@@ -19,9 +19,8 @@ export async function getBitBucketToken(code) {
                     accept: 'application/json'
                 }
             });
-
-        const accessToken = response.data.access_token;
-        return accessToken;
+            
+        return response.data.access_token;
     } catch (error) {
         throw new BitBucketAuthError('Failed to get BitBucket access token');
     }

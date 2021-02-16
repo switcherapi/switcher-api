@@ -72,9 +72,13 @@ export async function updateDomainVersion(domainId) {
 export function formatInput(input, 
     options = { toUpper: false, toLower: false, autoUnderscore: false, allowSpace: false }) {
 
-    const regexStr = options.autoUnderscore ? /^[a-zA-Z0-9_\- ]*$/ : 
+    let regexStr;
+    if (options.autoUnderscore) {
+        regexStr = /^[a-zA-Z0-9_\- ]*$/;
+    } else {
         // eslint-disable-next-line no-useless-escape
-        options.allowSpace ? /^[-a-zA-Z0-9_\- ]*$/ : /^[a-zA-Z0-9_\-]*$/;
+        regexStr = options.allowSpace ? /^[-a-zA-Z0-9_\- ]*$/ : /^[a-zA-Z0-9_\-]*$/;
+    }
 
     if (!input.match(regexStr)) {
         throw new Error('Invalid input format. Use only alphanumeric digits.');
@@ -116,11 +120,11 @@ export async function verifyOwnership(admin, element, domainId, action, routerTy
     
     const teams = await Team.find({ _id: { $in: admin.teams }, domain: domain._id, active: true });
     if (teams.length && admin.teams.length) {
-        for (var i = 0; i < teams.length; i++) {
+        for (const team of teams) {
             if (cascade) {
-                element = await verifyRolesCascade(teams[i], element, action, routerType);
+                element = await verifyRolesCascade(team, element, action, routerType);
             } else {
-                element = await verifyRoles(teams[i], element, action, routerType);
+                element = await verifyRoles(team, element, action, routerType);
             }
         }
     } else {

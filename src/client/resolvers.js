@@ -7,10 +7,9 @@ import { ConfigStrategy, processOperation } from '../models/config-strategy';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { verifyOwnership } from '../routers/common/index';
 import { resolveNotification, resolveValidation } from './relay/index';
-import { checkExecution } from '../external/switcher-api-facade';
 import Component from '../models/component';
 
-export const resolveConfigByKey = async (domain, key) => await Config.findOne({ domain, key }, null, { lean: true });
+export const resolveConfigByKey = async (domain, key) => Config.findOne({ domain, key }, null, { lean: true });
 
 export function resolveEnvStatus(source) {
     const key = Object.keys(source.activated);
@@ -98,7 +97,7 @@ export async function resolveGroupConfig(source, _id, name, activated, context) 
         return null;
     }
 
-    return await resolveComponentsFirst(source, context, groups);
+    return resolveComponentsFirst(source, context, groups);
 }
 
 export async function resolveDomain(_id, name, activated, context) {
@@ -133,8 +132,7 @@ export async function resolveDomain(_id, name, activated, context) {
 }
 
 export async function checkDomain(domainId) {
-    const domain = await Domain.findOne({ _id: domainId }, null, { lean: true });
-    return domain;
+    return Domain.findOne({ _id: domainId }, null, { lean: true });
 }
 
 /**
@@ -163,13 +161,11 @@ async function resolveComponentsFirst(source, context, groups) {
 
 async function checkGroup(configId) {
     const config = await Config.findOne({ _id: configId }, null, { lean: true });
-    const group = await GroupConfig.findOne({ _id: config.group }, null, { lean: true });
-    return group;
+    return GroupConfig.findOne({ _id: config.group }, null, { lean: true });
 }
 
 async function checkConfigStrategies (configId, strategyFilter) {
-    const strategies = await ConfigStrategy.find({ config: configId }, strategyFilter).lean();
-    return strategies;
+    return ConfigStrategy.find({ config: configId }, strategyFilter).lean();
 }
 
 async function resolveRelay(config, environment, entry, response) {
@@ -203,6 +199,40 @@ function isMetricDisabled(config, environment) {
     return false;
 }
 
+function checkFlags(config, group, domain, environment) {
+    if (config.activated[environment] === undefined ? 
+        !config.activated[EnvType.DEFAULT] : !config.activated[environment]) {
+        throw new Error('Config disabled');
+    } else if (group.activated[environment] === undefined ? 
+        !group.activated[EnvType.DEFAULT] : !group.activated[environment]) {
+        throw new Error('Group disabled');
+    } else if (domain.activated[environment] === undefined ? 
+        !domain.activated[EnvType.DEFAULT] : !domain.activated[environment]) {
+        throw new Error('Domain disabled');
+    }
+}
+
+function checkStrategy(context, strategies, environment) {
+    if (strategies) {
+        for (const strategy of strategies) {
+            if (!strategy.activated[environment]) continue;
+            checkStrategyInput(context.entry ? 
+                context.entry.filter(e => e.strategy == strategy.strategy) : [], 
+                strategy);
+        }
+    }
+}
+
+function checkStrategyInput(input, strategy) {
+    if (input.length) {
+        if (!processOperation(strategy.strategy, strategy.operation, input[0].input, strategy.values)) {
+            throw new Error(`Strategy '${strategy.strategy}' does not agree`);
+        }
+    } else {
+        throw new Error(`Strategy '${strategy.strategy}' did not receive any input`);
+    }
+}
+
 export async function resolveCriteria(config, context, strategyFilter) {
     context.config_id = config._id;
     const environment = context.environment;
@@ -227,39 +257,8 @@ export async function resolveCriteria(config, context, strategyFilter) {
     };
 
     try {
-        await checkExecution(domain);
-
-        // Check flags
-        if (config.activated[environment] === undefined ? 
-            !config.activated[EnvType.DEFAULT] : !config.activated[environment]) {
-            throw new Error('Config disabled');
-        } else if (group.activated[environment] === undefined ? 
-            !group.activated[EnvType.DEFAULT] : !group.activated[environment]) {
-            throw new Error('Group disabled');
-        } else if (domain.activated[environment] === undefined ? 
-            !domain.activated[EnvType.DEFAULT] : !domain.activated[environment]) {
-            throw new Error('Domain disabled');
-        }
-        
-        // Check strategies
-        if (strategies) {
-            for (var i = 0; i < strategies.length; i++) {
-                if (!strategies[i].activated[environment]) {
-                    continue;
-                }
-    
-                const input = context.entry ? context.entry.filter(e => e.strategy == strategies[i].strategy) : [];
-                if (input.length) {
-                    if (!processOperation(strategies[i].strategy, strategies[i].operation, input[0].input, strategies[i].values)) {
-                        throw new Error(`Strategy '${strategies[i].strategy}' does not agree`);
-                    }
-                } else {
-                    throw new Error(`Strategy '${strategies[i].strategy}' did not receive any input`);
-                }
-            }
-        }
-
-        // Check relay
+        checkFlags(config, group, domain, environment);
+        checkStrategy(context, strategies, environment);
         await resolveRelay(config, environment, context.entry, response);
     } catch (e) {
         response.result = false;
