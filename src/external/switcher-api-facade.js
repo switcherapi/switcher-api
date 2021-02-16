@@ -92,11 +92,6 @@ export async function checkTeam(domain) {
     ), 'Team limit has been reached.');
 }
 
-/**
- * deprecated
- */
-export async function checkExecution() {}
-
 export async function checkMetrics(config) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
         return true;

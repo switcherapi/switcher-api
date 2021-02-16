@@ -7,7 +7,6 @@ import { ConfigStrategy, processOperation } from '../models/config-strategy';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { verifyOwnership } from '../routers/common/index';
 import { resolveNotification, resolveValidation } from './relay/index';
-import { checkExecution } from '../external/switcher-api-facade';
 import Component from '../models/component';
 
 export const resolveConfigByKey = async (domain, key) => Config.findOne({ domain, key }, null, { lean: true });
@@ -217,18 +216,20 @@ function checkStrategy(context, strategies, environment) {
     if (strategies) {
         for (const strategy of strategies) {
             if (!strategy.activated[environment]) continue;
-
-            const input = context.entry ? 
-                context.entry.filter(e => e.strategy == strategy.strategy) : [];
-                
-            if (input.length) {
-                if (!processOperation(strategy.strategy, strategy.operation, input[0].input, strategy.values)) {
-                    throw new Error(`Strategy '${strategy.strategy}' does not agree`);
-                }
-            } else {
-                throw new Error(`Strategy '${strategy.strategy}' did not receive any input`);
-            }
+            checkStrategyInput(context.entry ? 
+                context.entry.filter(e => e.strategy == strategy.strategy) : [], 
+                strategy);
         }
+    }
+}
+
+function checkStrategyInput(input, strategy) {
+    if (input.length) {
+        if (!processOperation(strategy.strategy, strategy.operation, input[0].input, strategy.values)) {
+            throw new Error(`Strategy '${strategy.strategy}' does not agree`);
+        }
+    } else {
+        throw new Error(`Strategy '${strategy.strategy}' did not receive any input`);
     }
 }
 
@@ -256,7 +257,6 @@ export async function resolveCriteria(config, context, strategyFilter) {
     };
 
     try {
-        await checkExecution(domain);
         checkFlags(config, group, domain, environment);
         checkStrategy(context, strategies, environment);
         await resolveRelay(config, environment, context.entry, response);
