@@ -65,13 +65,11 @@ componentSchema.methods.generateAuthToken = async function (environment) {
         expiresIn: process.env.JWT_CLIENT_TOKEN_EXP_TIME
     };
 
-    const token = jwt.sign(({ 
+    return jwt.sign(({ 
         component: component._id,
         environment,
         vc: component.apihash.substring(50, component.apihash.length - 1) 
     }), process.env.JWT_SECRET, options);
-
-    return token;
 };
 
 componentSchema.statics.findByCredentials = async (domainName, componentName, apiKey) => {

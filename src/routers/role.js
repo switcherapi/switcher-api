@@ -10,6 +10,15 @@ import { getTeamById } from '../controller/team';
 
 const router = new express.Router();
 
+async function updateRole(req, res) {
+    try {
+        const role = await Controller.updateRole(req.body, req.params.id, req.admin);
+        res.send(role);
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+}
+
 router.post('/role/create/:team', [check('team').isMongoId()], 
     validate, auth, async (req, res) => {
     try {
@@ -67,12 +76,7 @@ router.get('/role/:id', [check('id').isMongoId()], validate,
 
 router.patch('/role/:id', [check('id').isMongoId()], validate, auth, 
     verifyInputUpdateParameters(['action', 'active', 'router', 'identifiedBy']), async (req, res) => {
-    try {
-        const role = await Controller.updateRole(req.body, req.params.id, req.admin);
-        res.send(role);
-    } catch (e) {
-        responseException(res, e, 400);
-    }
+    await updateRole(req, res);
 });
 
 router.delete('/role/:id', [check('id').isMongoId()], validate, 
@@ -107,12 +111,7 @@ router.patch('/role/value/remove/:id', [check('id').isMongoId()], validate,
 
 router.patch('/role/updateValues/:id', [check('id').isMongoId()], validate, 
     auth, async (req, res) => {
-    try {
-        const role = await Controller.updateRole(req.body, req.params.id, req.admin);
-        res.send(role);
-    } catch (e) {
-        responseException(res, e, 400);
-    }
+    await updateRole(req, res);
 });
 
 export default router;

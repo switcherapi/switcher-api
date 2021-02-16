@@ -1,30 +1,50 @@
 import History from '../history';
 import { checkHistory } from '../../external/switcher-api-facade';
 
-function checkDifference(oldValues, newValues, oldDocument, newDocument, 
-    defaultIgnoredFields, keyArr, keys, pos) {
+function checkDifference(diff, documents, defaultIgnoredFields, 
+    keyArr, keys, pos) {
     
     if (!defaultIgnoredFields.includes(keyArr[pos])) {
-        const oldValue = getValue(oldDocument, keyArr[pos]) || '';
-        const newValue = getValue(newDocument, keyArr[pos]) || '';
+        const vals = {
+            oldValue: getValue(documents.oldDocument, keyArr[pos]) || '',
+            newValue: getValue(documents.newDocument, keyArr[pos]) || ''
+        };
         
-        if (typeof oldValue === 'object' || typeof newValue === 'object') {
-            if (keyArr.length - 1 > pos) {
-                checkDifference(oldValues, newValues,  
-                    getValue(oldDocument, keyArr[pos]), 
-                    getValue(newDocument, keyArr[pos]), 
-                    defaultIgnoredFields, keyArr, keys, pos+1);
-            } else {
-                if (!Object.is(extractValue(oldValue), extractValue(newValue))) {
-                    oldValues.set(keys, extractValue(oldValue));
-                    newValues.set(keys, extractValue(newValue));
-                }
-            }
+        if (typeof vals.oldValue === 'object' || typeof vals.newValue === 'object') {
+            validateObjects(diff, documents, vals, keyArr, defaultIgnoredFields, keys, pos);
         } else {
-            if (!Object.is(oldValue, newValue)) {
-                oldValues.set(keys, oldValue);
-                newValues.set(keys, newValue);
+            if (!Object.is(vals.oldValue, vals.newValue)) {
+                diff.oldValues.set(keys, vals.oldValue);
+                diff.newValues.set(keys, vals.newValue);
             }
+        }
+    }
+}
+
+/**
+ * Compares objects
+ * 
+ * @param {*} diff old/new values that are different
+ * @param {*} documents old/new document evaluated
+ * @param {*} vals old/new values to be compared
+ * @param {*} keyArr fields to be compared
+ * @param {*} defaultIgnoredFields fields to be ignores
+ * @param {*} keys field that will be added to history
+ * @param {*} pos current validation position
+ */
+function validateObjects(diff, documents, vals, keyArr, 
+    defaultIgnoredFields, keys, pos) {
+    if (keyArr.length - 1 > pos) {
+        documents = {
+            oldDocument: getValue(documents.oldDocument, keyArr[pos]),
+            newDocument: getValue(documents.newDocument, keyArr[pos])
+        };
+
+        checkDifference(diff, documents, defaultIgnoredFields, keyArr, keys, pos+1);
+    } else {
+        if (!Object.is(extractValue(vals.oldValue), extractValue(vals.newValue))) {
+            diff.oldValues.set(keys, extractValue(vals.oldValue));
+            diff.newValues.set(keys, extractValue(vals.newValue));
         }
     }
 }
@@ -32,7 +52,8 @@ function checkDifference(oldValues, newValues, oldDocument, newDocument,
 function extractValue(element) {
     if (Array.isArray(element)) {
         return element.map(val => {
-            return val.name ? val.name : val.key ? val.key : val;
+            if (val.name) return val.name;
+            return val.key ? val.key : val;
         });
     }
 }
@@ -52,9 +73,9 @@ function getValue(document, field) {
 }
 
 export async function recordHistory(modifiedField, oldDocument, newDocument, domainId, ignoredFields = []) {
-    const oldValues = new Map();
-    const newValues = new Map();
     const defaultIgnoredFields = ['_id', 'updatedAt'];
+    const diff = { oldValues: new Map(), newValues: new Map() };
+    const documents = { oldDocument, newDocument };
 
     if (!await checkHistory(domainId))
         return;
@@ -65,20 +86,20 @@ export async function recordHistory(modifiedField, oldDocument, newDocument, dom
     
     modifiedField.forEach(keys => {
         const keyArr = keys.split('.');
-        checkDifference(oldValues, newValues, oldDocument, newDocument, 
-            defaultIgnoredFields, keyArr, keys.replace(/\./g, '/'), 0);
+        checkDifference(diff, documents, defaultIgnoredFields, 
+            keyArr, keys.replace(/\./g, '/'), 0);
     });
     
     const history = new History({
         domainId,
         elementId: newDocument._id,
-        oldValue: oldValues,
-        newValue: newValues,
+        oldValue: diff.oldValues,
+        newValue: diff.newValues,
         updatedBy: newDocument.updatedBy,
         date: Date.now()
     });
     
-    if (newValues.size > 0 && process.env.HISTORY_ACTIVATED === 'true') {
+    if (diff.newValues.size > 0 && process.env.HISTORY_ACTIVATED === 'true') {
         await history.save();
     }
 }

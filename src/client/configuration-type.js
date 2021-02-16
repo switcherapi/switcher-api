@@ -92,7 +92,7 @@ export const configType = new GraphQLObjectType({
                 }
             },
             resolve: async (source, { _id, strategy, operation, activated }, context) => {
-                return await resolveConfigStrategy(source, _id, strategy, operation, activated, context);
+                return resolveConfigStrategy(source, _id, strategy, operation, activated, context);
             }
         },
         components: {
@@ -147,7 +147,7 @@ export const groupConfigType = new GraphQLObjectType({
                 }
             },
             resolve: async (source, { _id, key, activated }, context) => {
-                return await resolveConfig(source, _id, key, activated, context);
+                return resolveConfig(source, _id, key, activated, context);
             }
         }
     }
@@ -200,7 +200,7 @@ export const domainType = new GraphQLObjectType({
                 }
             },
             resolve: async (source, { _id, name, activated }, context) => {
-                return await resolveGroupConfig(source, _id, name, activated, context);
+                return resolveGroupConfig(source, _id, name, activated, context);
             }
         }
     }

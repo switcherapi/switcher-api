@@ -85,9 +85,9 @@ const roleSchema = new mongoose.Schema({
 });
 
 export function checkActionType(actions) {
-    for (let index = 0; index < actions.length; index++) {
-        if (!Object.values(ActionTypes).includes(actions[index])) {
-            throw new Error(`Role validation failed: action: '${actions[index]}' is not a valid enum value.`);
+    for (const action of actions) {
+        if (!Object.values(ActionTypes).includes(action)) {
+            throw new Error(`Role validation failed: action: '${action}' is not a valid enum value.`);
         }
     }
 }

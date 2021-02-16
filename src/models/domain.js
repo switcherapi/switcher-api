@@ -88,23 +88,27 @@ domainSchema.options.toJSON = {
 };
 
 domainSchema.pre('remove', async function (next) {
-    var ObjectId = (require('mongoose').Types.ObjectId);
-
     const domain = this;
-    const group = await GroupConfig.find({ domain: new ObjectId(domain._id) });
+    const groups = await GroupConfig.find({ domain: domain._id });
     
-    if (group) {
-        group.forEach(async (g) => await g.remove());
+    if (groups) {
+        for (const group of groups) {
+            await group.remove();
+        }
     }
 
-    const team = await Team.find({ domain: new ObjectId(domain._id) });
-    if (team) {
-        team.forEach(async (e) => await e.remove());
+    const teams = await Team.find({ domain: domain._id });
+    if (teams) {
+        for (const team of teams) {
+            await team.remove();
+        }
     }
 
-    await Environment.deleteMany({ domain: new ObjectId(domain._id) });
-    await History.deleteMany({ domainId: domain._id });
-    await Metric.deleteMany({ domain: new ObjectId(domain._id) });
+    await Promise.all([
+        Environment.deleteMany({ domain: domain._id }), 
+        History.deleteMany({ domainId: domain._id }), 
+        Metric.deleteMany({ domain: domain._id })
+    ]);
 
     next();
 });
