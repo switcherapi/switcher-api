@@ -757,6 +757,39 @@ describe('Testing criteria [REST] ', () => {
                 done();
             });
     });
+
+    test('CLIENT_SUITE - Should return an empty list of switchers - all switchers queried found', (done) => {
+        request(app)
+            .get('/criteria/switchers_check')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                switchers: [
+                    'TEST_CONFIG_KEY'
+                ]
+            })
+            .expect(200)
+            .end((err, { body }) => {
+                expect(body.not_found).toEqual([]);
+                done();
+            });
+    });
+
+    test('CLIENT_SUITE - Should return the switcher queried - not found', (done) => {
+        request(app)
+            .get('/criteria/switchers_check')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                switchers: [
+                    'TEST_CONFIG_KEY',
+                    'I_DO_NOT_EXIST'
+                ]
+            })
+            .expect(200)
+            .end((err, { body }) => {
+                expect(body.not_found).toEqual(['I_DO_NOT_EXIST']);
+                done();
+            });
+    });
 });
 
 describe('Testing domain [Adm-GraphQL] ', () => {

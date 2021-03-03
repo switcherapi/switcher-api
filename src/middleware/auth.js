@@ -64,6 +64,7 @@ export async function appAuth(req, res, next) {
         req.token = token;
         req.domain = component.domain;
         req.component = component.name;
+        req.componentId = component._id;
         req.environment = decoded.environment;
         next();
     } catch (e) {
