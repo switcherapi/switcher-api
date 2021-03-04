@@ -58,7 +58,7 @@ router.get('/criteria/snapshot_check/:version', appAuth, async (req, res) => {
     }
 });
 
-router.get('/criteria/switchers_check', [
+router.post('/criteria/switchers_check', [
     check('switchers', 'Switcher Key is required').isLength({ min: 1 })], 
     validate, appAuth, async (req, res) => {
     try {
