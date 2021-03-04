@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "4f795538-874c-4b94-b0b5-76fb711b05d0",
+		"_postman_id": "cdfeeb52-cd3e-45ec-8478-155390a22621",
 		"name": "Switcher API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1037,15 +1037,6 @@
 								"value": ""
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "{{url}}/domain/generateApiKey/5df166239194d613400a52e7",
 							"host": [
@@ -4512,6 +4503,53 @@
 						"criteria",
 						"snapshot_check",
 						"1588557288037"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Client - Check Switcher/Component",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authClientToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"switchers\": [\r\n        \"FEATURE2020\",\r\n        \"RELAY_1\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/criteria/switchers_check",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"criteria",
+						"switchers_check"
 					]
 				}
 			},

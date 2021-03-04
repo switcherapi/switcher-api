@@ -1,8 +1,10 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import { checkConfig, checkConfigComponent } from '../middleware/validators';
+import { checkConfig, checkConfigComponent, validate } from '../middleware/validators';
 import { appAuth, appGenerateCredentials } from '../middleware/auth';
 import { resolveCriteria, checkDomain } from '../client/resolvers';
+import { getConfigs } from '../controller/config';
+import { check } from 'express-validator';
 
 const router = new express.Router();
 
@@ -51,6 +53,18 @@ router.get('/criteria/snapshot_check/:version', appAuth, async (req, res) => {
         } else {
             res.send({ status: true });
         }
+    } catch (e) {
+        res.status(500).send({ error: e.message });
+    }
+});
+
+router.get('/criteria/switchers_check', [
+    check('switchers', 'Switcher Key is required').isLength({ min: 1 })], 
+    validate, appAuth, async (req, res) => {
+    try {
+        const configsFound = await getConfigs({ domain: req.domain, components: req.componentId });
+        const configs = configsFound.map(config => config.key);
+        res.send({ not_found: req.body.switchers.filter(switcher => !configs.includes(switcher)) });
     } catch (e) {
         res.status(500).send({ error: e.message });
     }
