@@ -760,7 +760,7 @@ describe('Testing criteria [REST] ', () => {
 
     test('CLIENT_SUITE - Should return an empty list of switchers - all switchers queried found', (done) => {
         request(app)
-            .get('/criteria/switchers_check')
+            .post('/criteria/switchers_check')
             .set('Authorization', `Bearer ${token}`)
             .send({
                 switchers: [
@@ -776,7 +776,7 @@ describe('Testing criteria [REST] ', () => {
 
     test('CLIENT_SUITE - Should return the switcher queried - not found', (done) => {
         request(app)
-            .get('/criteria/switchers_check')
+            .post('/criteria/switchers_check')
             .set('Authorization', `Bearer ${token}`)
             .send({
                 switchers: [
