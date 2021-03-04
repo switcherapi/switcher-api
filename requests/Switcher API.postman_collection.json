@@ -4510,9 +4510,6 @@
 		},
 		{
 			"name": "Client - Check Switcher/Component",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -4524,7 +4521,7 @@
 						}
 					]
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
