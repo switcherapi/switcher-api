@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { buildRangeDateFilter } from '../../src/routers/metric';
+import { buildRangeDateFilter } from '../../src/controller/metric';
 
 describe('Test metric date range filters', () => {
 

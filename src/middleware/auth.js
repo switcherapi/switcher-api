@@ -1,13 +1,14 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import Admin from '../models/admin';
+import { getAdmin, getAdminById } from '../controller/admin';
+import { getComponentById } from '../controller/component';
 import Component from '../models/component';
 
 export async function auth(req, res, next) {
     try {
         const token = req.header('Authorization').replace('Bearer ', '');
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const admin = await Admin.findOne({ _id: decoded._id });
+        const admin = await getAdminById(decoded._id);
 
         if (!admin || !admin.active) {
             throw new Error();
@@ -37,14 +38,14 @@ export async function authRefreshToken(req, res, next) {
         }
 
         const decoded = await jwt.decode(token);
-        const admin = await Admin.findOne({ _id: decoded._id, token: refreshToken });
+        const admin = await getAdmin({ _id: decoded._id, token: refreshToken });
 
         if (!admin || !admin.active) {
             throw new Error();
         }
 
         const newTokenPair = await admin.generateAuthToken();
-        req.jwt = newTokenPair;
+        res.jwt = newTokenPair;
         next();
     } catch (e) {
         res.status(401).send({ error: 'Unable to refresh token.' });
@@ -55,7 +56,7 @@ export async function appAuth(req, res, next) {
     try {
         const token = req.header('Authorization').replace('Bearer ', '');
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const component = await Component.findOne({ _id: decoded.component }).lean();
+        const component = await getComponentById(decoded.component);
 
         if (component?.apihash.substring(50,component.apihash.length - 1) !== decoded.vc) {
             throw new Error();

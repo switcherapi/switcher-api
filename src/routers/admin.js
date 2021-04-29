@@ -87,7 +87,7 @@ router.post('/admin/logout', auth, async (req, res) => {
 });
 
 router.post('/admin/refresh/me', authRefreshToken, async (req, res) => {
-    res.status(200).send(req.jwt);
+    res.status(200).send(res.jwt);
 });
 
 router.get('/admin/me', auth, async (req, res) => {

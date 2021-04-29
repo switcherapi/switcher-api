@@ -19,6 +19,10 @@ export async function getConfigById(id) {
     return response(config, 'Config not found');
 }
 
+export async function getConfig(where, lean = false) {
+    return lean ? Config.findOne(where).lean() : Config.findOne(where);
+}
+
 export async function getConfigs(where) {
     return Config.find(where);
 }

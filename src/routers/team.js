@@ -1,7 +1,6 @@
 import express from 'express';
 import { auth } from '../middleware/auth';
 import { check, query } from 'express-validator';
-import { Team } from '../models/team';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { verifyOwnership } from './common/index';
@@ -27,14 +26,9 @@ router.post('/team/create', [check('name').isLength({ min: 2, max: 50 })],
 router.get('/team', [query('domain', 'Please, specify the \'domain\' id').isMongoId()], 
     validate, auth, async (req, res) => {
     try {
-        let teams = await Team.find({ domain: req.query.domain }, null,
-            {
-                skip: parseInt(req.query.skip),
-                limit: parseInt(req.query.limit),
-                sort: {
-                    name: req.query.sort === 'desc' ? -1 : 1
-                }
-            }).lean();
+        let teams = await Controller.getTeamsSort(
+            { domain: req.query.domain }, null, 
+            req.query.skip, req.query.limit, req.query.sort);
 
         teams = await verifyOwnership(req.admin, teams, req.query.domain, ActionTypes.READ, RouterTypes.ADMIN);
 
