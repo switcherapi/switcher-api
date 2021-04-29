@@ -13,6 +13,10 @@ export async function getComponents(where) {
     return Component.find(where);
 }
 
+export async function getTotalComponentsByDomainId(domain) {
+    return Component.find({ domain }).countDocuments();
+}
+
 export async function createComponent(args, admin) {
     let component = new Component({
         ...args,

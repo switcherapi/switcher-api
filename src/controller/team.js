@@ -58,6 +58,10 @@ export async function getTeamInvite(where, validate = true) {
     return teamInvite;
 }
 
+export async function getTotalTeamsByDomainId(domain) {
+    return Team.find({ domain }).countDocuments();
+}
+
 export async function createTeam(args, admin, defaultActions) {
     let team = new Team({
         ...args

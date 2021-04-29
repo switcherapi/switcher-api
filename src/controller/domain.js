@@ -20,6 +20,10 @@ export async function getDomain(where) {
     return response(domain, 'Domain not found');
 }
 
+export async function getTotalDomainsByOwner(owner) {
+    await Domain.find({ owner }).countDocuments();
+}
+
 export async function createDomain(args, admin) {
     let domain = new Domain({
         ...args,
