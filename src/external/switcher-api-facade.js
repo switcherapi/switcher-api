@@ -1,4 +1,4 @@
-import Switcher from 'switcher-client';
+import { Switcher, checkNumeric, checkValue } from 'switcher-client';
 import Domain from '../models/domain';
 import GroupConfig from '../models/group-config';
 import { Config } from '../models/config';
@@ -28,9 +28,8 @@ export async function checkDomain(req) {
 
     const total = await Domain.find({ owner: req.admin._id }).countDocuments();
     switcherFlagResult(await switcher.isItOn('ELEMENT_CREATION', [
-        Switcher.StrategiesType.VALUE, `domain#${req.admin._id}`, 
-        Switcher.StrategiesType.NUMERIC, total]
-    ), 'Domain limit has been reached.');
+        checkValue(`domain#${req.admin._id}`),
+        checkNumeric(total)]), 'Domain limit has been reached.');
 }
 
 export async function checkGroup(domain) {
@@ -39,9 +38,8 @@ export async function checkGroup(domain) {
 
     const total = await GroupConfig.find({ domain: domain._id }).countDocuments();
     switcherFlagResult(await switcher.isItOn('ELEMENT_CREATION', [
-        Switcher.StrategiesType.VALUE, `group#${domain.owner}`, 
-        Switcher.StrategiesType.NUMERIC, total]
-    ), 'Group limit has been reached.');
+        checkValue(`group#${domain.owner}`),
+        checkNumeric(total)]), 'Group limit has been reached.');
 }
 
 export async function checkSwitcher(group) {
@@ -51,9 +49,8 @@ export async function checkSwitcher(group) {
     const total = await Config.find({ domain: group.domain }).countDocuments();
     const { owner } = await Domain.findById(group.domain).lean();
     switcherFlagResult(await switcher.isItOn('ELEMENT_CREATION', [
-        Switcher.StrategiesType.VALUE, `switcher#${owner}`, 
-        Switcher.StrategiesType.NUMERIC, total]
-    ), 'Switcher limit has been reached.');
+        checkValue(`switcher#${owner}`),
+        checkNumeric(total)]), 'Switcher limit has been reached.');
 }
 
 export async function checkComponent(domain) {
@@ -63,9 +60,8 @@ export async function checkComponent(domain) {
     const total = await Component.find({ domain }).countDocuments();
     const { owner } = await Domain.findById(domain).lean();
     switcherFlagResult(await switcher.isItOn('ELEMENT_CREATION', [
-        Switcher.StrategiesType.VALUE, `component#${owner}`, 
-        Switcher.StrategiesType.NUMERIC, total]
-    ), 'Component limit has been reached.');
+        checkValue(`component#${owner}`),
+        checkNumeric(total)]), 'Component limit has been reached.');
 }
 
 export async function checkEnvironment(domain) {
@@ -75,9 +71,8 @@ export async function checkEnvironment(domain) {
     const total = await Environment.find({ domain }).countDocuments();
     const { owner } = await Domain.findById(domain).lean();
     switcherFlagResult(await switcher.isItOn('ELEMENT_CREATION', [
-        Switcher.StrategiesType.VALUE, `environment#${owner}`, 
-        Switcher.StrategiesType.NUMERIC, total]
-    ), 'Environment limit has been reached.');
+        checkValue(`environment#${owner}`),
+        checkNumeric(total)]), 'Environment limit has been reached.');
 }
 
 export async function checkTeam(domain) {
@@ -87,9 +82,8 @@ export async function checkTeam(domain) {
     const total = await Team.find({ domain }).countDocuments();
     const { owner } = await Domain.findById(domain).lean();
     switcherFlagResult(await switcher.isItOn('ELEMENT_CREATION', [
-        Switcher.StrategiesType.VALUE, `team#${owner}`, 
-        Switcher.StrategiesType.NUMERIC, total]
-    ), 'Team limit has been reached.');
+        checkValue(`team#${owner}`),
+        checkNumeric(total)]), 'Team limit has been reached.');
 }
 
 export async function checkMetrics(config) {
@@ -98,7 +92,7 @@ export async function checkMetrics(config) {
 
     const { owner } = await Domain.findById(config.domain).lean();
     if (!await switcher.isItOn('ELEMENT_CREATION', [
-        Switcher.StrategiesType.VALUE, `metrics#${owner}`])) {
+        checkValue(`metrics#${owner}`)])) {
 
         if (!config.disable_metrics) {
             config.disable_metrics = new Map();
@@ -117,7 +111,7 @@ export async function checkHistory(domain) {
 
     const { owner } = await Domain.findById(domain).lean();
     return switcher.isItOn('ELEMENT_CREATION', [
-        Switcher.StrategiesType.VALUE, `history#${owner}`]);
+        checkValue(`history#${owner}`)]);
 }
 
 export async function checkAdmin(login) {
@@ -125,8 +119,7 @@ export async function checkAdmin(login) {
         return;
 
     switcherFlagResult(await switcher.isItOn('ACCOUNT_CREATION', [
-        Switcher.StrategiesType.VALUE, login]
-    ), 'Account not released to use the API.');
+        checkValue(login)]), 'Account not released to use the API.');
 }
 
 export function notifyAcCreation(adminid) {
@@ -134,7 +127,7 @@ export function notifyAcCreation(adminid) {
         return;
 
     switcher.isItOn('ACCOUNT_IN_NOTIFY', [
-        Switcher.StrategiesType.VALUE, adminid]);
+        checkValue(adminid)]);
 }
 
 export function notifyAcDeletion(adminid) {
@@ -142,5 +135,5 @@ export function notifyAcDeletion(adminid) {
         return;
 
     switcher.isItOn('ACCOUNT_OUT_NOTIFY', [
-        Switcher.StrategiesType.VALUE, adminid]);
+        checkValue(adminid)]);
 }

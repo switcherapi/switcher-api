@@ -58,7 +58,7 @@
     "moment": "^2.29.1",
     "mongodb": "^3.3.3",
     "mongoose": "^5.12.7",
-    "switcher-client": "^3.0.0",
+    "switcher-client": "^3.0.1",
     "validator": "^13.6.0"
   },
   "devDependencies": {
