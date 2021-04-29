@@ -21,6 +21,10 @@ export async function getGroupConfigs(where) {
     return GroupConfig.find(where);
 }
 
+export async function getGroupsByDomainId(domain) {
+    await GroupConfig.find({ domain }).countDocuments();
+}
+
 export async function createGroup(args, admin) {
     let groupconfig = new GroupConfig({
         ...args,
