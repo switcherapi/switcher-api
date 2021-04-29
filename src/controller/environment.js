@@ -43,6 +43,10 @@ export async function getEnvironment(where) {
     return response(environment, 'Environment not found');
 }
 
+export async function getTotalEnvByDomainId(domain) {
+    return Environment.find({ domain }).countDocuments();
+}
+
 export async function createEnvironment(args, admin) {
     let environment = new Environment({
         ...args, 

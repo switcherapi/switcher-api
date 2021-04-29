@@ -23,6 +23,10 @@ export async function getConfigs(where) {
     return Config.find(where);
 }
 
+export async function getTotalConfigsByDomainId(domain) {
+    return Config.find({ domain }).countDocuments();
+}
+
 export async function createConfig(args, admin) {
     // validates account plan permissions
     const group = await getGroupConfigById(args.group);
