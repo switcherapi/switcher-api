@@ -20,19 +20,22 @@ export async function getConfigById(id) {
 }
 
 export async function getConfig(where, lean = false) {
-    const query = {};
-    if (where.domain) query.domain = where.domain;
-    if (where.key) query.key = where.key;
+    const query = Config.findOne();
 
-    return lean ? Config.findOne(query).lean() : Config.findOne(query);
+    if (where.domain) query.where('domain', where.domain);
+    if (where.key) query.where('key', where.key);
+    if (lean) query.lean();
+    
+    return query.exec();
 }
 
 export async function getConfigs(where) {
-    const query = {};
-    if (where.domain) query.domain = where.domain;
-    if (where.components) query.components = where.components;
+    const query = Config.find();
 
-    return Config.find(query);
+    if (where.domain) query.where('domain', where.domain);
+    if (where.components) query.where('components', where.components);
+
+    return query.exec();
 }
 
 export async function getTotalConfigsByDomainId(domain) {
