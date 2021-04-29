@@ -20,11 +20,19 @@ export async function getConfigById(id) {
 }
 
 export async function getConfig(where, lean = false) {
-    return lean ? Config.findOne(where).lean() : Config.findOne(where);
+    let query = {};
+    if (where.domain) query.domain = where.domain;
+    if (where.key) query.key = where.key;
+
+    return lean ? Config.findOne(query).lean() : Config.findOne(query);
 }
 
 export async function getConfigs(where) {
-    return Config.find(where);
+    let query = {};
+    if (where.domain) query.domain = where.domain;
+    if (where.components) query.components = where.components;
+
+    return Config.find(query);
 }
 
 export async function getTotalConfigsByDomainId(domain) {
@@ -36,8 +44,14 @@ export async function createConfig(args, admin) {
     const group = await getGroupConfigById(args.group);
     await checkSwitcher(group);
 
+    const query = {
+        key: args.key, 
+        group: group._id, 
+        domain: group.domain
+    };
+
     // validates existing config
-    let config = await Config.findOne({ key: args.key, group: group._id, domain: group.domain });
+    let config = await Config.findOne(query);
     if (config) {
         throw new BadRequestError(`Config ${config.key} already exist`);
     }
@@ -73,13 +87,15 @@ export async function deleteConfig(id, admin) {
 export async function updateConfig(id, args, admin) {
     let config = await getConfigById(id);
 
+    const query = {
+        key: args.key,
+        group: config.group, 
+        domain: config.domain 
+    };
+
     // validates existing switcher key 
     if (args.key) {
-        const duplicatedKey = await Config.findOne({ 
-                key: args.key, 
-                group: config.group, 
-                domain: config.domain 
-            });
+        const duplicatedKey = await Config.findOne(query);
 
         if (duplicatedKey) {
             throw new BadRequestError(`Config ${args.key} already exist`);
