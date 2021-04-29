@@ -43,6 +43,10 @@ export async function getEnvironment(where) {
     return response(environment, 'Environment not found');
 }
 
+export async function getEnvironments(where, projection, options) {
+    return Environment.find(where, projection, options);
+}
+
 export async function getTotalEnvByDomainId(domain) {
     return Environment.find({ domain }).countDocuments();
 }

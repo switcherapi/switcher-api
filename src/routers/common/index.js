@@ -1,17 +1,19 @@
-import { NotFoundError, PermissionError } from '../../exceptions';
-import { Environment, EnvType } from '../../models/environment';
-import Domain from '../../models/domain';
-import { Team } from '../../models/team';
-import { Role, ActionTypes, RouterTypes } from '../../models/role';
+import { BadRequestError, PermissionError } from '../../exceptions';
+import { EnvType } from '../../models/environment';
+import { ActionTypes, RouterTypes } from '../../models/role';
+import { getDomainById } from '../../controller/domain';
+import { getEnvironments } from '../../controller/environment';
+import { getTeams } from '../../controller/team';
+import { getRole, getRoles } from '../../controller/role';
 
 async function checkEnvironmentStatusRemoval(domainId, environmentName, strategy = false) {
-    const environment = await Environment.find({ domain: domainId }).select('name -_id');
+    const environment = await getEnvironments({ domain: domainId }, ['_id', 'name']);
     const isValidOperation = environment.filter((e) => 
         e.name === environmentName && 
         !strategy ? environmentName !== EnvType.DEFAULT : strategy).length > 0;
         
     if (!isValidOperation) {
-        throw new Error('Invalid environment');
+        throw new BadRequestError('Invalid environment');
     }
 }
 
@@ -59,12 +61,7 @@ export async function removeConfigStatus(config, environmentName) {
 }
 
 export async function updateDomainVersion(domainId) {
-    const domain = await Domain.findById(domainId);
-
-    if (!domain) {
-        throw new NotFoundError('Domain not found');
-    }
-
+    const domain = await getDomainById(domainId);
     domain.lastUpdate = Date.now();
     domain.save();
 }
@@ -109,16 +106,12 @@ export function sortBy(args) {
 }
 
 export async function verifyOwnership(admin, element, domainId, action, routerType, cascade = false) {
-    const domain = await Domain.findById(domainId);
-    if (!domain) {
-        throw new NotFoundError('Domain not found');
-    }
-
+    const domain = await getDomainById(domainId);
     if (admin._id.equals(domain.owner)) {
         return element;
     }
     
-    const teams = await Team.find({ _id: { $in: admin.teams }, domain: domain._id, active: true });
+    const teams = await getTeams({ _id: { $in: admin.teams }, domain: domain._id, active: true });
     if (teams.length && admin.teams.length) {
         for (const team of teams) {
             if (cascade) {
@@ -135,7 +128,7 @@ export async function verifyOwnership(admin, element, domainId, action, routerTy
 }
   
 async function verifyRoles(team, element, action, routerType) {
-    const role = await Role.findOne({
+    const role = await getRole({
         _id: { $in: team.roles }, 
         action: { $in: [action, ActionTypes.ALL] },
         active: true,
@@ -174,7 +167,7 @@ async function verifyRolesCascade(team, element, action, routerType) {
         ];
     }
 
-    const foundRole = await Role.find({
+    const foundRole = await getRoles({
         _id: { $in: team.roles }, 
         action: { $in: [action, ActionTypes.ALL] },
         active: true,
