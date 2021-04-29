@@ -39,7 +39,7 @@ export async function getEnvironmentById(id) {
 }
 
 export async function getEnvironment(where) {
-    let query = {};
+    const query = {};
     if (where.name) query.name = where.name;
     if (where.domain) query.domain = where.domain;
 
@@ -48,7 +48,7 @@ export async function getEnvironment(where) {
 }
 
 export async function getEnvironments(where, projection, options) {
-    let query = {};
+    const query = {};
     if (where.domain) query.domain = where.domain;
 
     return Environment.find(query, projection, options);

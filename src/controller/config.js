@@ -20,7 +20,7 @@ export async function getConfigById(id) {
 }
 
 export async function getConfig(where, lean = false) {
-    let query = {};
+    const query = {};
     if (where.domain) query.domain = where.domain;
     if (where.key) query.key = where.key;
 
@@ -28,7 +28,7 @@ export async function getConfig(where, lean = false) {
 }
 
 export async function getConfigs(where) {
-    let query = {};
+    const query = {};
     if (where.domain) query.domain = where.domain;
     if (where.components) query.components = where.components;
 
