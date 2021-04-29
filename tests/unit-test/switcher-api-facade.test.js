@@ -23,7 +23,7 @@ import {
     groupConfigDocument,
     config1Document
 } from '../fixtures/db_api';
-import Switcher from 'switcher-client';
+import { Switcher } from 'switcher-client';
 
 afterAll(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
