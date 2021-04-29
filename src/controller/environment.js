@@ -39,19 +39,23 @@ export async function getEnvironmentById(id) {
 }
 
 export async function getEnvironment(where) {
-    const query = {};
-    if (where.name) query.name = where.name;
-    if (where.domain) query.domain = where.domain;
+    const query = Environment.findOne();
 
-    let environment = await Environment.findOne(where);
+    if (where.domain) query.where('domain', where.domain);
+    if (where.name) query.where('name', where.name);
+    
+    let environment = await query.exec();
     return response(environment, 'Environment not found');
 }
 
 export async function getEnvironments(where, projection, options) {
-    const query = {};
-    if (where.domain) query.domain = where.domain;
+    const query = Environment.find();
 
-    return Environment.find(query, projection, options);
+    if (where.domain) query.where('domain', where.domain);
+    if (projection) query.projection(projection);
+    if (options) query.setOptions(options);
+
+    return query.exec();
 }
 
 export async function getTotalEnvByDomainId(domain) {
