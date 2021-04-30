@@ -33,7 +33,11 @@ export async function getTeamById(id) {
 }
 
 export async function getTeam(where) {
-    let team = await Team.findOne(where);
+    const query = Team.findOne();
+
+    if (where.roles) query.where('roles', where.roles);
+
+    let team = await query.exec();
     return response(team, 'Team not found');
 }
 

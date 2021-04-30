@@ -25,7 +25,12 @@ router.get('/metric/data/', [
 ], validate, auth, async (req, res) => {
     try {
         let { args } = buildMetricsFilter(req);
-        
+        const page = req.query.page.toString();
+
+        if (isNaN(page)) {
+            throw new Error('Page value should be a number');
+        }
+
         if (req.query.key) { 
             const config = await getConfig({ domain: req.query.domainid, key: req.query.key });
             if (config) {
@@ -33,10 +38,6 @@ router.get('/metric/data/', [
             } else {
                 return res.send();
             }
-        }
-
-        if (isNaN(req.query.page)) {
-            throw new Error('Page value should be a number');
         }
 
         const skip = parseInt((process.env.METRICS_MAX_PAGE * parseInt(req.query.page)) - process.env.METRICS_MAX_PAGE);
@@ -48,7 +49,7 @@ router.get('/metric/data/', [
             .populate({ path: 'config', select: 'key -_id' }).exec();
 
         res.send({
-            page: req.query.page,
+            page,
             data: metrics
         });
     } catch (e) {
