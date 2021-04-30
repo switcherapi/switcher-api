@@ -1,11 +1,11 @@
 import { validationResult } from 'express-validator';
-import { Config } from '../models/config';
-import { Environment } from '../models/environment';
-import Component from '../models/component';
 import { BadRequestError } from '../exceptions';
+import { getConfig } from '../controller/config';
+import { getComponents } from '../controller/component';
+import { getEnvironments } from '../controller/environment';
 
 export async function checkConfig(req, res, next) {
-    const config = await Config.findOne({ domain: req.domain, key: req.query.key }).lean();
+    const config = await getConfig({ domain: req.domain, key: req.query.key }, true);
 
     if (!config) {
         return res.status(404).send({ error: `Unable to load a key ${req.query.key}` });
@@ -16,7 +16,8 @@ export async function checkConfig(req, res, next) {
 }
 
 export async function checkConfigComponent(req, res, next) {
-    const componentFound = await Component.find({ _id: req.config.components, name: req.component });
+    const componentFound = await getComponents(
+        { _id: req.config.components, name: req.component });
     
     if (!componentFound.length) {
         return res.status(401).send({ error: `Component ${req.component} is not registered to ${req.config.key}` });
@@ -26,7 +27,7 @@ export async function checkConfigComponent(req, res, next) {
 }
 
 export async function checkEnvironmentStatusChange_v2(args, domain, field) {
-    const environment = await Environment.find({ domain }).select('name -_id');
+    const environment = await getEnvironments({ domain }, ['_id', 'name']);
     const updates = Object.keys(field || args);
     const isValidOperation = updates.every((update) => {
         return environment.filter((e) => e.name === update).length > 0;

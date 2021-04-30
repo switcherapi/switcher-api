@@ -25,6 +25,10 @@ export async function getRoles(where) {
     return Role.find(where).lean();
 }
 
+export async function getRole(where) {
+    return Role.findOne(where);
+}
+
 export async function createRole(args, teamId, admin) {
     const role = new Role({
         ...args

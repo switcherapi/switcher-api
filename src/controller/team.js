@@ -41,6 +41,17 @@ export async function getTeams(where, lean = false) {
     return lean ? Team.find(where).lean() : Team.find(where);
 }
 
+export async function getTeamsSort(where, projection, skip, limit, sort) {
+    return Team.find(where, projection,
+        {
+            skip: parseInt(skip),
+            limit: parseInt(limit),
+            sort: {
+                name: sort === 'desc' ? -1 : 1
+            }
+        }).lean();
+}
+
 export async function getTeamInviteById(id) {
     let teamInvite = await TeamInvite.findById(id);
     return response(teamInvite, 'Invite request not found');

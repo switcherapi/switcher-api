@@ -2,7 +2,6 @@ import express from 'express';
 import { auth } from '../middleware/auth';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { check, query } from 'express-validator';
-import Component from '../models/component';
 import * as Controller from '../controller/component';
 import { responseException } from '../exceptions';
 
@@ -37,7 +36,7 @@ router.get('/component/generateApiKey/:component/', [
 router.get('/component', [query('domain', 'Please, specify the \'domain\' id').isMongoId()], 
     validate, auth, async (req, res) => {
     try {
-        let components = await Component.find({ domain: req.query.domain },
+        let components = await Controller.getComponents({ domain: req.query.domain },
             ['_id', 'name', 'description'],
             {
                 skip: parseInt(req.query.skip),

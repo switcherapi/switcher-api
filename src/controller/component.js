@@ -9,8 +9,8 @@ export async function getComponentById(id) {
     return response(component, 'Component not found');
 }
 
-export async function getComponents(where) {
-    return Component.find(where);
+export async function getComponents(where, projection, options) {
+    return Component.find(where, projection, options);
 }
 
 export async function getTotalComponentsByDomainId(domain) {

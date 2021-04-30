@@ -1,6 +1,5 @@
 import express from 'express';
 import { check, query } from 'express-validator';
-import { Environment } from '../models/environment';
 import { auth } from '../middleware/auth';
 import { responseException } from '../exceptions';
 import { validate } from '../middleware/validators';
@@ -23,7 +22,7 @@ router.post('/environment/create', auth, async (req, res) => {
 router.get('/environment', [query('domain', 'Please, specify the \'domain\' id').isMongoId()], 
     validate, auth, async (req, res) => {
     try {
-        let environments = await Environment.find({ domain: req.query.domain },
+        let environments = await Controller.getEnvironments({ domain: req.query.domain },
             ['_id', 'name'],
             {
                 skip: parseInt(req.query.skip),
