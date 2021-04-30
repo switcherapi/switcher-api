@@ -61,14 +61,20 @@ router.get('/metric/statistics/', [
     check('statistics', 'add one or more options {swicthers,components,reasons,all} separed by comma').isLength({ min: 3 })
 ], validate, auth, async (req, res) => {
     try {
-        const { aggregatorFilter } = buildMetricsFilter(req);
+        const switcher = buildMetricsFilter(req);
+        const components = buildMetricsFilter(req);
+        const reasons = buildMetricsFilter(req);
+
         const dateGroupPattern =  req.query.dateGroupPattern ? 
             req.query.dateGroupPattern : 'YYYY-MM';
 
         if (req.query.key) { 
             const config = await getConfig({ domain: req.query.domainid, key: req.query.key });
             if (config) {
-                aggregatorFilter.$match.$expr.$and.push({ $eq: ['$config', config._id] });
+                const switcherId = { config: config._id };
+                switcher.aggregate.match(switcherId);
+                components.aggregate.match(switcherId);
+                reasons.aggregate.match(switcherId);
             } else {
                 return res.send();
             }
@@ -77,11 +83,11 @@ router.get('/metric/statistics/', [
         let result = {};
         await Promise.all([
             req.query.statistics.match(/(switchers)|(all)/) ?
-                aggregateSwitchers(aggregatorFilter, dateGroupPattern, result) : Promise.resolve(),
+                aggregateSwitchers(switcher.aggregate, dateGroupPattern, result) : Promise.resolve(),
             req.query.statistics.match(/(components)|(all)/) ?
-                aggregateComponents(aggregatorFilter, dateGroupPattern, result) : Promise.resolve(),
+                aggregateComponents(components.aggregate, dateGroupPattern, result) : Promise.resolve(),
             req.query.statistics.match(/(reasons)|(all)/) ?
-                aggreagateReasons(aggregatorFilter, result) : Promise.resolve()
+                aggreagateReasons(reasons.aggregate, result) : Promise.resolve()
         ]);
 
         res.send(result);

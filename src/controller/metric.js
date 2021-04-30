@@ -3,16 +3,13 @@ import { ObjectId } from 'mongodb';
 import { EnvType } from '../models/environment';
 import { Metric } from '../models/metric';
 
-export async function aggreagateReasons(aggregatorFilter, result) {
-    let reasonsAggregated = await Metric.aggregate([
-        aggregatorFilter,
-        {
-            $group: {
-                _id: { reason: '$reason' },
-                count: { $sum: 1 }
-            }
-        }
-    ]);
+export async function aggreagateReasons(aggregate, result) {
+    aggregate.group({
+        _id: { reason: '$reason' },
+        count: { $sum: 1 }
+    });
+
+    let reasonsAggregated = await Metric.aggregate(aggregate.pipeline()).exec();
 
     reasonsAggregated = reasonsAggregated.map(data => {
         return {
@@ -24,43 +21,35 @@ export async function aggreagateReasons(aggregatorFilter, result) {
     result.reasons = reasonsAggregated;
 }
 
-export async function aggregateComponents(aggregatorFilter, dateGroupPattern, result) {
-    let componentsAggregated = await Metric.aggregate([
-        aggregatorFilter,
-        {
-            $group: {
-                _id: { component: '$component', result: '$result', date: '$date' },
-                count: { $sum: 1 }
+export async function aggregateComponents(aggregate, dateGroupPattern, result) {
+    aggregate.group({
+        _id: { component: '$component', result: '$result', date: '$date' },
+        count: { $sum: 1 }
+    });
+
+    aggregate.lookup({
+        from: 'components',
+        localField: 'component',
+        foreignField: 'id',
+        as: 'components'
+    });
+
+    aggregate.project({
+        count: 1,
+        components: {
+            $filter: {
+                input: '$components',
+                as: 'component',
+                cond: { $eq: ['$$component.name', '$_id.component'] },
             }
-        },
-        {
-            $lookup: {
-                from: 'components',
-                localField: 'component',
-                foreignField: 'id',
-                as: 'components'
-            }
-        },
-        {
-            $project: {
-                count: 1,
-                components: {
-                    $filter: {
-                        input: '$components',
-                        as: 'component',
-                        cond: { $eq: ['$$component.name', '$_id.component'] },
-                    }
-                }
-            }
-        },
-        { $unwind: '$components' },
-        {
-            $project: {
-                count: 1
-            }
-        },
-        { $sort: { switchers: 1 } }
-    ]);
+        }
+    });
+
+    aggregate.unwind('$components');
+    aggregate.project({ count: 1 });
+    aggregate.sort({ switchers: 1 });
+
+    let componentsAggregated = await Metric.aggregate(aggregate.pipeline()).exec();
 
     componentsAggregated = componentsAggregated.map(data => {
         return {
@@ -74,45 +63,41 @@ export async function aggregateComponents(aggregatorFilter, dateGroupPattern, re
     result.components = buildStatistics(componentsAggregated, 'component');
 }
 
-export async function aggregateSwitchers(aggregatorFilter, dateGroupPattern, result) {
-    let switchersAggregated = await Metric.aggregate([
-        aggregatorFilter,
-        {
-            $group: {
-                _id: { config: '$config', result: '$result', date: '$date' },
-                count: { $sum: 1 }
+export async function aggregateSwitchers(aggregate, dateGroupPattern, result) {
+    aggregate.group({
+        _id: { config: '$config', result: '$result', date: '$date' },
+        count: { $sum: 1 }
+    });
+
+    aggregate.addFields({ 
+        convertedId: { 
+            $toObjectId: '$_id.config' 
+        } 
+    });
+
+    aggregate.lookup({
+        from: 'configs',
+        localField: 'config',
+        foreignField: 'id',
+        as: 'switchers'
+    });
+
+    aggregate.project({
+        count: 1,
+        switchers: {
+            $filter: {
+                input: '$switchers',
+                as: 'switcher',
+                cond: { $eq: ['$$switcher._id', '$convertedId'] },
             }
-        },
-        { $addFields: { convertedId: { $toObjectId: '$_id.config' } } },
-        {
-            $lookup: {
-                from: 'configs',
-                localField: 'config',
-                foreignField: 'id',
-                as: 'switchers'
-            }
-        },
-        {
-            $project: {
-                count: 1,
-                switchers: {
-                    $filter: {
-                        input: '$switchers',
-                        as: 'switcher',
-                        cond: { $eq: ['$$switcher._id', '$convertedId'] },
-                    }
-                }
-            }
-        },
-        { $unwind: '$switchers' },
-        {
-            $project: {
-                count: 1,
-                switchers: { key: 1 }
-            }
-        },
-        { $sort: { switchers: 1 } }
-    ]);
+        }
+    });
+
+    aggregate.unwind('$switchers');
+    aggregate.project({ count: 1, switchers: { key: 1 } });
+    aggregate.sort({ switchers: 1 });
+
+    let switchersAggregated = await Metric.aggregate(aggregate.pipeline()).exec();
 
     switchersAggregated = switchersAggregated.map(data => {
         return {
@@ -127,43 +112,46 @@ export async function aggregateSwitchers(aggregatorFilter, dateGroupPattern, res
 }
 
 export function buildMetricsFilter(req) {
-    let aggregatorFilter = { $match: { $expr: { $and: [] } } };
+    let aggregate = Metric.aggregate();
     let args = {};
 
     args.domain = req.query.domainid;
-    aggregatorFilter.$match.$expr.$and.push({ $eq: ['$domain', new ObjectId(req.query.domainid.toString())] });
+    aggregate.match({ domain: new ObjectId(req.query.domainid.toString()) });
 
     if (req.query.environment) {
         args.environment = req.query.environment;
-        aggregatorFilter.$match.$expr.$and.push({ $eq: ['$environment', req.query.environment.toString()] }); 
+        aggregate.match({ environment: req.query.environment.toString() });
     } else { 
         args.environment = EnvType.DEFAULT;
-        aggregatorFilter.$match.$expr.$and.push({ $eq: ['$environment', EnvType.DEFAULT] }); 
+        aggregate.match({ environment: EnvType.DEFAULT });
     }
+
     if (req.query.result) { 
         args.result = req.query.result;
-        aggregatorFilter.$match.$expr.$and.push({ $eq: ['$result', req.query.result === 'true'] }); 
+        aggregate.match({ result: req.query.result.toString() === 'true' });
     }
+
     if (req.query.component) { 
         args.component = req.query.component;
-        aggregatorFilter.$match.$expr.$and.push({ $eq: ['$component', req.query.component.toString()] }); 
+        aggregate.match({ component: req.query.component.toString() });
     }
+    
     if (req.query.group) { 
         args.group = req.query.group;
-        aggregatorFilter.$match.$expr.$and.push({ $eq: ['$group', req.query.group.toString()] }); 
+        aggregate.match({ group: req.query.group.toString() });
     }
 
     if (req.query.dateBefore && !req.query.dateAfter) { 
         args.date = { $lte: new Date(req.query.dateBefore) };
-        aggregatorFilter.$match.$expr.$and.push({ $lte: ['$date', new Date(req.query.dateBefore.toString())] });
+        aggregate.match({ date: { $lte: new Date(req.query.dateBefore.toString()) } });
     } else if (req.query.dateAfter && !req.query.dateBefore) { 
         args.date = { $gte: new Date(req.query.dateAfter) };
-        aggregatorFilter.$match.$expr.$and.push({ $gte: ['$date', new Date(req.query.dateAfter.toString())] });
+        aggregate.match({ date: { $gte: new Date(req.query.dateAfter.toString()) } });
     } else if (req.query.dateAfter && req.query.dateBefore) {
-        buildRangeDateFilter(req, args, aggregatorFilter);
+        buildRangeDateFilter(req, args, aggregate);
     }
 
-    return { aggregatorFilter, args };
+    return { args, aggregate };
 }
 
 export function buildStatistics(aggregatedData, dataKey, timeframe = false) {
@@ -198,7 +186,7 @@ export function buildStatistics(aggregatedData, dataKey, timeframe = false) {
 }
 
 
-export function buildRangeDateFilter(req, args, aggregatorFilter) {
+export function buildRangeDateFilter(req, args, aggregate) {
     // create interval when dates are the exactly the same
     if (req.query.dateAfter === req.query.dateBefore) {
         let dateAfter, dateBefore;
@@ -221,11 +209,11 @@ export function buildRangeDateFilter(req, args, aggregatorFilter) {
         }
 
         args.date = { $gte: dateAfter, $lte: dateBefore };
-        aggregatorFilter.$match.$expr.$and.push({ $lte: ['$date', dateBefore] });
-        aggregatorFilter.$match.$expr.$and.push({ $gte: ['$date', dateAfter] });
+        aggregate.match({ date: { $lte: dateBefore } });
+        aggregate.match({ date: { $gte: dateAfter } });
     } else {
         args.date = { $gte: new Date(req.query.dateAfter), $lte: new Date(req.query.dateBefore) };
-        aggregatorFilter.$match.$expr.$and.push({ $lte: ['$date', new Date(req.query.dateBefore)] });
-        aggregatorFilter.$match.$expr.$and.push({ $gte: ['$date', new Date(req.query.dateAfter)] });
+        aggregate.match({ date: { $lte: new Date(req.query.dateBefore) } });
+        aggregate.match({ date: { $gte: new Date(req.query.dateAfter) } });
     }
 }
