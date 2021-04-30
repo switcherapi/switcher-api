@@ -131,11 +131,11 @@ export function buildMetricsFilter(req) {
     let args = {};
 
     args.domain = req.query.domainid;
-    aggregatorFilter.$match.$expr.$and.push({ $eq: ['$domain', new ObjectId(req.query.domainid)] });
+    aggregatorFilter.$match.$expr.$and.push({ $eq: ['$domain', new ObjectId(req.query.domainid.toString())] });
 
     if (req.query.environment) {
         args.environment = req.query.environment;
-        aggregatorFilter.$match.$expr.$and.push({ $eq: ['$environment', req.query.environment] }); 
+        aggregatorFilter.$match.$expr.$and.push({ $eq: ['$environment', req.query.environment.toString()] }); 
     } else { 
         args.environment = EnvType.DEFAULT;
         aggregatorFilter.$match.$expr.$and.push({ $eq: ['$environment', EnvType.DEFAULT] }); 
@@ -146,19 +146,19 @@ export function buildMetricsFilter(req) {
     }
     if (req.query.component) { 
         args.component = req.query.component;
-        aggregatorFilter.$match.$expr.$and.push({ $eq: ['$component', req.query.component] }); 
+        aggregatorFilter.$match.$expr.$and.push({ $eq: ['$component', req.query.component.toString()] }); 
     }
     if (req.query.group) { 
         args.group = req.query.group;
-        aggregatorFilter.$match.$expr.$and.push({ $eq: ['$group', req.query.group] }); 
+        aggregatorFilter.$match.$expr.$and.push({ $eq: ['$group', req.query.group.toString()] }); 
     }
 
     if (req.query.dateBefore && !req.query.dateAfter) { 
         args.date = { $lte: new Date(req.query.dateBefore) };
-        aggregatorFilter.$match.$expr.$and.push({ $lte: ['$date', new Date(req.query.dateBefore)] });
+        aggregatorFilter.$match.$expr.$and.push({ $lte: ['$date', new Date(req.query.dateBefore.toString())] });
     } else if (req.query.dateAfter && !req.query.dateBefore) { 
         args.date = { $gte: new Date(req.query.dateAfter) };
-        aggregatorFilter.$match.$expr.$and.push({ $gte: ['$date', new Date(req.query.dateAfter)] });
+        aggregatorFilter.$match.$expr.$and.push({ $gte: ['$date', new Date(req.query.dateAfter.toString())] });
     } else if (req.query.dateAfter && req.query.dateBefore) {
         buildRangeDateFilter(req, args, aggregatorFilter);
     }
