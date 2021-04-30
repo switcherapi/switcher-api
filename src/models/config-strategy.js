@@ -123,7 +123,7 @@ export function strategyRequirements(strategy) {
     });
 
     return {
-        strategy,
+        strategy: foundStrategy,
         operationsAvailable,
         operationRequirements
     };
