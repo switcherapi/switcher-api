@@ -47,14 +47,13 @@ export async function createConfig(args, admin) {
     const group = await getGroupConfigById(args.group);
     await checkSwitcher(group);
 
-    const query = {
-        key: args.key, 
-        group: group._id, 
-        domain: group.domain
-    };
+    const query = Config.findOne();
+    query.where('key', args.key);
+    query.where('group', group._id);
+    query.where('domain', group.domain);
 
     // validates existing config
-    let config = await Config.findOne(query);
+    let config = await query.exec();
     if (config) {
         throw new BadRequestError(`Config ${config.key} already exist`);
     }
@@ -90,15 +89,14 @@ export async function deleteConfig(id, admin) {
 export async function updateConfig(id, args, admin) {
     let config = await getConfigById(id);
 
-    const query = {
-        key: args.key,
-        group: config.group, 
-        domain: config.domain 
-    };
-
     // validates existing switcher key 
     if (args.key) {
-        const duplicatedKey = await Config.findOne(query);
+        const query = Config.findOne();
+        query.where('key', args.key);
+        query.where('group', config.group);
+        query.where('domain', config.domain);
+
+        const duplicatedKey = await query.exec();
 
         if (duplicatedKey) {
             throw new BadRequestError(`Config ${args.key} already exist`);
