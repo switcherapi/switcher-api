@@ -26,7 +26,14 @@ export async function getRoles(where) {
 }
 
 export async function getRole(where) {
-    return Role.findOne(where);
+    const query = Role.findOne();
+
+    if (where._id) query.where('_id', where._id);
+    if (where.action) query.where('action', where.action);
+    if (where.active) query.where('active', where.active);
+    if (where.router) query.where('router', where.router);
+
+    return query.exec();
 }
 
 export async function createRole(args, teamId, admin) {

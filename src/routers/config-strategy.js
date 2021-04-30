@@ -95,9 +95,10 @@ router.delete('/configstrategy/history/:id', [
     }
 });
 
-router.get('/configstrategy/req/:strategy', auth, (req, res) => {
+router.get('/configstrategy/req/:strategy', [
+    check('strategy').isLength({ min: 1 })], validate, auth, (req, res) => {
     try {
-        res.send(strategyRequirements(req.params.strategy));
+        res.send(strategyRequirements(req.params.strategy.toString()));
     } catch (e) {
         responseException(res, e, 500);
     }

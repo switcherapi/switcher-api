@@ -5,10 +5,11 @@ import { getComponents } from '../controller/component';
 import { getEnvironments } from '../controller/environment';
 
 export async function checkConfig(req, res, next) {
-    const config = await getConfig({ domain: req.domain, key: req.query.key }, true);
+    const config = await getConfig({ domain: req.domain, key: req.query.key.toString() }, true);
 
     if (!config) {
-        return res.status(404).send({ error: `Unable to load a key ${req.query.key}` });
+        return res.status(404).send({ 
+            error: `Unable to load a key ${req.query.key.toString()}` });
     }
     
     req.config = config;
@@ -20,7 +21,8 @@ export async function checkConfigComponent(req, res, next) {
         { _id: req.config.components, name: req.component });
     
     if (!componentFound.length) {
-        return res.status(401).send({ error: `Component ${req.component} is not registered to ${req.config.key}` });
+        return res.status(401).send({ 
+            error: `Component ${req.component} is not registered to ${req.config.key}` });
     }
 
     next();

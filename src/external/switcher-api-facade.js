@@ -2,7 +2,7 @@ import { Switcher, checkNumeric, checkValue } from 'switcher-client';
 import { EnvType } from '../models/environment';
 import { FeatureUnavailableError } from '../exceptions';
 import { getDomainById, getTotalDomainsByOwner } from '../controller/domain';
-import { getGroupsByDomainId } from '../controller/group-config';
+import { getTotalGroupsByDomainId } from '../controller/group-config';
 import { getTotalConfigsByDomainId } from '../controller/config';
 import { getTotalComponentsByDomainId } from '../controller/component';
 import { getTotalEnvByDomainId } from '../controller/environment';
@@ -37,7 +37,7 @@ export async function checkGroup(domain) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
         return;
 
-    const total = await getGroupsByDomainId(domain._id);
+    const total = await getTotalGroupsByDomainId(domain._id);
     switcherFlagResult(await switcher.isItOn('ELEMENT_CREATION', [
         checkValue(`group#${domain.owner}`),
         checkNumeric(total)]), 'Group limit has been reached.');

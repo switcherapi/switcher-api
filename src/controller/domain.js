@@ -16,7 +16,13 @@ export async function getDomainById(id) {
 }
 
 export async function getDomain(where) {
-    let domain = await Domain.findOne(where);
+    const query = Domain.findOne();
+
+    if (where._id) query.where('_id', where._id);
+    if (where.owner) query.where('owner', where.owner);
+    if (where.transfer) query.where('transfer', where.transfer);
+    
+    let domain = await query.exec();
     return response(domain, 'Domain not found');
 }
 
