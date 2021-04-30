@@ -15,7 +15,13 @@ export async function getAdminById(id) {
 }
 
 export async function getAdmin(where) {
-    return Admin.findOne(where);
+    const query = Admin.findOne();
+
+    if (where._id) query.where('_id', where._id);
+    if (where.email) query.where('email', where.email);
+    if (where.token) query.where('token', where.token);
+
+    return query.exec();
 }
 
 export async function signUp(args, remoteAddress) {

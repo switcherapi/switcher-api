@@ -18,10 +18,21 @@ export async function getGroupConfigById(id) {
 }
 
 export async function getGroupConfigs(where) {
-    return GroupConfig.find(where);
+    const query = GroupConfig.find();
+    if (where.domain) query.where('domain', where.domain);
+    return query.exec();
 }
 
-export async function getGroupsByDomainId(domain) {
+export async function getGroupConfig(where) {
+    const query = GroupConfig.findOne();
+
+    if (where.domain) query.where('domain', where.domain);
+    if (where.name) query.where('name', where.name);
+    
+    return query.exec();
+}
+
+export async function getTotalGroupsByDomainId(domain) {
     await GroupConfig.find({ domain }).countDocuments();
 }
 
@@ -34,7 +45,7 @@ export async function createGroup(args, admin) {
     groupconfig.name = formatInput(groupconfig.name, { allowSpace: true });
 
     // validates existing group config
-    let group = await GroupConfig.findOne({ name: args.name, domain: args.domain });
+    let group = await getGroupConfig({ name: args.name, domain: args.domain });
     if (group) {
         throw new BadRequestError(`Group ${group.name} already exist`);
     }
@@ -67,7 +78,7 @@ export async function updateGroup(id, args, admin) {
     groupconfig.updatedBy = admin.email;
 
     if (args.name) {
-        let groupFound = await GroupConfig.findOne({ name: args.name, domain: groupconfig.domain });
+        let groupFound = await getGroupConfig({ name: args.name, domain: groupconfig.domain });
 
         if (groupFound) {
             throw new BadRequestError(`Group ${args.name} already exist`);
