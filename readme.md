@@ -59,7 +59,9 @@ Main features:
     "SWITCHER_API_URL": "http://localhost:3000",
     "SWITCHER_API_KEY": "[SWITCHER_API_KEY]",
     "SWITCHER_API_DOMAIN": "[SWITCHER_API_DOMAIN]",
-    "SWITCHER_API_ENVIRONMENT": "default"
+    "SWITCHER_API_ENVIRONMENT": "default",
+
+    "SWITCHER_SLACK_JWT_SECRET": [SWITCHER_SLACK_APP_SECRET]
   },
   "prod": {
   },

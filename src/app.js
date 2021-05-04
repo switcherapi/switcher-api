@@ -17,6 +17,7 @@ import configStrategyRouter from './routers/config-strategy';
 import metricRouter from './routers/metric';
 import teamRouter from './routers/team';
 import roleRouter from './routers/role';
+import slackRouter from './routers/slack';
 import schema from './client/schema';
 import { appAuth, auth } from './middleware/auth';
 
@@ -45,6 +46,7 @@ app.use(configStrategyRouter);
 app.use(metricRouter);
 app.use(teamRouter);
 app.use(roleRouter);
+app.use(slackRouter);
 
 /**
  * Client API - GraphQL
