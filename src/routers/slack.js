@@ -49,22 +49,7 @@ router.get('/slack/v1/findinstallation', [
     }
 });
 
-router.delete('/slack/v1/deleteinstallation', [
-    query('enterprise_id').exists(),
-    query('team_id').exists()
-], validate, slackAuth, async (req, res) => {
-    try {
-        const slack = await Controller.deleteSlack(
-            req.query.enterprise_id, req.query.team_id);
-
-        if (!slack) throw new NotFoundError();
-        res.send(slack);
-    } catch (e) {
-        responseException(res, e, 400);
-    }
-});
-
-router.delete('/slack/v1/deletebot', [
+router.delete('/slack/v1/installation', [
     query('enterprise_id').exists(),
     query('team_id').exists()
 ], validate, slackAuth, async (req, res) => {
