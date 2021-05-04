@@ -73,6 +73,16 @@ export async function appAuth(req, res, next) {
     }
 }
 
+export async function slackAuth(req, res, next) {
+    try {
+        const token = req.header('Authorization').replace('Bearer ', '');
+        jwt.verify(token, process.env.SWITCHER_SLACK_JWT_SECRET);
+        next();
+    } catch (e) {
+        res.status(401).send({ error: 'Invalid API token.' });
+    }
+}
+
 export async function appGenerateCredentials(req, res, next) {
     try {
         const key = req.header('switcher-api-key');
