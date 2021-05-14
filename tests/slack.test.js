@@ -4,7 +4,13 @@ import jwt from 'jsonwebtoken';
 import app from '../src/app';
 import * as Controller from '../src/controller/slack';
 import { mock1_slack_installation } from './fixtures/db_slack';
+import { EnvType } from '../src/models/environment';
 import Slack from '../src/models/slack';
+import { 
+    setupDatabase,
+    domainId
+} from './fixtures/db_api';
+import { TicketStatusType } from '../src/models/slack_ticket';
 
 afterAll(async () => {
     await Slack.deleteMany();
@@ -163,4 +169,116 @@ describe('Slack Installation', () => {
             .send().expect(422);
     });
 
+});
+
+describe('Slack Controller - Ticket', () => {
+    beforeAll(setupDatabase);
+
+    const ticket_fixture1 = {
+        environment: EnvType.DEFAULT,
+        group: 'Release 1',
+        switcher: 'MY_FEATURE1',
+        status: true,
+        observations: 'Success'
+    };
+
+    const buildInstallation = async (team_id, domain) => {
+        const installation = Object.assign({}, mock1_slack_installation);
+        installation.domain = domain;
+        installation.team_id = team_id;
+        installation.bot_payload.app_id = 'APP_ID';
+        await Controller.createSlackInstallation(installation);
+        return installation;
+    };
+
+    test('SLACK_SUITE - Should authorize Domain', async () => {
+        //given
+        const installation = await buildInstallation('SHOULD_AUTHORIZE_DOMAIN', null);
+
+        //test
+        const slack = await Controller.authorizeSlackInstallation(
+            domainId, null, installation.team_id);
+
+        expect(slack.domain).toBe(domainId);
+    });
+
+    test('SLACK_SUITE - Should NOT authorize Domain - Domain not found', async () => {
+        //given
+        const installation = await buildInstallation('SHOULD_AUTHORIZE_DOMAIN', null);
+
+        //test
+        const call = async () => {
+            await Controller.authorizeSlackInstallation(
+                new mongoose.Types.ObjectId(), null, installation.team_id);
+        }; 
+
+        await expect(call()).rejects.toThrowError('Domain not found');
+    });
+
+    test('SLACK_SUITE - Should create a new Ticket', async () => {
+        //given
+        const installation = await buildInstallation('SHOULD_CREATE_TICKET', domainId);
+
+        //test
+        const slack = await Controller.createTicket(
+            ticket_fixture1, null, installation.team_id);
+        expect(slack.tickets[0]).toMatchObject(ticket_fixture1);
+    });
+
+    test('SLACK_SUITE - Should process a Ticket - Approved', async () => {
+        //given
+        const installation = await buildInstallation('SHOULD_PROCESS_TICKET_OK', domainId);
+        let slack = await Controller.createTicket(
+            ticket_fixture1, null, installation.team_id);
+
+        //test
+        slack = await Controller.processTicket(
+            null, installation.team_id, slack.tickets[0].id, true);
+
+        expect(slack.tickets[0].ticket_approvals).toEqual(1);
+        expect(slack.tickets[0].ticket_status).toBe(TicketStatusType.APPROVED);
+        expect(slack.tickets[0].date_closed).not.toBe(null);
+    });
+
+    test('SLACK_SUITE - Should process a Ticket - Denied', async () => {
+        //given
+        const installation = await buildInstallation('SHOULD_PROCESS_TICKET_NOK', domainId);
+        let slack = await Controller.createTicket(
+            ticket_fixture1, null, installation.team_id);
+
+        //test
+        slack = await Controller.processTicket(
+            null, installation.team_id, slack.tickets[0].id, false);
+
+        expect(slack.tickets[0].ticket_approvals).toEqual(0);
+        expect(slack.tickets[0].ticket_status).toBe(TicketStatusType.DENIED);
+        expect(slack.tickets[0].date_closed).not.toBe(null);
+    });
+
+    test('SLACK_SUITE - Should NOT process a Ticket - Domain not found', async () => {
+        //given
+        const installation = await buildInstallation(
+            'SHOULD_NOT_PROCESS_TICKET_DOMAIN', new mongoose.Types.ObjectId());
+
+        //test
+        const call = async () => {
+            await Controller.processTicket(
+                null, installation.team_id, new mongoose.Types.ObjectId(), true);
+        }; 
+
+        await expect(call()).rejects.toThrowError('Domain not found');
+    });
+
+    test('SLACK_SUITE - Should NOT process a Ticket - Ticket not found', async () => {
+        //given
+        const installation = await buildInstallation('SHOULD_NOT_PROCESS_TICKET', domainId);
+
+        //test
+        const call = async () => {
+            await Controller.processTicket(
+                null, installation.team_id, new mongoose.Types.ObjectId(), true);
+        }; 
+
+        await expect(call()).rejects.toThrowError('Ticket not found');
+    });
 });

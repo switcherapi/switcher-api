@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
+import { slackTicketSchema } from './slack_ticket';
 
 const slackSchema = new mongoose.Schema({
     user_id: {
@@ -12,6 +13,10 @@ const slackSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    domain: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Domain'
+    },
     enterprise_id: {
         type: String,
         trim: true
@@ -21,7 +26,15 @@ const slackSchema = new mongoose.Schema({
     },
     bot_payload: {
         type: Object
-    }
+    },
+    settings: {
+        approvals: {
+            type: Number,
+            required: true,
+            default: 1
+        }
+    },
+    tickets: [slackTicketSchema]
 }, {
     timestamps: true
 });
