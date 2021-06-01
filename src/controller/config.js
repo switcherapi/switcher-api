@@ -30,11 +30,14 @@ export async function getConfig(where, lean = false) {
     return query.exec();
 }
 
-export async function getConfigs(where) {
+export async function getConfigs(where, lean = false) {
     const query = Config.find();
 
+    if (where.key) query.where('key', where.key);
     if (where.domain) query.where('domain', where.domain);
+    if (where.group) query.where('group', where.group);
     if (where.components) query.where('components', where.components);
+    if (lean) query.lean();
 
     return query.exec();
 }

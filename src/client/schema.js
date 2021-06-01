@@ -3,7 +3,7 @@ import { domainType, flatConfigurationType } from './configuration-type';
 import { EnvType } from '../models/environment';
 import { strategyInputType, criteriaType } from './criteria-type';
 import { resolveConfigByKey, resolveDomain } from './resolvers';
-import { resolveFlatConfigurationByConfig, resolveFlatConfigurationTypeByGroup } from './configuration-resolvers';
+import { resolveConfigByConfig, resolveGroup } from './configuration-resolvers';
 
 const queryType = new GraphQLObjectType({
     name: 'Query',
@@ -81,12 +81,14 @@ const queryType = new GraphQLObjectType({
                     context.environment = environment;
                     context.domain = context.domain || domain;
                     if (key) {
-                        return resolveFlatConfigurationByConfig(key, context.domain);
+                        return resolveConfigByConfig(key, context.domain);
                     }
 
                     if (group) {
-                        return resolveFlatConfigurationTypeByGroup(group, context.domain);
+                        return resolveGroup(context.domain, group);
                     }
+
+                    return resolveGroup(context.domain);
                 }
             }
         },

@@ -12,22 +12,26 @@ async function verifyGroupInput(groupId, admin) {
     return verifyOwnership(admin, groupconfig, groupconfig.domain, ActionTypes.UPDATE, RouterTypes.GROUP);
 }
 
-export async function getGroupConfigById(id) {
-    let group = await GroupConfig.findById(id);
+export async function getGroupConfigById(id, lean = false) {
+    let group = await GroupConfig.findById(id, null, { lean });
     return response(group, 'Group Config not found');
 }
 
-export async function getGroupConfigs(where) {
+export async function getGroupConfigs(where, lean = false) {
     const query = GroupConfig.find();
     if (where.domain) query.where('domain', where.domain);
+    if (where.name) query.where('name', where.name);
+    if (lean) query.lean();
+    
     return query.exec();
 }
 
-export async function getGroupConfig(where) {
+export async function getGroupConfig(where, lean = false) {
     const query = GroupConfig.findOne();
 
     if (where.domain) query.where('domain', where.domain);
     if (where.name) query.where('name', where.name);
+    if (lean) query.lean();
     
     return query.exec();
 }

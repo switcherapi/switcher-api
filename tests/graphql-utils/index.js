@@ -278,4 +278,17 @@ export const expected109 = `
     "group":[
         {"name":"Group Test","description":"Test Group","statusByEnv":[{"env":"default","value":true}]}],
         "config":[
-            {"key":"TEST_CONFIG_KEY","description":"Test config 1","statusByEnv":[{"env":"default","value":true}]}],"strategies":null}}}`;
+            {"key":"TEST_CONFIG_KEY","description":"Test config 1","statusByEnv":[{"env":"default","value":true}]}
+        ],
+        "strategies":null}}}`;
+
+export const expected110 = `
+    {"data":
+    {"configuration":{"domain":{"name":"Domain","description":"Test Domain","activated":true,"statusByEnv":[{"env":"default","value":true}]},
+    "group":[
+        {"name":"Group Test","description":"Test Group","activated":true,"statusByEnv":[{"env":"default","value":true}]}],
+        "config":[
+            {"key":"TEST_CONFIG_KEY","description":"Test config 1","activated":true,"statusByEnv":[{"env":"default","value":true}]},
+            {"key":"TEST_CONFIG_KEY_PRD_QA","description":"Test config 2 - Off in PRD and ON in QA","activated":false,"statusByEnv":[{"env":"default","value":false},{"env":"QA","value":true}]}
+        ],
+        "strategies":null}}}`;
