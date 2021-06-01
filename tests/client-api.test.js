@@ -860,6 +860,19 @@ describe('Testing domain [Adm-GraphQL] ', () => {
             });
     });
 
+    test('CLIENT_SUITE - Should return domain Flat-structure - By domain', (done) => {
+        request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send(graphqlUtils.configurationQuery([
+                ['domain', domainId]]))
+            .expect(200)
+            .end((err, res) => {
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected110));
+                done();
+            });
+    });
+
     test('CLIENT_SUITE - Should NOT return domain structure for an excluded team member', async (done) => {
         //given
         const admin = await Admin.findById(adminAccountId);

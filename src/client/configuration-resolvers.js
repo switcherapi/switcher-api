@@ -1,13 +1,13 @@
-import { Config } from '../models/config';
-import GroupConfig from '../models/group-config';
 import Domain from '../models/domain';
 import Component from '../models/component';
 import { ConfigStrategy } from '../models/config-strategy';
 import { verifyOwnership } from '../routers/common';
 import { ActionTypes, RouterTypes } from '../models/role';
+import { getGroupConfigById, getGroupConfigs } from '../controller/group-config';
+import { getConfigs } from '../controller/config';
 
-export async function resolveFlatConfigurationByConfig(key, domainId) {
-    const config = await Config.find({ key, domain: domainId }).lean();
+export async function resolveConfigByConfig(key, domainId) {
+    const config = await getConfigs({ key, domain: domainId }, true);
     if (config.length > 0) {
         return { config };
     } else {
@@ -15,8 +15,15 @@ export async function resolveFlatConfigurationByConfig(key, domainId) {
     }
 }
 
-export async function resolveFlatConfigurationTypeByGroup(groupConfig, domainId) {
-    const group = await GroupConfig.find({ name: groupConfig, domain: domainId }).lean();
+export async function resolveGroup(domainId, groupConfig = undefined) {
+    let query = {
+        domain: domainId
+    };
+
+    if (groupConfig) 
+        query.name = groupConfig;
+
+    const group = await getGroupConfigs(query, true);
     if (group.length > 0) {
         return { group };
     } else {
@@ -53,7 +60,7 @@ export async function resolveFlatConfig(source, context) {
         configs = source.config;
         domainId = configs[0].domain;
     } else if (source.group) {
-        configs = await Config.find({ group: source.group[0]._id }).lean();
+        configs = await getConfigs({ group: source.group.map(g => g._id) }, true);
         domainId = source.group[0].domain;
     }
 
@@ -73,7 +80,7 @@ export async function resolveFlatGroupConfig(source, context) {
     let group;
 
     if (source.config) {
-        group =  await GroupConfig.find({ _id: source.config[0].group }).lean();
+        group = [await getGroupConfigById(source.config[0].group, true)];
     } else if (source.group) {
         group = source.group;
     }
