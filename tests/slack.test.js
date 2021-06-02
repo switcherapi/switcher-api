@@ -8,6 +8,7 @@ import { EnvType } from '../src/models/environment';
 import Slack from '../src/models/slack';
 import { 
     setupDatabase,
+    adminMasterAccountToken,
     domainId
 } from './fixtures/db_api';
 import { TicketStatusType } from '../src/models/slack_ticket';
@@ -27,7 +28,17 @@ const generateToken = (expiresIn) => {
     });
 };
 
+const buildInstallation = async (team_id, domain) => {
+    const installation = Object.assign({}, mock1_slack_installation);
+    installation.domain = domain;
+    installation.team_id = team_id;
+    installation.bot_payload.app_id = 'APP_ID';
+    await Controller.createSlackInstallation(installation);
+    return installation;
+};
+
 describe('Slack Installation', () => {
+    beforeAll(setupDatabase);
 
     test('SLACK_SUITE - Should save installation', async () => {
         const response = await request(app)
@@ -75,6 +86,51 @@ describe('Slack Installation', () => {
             .post('/slack/v1/installation')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send(slack).expect(422);
+    });
+
+    test('SLACK_SUITE - Should authorize installation', async () => {
+        //given
+        const installation = await buildInstallation('SHOULD_AUTHORIZE_DOMAIN', null);
+
+        //test
+        const response = await request(app)
+            .post('/slack/v1/authorize')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                domain: domainId,
+                team_id: installation.team_id
+            }).expect(200);
+
+        expect(response.body.domain).toBe(String(domainId));
+    });
+
+    test('SLACK_SUITE - Should NOT authorize installation - Invalid Domain Id', async () => {
+        await request(app)
+            .post('/slack/v1/authorize')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                domain: 'INVALID_DOMAIN',
+                team_id: 'team_id'
+            }).expect(422);
+    });
+
+    test('SLACK_SUITE - Should NOT authorize installation - Domain Id not found', async () => {
+        await request(app)
+            .post('/slack/v1/authorize')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                domain: new mongoose.Types.ObjectId(),
+                team_id: 'team_id'
+            }).expect(404);
+    });
+
+    test('SLACK_SUITE - Should NOT authorize installation - Team Id is missing', async () => {
+        await request(app)
+            .post('/slack/v1/authorize')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                domain: domainId
+            }).expect(422);
     });
 
     test('SLACK_SUITE - Should find bot', async () => {
@@ -182,22 +238,15 @@ describe('Slack Controller - Ticket', () => {
         observations: 'Success'
     };
 
-    const buildInstallation = async (team_id, domain) => {
-        const installation = Object.assign({}, mock1_slack_installation);
-        installation.domain = domain;
-        installation.team_id = team_id;
-        installation.bot_payload.app_id = 'APP_ID';
-        await Controller.createSlackInstallation(installation);
-        return installation;
-    };
-
     test('SLACK_SUITE - Should authorize Domain', async () => {
         //given
         const installation = await buildInstallation('SHOULD_AUTHORIZE_DOMAIN', null);
 
         //test
-        const slack = await Controller.authorizeSlackInstallation(
-            domainId, null, installation.team_id);
+        const slack = await Controller.authorizeSlackInstallation({
+            domain: domainId,
+            team_id: installation.team_id
+        });
 
         expect(slack.domain).toBe(domainId);
     });
@@ -208,8 +257,10 @@ describe('Slack Controller - Ticket', () => {
 
         //test
         const call = async () => {
-            await Controller.authorizeSlackInstallation(
-                new mongoose.Types.ObjectId(), null, installation.team_id);
+            await Controller.authorizeSlackInstallation({
+                domain: new mongoose.Types.ObjectId(),
+                team_id: installation.team_id
+            });
         }; 
 
         await expect(call()).rejects.toThrowError('Domain not found');

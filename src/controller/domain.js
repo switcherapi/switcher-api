@@ -10,8 +10,8 @@ import { ActionTypes, RouterTypes } from '../models/role';
 import { formatInput, removeDomainStatus, verifyOwnership } from '../routers/common';
 import { response } from './common';
 
-export async function getDomainById(id) {
-    let domain = await Domain.findById(id);
+export async function getDomainById(id, lean = false) {
+    let domain = await Domain.findById(id, null, { lean });
     return response(domain, 'Domain not found');
 }
 

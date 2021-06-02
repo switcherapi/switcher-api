@@ -1,12 +1,12 @@
-import Domain from '../models/domain';
-import Component from '../models/component';
-import { ConfigStrategy } from '../models/config-strategy';
 import { verifyOwnership } from '../routers/common';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { getGroupConfigById, getGroupConfigs } from '../controller/group-config';
 import { getConfigs } from '../controller/config';
+import { getStrategies } from '../controller/config-strategy';
 import { getEnvironments } from '../controller/environment';
 import { getSlack } from '../controller/slack';
+import { getDomainById } from '../controller/domain';
+import { getComponents } from '../controller/component';
 
 async function resolveConfigByConfig(key, domainId) {
     const config = await getConfigs({ key, domain: domainId }, true);
@@ -76,7 +76,7 @@ export async function resolveFlatConfigStrategy(source, context) {
     let strategies;
 
     if (source.config) {
-        strategies = await ConfigStrategy.find({ config: source.config[0]._id }).lean();
+        strategies = await getStrategies({ config: source.config[0]._id }, true);
     } else {
         return null;
     }
@@ -142,7 +142,7 @@ export async function resolveFlatDomain(source, context) {
     let domain;
 
     if (context.domain) {
-        domain = await Domain.findById(context.domain).lean();
+        domain = await getDomainById(context.domain, true);
     }
 
     try {
@@ -158,6 +158,6 @@ export async function resolveFlatDomain(source, context) {
 }
 
 export async function resolveComponents(source) {
-    const components = await Component.find( { _id: { $in: source.components } });
+    const components = await getComponents({ _id: { $in: source.components } });
     return components.length ? components.map(component => component.name) : [];
 }
