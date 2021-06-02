@@ -1,7 +1,7 @@
 import express from 'express';
 import { check, query } from 'express-validator';
 import { NotFoundError, responseException } from '../exceptions';
-import { slackAuth } from '../middleware/auth';
+import { auth, slackAuth } from '../middleware/auth';
 import * as Controller from '../controller/slack';
 import { validate } from '../middleware/validators';
 
@@ -14,6 +14,18 @@ router.post('/slack/v1/installation', [
     try {
         const slackInstallation = await Controller.createSlackInstallation(req.body);
         res.status(201).send(slackInstallation);
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+});
+
+router.post('/slack/v1/authorize', [
+    check('domain').isMongoId(),
+    check('team_id').exists()
+], validate, auth, async (req, res) => {
+    try {
+        const slackInstallation = await Controller.authorizeSlackInstallation(req.body);
+        res.status(200).send(slackInstallation);
     } catch (e) {
         responseException(res, e, 400);
     }

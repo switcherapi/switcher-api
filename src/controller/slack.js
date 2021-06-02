@@ -33,8 +33,8 @@ export async function createSlackInstallation(args) {
     return slackInstallation.save();
 }
 
-export async function authorizeSlackInstallation(domain, enterprise_id, team_id) {
-    const slack = await getSlackOrError(enterprise_id, team_id);
+export async function authorizeSlackInstallation({ domain, team_id }) {
+    const slack = await getSlackOrError(undefined, team_id);
     await getDomainById(domain);
     slack.domain = domain;
     return slack.save();
