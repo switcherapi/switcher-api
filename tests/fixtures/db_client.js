@@ -12,6 +12,7 @@ import { Environment, EnvType } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
 import { ActionTypes, RouterTypes, Role } from '../../src/models/role';
 import { Team } from '../../src/models/team';
+import Slack from '../../src/models/slack';
 
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test_secret';
 
@@ -179,6 +180,13 @@ export const team = {
     roles: [roleConfigsId]
 };
 
+export const slack = {
+    _id: new mongoose.Types.ObjectId(),
+    team_id: 'TEAM_ID',
+    user_id: 'USER_ID',
+    domain: domainId
+};
+
 export const setupDatabase = async () => {
     await ConfigStrategy.deleteMany();
     await Config.deleteMany();
@@ -191,6 +199,7 @@ export const setupDatabase = async () => {
     await History.deleteMany();
     await Metric.deleteMany();
 
+    await Slack.deleteMany();
     await Team.deleteMany();
     await Role.deleteMany();
 
@@ -207,6 +216,7 @@ export const setupDatabase = async () => {
     await new Environment(environment1).save();
     await new Environment(environment2).save();
 
+    await new Slack(slack).save();
     await new Team(team).save();
     await new Role(roleConfigs).save();
 

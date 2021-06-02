@@ -1,13 +1,15 @@
-export const configurationQuery = (where) => {
+export const configurationQuery = (
+    where, domain = true, group = true, config = true, strategy = true, env = false) => {
     const query = `${where.map(input => `${input[0]}: "${input[1]}"`)}`;
     return { 
         query: `
             {
                 configuration(${query}) {
-                    domain { name description activated statusByEnv { env value } }
-                    group { name description activated statusByEnv { env value } }
-                    config { key description activated statusByEnv { env value } }
-                    strategies { strategy activated operation values statusByEnv { env value } }
+                    ${domain ? 'domain { name description activated statusByEnv { env value } }' : ''}
+                    ${group ? 'group { name description activated statusByEnv { env value } }' : ''}
+                    ${config ? 'config { key description activated statusByEnv { env value } }' : ''}
+                    ${strategy ? 'strategies { strategy activated operation values statusByEnv { env value } }' : ''}
+                    ${env ? 'environments' : ''}
                 }
             }  
     `};
@@ -292,3 +294,6 @@ export const expected110 = `
             {"key":"TEST_CONFIG_KEY_PRD_QA","description":"Test config 2 - Off in PRD and ON in QA","activated":false,"statusByEnv":[{"env":"default","value":false},{"env":"QA","value":true}]}
         ],
         "strategies":null}}}`;
+
+export const expected111 = `
+    {"data":{"configuration":{"environments":["default","QA"]}}}`;

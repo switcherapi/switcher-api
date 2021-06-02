@@ -44,6 +44,147 @@
 			"response": []
 		},
 		{
+			"name": "Switcher Slack - Installation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "localhost:5000/switcher_api/saveinstallation",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"switcher_api",
+						"saveinstallation"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Switcher Slack - Find Bot",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "localhost:5000/switcher_api/findbot",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"switcher_api",
+						"findbot"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Switcher Slack - Find Installation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "localhost:5000/switcher_api/findinstallation",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"switcher_api",
+						"findinstallation"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Admin - Signup",
 			"event": [
 				{
@@ -4714,7 +4855,7 @@
 			"response": []
 		},
 		{
-			"name": "Client - Configuration Flat (GraphQL)",
+			"name": "Client - Configuration (GraphQL)",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -4748,14 +4889,14 @@
 			"response": []
 		},
 		{
-			"name": "Client - Configuration Flat (Adm-GraphQL)",
+			"name": "Client - Configuration (Adm-GraphQL)",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "{\r\n    configuration(domain: \"5e0ece606f4f994eac9007ae\", group: \"Project 2\") {\r\n    # configuration(domain: \"5e0ece606f4f994eac9007ae\", key: \"FEATURE01\", environment: \"default\") {\r\n    # configuration(domain: \"5e4f9d8966e06b59c8254500\", key: \"FEATURE01\", environment: \"default\") {\r\n        domain {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        group {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        config {\r\n            key\r\n            description\r\n            activated\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n}",
+						"query": "{\r\n    configuration(domain: \"5e0ece606f4f994eac9007ae\") {\r\n    # configuration(domain: \"5e0ece606f4f994eac9007ae\", group: \"Project 2\") {\r\n    # configuration(domain: \"5e0ece606f4f994eac9007ae\", group: \"Release 1\") {\r\n    # configuration(domain: \"5e0ece606f4f994eac9007ae\", key: \"FEATURE01\", environment: \"default\") {\r\n    # configuration(domain: \"5e4f9d8966e06b59c8254500\", key: \"FEATURE01\", environment: \"default\") {\r\n        domain {\r\n            name\r\n            activated\r\n        }\r\n        group {\r\n            name\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n        }\r\n        config {\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
 						"variables": ""
 					}
 				},
@@ -4772,7 +4913,79 @@
 			"response": []
 		},
 		{
-			"name": "Client - Configuration Flat by Group (GraphQL)",
+			"name": "Client - Configuration (Slack-GraphQL) - Env",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "{\r\n    configuration(slack_team_id: \"TUW2RH760\") {\r\n    # configuration(slack_team_id: \"T02183P97NZ\") {\r\n        environments\r\n    }\r\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{url}}/adm-graphql",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"adm-graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Client - Configuration (Slack-GraphQL) - Groups",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "{\r\n    configuration(slack_team_id: \"TUW2RH760\", environment: \"development\") {\r\n        group {\r\n            name\r\n            activated\r\n        }\r\n    }\r\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{url}}/adm-graphql",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"adm-graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Client - Configuration (Salck-GraphQL) - Configs",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "{\r\n    configuration(slack_team_id: \"TUW2RH760\", environment: \"default\", group: \"Release 1\") {\r\n        config {\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "{{url}}/adm-graphql",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"adm-graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Client - Configuration by Group (GraphQL)",
 			"request": {
 				"auth": {
 					"type": "bearer",
