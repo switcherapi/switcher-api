@@ -25,7 +25,8 @@ import {
     domainDocument,
     configStrategyUSERId,
     component1,
-    adminAccountId
+    adminAccountId,
+    slack
 } from './fixtures/db_client';
 
 const changeStrategy = async (strategyId, newOperation, status, environment) => {
@@ -869,6 +870,19 @@ describe('Testing domain [Adm-GraphQL] ', () => {
             .expect(200)
             .end((err, res) => {
                 expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected110));
+                done();
+            });
+    });
+
+    test('CLIENT_SUITE - Should return environments Flat-structure - By Slack Team ID', (done) => {
+        request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send(graphqlUtils.configurationQuery([
+                ['slack_team_id', slack.team_id]], false, false, false, false, true))
+            .expect(200)
+            .end((err, res) => {
+                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected111));
                 done();
             });
     });

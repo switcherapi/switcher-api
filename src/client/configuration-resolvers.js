@@ -5,8 +5,10 @@ import { verifyOwnership } from '../routers/common';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { getGroupConfigById, getGroupConfigs } from '../controller/group-config';
 import { getConfigs } from '../controller/config';
+import { getEnvironments } from '../controller/environment';
+import { getSlack } from '../controller/slack';
 
-export async function resolveConfigByConfig(key, domainId) {
+async function resolveConfigByConfig(key, domainId) {
     const config = await getConfigs({ key, domain: domainId }, true);
     if (config.length > 0) {
         return { config };
@@ -15,7 +17,7 @@ export async function resolveConfigByConfig(key, domainId) {
     }
 }
 
-export async function resolveGroup(domainId, groupConfig = undefined) {
+async function resolveGroup(domainId, groupConfig = undefined) {
     let query = {
         domain: domainId
     };
@@ -29,6 +31,45 @@ export async function resolveGroup(domainId, groupConfig = undefined) {
     } else {
         return undefined;
     }
+}
+
+async function resolveSlackInstallation(args) {
+    const slack = await getSlack(null, args.slack_team_id);
+
+    if (slack) {
+        args.domain = slack.domain;
+    }
+}
+
+export async function resolveConfiguration(args, context) {
+    if (args.environment) {
+        context.environment = args.environment;
+    }
+
+    if (args.slack_team_id) {
+        await resolveSlackInstallation(args);
+    }
+
+    if (context.domain || args.domain) {
+        context.environment = args.environment;
+        context.domain = context.domain || args.domain;
+        if (args.key) {
+            return resolveConfigByConfig(args.key, context.domain);
+        }
+
+        if (args.group) {
+            return resolveGroup(context.domain, args.group);
+        }
+
+        return resolveGroup(context.domain);
+    }
+}
+
+export async function resolveFlatEnv(context) {
+    const environments = await getEnvironments(
+        { domain: context.domain }, null, { lean: true });
+        
+    return environments.map(e => e.name);
 }
 
 export async function resolveFlatConfigStrategy(source, context) {

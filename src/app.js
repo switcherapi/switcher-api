@@ -19,7 +19,7 @@ import teamRouter from './routers/team';
 import roleRouter from './routers/role';
 import slackRouter from './routers/slack';
 import schema from './client/schema';
-import { appAuth, auth } from './middleware/auth';
+import { appAuth, auth, slackAuth } from './middleware/auth';
 
 const app = express();
 
@@ -49,7 +49,7 @@ app.use(roleRouter);
 app.use(slackRouter);
 
 /**
- * Client API - GraphQL
+ * Component: Client API - GraphQL
  */
 app.use('/graphql', appAuth, graphqlHTTP({
     schema,
@@ -57,9 +57,17 @@ app.use('/graphql', appAuth, graphqlHTTP({
 }));
 
 /**
- * Client API - GraphQL
+ * Admin: Client API - GraphQL
  */
 app.use('/adm-graphql', auth, graphqlHTTP({
+    schema,
+    graphiql: true
+}));
+
+/**
+ * Slack: Client API - GraphQL
+ */
+ app.use('/slack-graphql', slackAuth, graphqlHTTP({
     schema,
     graphiql: true
 }));

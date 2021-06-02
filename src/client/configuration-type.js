@@ -1,7 +1,14 @@
 import { resolveConfigStrategy, resolveConfig, resolveGroupConfig, resolveEnvStatus } from './resolvers';
 import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLFloat } from 'graphql';
 import { EnvType } from '../models/environment';
-import { resolveFlatDomain, resolveFlatGroupConfig, resolveFlatConfig, resolveFlatConfigStrategy, resolveComponents } from './configuration-resolvers';
+import { 
+    resolveFlatDomain, 
+    resolveFlatGroupConfig, 
+    resolveFlatConfig, 
+    resolveFlatConfigStrategy, 
+    resolveComponents, 
+    resolveFlatEnv 
+} from './configuration-resolvers';
 
 const envStatus = new GraphQLObjectType({
     name: 'EnvStatus',
@@ -11,7 +18,7 @@ const envStatus = new GraphQLObjectType({
         },
         value: { 
             type: GraphQLBoolean
-         }
+        }
     }
 });
 
@@ -231,6 +238,12 @@ export const flatConfigurationType = new GraphQLObjectType({
             type: GraphQLList(strategyType),
             resolve: async (source, args, context) => {
                 return resolveFlatConfigStrategy(source, context);
+            }
+        },
+        environments: {
+            type: GraphQLList(GraphQLString),
+            resolve: async (source, args, context) => {
+                return resolveFlatEnv(context);
             }
         }
     }
