@@ -22,6 +22,13 @@ export async function getStrategyById(id) {
     return response(strategy, 'Strategy not found');
 }
 
+export async function getStrategies(where, lean = false) {
+    const query = ConfigStrategy.find();
+    if (where.config) query.where('config', where.config);
+    if (lean) query.lean();
+    return query.exec();
+}
+
 export async function createStrategy(args, admin) {
     const config = await getConfigById(args.config);
 
