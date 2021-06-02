@@ -3,7 +3,7 @@ import { domainType, flatConfigurationType } from './configuration-type';
 import { EnvType } from '../models/environment';
 import { strategyInputType, criteriaType } from './criteria-type';
 import { resolveConfigByKey, resolveDomain } from './resolvers';
-import { resolveConfigByConfig, resolveGroup } from './configuration-resolvers';
+import { resolveConfiguration } from './configuration-resolvers';
 
 const queryType = new GraphQLObjectType({
     name: 'Query',
@@ -70,26 +70,13 @@ const queryType = new GraphQLObjectType({
                 },
                 environment: {
                     type: GraphQLString
+                },
+                slack_team_id: {
+                    type: GraphQLString
                 }
             },
-            resolve: async (source, { domain, group, key, environment }, context) => {
-                if (environment) {
-                    context.environment = environment;
-                }
-
-                if (context.domain || domain) {
-                    context.environment = environment;
-                    context.domain = context.domain || domain;
-                    if (key) {
-                        return resolveConfigByConfig(key, context.domain);
-                    }
-
-                    if (group) {
-                        return resolveGroup(context.domain, group);
-                    }
-
-                    return resolveGroup(context.domain);
-                }
+            resolve: async (source, args, context) => {
+                return resolveConfiguration(args, context);
             }
         },
     }
