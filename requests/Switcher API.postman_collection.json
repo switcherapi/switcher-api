@@ -4398,6 +4398,38 @@
 			"response": []
 		},
 		{
+			"name": "Slack -  Installation Info",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/slack/v1/installation/5e0ece606f4f994eac9007ae",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"slack",
+						"v1",
+						"installation",
+						"5e0ece606f4f994eac9007ae"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Slack -  Ticket History Reset",
 			"request": {
 				"method": "POST",
