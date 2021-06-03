@@ -4398,6 +4398,93 @@
 			"response": []
 		},
 		{
+			"name": "Slack -  Ticket History Reset",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"team_id\": \"TEAM_ID\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/slack/v1/ticket/clear",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"slack",
+						"v1",
+						"ticket",
+						"clear"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Slack -  Create Ticket",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"team_id\": \"TEAM_ID\",\r\n    \"ticket_content\": {\r\n        \"environment\": \"default\",\r\n        \"group\": \"Release 1\",\r\n        \"switcher\": \"FEATURE02\",\r\n        \"status\": false,\r\n        \"observations\": \"Activate\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/slack/v1/ticket/create",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"slack",
+						"v1",
+						"ticket",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Slack -  Process Ticket",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"team_id\": \"TEAM_ID\",\r\n    \"ticket_id\": \"60b844a27fe6223020777e69\",\r\n    \"approved\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/slack/v1/ticket/process",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"slack",
+						"v1",
+						"ticket",
+						"process"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Client - Criteria/Auth (REST)",
 			"event": [
 				{
@@ -4920,7 +5007,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "{\r\n    configuration(slack_team_id: \"TUW2RH760\") {\r\n    # configuration(slack_team_id: \"T02183P97NZ\") {\r\n        environments\r\n    }\r\n}",
+						"query": "{\r\n    configuration(slack_team_id: \"TEAM_ID\") {\r\n        environments\r\n    }\r\n}",
 						"variables": ""
 					}
 				},
@@ -4944,7 +5031,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "{\r\n    configuration(slack_team_id: \"TUW2RH760\", environment: \"development\") {\r\n        group {\r\n            name\r\n            activated\r\n        }\r\n    }\r\n}",
+						"query": "{\r\n    configuration(slack_team_id: \"TEAM_ID\", environment: \"development\") {\r\n        group {\r\n            name\r\n            activated\r\n        }\r\n    }\r\n}",
 						"variables": ""
 					}
 				},
@@ -4968,7 +5055,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "{\r\n    configuration(slack_team_id: \"TUW2RH760\", environment: \"default\", group: \"Release 1\") {\r\n        config {\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
+						"query": "{\r\n    configuration(slack_team_id: \"TEAM_ID\", environment: \"default\", group: \"Release 1\") {\r\n        config {\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
 						"variables": ""
 					}
 				},
