@@ -8,10 +8,13 @@ import { EnvType } from '../src/models/environment';
 import Slack from '../src/models/slack';
 import { 
     setupDatabase,
+    slack,
     adminMasterAccountToken,
-    domainId
+    domainId,
+    config1Document,
+    groupConfigDocument,
+    adminAccountToken
 } from './fixtures/db_api';
-import { TicketStatusType } from '../src/models/slack_ticket';
 
 afterAll(async () => {
     await Slack.deleteMany();
@@ -102,6 +105,20 @@ describe('Slack Installation', () => {
             }).expect(200);
 
         expect(response.body.domain).toBe(String(domainId));
+    });
+
+    test('SLACK_SUITE - Should NOT authorize installation - Admin is not owner', async () => {
+        //given
+        const installation = await buildInstallation('SHOULD_NOT_AUTHORIZE_DOMAIN', null);
+
+        //test
+        await request(app)
+            .post('/slack/v1/authorize')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send({
+                domain: domainId,
+                team_id: installation.team_id
+            }).expect(401);
     });
 
     test('SLACK_SUITE - Should NOT authorize installation - Invalid Domain Id', async () => {
@@ -227,109 +244,229 @@ describe('Slack Installation', () => {
 
 });
 
-describe('Slack Controller - Ticket', () => {
+describe('Slack Route - Create Ticket', () => {
     beforeAll(setupDatabase);
 
-    const ticket_fixture1 = {
-        environment: EnvType.DEFAULT,
-        group: 'Release 1',
-        switcher: 'MY_FEATURE1',
-        status: true,
-        observations: 'Success'
+    test('SLACK_SUITE - Should create a ticket', async () => {
+        const ticket_content = {
+            environment: EnvType.DEFAULT,
+            group: groupConfigDocument.name,
+            switcher: config1Document.key,
+            status: false,
+            observations: 'Should create ticket'
+        };
+
+        const response = await request(app)
+            .post('/slack/v1/ticket/create')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_content
+            }).expect(201);
+
+        expect(response.body).toMatchObject(ticket_content);
+    });
+
+    test('SLACK_SUITE - Should NOT create a ticket - Already opened', async () => {
+        const ticket_content = {
+            environment: EnvType.DEFAULT,
+            group: groupConfigDocument.name,
+            switcher: config1Document.key,
+            status: false,
+            observations: 'Should create ticket'
+        };
+
+        const response = await request(app)
+            .post('/slack/v1/ticket/create')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_content
+            }).expect(400);
+            
+        expect(response.body.error).toBe('Ticket already opened');
+    });
+
+    test('SLACK_SUITE - Should NOT create a ticket - Group not found', async () => {
+        const ticket_content = {
+            environment: EnvType.DEFAULT,
+            group: 'NOT_FOUND',
+            switcher: config1Document.key,
+            status: false
+        };
+
+        const response = await request(app)
+            .post('/slack/v1/ticket/create')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_content
+            }).expect(404);
+            
+        expect(response.body.error).toBe('Group not found');
+    });
+
+    test('SLACK_SUITE - Should NOT create a ticket - Group not found', async () => {
+        const ticket_content = {
+            environment: EnvType.DEFAULT,
+            group: groupConfigDocument.name,
+            switcher: 'NOT_FOUND',
+            status: false
+        };
+
+        const response = await request(app)
+            .post('/slack/v1/ticket/create')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_content
+            }).expect(404);
+            
+        expect(response.body.error).toBe('Switcher not found');
+    });
+
+    test('SLACK_SUITE - Should NOT create a ticket - Environment not found', async () => {
+        const ticket_content = {
+            environment: 'NOT_FOUND',
+            group: groupConfigDocument.name,
+            switcher: config1Document.key,
+            status: false
+        };
+
+        const response = await request(app)
+            .post('/slack/v1/ticket/create')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_content
+            }).expect(404);
+            
+        expect(response.body.error).toBe('Environment not found');
+    });
+});
+
+describe('Slack Route - Process Ticket', () => {
+    beforeAll(setupDatabase);
+
+    const createTicket = async (add_switcher = true) => {
+        let ticket_content = {
+            environment: EnvType.DEFAULT,
+            group: groupConfigDocument.name,
+            status: false,
+            observations: 'Should create ticket'
+        };
+
+        if (add_switcher)
+            ticket_content.switcher = config1Document.key;
+
+        const response = await request(app)
+            .post('/slack/v1/ticket/create')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_content
+            });
+
+        return response.body;
     };
 
-    test('SLACK_SUITE - Should authorize Domain', async () => {
+    test('SLACK_SUITE - Should approve a ticket - Switcher Change Request', async () => {
         //given
-        const installation = await buildInstallation('SHOULD_AUTHORIZE_DOMAIN', null);
+        const ticket = await createTicket();
 
         //test
-        const slack = await Controller.authorizeSlackInstallation({
-            domain: domainId,
-            team_id: installation.team_id
-        });
+        const response = await request(app)
+            .post('/slack/v1/ticket/process')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_id: ticket._id,
+                approved: true
+            }).expect(200);
 
-        expect(slack.domain).toBe(domainId);
+        expect(response.body.message).toBe(`Ticket ${ticket._id} processed`);
     });
 
-    test('SLACK_SUITE - Should NOT authorize Domain - Domain not found', async () => {
+    test('SLACK_SUITE - Should approve a ticket - Group Change Request', async () => {
         //given
-        const installation = await buildInstallation('SHOULD_AUTHORIZE_DOMAIN', null);
+        const ticket = await createTicket(false);
 
         //test
-        const call = async () => {
-            await Controller.authorizeSlackInstallation({
-                domain: new mongoose.Types.ObjectId(),
-                team_id: installation.team_id
+        const response = await request(app)
+            .post('/slack/v1/ticket/process')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_id: ticket._id,
+                approved: true
             });
-        }; 
 
-        await expect(call()).rejects.toThrowError('Domain not found');
+        expect(response.body.message).toBe(`Ticket ${ticket._id} processed`);
     });
 
-    test('SLACK_SUITE - Should create a new Ticket', async () => {
+    test('SLACK_SUITE - Should NOT process a ticket - Ticket not found', async () => {
+        await request(app)
+            .post('/slack/v1/ticket/process')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_id: new mongoose.Types.ObjectId(),
+                approved: true
+            }).expect(404);
+    });
+
+    test('SLACK_SUITE - Should NOT process a ticket - Installation not found', async () => {
+        await request(app)
+            .post('/slack/v1/ticket/process')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: 'NOT_FOUND',
+                ticket_id: new mongoose.Types.ObjectId(),
+                approved: true
+            }).expect(404);
+    });
+
+    test('SLACK_SUITE - Should deny a ticket', async () => {
         //given
-        const installation = await buildInstallation('SHOULD_CREATE_TICKET', domainId);
+        const ticket = await createTicket();
 
         //test
-        const slack = await Controller.createTicket(
-            ticket_fixture1, null, installation.team_id);
-        expect(slack.tickets[0]).toMatchObject(ticket_fixture1);
+        const response = await request(app)
+            .post('/slack/v1/ticket/process')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_id: ticket._id,
+                approved: false
+            }).expect(200);
+
+        expect(response.body.message).toBe(`Ticket ${ticket._id} processed`);
     });
 
-    test('SLACK_SUITE - Should process a Ticket - Approved', async () => {
-        //given
-        const installation = await buildInstallation('SHOULD_PROCESS_TICKET_OK', domainId);
-        let slack = await Controller.createTicket(
-            ticket_fixture1, null, installation.team_id);
+    test('SLACK_SUITE - Should reset installation tickets', async () => {
+        //verify that
+        let slackInstallation = await Slack.findOne({ team_id: slack.team_id });
+        expect(slackInstallation.tickets.length).toBeGreaterThan(0);
 
         //test
-        slack = await Controller.processTicket(
-            null, installation.team_id, slack.tickets[0].id, true);
+        await request(app)
+            .post('/slack/v1/ticket/clear')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                team_id: slack.team_id
+            }).expect(200);
 
-        expect(slack.tickets[0].ticket_approvals).toEqual(1);
-        expect(slack.tickets[0].ticket_status).toBe(TicketStatusType.APPROVED);
-        expect(slack.tickets[0].date_closed).not.toBe(null);
+        slackInstallation = await Slack.findOne({ team_id: slack.team_id });
+        expect(slackInstallation.tickets.length).toEqual(0);
     });
 
-    test('SLACK_SUITE - Should process a Ticket - Denied', async () => {
-        //given
-        const installation = await buildInstallation('SHOULD_PROCESS_TICKET_NOK', domainId);
-        let slack = await Controller.createTicket(
-            ticket_fixture1, null, installation.team_id);
-
-        //test
-        slack = await Controller.processTicket(
-            null, installation.team_id, slack.tickets[0].id, false);
-
-        expect(slack.tickets[0].ticket_approvals).toEqual(0);
-        expect(slack.tickets[0].ticket_status).toBe(TicketStatusType.DENIED);
-        expect(slack.tickets[0].date_closed).not.toBe(null);
+    test('SLACK_SUITE - Should NOT reset installation tickets - Admin not owner', async () => {
+        await request(app)
+            .post('/slack/v1/ticket/clear')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send({
+                team_id: slack.team_id
+            }).expect(401);
     });
 
-    test('SLACK_SUITE - Should NOT process a Ticket - Domain not found', async () => {
-        //given
-        const installation = await buildInstallation(
-            'SHOULD_NOT_PROCESS_TICKET_DOMAIN', new mongoose.Types.ObjectId());
-
-        //test
-        const call = async () => {
-            await Controller.processTicket(
-                null, installation.team_id, new mongoose.Types.ObjectId(), true);
-        }; 
-
-        await expect(call()).rejects.toThrowError('Domain not found');
-    });
-
-    test('SLACK_SUITE - Should NOT process a Ticket - Ticket not found', async () => {
-        //given
-        const installation = await buildInstallation('SHOULD_NOT_PROCESS_TICKET', domainId);
-
-        //test
-        const call = async () => {
-            await Controller.processTicket(
-                null, installation.team_id, new mongoose.Types.ObjectId(), true);
-        }; 
-
-        await expect(call()).rejects.toThrowError('Ticket not found');
-    });
 });

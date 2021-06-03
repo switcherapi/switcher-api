@@ -13,6 +13,7 @@ import { Role, ActionTypes, RouterTypes } from '../../src/models/role';
 import { Metric } from '../../src/models/metric';
 import { EnvType, Environment } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
+import Slack from '../../src/models/slack';
 
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test_secret';
 
@@ -162,6 +163,13 @@ export const teamInviteNoTeam = {
     email: 'admin@mail.com'
 };
 
+export const slack = {
+    _id: new mongoose.Types.ObjectId(),
+    team_id: 'TEAM_ID',
+    user_id: 'USER_ID',
+    domain: domainId
+};
+
 export const setupDatabase = async () => {
     await ConfigStrategy.deleteMany();
     await Config.deleteMany();
@@ -170,6 +178,7 @@ export const setupDatabase = async () => {
     await Admin.deleteMany();
     await Environment.deleteMany();
     await Component.deleteMany();
+    await Slack.deleteMany();
 
     await History.deleteMany();
     await Metric.deleteMany();
@@ -193,6 +202,7 @@ export const setupDatabase = async () => {
     await new Config(config2Document).save();
     await new ConfigStrategy(configStrategyDocument).save();
     await new TeamInvite(teamInviteNoTeam).save();
+    await new Slack(slack).save();
     await new Team(team1).save();
     await new Team(team).save();
     await new Role(role1).save();
