@@ -6,15 +6,6 @@ import { getDomainById } from './domain';
 import { getEnvironment } from './environment';
 import { getGroupConfig } from './group-config';
 
-async function getSlackOrError(enterprise_id, team_id) {
-    const slack = await getSlack(enterprise_id, team_id);
-
-    if (!slack)
-        throw new NotFoundError('Slack installation not found');
-
-    return slack;
-}
-
 async function canCreateTicket(slack, ticket_content) {
     if (slack.isTicketOpened(ticket_content))
         throw new BadRequestError('Ticket already opened');
@@ -40,14 +31,21 @@ async function canCreateTicket(slack, ticket_content) {
 
 }
 
-export async function getSlack(enterprise_id, team_id) {
+export async function getSlackOrError(where) {
+    const slack = await getSlack(where);
+
+    if (!slack)
+        throw new NotFoundError('Slack installation not found');
+
+    return slack;
+}
+
+export async function getSlack(where) {
     const query = Slack.findOne();
 
-    if (enterprise_id) {
-        query.where('enterprise_id', enterprise_id);
-    } else {
-        query.where('team_id', team_id);
-    }
+    if (where.id) query.where('_id', where.id);
+    if (where.team_id) query.where('team_id', where.team_id);
+    if (where.enterprise_id) query.where('enterprise_id', where.enterprise_id);
 
     return query.exec();
 }
@@ -62,24 +60,39 @@ export async function createSlackInstallation(args) {
 }
 
 export async function authorizeSlackInstallation(domain, team_id, admin) {
-    const slack = await getSlackOrError(undefined, team_id);
+    const slack = await getSlackOrError({ team_id });
     const _domain = await getDomainById(domain);
 
     if (String(_domain.owner) != String(admin._id))
         throw new PermissionError('Only the domain owner can authorize a Slack integration');
 
+    // update Domain integrations
+    _domain.integrations.slack = slack._id;
+    _domain.updatedBy = SLACK_SUB;
+    await _domain.save();
+
+    // update Slack domain reference
     slack.domain = domain;
     return slack.save();
 }
 
 export async function deleteSlack(enterprise_id, team_id) {
-    const slack = await getSlack(enterprise_id, team_id);
-    if (slack)
+    const slack = await getSlack({ enterprise_id, team_id });
+    if (slack) {
+        // update Domain integrations
+        if (slack.domain) {
+            const domain = await getDomainById(slack.domain);
+            domain.integrations.slack = null;
+            domain.updatedBy = SLACK_SUB;
+            await domain.save();
+        }
+
         return slack.remove();
+    }
 }
 
 export async function resetTicketHistory(enterprise_id, team_id, admin) {
-    const slack = await getSlackOrError(enterprise_id, team_id);
+    const slack = await getSlackOrError({ enterprise_id, team_id });
     const domain = await getDomainById(slack.domain);
 
     if (String(domain.owner) != String(admin._id))
@@ -90,7 +103,7 @@ export async function resetTicketHistory(enterprise_id, team_id, admin) {
 }
 
 export async function createTicket(ticket_content, enterprise_id, team_id) {
-    const slack = await getSlackOrError(enterprise_id, team_id);
+    const slack = await getSlackOrError({ enterprise_id, team_id });
 
     await canCreateTicket(slack, ticket_content);
     const slackTicket = {
@@ -103,7 +116,7 @@ export async function createTicket(ticket_content, enterprise_id, team_id) {
 }
 
 export async function processTicket(enterprise_id, team_id, ticket_id, approved) {
-    const slack = await getSlackOrError(enterprise_id, team_id);
+    const slack = await getSlackOrError({ enterprise_id, team_id });
     await getDomainById(slack.domain);
     const ticket = slack.tickets.filter(
         t => String(t.id) === String(ticket_id) &&

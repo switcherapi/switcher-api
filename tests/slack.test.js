@@ -15,6 +15,7 @@ import {
     groupConfigDocument,
     adminAccountToken
 } from './fixtures/db_api';
+import { getDomainById } from '../src/controller/domain';
 
 afterAll(async () => {
     await Slack.deleteMany();
@@ -105,6 +106,32 @@ describe('Slack Installation', () => {
             }).expect(200);
 
         expect(response.body.domain).toBe(String(domainId));
+    });
+
+    test('SLACK_SUITE - Should query installation by Domain', async () => {
+        const response = await request(app)
+            .get(`/slack/v1/installation/${String(domainId)}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        expect(response.body.team_name).toBe(
+            mock1_slack_installation.installation_payload.team_name);
+        expect(response.body.channel).toBe(
+            mock1_slack_installation.installation_payload.incoming_webhook_channel);
+    });
+
+    test('SLACK_SUITE - Should NOT query installation by Domain - Domain not found', async () => {
+        await request(app)
+            .get(`/slack/v1/installation/${new mongoose.Types.ObjectId()}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404);
+    });
+
+    test('SLACK_SUITE - Should NOT query installation by Domain - Invalid Domain', async () => {
+        await request(app)
+            .get('/slack/v1/installation/INVALID')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(422);
     });
 
     test('SLACK_SUITE - Should NOT authorize installation - Admin is not owner', async () => {
@@ -210,7 +237,7 @@ describe('Slack Installation', () => {
             .send().expect(422);
     });
 
-    test('SLACK_SUITE - Should delete installation', async () => {
+    test('SLACK_SUITE - Should delete not authorized installation', async () => {
         //given
         const installation = Object.assign({}, mock1_slack_installation);
         installation.team_id = 'T_DELETE_INSTALL';
@@ -224,7 +251,31 @@ describe('Slack Installation', () => {
             .send().expect(200);
 
         //check DB
-        const slackDb = await Controller.getSlack(installation.enterprise_id, installation.team_id);
+        const slackDb = await Controller.getSlack({
+            enterprise_id: installation.enterprise_id, 
+            team_id: installation.team_id
+        });
+        expect(slackDb).toBe(null);
+    });
+
+    test('SLACK_SUITE - Should delete authorized installation', async () => {
+        //verify that
+        let domain = await getDomainById(domainId);
+        expect(domain.integrations.slack).not.toBe(null);
+
+        //test
+        await request(app)
+            .delete('/slack/v1/installation?team_id=SHOULD_AUTHORIZE_DOMAIN')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send().expect(200);
+
+        //check DB
+        domain = await getDomainById(domainId);
+        expect(domain.integrations.slack).toBe(null);
+
+        const slackDb = await Controller.getSlack({
+            team_id: 'SHOULD_AUTHORIZE_DOMAIN'
+        });
         expect(slackDb).toBe(null);
     });
 

@@ -34,7 +34,7 @@ async function resolveGroup(domainId, groupConfig = undefined) {
 }
 
 async function resolveSlackInstallation(args) {
-    const slack = await getSlack(null, args.slack_team_id);
+    const slack = await getSlack({ team_id: args.slack_team_id });
 
     if (slack) {
         args.domain = slack.domain;
