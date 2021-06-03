@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { slackTicketSchema } from './slack_ticket';
+import { slackTicketSchema, TicketStatusType } from './slack_ticket';
 
 const slackSchema = new mongoose.Schema({
     user_id: {
@@ -50,6 +50,15 @@ slackSchema.options.toJSON = {
         }
         return ret;
     }
+};
+
+slackSchema.methods.isTicketOpened = function (ticket_content) {
+    const slack = this;
+    return slack.tickets.filter(ticket => 
+        ticket.environment === ticket_content.environment &&
+        ticket.group === ticket_content.group &&
+        ticket.switcher === ticket_content.switcher &&
+        ticket.ticket_status === TicketStatusType.OPENED).length;
 };
 
 const Slack = mongoose.model('Slack', slackSchema);

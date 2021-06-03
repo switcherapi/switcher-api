@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+export const SLACK_SUB = 'Switcher Slack App';
 export const TicketStatusType = Object.freeze({
     OPENED: 'OPENED',
     APPROVED: 'APPROVED',
@@ -7,10 +8,6 @@ export const TicketStatusType = Object.freeze({
 });
 
 export const slackTicketSchema = new mongoose.Schema({
-    id: {
-        type: mongoose.Schema.Types.ObjectId,
-        default: new mongoose.Types.ObjectId()
-    },
     environment: {
         type: String,
         required: true

@@ -24,8 +24,65 @@ router.post('/slack/v1/authorize', [
     check('team_id').exists()
 ], validate, auth, async (req, res) => {
     try {
-        const slackInstallation = await Controller.authorizeSlackInstallation(req.body);
+        const slackInstallation = await Controller.authorizeSlackInstallation(
+            req.body.domain, req.body.team_id, req.admin);
+
         res.status(200).send(slackInstallation);
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+});
+
+router.post('/slack/v1/ticket/clear', [
+    check('team_id').exists()
+], validate, auth, async (req, res) => {
+    try {
+        const slackInstallation = await Controller.resetTicketHistory(
+            req.body.enterprise_id, req.body.team_id, req.admin);
+
+        res.status(200).send(slackInstallation);
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+});
+
+router.post('/slack/v1/ticket/create', [
+    check('team_id').exists(),
+    check('ticket_content.environment').exists(),
+    check('ticket_content.group').exists(),
+    check('ticket_content.switcher').isLength({ min: 0 }),
+    check('ticket_content.observations', 'Max-length is 2000').isLength({ max: 2000 }),
+    check('ticket_content.status').isBoolean()
+], validate, slackAuth, async (req, res) => {
+    try {
+        const ticket_content = {
+            environment: req.body.ticket_content.environment,
+            group: req.body.ticket_content.group,
+            switcher: req.body.ticket_content.switcher,
+            observations: req.body.ticket_content.observations,
+            status: req.body.ticket_content.status
+        };
+
+        const ticket = await Controller.createTicket(
+            ticket_content, req.body.enterprise_id, req.body.team_id);
+            
+        res.status(201).send(ticket);
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+});
+
+router.post('/slack/v1/ticket/process', [
+    check('team_id').exists(),
+    check('ticket_id').isMongoId(),
+    check('approved').isBoolean()
+], validate, slackAuth, async (req, res) => {
+    try {
+        await Controller.processTicket(
+            req.body.enterprise_id, req.body.team_id, 
+            req.body.ticket_id, req.body.approved);
+
+        res.status(200).send({ message: `Ticket ${req.body.ticket_id} processed` });
     } catch (e) {
         responseException(res, e, 400);
     }
