@@ -4,6 +4,8 @@ import { NotFoundError, responseException } from '../exceptions';
 import { auth, slackAuth } from '../middleware/auth';
 import * as Controller from '../controller/slack';
 import { validate } from '../middleware/validators';
+import { TicketStatusType } from '../models/slack_ticket';
+import { getDomainById } from '../controller/domain';
 
 const router = new express.Router();
 
@@ -89,12 +91,13 @@ router.post('/slack/v1/ticket/process', [
 });
 
 router.get('/slack/v1/findbot', [
-    query('enterprise_id').exists(),
     query('team_id').exists()
 ], validate, slackAuth, async (req, res) => {
     try {
-        const slack = await Controller.getSlack(
-            req.query.enterprise_id, req.query.team_id);
+        const slack = await Controller.getSlack({
+            enterprise_id: req.query.enterprise_id, 
+            team_id: req.query.team_id
+        });
 
         if (!slack) throw new NotFoundError();
         res.send(slack.bot_payload);
@@ -104,12 +107,13 @@ router.get('/slack/v1/findbot', [
 });
 
 router.get('/slack/v1/findinstallation', [
-    query('enterprise_id').exists(),
     query('team_id').exists()
 ], validate, slackAuth, async (req, res) => {
     try {
-        const slack = await Controller.getSlack(
-            req.query.enterprise_id, req.query.team_id);
+        const slack = await Controller.getSlack({
+            enterprise_id: req.query.enterprise_id, 
+            team_id: req.query.team_id
+        });
 
         if (!slack) throw new NotFoundError();
         res.send(slack.installation_payload);
@@ -118,8 +122,34 @@ router.get('/slack/v1/findinstallation', [
     }
 });
 
+router.get('/slack/v1/installation/:domain', [
+    check('domain').isMongoId()
+], validate, auth, async (req, res) => {
+    try {
+        const domain = await getDomainById(req.params.domain);
+        const { tickets, installation_payload, settings } = 
+            await Controller.getSlackOrError({ id: domain.integrations.slack });
+
+        const openedTickets = tickets.filter(t => t.ticket_status === TicketStatusType.OPENED).length;
+        const approvedTickets = tickets.filter(t => t.ticket_status === TicketStatusType.APPROVED).length;
+
+        res.send({
+            team_name: installation_payload.team_name,
+            bot_scopes: installation_payload.bot_scopes,
+            channel: installation_payload.incoming_webhook_channel,
+            is_enterprise: installation_payload.is_enterprise_install,
+            installed_at: installation_payload.installed_at,
+            tickets_opened: openedTickets,
+            tickets_approved: approvedTickets,
+            tickets_denied: (tickets.length - openedTickets - approvedTickets),
+            settings
+        });
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+});
+
 router.delete('/slack/v1/installation', [
-    query('enterprise_id').exists(),
     query('team_id').exists()
 ], validate, slackAuth, async (req, res) => {
     try {

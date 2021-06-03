@@ -30,6 +30,12 @@ const domainSchema = new mongoose.Schema({
         required: true,
         ref: 'Admin'
     },
+    integrations: {
+        slack: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Slack'
+        }
+    },
     lastUpdate: {
         type: Number,
         default: Date.now()
