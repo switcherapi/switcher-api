@@ -124,7 +124,8 @@ export async function processTicket(enterprise_id, team_id, ticket_id, approved)
         await closeTicket(null, ticket[0]);
     }
 
-    return slack.save();
+    await slack.save();
+    return ticket[0];
 }
 
 async function closeTicket(domain, ticket) {

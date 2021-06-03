@@ -78,11 +78,11 @@ router.post('/slack/v1/ticket/process', [
     check('approved').isBoolean()
 ], validate, slackAuth, async (req, res) => {
     try {
-        await Controller.processTicket(
+        const ticket = await Controller.processTicket(
             req.body.enterprise_id, req.body.team_id, 
             req.body.ticket_id, req.body.approved);
 
-        res.status(200).send({ message: `Ticket ${req.body.ticket_id} processed` });
+        res.status(200).send({ message: `Ticket ${ticket._id} processed` });
     } catch (e) {
         responseException(res, e, 400);
     }
