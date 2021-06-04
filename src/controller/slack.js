@@ -28,7 +28,18 @@ async function canCreateTicket(slack, ticket_content) {
         if (!config)
             throw new NotFoundError('Switcher not found');
     }
+}
 
+async function deleteSlackInstallation(slack) {
+    // update Domain integrations
+    if (slack.domain) {
+        const domain = await getDomainById(slack.domain);
+        domain.integrations.slack = null;
+        domain.updatedBy = SLACK_SUB;
+        await domain.save();
+    }
+
+    return slack.remove();
 }
 
 export async function getSlackOrError(where) {
@@ -78,17 +89,18 @@ export async function authorizeSlackInstallation(domain, team_id, admin) {
 
 export async function deleteSlack(enterprise_id, team_id) {
     const slack = await getSlack({ enterprise_id, team_id });
-    if (slack) {
-        // update Domain integrations
-        if (slack.domain) {
-            const domain = await getDomainById(slack.domain);
-            domain.integrations.slack = null;
-            domain.updatedBy = SLACK_SUB;
-            await domain.save();
-        }
+    if (slack)
+        return deleteSlackInstallation(slack);
+}
 
-        return slack.remove();
-    }
+export async function unlinkSlack(domainid, admin) {
+    const domain = await getDomainById(domainid);
+
+    if (String(domain.owner) != String(admin._id))
+        throw new PermissionError('Only the domain owner can unlink integrations');
+
+    const slack = await getSlackOrError({ id: domain.integrations.slack });
+    return deleteSlackInstallation(slack);
 }
 
 export async function resetTicketHistory(enterprise_id, team_id, admin) {
