@@ -163,4 +163,15 @@ router.delete('/slack/v1/installation', [
     }
 });
 
+router.delete('/slack/v1/installation/unlink', [
+    query('domain').exists()
+], validate, auth, async (req, res) => {
+    try {
+        const slack = await Controller.unlinkSlack(req.query.domain, req.admin);
+        res.send(slack);
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+});
+
 export default router;
