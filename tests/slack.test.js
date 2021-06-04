@@ -293,6 +293,53 @@ describe('Slack Installation', () => {
             .send().expect(422);
     });
 
+    test('SLACK_SUITE - Should unlink installation', async () => {
+        //given
+        const installation = await buildInstallation('SHOULD_UNLINK_INTEGRATION', null);
+        await request(app)
+            .post('/slack/v1/authorize')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                domain: domainId,
+                team_id: installation.team_id
+            }).expect(200);
+
+        //verify that
+        let domain = await getDomainById(domainId);
+        expect(domain.integrations.slack).not.toBe(null);
+
+        //test
+        await request(app)
+            .delete(`/slack/v1/installation/unlink?domain=${String(domainId)}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        //check DB
+        domain = await getDomainById(domainId);
+        expect(domain.integrations.slack).toBe(null);
+
+        const slackDb = await Controller.getSlack({
+            team_id: 'SHOULD_UNLINK_INTEGRATION'
+        });
+        expect(slackDb).toBe(null);
+    });
+
+    test('SLACK_SUITE - Should NOT unlink installation - Admin is not owner', async () => {
+        const response = await request(app)
+            .delete(`/slack/v1/installation/unlink?domain=${String(domainId)}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send().expect(401);
+
+        expect(response.body.error).toBe('Only the domain owner can unlink integrations');
+    });
+
+    test('SLACK_SUITE - Should NOT unlink installation - Domain Id not provided', async () => {
+        await request(app)
+            .delete('/slack/v1/installation/unlink')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send().expect(422);
+    });
+
 });
 
 describe('Slack Route - Create Ticket', () => {
