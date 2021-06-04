@@ -64,7 +64,7 @@ export async function transferDomain(args, admin) {
 
     domain.updatedBy = admin.email;
     domain.transfer = domain.transfer ? null : true;
-    await domain.save();
+    return await domain.save();
 }
 
 export async function transferDomainAccept(args, admin) {
