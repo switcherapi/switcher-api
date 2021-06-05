@@ -105,7 +105,7 @@ describe('Slack Installation', () => {
                 team_id: installation.team_id
             }).expect(200);
 
-        expect(response.body.domain).toBe(String(domainId));
+        expect(response.body.message).toBe('Authorization completed');
     });
 
     test('SLACK_SUITE - Should query installation by Domain', async () => {

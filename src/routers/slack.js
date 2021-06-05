@@ -26,10 +26,10 @@ router.post('/slack/v1/authorize', [
     check('team_id').exists()
 ], validate, auth, async (req, res) => {
     try {
-        const slackInstallation = await Controller.authorizeSlackInstallation(
+        await Controller.authorizeSlackInstallation(
             req.body.domain, req.body.team_id, req.admin);
 
-        res.status(200).send(slackInstallation);
+        res.status(200).send({ message: 'Authorization completed' });
     } catch (e) {
         responseException(res, e, 400);
     }
@@ -39,10 +39,10 @@ router.post('/slack/v1/ticket/clear', [
     check('team_id').exists()
 ], validate, auth, async (req, res) => {
     try {
-        const slackInstallation = await Controller.resetTicketHistory(
+        await Controller.resetTicketHistory(
             req.body.enterprise_id, req.body.team_id, req.admin);
 
-        res.status(200).send(slackInstallation);
+        res.status(200).send({ message: 'Tickets cleared with success' });
     } catch (e) {
         responseException(res, e, 400);
     }
@@ -134,6 +134,7 @@ router.get('/slack/v1/installation/:domain', [
         const approvedTickets = tickets.filter(t => t.ticket_status === TicketStatusType.APPROVED).length;
 
         res.send({
+            team_id: installation_payload.team_id,
             team_name: installation_payload.team_name,
             bot_scopes: installation_payload.bot_scopes,
             channel: installation_payload.incoming_webhook_channel,
