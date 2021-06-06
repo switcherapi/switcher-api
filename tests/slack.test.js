@@ -52,21 +52,34 @@ describe('Slack Feature Availability', () => {
     test('SLACK_SUITE - Should check feature - Available', async () => {
         Switcher.assume('SLACK_INTEGRATION').true();
         const response = await request(app)
-            .get('/slack/v1/availability')
+            .post('/slack/v1/availability')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200);
+            .send({
+                feature: 'SLACK_INTEGRATION'
+            }).expect(200);
 
-        expect(response.body.message).toBe('Slack Integration is available.');
+        expect(response.body.result).toBe(true);
+    });
+
+    test('SLACK_SUITE - Should check feature - Available', async () => {
+        Switcher.assume('SLACK_INTEGRATION').false();
+        const response = await request(app)
+            .post('/slack/v1/availability')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                feature: 'SLACK_INTEGRATION'
+            }).expect(200);
+
+        expect(response.body.result).toBe(false);
     });
 
     test('SLACK_SUITE - Should check - Not available', async () => {
-        Switcher.assume('SLACK_INTEGRATION').false();
-        const response = await request(app)
-            .get('/slack/v1/availability')
+        await request(app)
+            .post('/slack/v1/availability')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
-
-        expect(response.body.error).toBe('Slack Integration is not available.');
+            .send({
+                feature: 'INVALID_FEATURE_KEY'
+            }).expect(400);
     });
 });
 

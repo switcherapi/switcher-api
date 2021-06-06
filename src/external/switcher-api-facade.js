@@ -131,6 +131,13 @@ export async function checkSlackIntegration(value) {
         checkValue(value)]), 'Slack Integration is not available.');
 }
 
+export async function checkSlackFeatures(admin, feature) {
+    if (process.env.SWITCHER_API_ENABLE != 'true')
+        return false;
+    
+    return switcher.isItOn(feature, [checkValue(admin)]);
+}
+
 export function notifyAcCreation(adminid) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
         return;
