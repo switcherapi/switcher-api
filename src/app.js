@@ -80,10 +80,11 @@ app.get('/check', (req, res) => {
             env: process.env.ENV,
             db_state: mongoose.connection.readyState,
             switcherapi: process.env.SWITCHER_API_ENABLE,
+            switcherapi_logger: process.env.SWITCHER_API_LOGGER,
             history: process.env.HISTORY_ACTIVATED,
             metrics: process.env.METRICS_ACTIVATED,
             max_metrics_pages: process.env.METRICS_MAX_PAGE,
-            max_stretegy_op: process.env.MAX_EXIST_STRATEGYOPERATION
+            max_stretegy_op: process.env.MAX_EXIST_STRATEGYOPERATION,
         } 
     });
 });

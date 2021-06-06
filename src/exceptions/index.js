@@ -1,3 +1,5 @@
+import { Switcher } from 'switcher-client';
+
 export class NotFoundError extends Error {
     constructor(message) {
         super(message);
@@ -33,8 +35,15 @@ export class FeatureUnavailableError extends Error {
     }
 }
 
-//@deprecated - created temporarily to refactory exceptions dependencies
-export function responseException(res, err, code) {
+export function responseException(res, err, code, feature = undefined) {
+    if (process.env.SWITCHER_API_LOGGER == 'true') {
+        console.error(`Error (${err.constructor.name}): ${err.message} - Code: ${code}`);
+        if (feature) {
+            console.error('\n### Switcher API Logger ###\n' + 
+                JSON.stringify(Switcher.getLogger(feature), undefined, 2));
+        }
+    }
+
     if (err.code)
         return res.status(err.code).send({ error: err.message });
     res.status(code).send({ error: err.message });

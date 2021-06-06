@@ -16,7 +16,7 @@ router.post('/team/create', [check('name').isLength({ min: 2, max: 50 })],
         const team = await Controller.createTeam(req.body, req.admin, req.query.defaultActions);
         res.status(201).send(team);
     } catch (e) {
-        responseException(res, e, 400);
+        responseException(res, e, 400, 'ELEMENT_CREATION');
     }
 });
 

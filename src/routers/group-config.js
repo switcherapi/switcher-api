@@ -16,7 +16,7 @@ router.post('/groupconfig/create', auth, async (req, res) => {
         const groupconfig = await Controller.createGroup(req.body, req.admin);
         res.status(201).send(groupconfig);
     } catch (e) {
-        responseException(res, e, 500);
+        responseException(res, e, 500, 'ELEMENT_CREATION');
     }
 });
 
