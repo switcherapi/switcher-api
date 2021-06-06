@@ -19,7 +19,7 @@ router.post('/admin/signup', [
 
         res.status(201).send({ admin });
     } catch (e) {
-        responseException(res, e, 400);
+        responseException(res, e, 400, 'ACCOUNT_CREATION');
     }
 });
 

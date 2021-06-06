@@ -17,7 +17,7 @@ router.post('/domain/create', auth, async (req, res) => {
         const domain = await Controller.createDomain(req.body, req.admin);
         res.status(201).send(domain);
     } catch (e) {
-        responseException(res, e, 400);
+        responseException(res, e, 400, 'ELEMENT_CREATION');
     }
 });
 

@@ -12,7 +12,7 @@ router.post('/environment/create', auth, async (req, res) => {
         const environment = await Controller.createEnvironment(req.body, req.admin);
         res.status(201).send(environment);
     } catch (e) {
-        responseException(res, e, 400);
+        responseException(res, e, 400, 'ELEMENT_CREATION');
     }
 });
 
