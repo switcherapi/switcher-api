@@ -2,10 +2,11 @@ import express from 'express';
 import { check, query } from 'express-validator';
 import { NotFoundError, responseException } from '../exceptions';
 import { auth, slackAuth } from '../middleware/auth';
-import * as Controller from '../controller/slack';
 import { validate } from '../middleware/validators';
 import { TicketStatusType } from '../models/slack_ticket';
 import { getDomainById } from '../controller/domain';
+import { checkSlackIntegration } from '../external/switcher-api-facade';
+import * as Controller from '../controller/slack';
 
 const router = new express.Router();
 
@@ -150,6 +151,15 @@ router.get('/slack/v1/installation/:domain', [
     }
 });
 
+router.get('/slack/v1/availability', auth, async (req, res) => {
+    try {
+        await checkSlackIntegration(req.admin._id);
+        res.send({ message: 'Slack Integration is available.' });
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+});
+
 router.delete('/slack/v1/installation', [
     query('team_id').exists()
 ], validate, slackAuth, async (req, res) => {
@@ -168,8 +178,8 @@ router.delete('/slack/v1/installation/unlink', [
     query('domain').exists()
 ], validate, auth, async (req, res) => {
     try {
-        const slack = await Controller.unlinkSlack(req.query.domain, req.admin);
-        res.send(slack);
+        await Controller.unlinkSlack(req.query.domain, req.admin);
+        res.send({ message: 'Slack Integration uninstalled with success' });
     } catch (e) {
         responseException(res, e, 400);
     }

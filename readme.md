@@ -20,11 +20,13 @@ Main features:
 - Detailed metrics.
 - Client endpoints exposed in **REST** and **GraphQL**.
 - Zero-latency mode also enables your applications to work with zero latency.
+- Exclusive Slack App to control and test changes.
  
 
 - **JavaScript lib**: (https://github.com/switcherapi/switcher-client-master)
 - **Java lib**: (https://github.com/switcherapi/switcher-client)
 - **Switcher Management**: (https://github.com/switcherapi/switcher-management)
+- **Switcher Slack App**: (https://github.com/switcherapi/switcher-slack-app)
 
 * * *
 
