@@ -5,10 +5,19 @@ import { auth, slackAuth } from '../middleware/auth';
 import { validate } from '../middleware/validators';
 import { TicketStatusType } from '../models/slack_ticket';
 import { getDomainById } from '../controller/domain';
-import { checkSlackIntegration } from '../external/switcher-api-facade';
+import { checkSlackFeatures } from '../external/switcher-api-facade';
 import * as Controller from '../controller/slack';
 
 const router = new express.Router();
+
+router.post('/slack/v1/availability', auth, async (req, res) => {
+    try {
+        const result = await checkSlackFeatures(req.admin._id, req.body.feature);
+        res.send({ result });
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+});
 
 router.post('/slack/v1/installation', [
     check('installation_payload').exists(),
@@ -146,15 +155,6 @@ router.get('/slack/v1/installation/:domain', [
             tickets_denied: (tickets.length - openedTickets - approvedTickets),
             settings
         });
-    } catch (e) {
-        responseException(res, e, 400);
-    }
-});
-
-router.get('/slack/v1/availability', auth, async (req, res) => {
-    try {
-        await checkSlackIntegration(req.admin._id);
-        res.send({ message: 'Slack Integration is available.' });
     } catch (e) {
         responseException(res, e, 400);
     }
