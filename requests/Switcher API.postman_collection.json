@@ -4430,6 +4430,34 @@
 			"response": []
 		},
 		{
+			"name": "Slack - Feature Availability",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"feature\": \"SLACK_INTEGRATION\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/slack/v1/availability",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"slack",
+						"v1",
+						"availability"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Slack -  Ticket History Reset",
 			"request": {
 				"method": "POST",
