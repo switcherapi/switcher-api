@@ -1,8 +1,10 @@
+import { Switcher } from 'switcher-client';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import app from '../src/app';
 import * as Controller from '../src/controller/slack';
+import { getDomainById } from '../src/controller/domain';
 import { mock1_slack_installation } from './fixtures/db_slack';
 import { EnvType } from '../src/models/environment';
 import Slack from '../src/models/slack';
@@ -15,7 +17,6 @@ import {
     groupConfigDocument,
     adminAccountToken
 } from './fixtures/db_api';
-import { getDomainById } from '../src/controller/domain';
 
 afterAll(async () => {
     await Slack.deleteMany();
@@ -40,6 +41,34 @@ const buildInstallation = async (team_id, domain) => {
     await Controller.createSlackInstallation(installation);
     return installation;
 };
+
+describe('Slack Feature Availability', () => {
+    afterAll(() => process.env.SWITCHER_API_ENABLE = false);
+    beforeAll(async () => {
+        await setupDatabase();
+        process.env.SWITCHER_API_ENABLE = true;
+    });
+
+    test('SLACK_SUITE - Should check feature - Available', async () => {
+        Switcher.assume('SLACK_INTEGRATION').true();
+        const response = await request(app)
+            .get('/slack/v1/availability')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        expect(response.body.message).toBe('Slack Integration is available.');
+    });
+
+    test('SLACK_SUITE - Should check - Not available', async () => {
+        Switcher.assume('SLACK_INTEGRATION').false();
+        const response = await request(app)
+            .get('/slack/v1/availability')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(400);
+
+        expect(response.body.error).toBe('Slack Integration is not available.');
+    });
+});
 
 describe('Slack Installation', () => {
     beforeAll(setupDatabase);
@@ -71,6 +100,23 @@ describe('Slack Installation', () => {
             enterpriseSlack.installation_payload);
         expect(response.body.bot_payload).toMatchObject(
             enterpriseSlack.bot_payload);
+    });
+
+    test('SLACK_SUITE - Should NOT save installation - Slack unavailable', async () => {
+        //given
+        process.env.SWITCHER_API_ENABLE = true;
+        Switcher.assume('SLACK_INTEGRATION').false();
+
+        //test
+        const response = await request(app)
+            .post('/slack/v1/installation')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send(mock1_slack_installation).expect(400);
+
+        expect(response.body.error).toBe('Slack Integration is not available.');
+
+        //teardown
+        process.env.SWITCHER_API_ENABLE = false;
     });
 
     test('SLACK_SUITE - Should NOT save installation - Token expired', async () => {
@@ -339,7 +385,6 @@ describe('Slack Installation', () => {
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(422);
     });
-
 });
 
 describe('Slack Route - Create Ticket', () => {

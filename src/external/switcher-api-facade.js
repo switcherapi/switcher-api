@@ -123,6 +123,14 @@ export async function checkAdmin(login) {
         checkValue(login)]), 'Account not released to use the API.');
 }
 
+export async function checkSlackIntegration(value) {
+    if (process.env.SWITCHER_API_ENABLE != 'true')
+        return;
+
+    switcherFlagResult(await switcher.isItOn('SLACK_INTEGRATION', [
+        checkValue(value)]), 'Slack Integration is not available.');
+}
+
 export function notifyAcCreation(adminid) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
         return;

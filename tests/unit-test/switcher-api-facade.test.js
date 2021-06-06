@@ -10,7 +10,8 @@ import {
     checkTeam, 
     checkMetrics, 
     checkHistory, 
-    checkAdmin, 
+    checkAdmin,
+    checkSlackIntegration,
     notifyAcCreation,
      notifyAcDeletion 
 } from '../../src/external/switcher-api-facade';
@@ -216,6 +217,24 @@ describe('Testing Switcher API Facade', () => {
     test('UNIT_API_FACADE - Should notify external service - Account being unregistered', async () => {
         Switcher.assume('ACCOUNT_OUT_NOTIFY').true();
         expect(notifyAcDeletion(adminAccountId)).toBe(undefined);
+    });
+
+    test('UNIT_API_FACADE - Should enable feature - Slack Integration', async () => {
+        const call = async () => {
+            Switcher.assume('SLACK_INTEGRATION').true();
+            await checkSlackIntegration('admin_id');
+        }; 
+
+        await expect(call()).resolves.toBe(undefined);
+    });
+
+    test('UNIT_API_FACADE - Should NOT enable feature - Slack Integration', async () => {
+        const call = async () => {
+            Switcher.assume('SLACK_INTEGRATION').false();
+            await checkSlackIntegration('admin_id');
+        }; 
+
+        await expect(call()).rejects.toThrowError('Slack Integration is not available.');
     });
 
 });
