@@ -1,5 +1,6 @@
 import express from 'express';
 import { check, query } from 'express-validator';
+import { Switcher } from 'switcher-client';
 import { NotFoundError, responseException } from '../exceptions';
 import { auth, slackAuth } from '../middleware/auth';
 import { validate } from '../middleware/validators';
@@ -13,9 +14,14 @@ const router = new express.Router();
 router.post('/slack/v1/availability', auth, async (req, res) => {
     try {
         const result = await checkSlackFeatures(req.admin._id, req.body.feature);
+
+        if (process.env.SWITCHER_API_LOGGER == 'true')
+            console.log('\n### Switcher API Logger ###\n' + 
+                JSON.stringify(Switcher.getLogger(req.body.feature), undefined, 2));
+                
         res.send({ result });
     } catch (e) {
-        responseException(res, e, 400);
+        responseException(res, e, 400, req.body.feature);
     }
 });
 
@@ -27,7 +33,7 @@ router.post('/slack/v1/installation', [
         const slackInstallation = await Controller.createSlackInstallation(req.body);
         res.status(201).send(slackInstallation);
     } catch (e) {
-        responseException(res, e, 400);
+        responseException(res, e, 400, 'SLACK_INTEGRATION');
     }
 });
 

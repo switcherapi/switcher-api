@@ -15,7 +15,7 @@ router.post('/component/create', [
         const { component, apiKey } = await Controller.createComponent(req.body, req.admin);
         res.status(201).send({ component, apiKey });
     } catch (e) {
-        responseException(res, e, 400);
+        responseException(res, e, 400, 'ELEMENT_CREATION');
     }
 });
 

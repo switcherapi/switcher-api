@@ -12,9 +12,10 @@ const apiKey = process.env.SWITCHER_API_KEY;
 const environment = process.env.SWITCHER_API_ENVIRONMENT;
 const domainName = process.env.SWITCHER_API_DOMAIN;
 const url = process.env.SWITCHER_API_URL;
+const logger = process.env.SWITCHER_API_LOGGER;
 const component = 'switcherapi';
 
-Switcher.buildContext({ url, apiKey, domain: domainName, component, environment });
+Switcher.buildContext({ url, apiKey, domain: domainName, component, environment }, { logger });
 const switcher = Switcher.factory();
 
 function switcherFlagResult(flag, message) {

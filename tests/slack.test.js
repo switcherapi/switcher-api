@@ -43,10 +43,15 @@ const buildInstallation = async (team_id, domain) => {
 };
 
 describe('Slack Feature Availability', () => {
-    afterAll(() => process.env.SWITCHER_API_ENABLE = false);
     beforeAll(async () => {
         await setupDatabase();
         process.env.SWITCHER_API_ENABLE = true;
+        process.env.SWITCHER_API_LOGGER = true;
+    });
+
+    afterAll(() => {
+        process.env.SWITCHER_API_ENABLE = false;
+        process.env.SWITCHER_API_LOGGER = false;
     });
 
     test('SLACK_SUITE - Should check feature - Available', async () => {

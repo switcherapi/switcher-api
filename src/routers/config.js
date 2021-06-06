@@ -19,7 +19,7 @@ router.post('/config/create', auth, async (req, res) => {
         const config = await Controller.createConfig(req.body, req.admin);
         res.status(201).send(config);
     } catch (e) {
-        responseException(res, e, 400);
+        responseException(res, e, 400, 'ELEMENT_CREATION');
     }
 });
 
