@@ -1,4 +1,5 @@
 import { BadRequestError, NotFoundError, PermissionError } from '../exceptions';
+import { checkSlackIntegration } from '../external/switcher-api-facade';
 import Slack from '../models/slack';
 import { TicketStatusType, SLACK_SUB } from '../models/slack_ticket';
 import { getConfig } from './config';
@@ -62,6 +63,8 @@ export async function getSlack(where) {
 }
 
 export async function createSlackInstallation(args) {
+    await checkSlackIntegration(args.team_id);
+
     // Remove old installation
     await deleteSlack(args.enterprise_id, args.team_id);
 
