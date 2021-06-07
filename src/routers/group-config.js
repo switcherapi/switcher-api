@@ -8,6 +8,7 @@ import { responseException } from '../exceptions';
 import { ActionTypes, RouterTypes } from '../models/role';
 import * as Controller from '../controller/group-config';
 import { getDomainById } from '../controller/domain';
+import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
@@ -16,7 +17,7 @@ router.post('/groupconfig/create', auth, async (req, res) => {
         const groupconfig = await Controller.createGroup(req.body, req.admin);
         res.status(201).send(groupconfig);
     } catch (e) {
-        responseException(res, e, 500, 'ELEMENT_CREATION');
+        responseException(res, e, 500, SwitcherKeys.ELEMENT_CREATION);
     }
 });
 
