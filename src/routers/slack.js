@@ -1,19 +1,25 @@
 import express from 'express';
 import { check, query } from 'express-validator';
-import { Switcher } from 'switcher-client';
+import { checkValue, Switcher } from 'switcher-client';
 import { NotFoundError, responseException } from '../exceptions';
 import { auth, slackAuth } from '../middleware/auth';
 import { validate } from '../middleware/validators';
 import { TicketStatusType } from '../models/slack_ticket';
+import { checkFeature, SwitcherKeys } from '../external/switcher-api-facade';
 import { getDomainById } from '../controller/domain';
-import { checkSlackFeatures } from '../external/switcher-api-facade';
 import * as Controller from '../controller/slack';
 
 const router = new express.Router();
 
 router.post('/slack/v1/availability', auth, async (req, res) => {
     try {
-        const result = await checkSlackFeatures(req.admin._id, req.body.feature);
+        const result = await checkFeature(
+            req.body.feature, [
+                checkValue(req.admin._id)
+            ], [
+                SwitcherKeys.SLACK_INTEGRATION, 
+                SwitcherKeys.SLACK_UPDATE
+            ]);
 
         if (process.env.SWITCHER_API_LOGGER == 'true')
             console.log('\n### Switcher API Logger ###\n' + 
@@ -33,7 +39,7 @@ router.post('/slack/v1/installation', [
         const slackInstallation = await Controller.createSlackInstallation(req.body);
         res.status(201).send(slackInstallation);
     } catch (e) {
-        responseException(res, e, 400, 'SLACK_INTEGRATION');
+        responseException(res, e, 400, SwitcherKeys.SLACK_INTEGRATION);
     }
 });
 

@@ -4,6 +4,7 @@ import { auth } from '../middleware/auth';
 import { responseException } from '../exceptions';
 import { validate } from '../middleware/validators';
 import * as Controller from '../controller/environment';
+import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
@@ -12,7 +13,7 @@ router.post('/environment/create', auth, async (req, res) => {
         const environment = await Controller.createEnvironment(req.body, req.admin);
         res.status(201).send(environment);
     } catch (e) {
-        responseException(res, e, 400, 'ELEMENT_CREATION');
+        responseException(res, e, 400, SwitcherKeys.ELEMENT_CREATION);
     }
 });
 

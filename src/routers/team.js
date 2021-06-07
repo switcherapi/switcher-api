@@ -7,6 +7,7 @@ import { verifyOwnership } from './common/index';
 import { responseException } from '../exceptions';
 import * as Controller from '../controller/team';
 import { getDomainById } from '../controller/domain';
+import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
@@ -16,7 +17,7 @@ router.post('/team/create', [check('name').isLength({ min: 2, max: 50 })],
         const team = await Controller.createTeam(req.body, req.admin, req.query.defaultActions);
         res.status(201).send(team);
     } catch (e) {
-        responseException(res, e, 400, 'ELEMENT_CREATION');
+        responseException(res, e, 400, SwitcherKeys.ELEMENT_CREATION);
     }
 });
 

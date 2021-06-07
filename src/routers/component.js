@@ -4,6 +4,7 @@ import { validate, verifyInputUpdateParameters } from '../middleware/validators'
 import { check, query } from 'express-validator';
 import * as Controller from '../controller/component';
 import { responseException } from '../exceptions';
+import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
@@ -15,7 +16,7 @@ router.post('/component/create', [
         const { component, apiKey } = await Controller.createComponent(req.body, req.admin);
         res.status(201).send({ component, apiKey });
     } catch (e) {
-        responseException(res, e, 400, 'ELEMENT_CREATION');
+        responseException(res, e, 400, SwitcherKeys.ELEMENT_CREATION);
     }
 });
 

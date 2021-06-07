@@ -5,7 +5,7 @@ import { check } from 'express-validator';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { verifyOwnership, sortBy } from './common/index';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { checkDomain } from '../external/switcher-api-facade';
+import { checkDomain, SwitcherKeys } from '../external/switcher-api-facade';
 import * as Controller from '../controller/domain';
 import { responseException } from '../exceptions';
 
@@ -17,7 +17,7 @@ router.post('/domain/create', auth, async (req, res) => {
         const domain = await Controller.createDomain(req.body, req.admin);
         res.status(201).send(domain);
     } catch (e) {
-        responseException(res, e, 400, 'ELEMENT_CREATION');
+        responseException(res, e, 400, SwitcherKeys.ELEMENT_CREATION);
     }
 });
 

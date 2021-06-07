@@ -5,6 +5,7 @@ import { check } from 'express-validator';
 import { verifyOwnership } from './common';
 import { responseException } from '../exceptions';
 import * as Controller from '../controller/admin';
+import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
@@ -19,7 +20,7 @@ router.post('/admin/signup', [
 
         res.status(201).send({ admin });
     } catch (e) {
-        responseException(res, e, 400, 'ACCOUNT_CREATION');
+        responseException(res, e, 400, SwitcherKeys.ACCOUNT_CREATION);
     }
 });
 
