@@ -11,6 +11,7 @@ import {
 import { sortBy, verifyOwnership } from './common/index';
 import * as Controller from '../controller/config';
 import { getGroupConfigById } from '../controller/group-config';
+import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
@@ -19,7 +20,7 @@ router.post('/config/create', auth, async (req, res) => {
         const config = await Controller.createConfig(req.body, req.admin);
         res.status(201).send(config);
     } catch (e) {
-        responseException(res, e, 400, 'ELEMENT_CREATION');
+        responseException(res, e, 400, SwitcherKeys.ELEMENT_CREATION);
     }
 });
 
