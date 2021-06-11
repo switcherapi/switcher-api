@@ -11,6 +11,32 @@ import * as Controller from '../controller/slack';
 
 const router = new express.Router();
 
+const findInstallation = async (req, res) => {
+    try {
+        const slack = await Controller.getSlack({
+            enterprise_id: req.query.enterprise_id, 
+            team_id: req.query.team_id
+        });
+
+        if (!slack) throw new NotFoundError();
+        res.send(slack.installation_payload);
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+};
+
+const deleteInstallation = async (req, res) => {
+    try {
+        const slack = await Controller.deleteSlack(
+            req.query.enterprise_id, req.query.team_id);
+
+        if (!slack) throw new NotFoundError();
+        res.send(slack);
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+};
+
 router.post('/slack/v1/availability', auth, async (req, res) => {
     try {
         const result = await checkFeature(
@@ -131,17 +157,13 @@ router.get('/slack/v1/findbot', [
 router.get('/slack/v1/findinstallation', [
     query('team_id').exists()
 ], validate, slackAuth, async (req, res) => {
-    try {
-        const slack = await Controller.getSlack({
-            enterprise_id: req.query.enterprise_id, 
-            team_id: req.query.team_id
-        });
+    await findInstallation(req, res);
+});
 
-        if (!slack) throw new NotFoundError();
-        res.send(slack.installation_payload);
-    } catch (e) {
-        responseException(res, e, 400);
-    }
+router.get('/slack/v1/installation/find', [
+    query('team_id').exists()
+], validate, auth, async (req, res) => {
+    await findInstallation(req, res);
 });
 
 router.get('/slack/v1/installation/:domain', [
@@ -175,15 +197,13 @@ router.get('/slack/v1/installation/:domain', [
 router.delete('/slack/v1/installation', [
     query('team_id').exists()
 ], validate, slackAuth, async (req, res) => {
-    try {
-        const slack = await Controller.deleteSlack(
-            req.query.enterprise_id, req.query.team_id);
+    await deleteInstallation(req, res);
+});
 
-        if (!slack) throw new NotFoundError();
-        res.send(slack);
-    } catch (e) {
-        responseException(res, e, 400);
-    }
+router.delete('/slack/v1/installation/decline', [
+    query('team_id').exists()
+], validate, auth, async (req, res) => {
+    await deleteInstallation(req, res);
 });
 
 router.delete('/slack/v1/installation/unlink', [
