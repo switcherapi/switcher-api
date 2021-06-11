@@ -18,7 +18,7 @@ const findInstallation = async (req, res) => {
             team_id: req.query.team_id
         });
 
-        if (!slack) throw new NotFoundError();
+        if (!slack || slack.domain) throw new NotFoundError();
         res.send(slack.installation_payload);
     } catch (e) {
         responseException(res, e, 400);
