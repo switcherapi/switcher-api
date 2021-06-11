@@ -301,6 +301,22 @@ describe('Slack Installation', () => {
             .send().expect(422);
     });
 
+    test('SLACK_SUITE - Should find installation (Admin)', async () => {
+        //given
+        const installation = Object.assign({}, mock1_slack_installation);
+        installation.team_id = 'T_FIND_INSTALL_ADMIN';
+        installation.installation_payload.app_id = 'TEST_FIND_INSTALLATION2';
+        await Controller.createSlackInstallation(installation);
+
+        //test
+        const response = await request(app)
+            .get(`/slack/v1/installation/find?enterprise_id=&team_id=${installation.team_id}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        expect(response.body).toMatchObject(installation.installation_payload);
+    });
+
     test('SLACK_SUITE - Should delete not authorized installation', async () => {
         //given
         const installation = Object.assign({}, mock1_slack_installation);
@@ -403,6 +419,23 @@ describe('Slack Installation', () => {
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(422);
     });
+
+    test('SLACK_SUITE - Should decline installation', async () => {
+        //given
+        const installation = await buildInstallation('SHOULD_DECLINE_INTEGRATION', null);
+
+        //test
+        await request(app)
+            .delete(`/slack/v1/installation/decline?team_id=${installation.team_id}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        const slackDb = await Controller.getSlack({
+            team_id: 'SHOULD_DECLINE_INTEGRATION'
+        });
+        expect(slackDb).toBe(null);
+    });
+
 });
 
 describe('Slack Route - Create Ticket', () => {

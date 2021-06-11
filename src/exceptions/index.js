@@ -37,7 +37,7 @@ export class FeatureUnavailableError extends Error {
 
 export function responseException(res, err, code, feature = undefined) {
     if (process.env.SWITCHER_API_LOGGER == 'true') {
-        console.error(`Error (${err.constructor.name}): ${err.message} - Code: ${code}`);
+        console.error(`Error (${err.constructor.name}): ${err.message} - Code: ${err.code}`);
         if (feature) {
             console.error('\n### Switcher API Logger ###\n' + 
                 JSON.stringify(Switcher.getLogger(feature), undefined, 2));
