@@ -170,6 +170,12 @@ describe('Slack Installation', () => {
             }).expect(200);
 
         expect(response.body.message).toBe('Authorization completed');
+
+        //should not find linked/authorized installation
+        await request(app)
+            .get(`/slack/v1/installation/find?enterprise_id=&team_id=${installation.team_id}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404);
     });
 
     test('SLACK_SUITE - Should query installation by Domain', async () => {
