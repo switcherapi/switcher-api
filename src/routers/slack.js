@@ -11,14 +11,14 @@ import * as Controller from '../controller/slack';
 
 const router = new express.Router();
 
-const findInstallation = async (req, res) => {
+const findInstallation = async (req, res, checkDomain = false) => {
     try {
         const slack = await Controller.getSlack({
             enterprise_id: req.query.enterprise_id, 
             team_id: req.query.team_id
         });
 
-        if (!slack || slack.domain) throw new NotFoundError();
+        if (!slack || (checkDomain && slack.domain)) throw new NotFoundError();
         res.send(slack.installation_payload);
     } catch (e) {
         responseException(res, e, 400);
@@ -163,7 +163,7 @@ router.get('/slack/v1/findinstallation', [
 router.get('/slack/v1/installation/find', [
     query('team_id').exists()
 ], validate, auth, async (req, res) => {
-    await findInstallation(req, res);
+    await findInstallation(req, res, true);
 });
 
 router.get('/slack/v1/installation/:domain', [
