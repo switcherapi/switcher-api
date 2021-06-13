@@ -117,6 +117,11 @@ export async function resetTicketHistory(enterprise_id, team_id, admin) {
     return slack.save();
 }
 
+export async function validateTicket(ticket_content, enterprise_id, team_id) {
+    const slack = await getSlackOrError({ enterprise_id, team_id });
+    await canCreateTicket(slack, ticket_content);
+}
+
 export async function createTicket(ticket_content, enterprise_id, team_id) {
     const slack = await getSlackOrError({ enterprise_id, team_id });
 
@@ -127,7 +132,11 @@ export async function createTicket(ticket_content, enterprise_id, team_id) {
 
     slack.tickets.push(slackTicket);
     const { tickets } = await slack.save();
-    return tickets[tickets.length - 1];
+    return {
+        channel_id: slack.installation_payload.incoming_webhook_channel_id,
+        channel: slack.installation_payload.incoming_webhook_channel,
+        ticket: tickets[tickets.length - 1]
+    };
 }
 
 export async function processTicket(enterprise_id, team_id, ticket_id, approved) {

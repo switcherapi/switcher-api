@@ -43,15 +43,18 @@ const buildInstallation = async (team_id, domain) => {
 };
 
 describe('Slack Feature Availability', () => {
+    const logger_status = process.env.SWITCHER_API_LOGGER == 'true';
+
     beforeAll(async () => {
         await setupDatabase();
         process.env.SWITCHER_API_ENABLE = true;
-        process.env.SWITCHER_API_LOGGER = true;
+        if (!logger_status)
+            process.env.SWITCHER_API_LOGGER = true;
     });
 
     afterAll(() => {
         process.env.SWITCHER_API_ENABLE = false;
-        process.env.SWITCHER_API_LOGGER = false;
+        process.env.SWITCHER_API_LOGGER = logger_status;
     });
 
     test('SLACK_SUITE - Should check feature - Available', async () => {
@@ -448,6 +451,7 @@ describe('Slack Route - Create Ticket', () => {
     beforeAll(setupDatabase);
 
     test('SLACK_SUITE - Should create a ticket', async () => {
+        //given
         const ticket_content = {
             environment: EnvType.DEFAULT,
             group: groupConfigDocument.name,
@@ -456,6 +460,16 @@ describe('Slack Route - Create Ticket', () => {
             observations: 'Should create ticket'
         };
 
+        //validate
+        await request(app)
+            .post('/slack/v1/ticket/validate')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_content
+            }).expect(200);
+
+        //test - create
         const response = await request(app)
             .post('/slack/v1/ticket/create')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
@@ -464,7 +478,30 @@ describe('Slack Route - Create Ticket', () => {
                 ticket_content
             }).expect(201);
 
-        expect(response.body).toMatchObject(ticket_content);
+        expect(response.body).toMatchObject({
+            channel_id: slack.installation_payload.incoming_webhook_channel_id,
+            channel: slack.installation_payload.incoming_webhook_channel,
+            ticket: ticket_content
+        });
+    });
+
+    test('SLACK_SUITE - Should NOT create a ticket - Invalid', async () => {
+        const ticket_content = {
+            environment: EnvType.DEFAULT,
+            group: groupConfigDocument.name,
+            switcher: 'INVALID_SWITCHER_KEY',
+            status: true
+        };
+
+        const response = await request(app)
+            .post('/slack/v1/ticket/validate')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_content
+            }).expect(404);
+            
+        expect(response.body.error).toBe('Switcher not found');
     });
 
     test('SLACK_SUITE - Should NOT create a ticket - Already opened', async () => {
@@ -572,7 +609,7 @@ describe('Slack Route - Process Ticket', () => {
 
     test('SLACK_SUITE - Should approve a ticket - Switcher Change Request', async () => {
         //given
-        const ticket = await createTicket();
+        const { ticket } = await createTicket();
 
         //test
         const response = await request(app)
@@ -589,7 +626,7 @@ describe('Slack Route - Process Ticket', () => {
 
     test('SLACK_SUITE - Should approve a ticket - Group Change Request', async () => {
         //given
-        const ticket = await createTicket(false);
+        const { ticket } = await createTicket(false);
 
         //test
         const response = await request(app)
@@ -628,7 +665,7 @@ describe('Slack Route - Process Ticket', () => {
 
     test('SLACK_SUITE - Should deny a ticket', async () => {
         //given
-        const ticket = await createTicket();
+        const { ticket } = await createTicket();
 
         //test
         const response = await request(app)

@@ -167,7 +167,11 @@ export const slack = {
     _id: new mongoose.Types.ObjectId(),
     team_id: 'TEAM_ID',
     user_id: 'USER_ID',
-    domain: domainId
+    domain: domainId,
+    installation_payload : {
+        incoming_webhook_channel : 'Approval Team',
+        incoming_webhook_channel_id : 'CHANNEL_ID'
+    },
 };
 
 export const setupDatabase = async () => {
