@@ -37,6 +37,16 @@ const deleteInstallation = async (req, res) => {
     }
 };
 
+const createTicketContent = (req) => {
+    return {
+        environment: req.body.ticket_content.environment,
+        group: req.body.ticket_content.group,
+        switcher: req.body.ticket_content.switcher,
+        observations: req.body.ticket_content.observations,
+        status: req.body.ticket_content.status
+    };
+};
+
 router.post('/slack/v1/availability', auth, async (req, res) => {
     try {
         const result = await checkFeature(
@@ -96,6 +106,24 @@ router.post('/slack/v1/ticket/clear', [
     }
 });
 
+router.post('/slack/v1/ticket/validate', [
+    check('team_id').exists(),
+    check('ticket_content.environment').exists(),
+    check('ticket_content.group').exists(),
+    check('ticket_content.switcher').isLength({ min: 0 }),
+    check('ticket_content.status').isBoolean()
+], validate, slackAuth, async (req, res) => {
+    try {
+        const ticket_content = createTicketContent(req);
+        await Controller.validateTicket(
+            ticket_content, req.body.enterprise_id, req.body.team_id);
+            
+        res.status(200).send({ message: 'Ticket verified' });
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+});
+
 router.post('/slack/v1/ticket/create', [
     check('team_id').exists(),
     check('ticket_content.environment').exists(),
@@ -105,14 +133,7 @@ router.post('/slack/v1/ticket/create', [
     check('ticket_content.status').isBoolean()
 ], validate, slackAuth, async (req, res) => {
     try {
-        const ticket_content = {
-            environment: req.body.ticket_content.environment,
-            group: req.body.ticket_content.group,
-            switcher: req.body.ticket_content.switcher,
-            observations: req.body.ticket_content.observations,
-            status: req.body.ticket_content.status
-        };
-
+        const ticket_content = createTicketContent(req);
         const ticket = await Controller.createTicket(
             ticket_content, req.body.enterprise_id, req.body.team_id);
             
