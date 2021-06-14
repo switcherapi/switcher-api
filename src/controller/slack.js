@@ -1,4 +1,4 @@
-import { BadRequestError, NotFoundError, PermissionError } from '../exceptions';
+import { NotFoundError, PermissionError } from '../exceptions';
 import { checkSlackIntegration } from '../external/switcher-api-facade';
 import Slack from '../models/slack';
 import { TicketStatusType, SLACK_SUB } from '../models/slack_ticket';
@@ -7,9 +7,14 @@ import { getDomainById } from './domain';
 import { getEnvironment } from './environment';
 import { getGroupConfig } from './group-config';
 
+/**
+ * Validates if ticket already exists, if so, return it.
+ * Otherwise, validates if ticket content is valid
+ */
 async function canCreateTicket(slack, ticket_content) {
-    if (slack.isTicketOpened(ticket_content))
-        throw new BadRequestError('Ticket already opened');
+    const existingTicket = slack.isTicketOpened(ticket_content);
+    if (existingTicket.length)
+        return existingTicket[0];
 
     let group, config;
     await Promise.all([
@@ -119,23 +124,27 @@ export async function resetTicketHistory(enterprise_id, team_id, admin) {
 
 export async function validateTicket(ticket_content, enterprise_id, team_id) {
     const slack = await getSlackOrError({ enterprise_id, team_id });
-    await canCreateTicket(slack, ticket_content);
+    return canCreateTicket(slack, ticket_content);
 }
 
 export async function createTicket(ticket_content, enterprise_id, team_id) {
     const slack = await getSlackOrError({ enterprise_id, team_id });
 
-    await canCreateTicket(slack, ticket_content);
-    const slackTicket = {
-        ...ticket_content
-    };
+    let _ticket = await canCreateTicket(slack, ticket_content);
+    if (!_ticket) {
+        const slackTicket = {
+            ...ticket_content
+        };
+    
+        slack.tickets.push(slackTicket);
+        const { tickets } = await slack.save();
+        _ticket = tickets[tickets.length - 1];
+    }
 
-    slack.tickets.push(slackTicket);
-    const { tickets } = await slack.save();
     return {
         channel_id: slack.installation_payload.incoming_webhook_channel_id,
         channel: slack.installation_payload.incoming_webhook_channel,
-        ticket: tickets[tickets.length - 1]
+        ticket: _ticket
     };
 }
 

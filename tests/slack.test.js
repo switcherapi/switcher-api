@@ -504,7 +504,7 @@ describe('Slack Route - Create Ticket', () => {
         expect(response.body.error).toBe('Switcher not found');
     });
 
-    test('SLACK_SUITE - Should NOT create a ticket - Already opened', async () => {
+    test('SLACK_SUITE - Should NOT create a ticket - Return existing one', async () => {
         const ticket_content = {
             environment: EnvType.DEFAULT,
             group: groupConfigDocument.name,
@@ -513,15 +513,19 @@ describe('Slack Route - Create Ticket', () => {
             observations: 'Should create ticket'
         };
 
+        // Retrieve existing ticket
+        const ticket = await Controller.validateTicket(
+            ticket_content, undefined, slack.team_id);
+
         const response = await request(app)
             .post('/slack/v1/ticket/create')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
                 ticket_content
-            }).expect(400);
+            }).expect(201);
             
-        expect(response.body.error).toBe('Ticket already opened');
+        expect(String(response.body.ticket._id)).toBe(String(ticket._id));
     });
 
     test('SLACK_SUITE - Should NOT create a ticket - Group not found', async () => {
