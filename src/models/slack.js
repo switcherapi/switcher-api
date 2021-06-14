@@ -58,7 +58,7 @@ slackSchema.methods.isTicketOpened = function (ticket_content) {
         ticket.environment === ticket_content.environment &&
         ticket.group === ticket_content.group &&
         ticket.switcher === ticket_content.switcher &&
-        ticket.ticket_status === TicketStatusType.OPENED).length;
+        ticket.ticket_status === TicketStatusType.OPENED);
 };
 
 const Slack = mongoose.model('Slack', slackSchema);
