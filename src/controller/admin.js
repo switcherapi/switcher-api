@@ -29,6 +29,10 @@ export async function signUp(args, remoteAddress) {
     await validate_token(args.token, remoteAddress);
     const admin = new Admin(args);
     const code = await admin.generateAuthCode();
+
+    if (process.env.GOOGLE_SKIP_AUTH == 'true')
+        admin.active = true;
+    
     await admin.save();
 
     sendAuthCode(admin.email, admin.name, code);

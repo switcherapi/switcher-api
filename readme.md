@@ -56,6 +56,7 @@ Main features:
     "BITBUCKET_OAUTH_CLIENT_ID": "[BITBUCKET_CLIENT_ID]",
     "BITBUCKET_OAUTH_SECRET": "[BITBUCKET_API_SECRET]",
     "GOOGLE_RECAPTCHA_SECRET": "[GOOGLE_RECAPTCHA_SECRET]",
+    "GOOGLE_SKIP_AUTH": false,
 
     "SWITCHER_API_LOGGER": true,
     "SWITCHER_API_ENABLE": false,
@@ -73,6 +74,35 @@ Main features:
     "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-test"
   }
 }
+```
+
+### Local setup (Docker - Skipping Email verification)
+
+Consider running Switcher API as docker image or local node using docker compose.
+The image is still not upload to the Docker Hub but can be created using the Dockerfile included in this project.
+
+```
+docker build -t switcher-api .
+```
+
+1. Create folder/file "config/.env.dev" with the following content:
+```
+ENV=DEV
+MONGODB_URI=mongodb://mongodb:27017/switcher-api
+JWT_SECRET=myTaskAppJWTtoken
+JWT_CLIENT_TOKEN_EXP_TIME=5m
+JWT_ADMIN_TOKEN_RENEW_INTERVAL=10m
+MAX_EXIST_STRATEGYOPERATION=100
+HISTORY_ACTIVATED=true
+METRICS_ACTIVATED=true
+METRICS_MAX_PAGE=50
+GOOGLE_SKIP_AUTH=true
+SWITCHER_API_ENABLE=false
+```
+2. Run the command: 
+
+```
+docker-compose --env-file ./config/.env.dev up -d
 ```
 
 # Usage
