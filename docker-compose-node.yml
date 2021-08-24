@@ -1,0 +1,41 @@
+version: '3.8'
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  backend:
+    driver: bridge
+
+services:
+  mongodb:
+    image : mongo
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_DATABASE: switcher-api
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - backend
+    restart: unless-stopped
+
+  express:
+    image: node:12-alpine
+    volumes:
+      - type: bind
+        source: ./
+        target: /app
+    working_dir: /app
+    command: npm run dev
+    ports:
+      - '3000:3000'
+    networks:
+      - backend
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    depends_on:
+      - mongodb
