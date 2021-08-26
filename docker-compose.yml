@@ -22,11 +22,11 @@ services:
       - backend
     restart: unless-stopped
 
-  express:
-    image: switcher-api
+  switcherapi:
+    image: trackerforce/switcher-api
     container_name: switcherapi
     ports:
-      - '3000:3000'
+      - 3000:3000
     networks:
       - backend
     environment:
@@ -61,3 +61,17 @@ services:
       - SWITCHER_SLACK_JWT_SECRET=${SWITCHER_SLACK_JWT_SECRET}
     depends_on:
       - mongodb
+
+  switchermanagement:
+    image: trackerforce/switcher-management
+    container_name: switchermanagement
+    command: /bin/sh -c "setup.sh"
+    ports:
+      - 80:80
+    networks:
+      - backend
+    environment: 
+      - SWITCHERAPI_URL=${SWITCHERAPI_URL}
+      - SM_IP=${SM_IP}
+    depends_on:
+      - switcherapi
