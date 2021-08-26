@@ -79,7 +79,7 @@ Main features:
 ### Running On-Prem via Docker Composer
 
 Consider running Switcher API locally. 
-This option lavarages Switcher API and Switcher Management, allowing it to be configured separately as wish.
+This option leverages Switcher API and Switcher Management, allowing it to be configured separately as wish.
 
 1. Create folder/file "config/.env.dev" with the following content:
 ```
