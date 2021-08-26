@@ -76,20 +76,15 @@ Main features:
 }
 ```
 
-### Local setup (Docker - Skipping Email verification)
+### Running On-Prem via Docker Composer
 
-Consider running Switcher API as docker image or local node using docker compose.
-The image is still not upload to the Docker Hub but can be created using the Dockerfile included in this project.
-
-```
-docker build -t switcher-api .
-```
+Consider running Switcher API locally. 
+This option lavarages Switcher API and Switcher Management, allowing it to be configured separately as wish.
 
 1. Create folder/file "config/.env.dev" with the following content:
 ```
-ENV=DEV
 MONGODB_URI=mongodb://mongodb:27017/switcher-api
-JWT_SECRET=myTaskAppJWTtoken
+JWT_SECRET=YOU_CANNOT_SEE_IT
 JWT_CLIENT_TOKEN_EXP_TIME=5m
 JWT_ADMIN_TOKEN_RENEW_INTERVAL=10m
 MAX_EXIST_STRATEGYOPERATION=100
@@ -98,7 +93,12 @@ METRICS_ACTIVATED=true
 METRICS_MAX_PAGE=50
 GOOGLE_SKIP_AUTH=true
 SWITCHER_API_ENABLE=false
+SWITCHERAPI_URL=http://localhost:3000
+SM_IP=localhost
 ```
+
+Configure **SWITCHERAPI_URL** and **SM_IP** if you want to access Switcher Management from an external network.
+
 2. Run the command: 
 
 ```
