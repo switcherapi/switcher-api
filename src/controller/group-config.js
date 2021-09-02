@@ -37,7 +37,7 @@ export async function getGroupConfig(where, lean = false) {
 }
 
 export async function getTotalGroupsByDomainId(domain) {
-    await GroupConfig.find({ domain }).countDocuments();
+    return GroupConfig.find({ domain }).countDocuments();
 }
 
 export async function createGroup(args, admin) {
