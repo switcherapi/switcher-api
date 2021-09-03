@@ -46,7 +46,7 @@ router.get('/team/:id', [check('id').isMongoId()],
             req.params.id, req.admin, ActionTypes.READ);
 
         if (req.query.resolveMembers) {
-            await team.populate({ path: 'members_list' }).execPopulate();
+            await team.populate({ path: 'members_list' });
         }
 
         res.send(team);
@@ -92,7 +92,7 @@ router.get('/team/member/invite/:id', [check('id').isMongoId()],
 
         await teamInvite.populate({
             path: 'team'
-        }).execPopulate();
+        });
 
         const team = teamInvite.team;
         const domain = await getDomainById(team[0].domain);

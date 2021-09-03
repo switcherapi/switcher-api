@@ -31,11 +31,11 @@ router.get('/groupconfig', [query('domain', 'Please, specify the \'domain\' id')
         await domain.populate({
             path: 'groupConfig',
             options: {
-                limit: parseInt(req.query.limit),
-                skip: parseInt(req.query.skip),
+                limit: parseInt(req.query.limit || 10),
+                skip: parseInt(req.query.skip || 0),
                 sort: sortBy(req.query)
             }
-        }).execPopulate();
+        });
 
         let groups = domain.groupConfig;
         groups = await verifyOwnership(req.admin, groups, domain._id, ActionTypes.READ, RouterTypes.GROUP, true);
@@ -68,8 +68,8 @@ router.get('/groupconfig/history/:id', [check('id').isMongoId()],
         const history = await History.find({ domainId: groupconfig.domain, elementId: groupconfig._id })
             .select('oldValue newValue updatedBy date -_id')
             .sort(sortBy(req.query))
-            .limit(parseInt(req.query.limit))
-            .skip(parseInt(req.query.skip));
+            .limit(parseInt(req.query.limit || 10))
+            .skip(parseInt(req.query.skip || 0));
 
         await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP);
 
