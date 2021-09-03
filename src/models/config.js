@@ -138,7 +138,7 @@ configSchema.options.toJSON = {
 async function recordConfigHistory(config, modifiedField) {
     if (config.__v !== undefined && modifiedField.length) {
         const oldConfig = await Config.findById(config._id);
-        await oldConfig.populate({ path: 'component_list' }).execPopulate();
+        await oldConfig.populate({ path: 'component_list' });
         await recordHistory(modifiedField, oldConfig.toJSON(), config, config.domain);
     }
 }
@@ -165,7 +165,7 @@ configSchema.pre('remove', async function (next) {
 
 configSchema.pre('save', async function (next) {
     const config = this;
-    await config.populate({ path: 'component_list' }).execPopulate();
+    await config.populate({ path: 'component_list' });
     await recordConfigHistory(config.toJSON(), this.modifiedPaths());
     await checkMetrics(config);
     next();

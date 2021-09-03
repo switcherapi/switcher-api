@@ -33,11 +33,11 @@ router.get('/config', auth, async (req, res) => {
         await groupConfig.populate({
             path: 'config',
             options: {
-                limit: parseInt(req.query.limit),
-                skip: parseInt(req.query.skip),
+                limit: parseInt(req.query.limit || 10),
+                skip: parseInt(req.query.skip || 0),
                 sort: sortBy(req.query)
             }
-        }).execPopulate();
+        });
 
         let configs = groupConfig.config;
 
@@ -56,7 +56,7 @@ router.get('/config/:id', [
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
 
         if (req.query.resolveComponents) {
-            await config.populate({ path: 'component_list' }).execPopulate();
+            await config.populate({ path: 'component_list' });
         }
 
         res.send(config);
@@ -75,8 +75,8 @@ router.get('/config/history/:id', [
         const history = await History.find({ domainId: config.domain, elementId: config._id })
             .select('oldValue newValue updatedBy date -_id')
             .sort(sortBy(req.query))
-            .limit(parseInt(req.query.limit))
-            .skip(parseInt(req.query.skip));
+            .limit(parseInt(req.query.limit || 10))
+            .skip(parseInt(req.query.skip || 0));
 
         await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG);
 

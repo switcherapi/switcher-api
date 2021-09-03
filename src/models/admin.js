@@ -197,9 +197,8 @@ adminSchema.pre('save', async function (next) {
 });
 
 adminSchema.post('save', function(error, doc, next) {
-    if (error.name === 'MongoError' && error.code === 11000) {
+    if (error.name === 'MongoServerError' && error.code === 11000)
         return next(new Error('Account is already registered.'));
-    }
     
     next(error);
 });

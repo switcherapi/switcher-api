@@ -92,7 +92,7 @@ router.post('/admin/refresh/me', authRefreshToken, async (req, res) => {
 });
 
 router.get('/admin/me', auth, async (req, res) => {
-    await req.admin.populate({ path: 'team_list' }).execPopulate();
+    await req.admin.populate({ path: 'team_list' });
     res.send(req.admin);
 });
 
@@ -122,7 +122,7 @@ router.post('/admin/collaboration/permission', [
 });
 
 router.get('/admin/collaboration', auth, async (req, res) => {
-    await req.admin.populate({ path: 'team_list' }).execPopulate();
+    await req.admin.populate({ path: 'team_list' });
     const domains = req.admin.team_list.map(adm => adm.domain.toString());
     res.send(Array.from(new Set(domains)));
 });

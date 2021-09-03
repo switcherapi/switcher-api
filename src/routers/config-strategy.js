@@ -32,11 +32,11 @@ router.get('/configstrategy', auth, async (req, res) => {
         await config.populate({
             path: 'configStrategy',
             options: {
-                limit: parseInt(req.query.limit),
-                skip: parseInt(req.query.skip),
+                limit: parseInt(req.query.limit || 10),
+                skip: parseInt(req.query.skip || 0),
                 sort: sortBy(req.query)
             }
-        }).execPopulate();
+        });
         
         let configStrategies = config.configStrategy.filter(
             elements => elements.activated.get(req.query.env ? req.query.env : EnvType.DEFAULT) != undefined);
@@ -71,8 +71,8 @@ router.get('/configstrategy/history/:id', [
         const history = await History.find({ domainId: configStrategy.domain, elementId: configStrategy._id })
             .select('oldValue newValue updatedBy date -_id')
             .sort(sortBy(req.query))
-            .limit(parseInt(req.query.limit))
-            .skip(parseInt(req.query.skip));
+            .limit(parseInt(req.query.limit || 10))
+            .skip(parseInt(req.query.skip || 0));
 
         await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY);
 

@@ -44,7 +44,12 @@ export function responseException(res, err, code, feature = undefined) {
         }
     }
 
-    if (err.code)
-        return res.status(err.code).send({ error: err.message });
+    if (err.code) {
+        try {
+            return res.status(err.code).send({ error: err.message });
+        } catch (e) {
+            console.error(err);
+        }
+    }
     res.status(code).send({ error: err.message });
 }

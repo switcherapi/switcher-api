@@ -26,8 +26,8 @@ router.get('/environment', [query('domain', 'Please, specify the \'domain\' id')
         let environments = await Controller.getEnvironments({ domain: req.query.domain },
             ['_id', 'name'],
             {
-                skip: parseInt(req.query.skip),
-                limit: parseInt(req.query.limit),
+                skip: parseInt(req.query.skip || 0),
+                limit: parseInt(req.query.limit || 10),
                 sort: {
                     name: req.query.sort === 'desc' ? -1 : 1
                 }
