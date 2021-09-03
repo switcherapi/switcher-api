@@ -113,7 +113,8 @@ describe('Testing fetch configuration info', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
-        expect(response.body[0].createdAt > response.body[1].createdAt).toBe(true);
+        expect(response.body[0].key).toEqual('TEST_CONFIG_KEY_2');
+        expect(response.body[1].key).toEqual('TEST_CONFIG_KEY_1');
 
         // test ascending
         response = await request(app)
@@ -121,7 +122,8 @@ describe('Testing fetch configuration info', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
-        expect(response.body[0].createdAt < response.body[1].createdAt).toBe(true);
+        expect(response.body[0].key).toEqual('TEST_CONFIG_KEY_1');
+        expect(response.body[1].key).toEqual('TEST_CONFIG_KEY_2');
     });
 
     test('CONFIG_SUITE - Should NOT get Config information by invalid Group Id', async () => { 

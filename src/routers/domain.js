@@ -27,11 +27,11 @@ router.get('/domain', auth, async (req, res) => {
     await req.admin.populate({
         path: 'domain',
         options: {
-            limit: parseInt(req.query.limit),
-            skip: parseInt(req.query.skip),
+            limit: parseInt(req.query.limit || 10),
+            skip: parseInt(req.query.skip || 0),
             sort: sortBy(req.query)
         }
-    }).execPopulate();
+    });
     res.send(req.admin.domain);
 });
 
@@ -56,8 +56,8 @@ router.get('/domain/history/:id', [check('id').isMongoId()],
         const history = await History.find({ elementId: domain._id })
             .select('oldValue newValue updatedBy date -_id')
             .sort(sortBy(req.query))
-            .limit(parseInt(req.query.limit))
-            .skip(parseInt(req.query.skip));
+            .limit(parseInt(req.query.limit || 10))
+            .skip(parseInt(req.query.skip || 0));
 
         await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN);
 

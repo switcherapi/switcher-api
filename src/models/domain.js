@@ -133,9 +133,8 @@ domainSchema.pre('save', async function (next) {
 });
 
 domainSchema.post('save', function(error, doc, next) {
-    if (error.name === 'MongoError' && error.code === 11000) {
+    if (error.name === 'MongoServerError' && error.code === 11000)
         return next(new Error('The domain name is already in use.'));
-    }
 
     next(error);
 });

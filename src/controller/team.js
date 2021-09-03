@@ -48,8 +48,8 @@ export async function getTeams(where, lean = false) {
 export async function getTeamsSort(where, projection, skip, limit, sort) {
     return Team.find(where, projection,
         {
-            skip: parseInt(skip),
-            limit: parseInt(limit),
+            skip: parseInt(skip || 0),
+            limit: parseInt(limit || 10),
             sort: {
                 name: sort === 'desc' ? -1 : 1
             }
@@ -130,7 +130,7 @@ export async function acceptInvite(request_id, admin) {
 
     await teamInvite.populate({
         path: 'team'
-    }).execPopulate();
+    });
 
     const team = teamInvite.team;
 
