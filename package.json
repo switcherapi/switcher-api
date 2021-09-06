@@ -44,7 +44,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.3",
     "babel-preset-env": "^1.7.0",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
