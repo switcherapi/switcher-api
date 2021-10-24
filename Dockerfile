@@ -1,5 +1,5 @@
 # ---------- Base ----------
-FROM node:12-alpine AS base
+FROM node:fermium-alpine3.14 AS base
 
 WORKDIR /app
 
