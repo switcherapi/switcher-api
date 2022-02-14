@@ -95,8 +95,9 @@ describe('Insertion tests', () => {
 
         expect(response.body.apiKey).not.toBeNull();
         // DB validation - current Domain token should not be as the same as the generated
+        const apiKey = Buffer.from(response.body.apiKey, 'base64').toString('ascii');
         const component = await Component.findById(component1Id).lean();
-        const isMatch = await bcrypt.compare(response.body.apiKey, component.apihash);
+        const isMatch = await bcrypt.compare(apiKey, component.apihash);
         expect(isMatch).toEqual(true);
     });
 

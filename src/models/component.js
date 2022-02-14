@@ -54,8 +54,8 @@ componentSchema.methods.generateApiKey = async function () {
     const hash = await bcrypt.hash(apiKey, 8);
     component.apihash = hash;
     await component.save();
-
-    return apiKey;
+    
+    return Buffer.from(apiKey).toString('base64');
 };
 
 componentSchema.methods.generateAuthToken = async function (environment) {
@@ -80,7 +80,8 @@ componentSchema.statics.findByCredentials = async (domainName, componentName, ap
         throw new Error('Unable to find this Component');
     }
 
-    const isMatch = await bcrypt.compare(apiKey, component.apihash);
+    let decoded = Buffer.from(apiKey, 'base64').toString('ascii');
+    const isMatch = await bcrypt.compare(decoded, component.apihash);
 
     if (!isMatch) {
         throw new Error('Unable to find this Component');
