@@ -550,10 +550,11 @@ describe('Testing criteria [REST] ', () => {
             owner: adminMasterAccountId
         };
 
-        const apiKey = await bcrypt.hash(component._id + component.name, 8);
-        const hash = await bcrypt.hash(apiKey, 8);
+        const hashApiKey = await bcrypt.hash(component._id + component.name, 8);
+        const hash = await bcrypt.hash(hashApiKey, 8);
         component.apihash = hash;
         await new Component(component).save();
+        const apiKey = Buffer.from(hashApiKey).toString('base64');
 
         const response = await request(app)
             .post('/criteria/auth')

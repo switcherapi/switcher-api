@@ -228,8 +228,9 @@ export const setupDatabase = async () => {
     await new ConfigStrategy(configStrategyTIME_BETWEENDocument).save();
     await new ConfigStrategy(configStrategyTIME_GREATDocument).save();
 
-    apiKey = await bcrypt.hash(component1._id + component1.name, 8);
-    const hash = await bcrypt.hash(apiKey, 8);
+    const hashApiKey = await bcrypt.hash(component1._id + component1.name, 8);
+    const hash = await bcrypt.hash(hashApiKey, 8);
     component1.apihash = hash;
     await new Component(component1).save();
+    apiKey = Buffer.from(hashApiKey).toString('base64');
 };
