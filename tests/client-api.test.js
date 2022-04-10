@@ -37,15 +37,15 @@ const changeStrategy = async (strategyId, newOperation, status, environment) => 
     await strategy.save();
 };
 
-const changeConfigStatus = async (configId, status, environment) => {
-    const config = await Config.findById(configId);
+const changeConfigStatus = async (configid, status, environment) => {
+    const config = await Config.findById(configid);
     config.activated.set(environment, status !== undefined ? status : config.activated.get(environment));
     config.updatedBy = adminMasterAccountId;
     await config.save();
 };
 
-const changeConfigDisableMetricFlag = async (configId, status, environment) => {
-    const config = await Config.findById(configId);
+const changeConfigDisableMetricFlag = async (configid, status, environment) => {
+    const config = await Config.findById(configid);
     if (!config.disable_metrics)
         config.disable_metrics = new Map;
 
@@ -54,18 +54,29 @@ const changeConfigDisableMetricFlag = async (configId, status, environment) => {
     await config.save();
 };
 
-const changeGroupConfigStatus = async (groupConfigId, status, environment) => {
-    const groupConfig = await GroupConfig.findById(groupConfigId);
+const changeGroupConfigStatus = async (groupconfigid, status, environment) => {
+    const groupConfig = await GroupConfig.findById(groupconfigid);
     groupConfig.activated.set(environment, status !== undefined ? status : groupConfig.activated.get(environment));
     groupConfig.updatedBy = adminMasterAccountId;
     await groupConfig.save();
 };
 
-const changeDomainStatus = async (domainId, status, environment) => {
-    const domain = await Domain.findById(domainId);
+const changeDomainStatus = async (domainid, status, environment) => {
+    const domain = await Domain.findById(domainid);
     domain.activated.set(environment, status !== undefined ? status : domain.activated.get(environment));
     domain.updatedBy = adminMasterAccountId;
     await domain.save();
+};
+
+const createRequestAuth = async () => {
+    return request(app)
+        .post('/criteria/auth')
+        .set('switcher-api-key', `${apiKey}`)
+        .send({
+            domain: domainDocument.name,
+            component: component1.name,
+            environment: EnvType.DEFAULT
+        });
 };
 
 beforeAll(setupDatabase);
@@ -79,70 +90,54 @@ describe('Testing criteria [GraphQL] ', () => {
     let token;
 
     beforeAll(async () => {
-        const response = await request(app)
-            .post('/criteria/auth')
-            .set('switcher-api-key', `${apiKey}`)
-            .send({
-                domain: domainDocument.name,
-                component: component1.name,
-                environment: EnvType.DEFAULT
-            }).expect(200);
-
+        const response = await createRequestAuth();
         token = response.body.token;
     });
 
     afterAll(setupDatabase);
 
-    test('CLIENT_SUITE - Should return success on a simple CRITERIA response', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return success on a simple CRITERIA response', async () => {
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
             .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
                 [StrategiesType.VALUE, 'USER_1'], 
                 [StrategiesType.NETWORK, '10.0.0.3']]))
-            )
-            .expect(200)
-            .end((err, res) => {
-                const expected = graphqlUtils.criteriaResult('true', 'Success');
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
-                done();
-            });
+            );
+
+        const expected = graphqlUtils.criteriaResult('true', 'Success');
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
     });
 
-    test('CLIENT_SUITE - Should return success on Flat view resolved by Group name', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return success on Flat view resolved by Group name', async () => {
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send(graphqlUtils.configurationQuery([['group', 'Group Test']]))
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected100));
-                done();
-            });
+            .send(graphqlUtils.configurationQuery([['group', 'Group Test']]));
+
+        expect(req.statusCode).toBe(200);
+        expect(req.body).toMatchObject(JSON.parse(graphqlUtils.expected100));
     });
 
-    test('CLIENT_SUITE - Should NOT return on Flat view resolved by an unknown Group name', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should NOT return on Flat view resolved by an unknown Group name', async () => {
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send(graphqlUtils.configurationQuery([['group', 'UNKNOWN GROUP NAME']]))
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text).data.configuration).toEqual(null);
-                done();
-            });
+            .send(graphqlUtils.configurationQuery([['group', 'UNKNOWN GROUP NAME']]));
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text).data.configuration).toEqual(null);
     });
 
-    test('CLIENT_SUITE - Should return success on Flat view resolved by Config Key', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return success on Flat view resolved by Config Key', async () => {
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send(graphqlUtils.configurationQuery([['key', keyConfig]]))
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected101));
-                done();
-            });
+            .send(graphqlUtils.configurationQuery([['key', keyConfig]]));
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected101));
     });
 
     test('CLIENT_SUITE - Should return success on Flat view resolved by Config Key - Uncovered environment, should look to production', async () => {
@@ -162,62 +157,54 @@ describe('Testing criteria [GraphQL] ', () => {
             .expect(200);
     });
 
-    test('CLIENT_SUITE - Should NOT return on Flat view resolved by an unknown Config Key', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should NOT return on Flat view resolved by an unknown Config Key', async () => {
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send(graphqlUtils.configurationQuery([['key', 'UNKNOWN_CONFIG_KEY']]))
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text).data.configuration).toEqual(null);
-                done();
-            });
+            .send(graphqlUtils.configurationQuery([['key', 'UNKNOWN_CONFIG_KEY']]));
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text).data.configuration).toEqual(null);
     });
 
-    test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Bad login input', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Bad login input', async () => {
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
             .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
                 [StrategiesType.VALUE, 'USER_4'], 
                 [StrategiesType.NETWORK, '10.0.0.3']]))
-            )
-            .expect(200)
-            .end((err, res) => {
-                const expected = graphqlUtils.criteriaResult('false', `Strategy '${StrategiesType.VALUE}' does not agree`);
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
-                done();
-            });
+            );
+
+        const expected = graphqlUtils.criteriaResult('false', `Strategy '${StrategiesType.VALUE}' does not agree`);
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
     });
 
-    test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Missing input', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Missing input', async () => {
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
             .send(graphqlUtils.criteriaQuery(keyConfig, graphqlUtils.buildEntries([
                 [StrategiesType.VALUE, 'USER_2']]))
-            )
-            .expect(200)
-            .end((err, res) => {
-                const expected = graphqlUtils.criteriaResult('false', `Strategy '${StrategiesType.NETWORK}' did not receive any input`);
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
-                done();
-            });
+            );
+
+        const expected = graphqlUtils.criteriaResult('false', `Strategy '${StrategiesType.NETWORK}' did not receive any input`);
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
     });
 
-    test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Invalid KEY', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Invalid KEY', async () => {
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
             .send(graphqlUtils.criteriaQuery('INVALID_KEY', graphqlUtils.buildEntries([
                 [StrategiesType.VALUE, 'USER_1'],
                 [StrategiesType.NETWORK, '10.0.0.3']]))
-            )
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text).data.criteria).toEqual(null);
-                done();
-            });
+            );
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text).data.criteria).toEqual(null);
     });
 
     test('CLIENT_SUITE - Should return config disabled for PRD environment while activated in QA', async () => {
@@ -403,101 +390,87 @@ describe('Testing domain', () => {
 
     afterAll(setupDatabase);
 
-    test('CLIENT_SUITE - Should return the Domain structure', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return the Domain structure', async () => {
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send(graphqlUtils.domainQuery([['_id', domainId]], true, true, true))
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected102));
-                done();
-            });
+            .send(graphqlUtils.domainQuery([['_id', domainId]], true, true, true));
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected102));
     });
 
-    test('CLIENT_SUITE - Should return 2 switchers when NOT filtered by Component', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return 2 switchers when NOT filtered by Component', async () => {
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
             .send(graphqlUtils.domainQuery([
                 ['name', domainDocument.name], 
                 ['environment', EnvType.DEFAULT]])
-            )
-            .expect(200)
-            .end((err, res) => {
-                const result = JSON.parse(res.text);
-                expect(result.data.domain.group[0].config.length).toBe(2);
-                done();
-            });
+            );
+        
+        const result = JSON.parse(req.text);
+        expect(req.statusCode).toBe(200);
+        expect(result.data.domain.group[0].config.length).toBe(2);
     });
 
-    test('CLIENT_SUITE - Should return 1 switcher when filtered by Component', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return 1 switcher when filtered by Component', async () => {
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
             .send(graphqlUtils.domainQuery([
                 ['name', domainDocument.name], 
                 ['environment', EnvType.DEFAULT],
                 ['_component', 'TestApp']])
-            )
-            .expect(200)
-            .end((err, res) => {
-                const result = JSON.parse(res.text);
-                expect(result.data.domain.group[0].config.length).toBe(1);
-                done();
-            });
+            );
+
+        const result = JSON.parse(req.text);
+        expect(req.statusCode).toBe(200);
+        expect(result.data.domain.group[0].config.length).toBe(1);
     });
 
-    test('CLIENT_SUITE - Should return the Domain structure - Just using environment', (done) => {
+    test('CLIENT_SUITE - Should return the Domain structure - Just using environment', async () => {
         // Domain will be resolved while identifying the component
-        request(app)
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
             .send(graphqlUtils.domainQuery([
                 ['name', domainDocument.name], 
                 ['environment', EnvType.DEFAULT]], true, true, true)
-            )
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected102));
-                done();
-            });
+            );
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected102));
     });
 
-    test('CLIENT_SUITE - Should return the Domain structure - Disabling strategies (resolver test)', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return the Domain structure - Disabling strategies (resolver test)', async () => {
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send(graphqlUtils.domainQuery([['_id', domainId]], true, true, false))
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected103));
-                done();
-            });
+            .send(graphqlUtils.domainQuery([['_id', domainId]], true, true, false));
+    
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected103));
     });
 
-    test('CLIENT_SUITE - Should return the Domain structure - Disabling group config (resolver test)', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return the Domain structure - Disabling group config (resolver test)', async () => {
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send(graphqlUtils.domainQuery([['_id', domainId]], false, false, false))
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected104));
-                done();
-            });
+            .send(graphqlUtils.domainQuery([['_id', domainId]], false, false, false));
+         
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected104));
     });
 
-    test('CLIENT_SUITE - Should return the Domain structure - Disabling config (resolver test)', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return the Domain structure - Disabling config (resolver test)', async () => {
+        const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send(graphqlUtils.domainQuery([['_id', domainId]], true, false, false))
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected105(keyConfigPrdQA)));
-                done();
-            });
+            .send(graphqlUtils.domainQuery([['_id', domainId]], true, false, false));
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected105(keyConfigPrdQA)));
     });
 });
 
@@ -505,20 +478,12 @@ describe('Testing criteria [REST] ', () => {
     let token;
 
     beforeAll(async () => {
-        const response = await request(app)
-            .post('/criteria/auth')
-            .set('switcher-api-key', `${apiKey}`)
-            .send({
-                domain: domainDocument.name,
-                component: component1.name,
-                environment: EnvType.DEFAULT
-            }).expect(200);
-
+        const response = await createRequestAuth();
         token = response.body.token;
     });
 
-    test('CLIENT_SUITE - Should return success on a entry-based CRITERIA response', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return success on a entry-based CRITERIA response', async () => {
+        const req = await request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${token}`)
             .send({
@@ -531,16 +496,15 @@ describe('Testing criteria [REST] ', () => {
                         strategy: StrategiesType.NETWORK,
                         input: '10.0.0.3'
                     }]})
-            .expect(200)
-            .end((err, { body }) => {
-                expect(body.strategies.length).toEqual(4);
-                expect(body.reason).toEqual('Success');
-                expect(body.result).toBe(true);
-                done();
-            });
+            .expect(200);
+
+        expect(req.statusCode).toBe(200);
+        expect(req.body.strategies.length).toEqual(4);
+        expect(req.body.reason).toEqual('Success');
+        expect(req.body.result).toBe(true);
     });
 
-    test('CLIENT_SUITE - Should NOT return success on a entry-based CRITERIA response - Component not registered', async (done) => {
+    test('CLIENT_SUITE - Should NOT return success on a entry-based CRITERIA response - Component not registered', async () => {
         //given
         const component = {
             _id: new mongoose.Types.ObjectId(),
@@ -554,11 +518,11 @@ describe('Testing criteria [REST] ', () => {
         const hash = await bcrypt.hash(hashApiKey, 8);
         component.apihash = hash;
         await new Component(component).save();
-        const apiKey = Buffer.from(hashApiKey).toString('base64');
+        const generatedApiKey = Buffer.from(hashApiKey).toString('base64');
 
         const response = await request(app)
             .post('/criteria/auth')
-            .set('switcher-api-key', `${apiKey}`)
+            .set('switcher-api-key', `${generatedApiKey}`)
             .send({
                 domain: domainDocument.name,
                 component: component.name,
@@ -568,7 +532,7 @@ describe('Testing criteria [REST] ', () => {
         const tempToken = response.body.token;
 
         //test
-        request(app)
+        const req = await request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${tempToken}`)
             .send({
@@ -580,16 +544,14 @@ describe('Testing criteria [REST] ', () => {
                     {
                         strategy: StrategiesType.NETWORK,
                         input: '10.0.0.3'
-                    }]})
-            .expect(200)
-            .end((err, { body }) => {
-                expect(body.error).toEqual(`Component ${component.name} is not registered to ${keyConfig}`);
-                done();
-            });
+                    }]});
+
+        expect(req.statusCode).toBe(401);
+        expect(req.body.error).toEqual(`Component ${component.name} is not registered to ${keyConfig}`);
     });
 
-    test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Bad login input', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Bad login input', async () => {
+        const req = await request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true`)
             .set('Authorization', `Bearer ${token}`)
             .send({
@@ -601,18 +563,16 @@ describe('Testing criteria [REST] ', () => {
                     {
                         strategy: StrategiesType.NETWORK,
                         input: '10.0.0.3'
-                    }]})
-            .expect(200)
-            .end((err, { body }) => {
-                expect(body.strategies).toBe(undefined);
-                expect(body.reason).toEqual(`Strategy '${StrategiesType.VALUE}' does not agree`);
-                expect(body.result).toBe(false);
-                done();
-            });
+                    }]});
+
+        expect(req.statusCode).toBe(200);
+        expect(req.body.strategies).toBe(undefined);
+        expect(req.body.reason).toEqual(`Strategy '${StrategiesType.VALUE}' does not agree`);
+        expect(req.body.result).toBe(false);
     });
 
-    test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Invalid KEY', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Invalid KEY', async () => {
+        const req = await request(app)
             .post('/criteria?key=INVALID_KEY&showReason=true')
             .set('Authorization', `Bearer ${token}`)
             .send({
@@ -624,11 +584,9 @@ describe('Testing criteria [REST] ', () => {
                     {
                         strategy: StrategiesType.NETWORK,
                         input: '10.0.0.3'
-                    }]})
-            .expect(404)
-            .end(() => {
-                done();
-            });
+                    }]});
+
+        expect(req.statusCode).toBe(404);
     });
 
     test('CLIENT_SUITE - Should NOT return due to a API Key change, then it should return after renewing the token', async () => {
@@ -712,72 +670,62 @@ describe('Testing criteria [REST] ', () => {
             }).expect(401);
     });
 
-    test('CLIENT_SUITE - Should return that snapshot version is outdated - status = false', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return that snapshot version is outdated - status = false', async () => {
+        const req = await request(app)
             .get('/criteria/snapshot_check/1')
             .set('Authorization', `Bearer ${token}`)
-            .send()
-            .expect(200)
-            .end((err, { body }) => {
-                expect(body.status).toEqual(false);
-                done();
-            });
+            .send();
+
+        expect(req.statusCode).toBe(200);
+        expect(req.body.status).toEqual(false);
     });
 
-    test('CLIENT_SUITE - Should return that snapshot version is updated - status = true', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return that snapshot version is updated - status = true', async () => {
+        const req = await request(app)
             .get('/criteria/snapshot_check/5')
             .set('Authorization', `Bearer ${token}`)
-            .send()
-            .expect(200)
-            .end((err, { body }) => {
-                expect(body.status).toEqual(true);
-                done();
-            });
+            .send();
+
+        expect(req.statusCode).toBe(200);
+        expect(req.body.status).toEqual(true);
     });
 
-    test('CLIENT_SUITE - Should return error when validating snapshot version - Version is not a number', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return error when validating snapshot version - Version is not a number', async () => {
+        const req = await request(app)
             .get('/criteria/snapshot_check/ONLY_NUMBER_ALLOWED')
             .set('Authorization', `Bearer ${token}`)
-            .send()
-            .expect(400)
-            .end((err, { body }) => {
-                expect(body.error).toEqual('Wrong value for domain version');
-                done();
-            });
+            .send();
+
+        expect(req.statusCode).toBe(400);
+        expect(req.body.error).toEqual('Wrong value for domain version');
     });
 
-    test('CLIENT_SUITE - Should return error when validating snapshot version - Invalid token', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return error when validating snapshot version - Invalid token', async () => {
+        const req = await request(app)
             .get('/criteria/snapshot_check/5')
             .set('Authorization', 'Bearer INVALID_TOKEN')
-            .send()
-            .expect(500)
-            .end((err, { body }) => {
-                expect(body.error).toEqual('Invalid API token.');
-                done();
-            });
+            .send();
+
+        expect(req.statusCode).toBe(401);
+        expect(req.body.error).toEqual('Invalid API token.');
     });
 
-    test('CLIENT_SUITE - Should return an empty list of switchers - all switchers queried found', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return an empty list of switchers - all switchers queried found', async () => {
+        const req = await request(app)
             .post('/criteria/switchers_check')
             .set('Authorization', `Bearer ${token}`)
             .send({
                 switchers: [
                     'TEST_CONFIG_KEY'
                 ]
-            })
-            .expect(200)
-            .end((err, { body }) => {
-                expect(body.not_found).toEqual([]);
-                done();
             });
+
+        expect(req.statusCode).toBe(200);
+        expect(req.body.not_found).toEqual([]);
     });
 
-    test('CLIENT_SUITE - Should return the switcher queried - not found', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return the switcher queried - not found', async () => {
+        const req = await request(app)
             .post('/criteria/switchers_check')
             .set('Authorization', `Bearer ${token}`)
             .send({
@@ -785,12 +733,10 @@ describe('Testing criteria [REST] ', () => {
                     'TEST_CONFIG_KEY',
                     'I_DO_NOT_EXIST'
                 ]
-            })
-            .expect(200)
-            .end((err, { body }) => {
-                expect(body.not_found).toEqual(['I_DO_NOT_EXIST']);
-                done();
             });
+
+        expect(req.statusCode).toBe(200);
+        expect(req.body.not_found).toEqual(['I_DO_NOT_EXIST']);
     });
 });
 
@@ -798,127 +744,109 @@ describe('Testing domain [Adm-GraphQL] ', () => {
 
     afterAll(setupDatabase);
 
-    test('CLIENT_SUITE - Should return domain structure', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return domain structure', async () => {
+        const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(graphqlUtils.domainQuery([['name', 'Domain']]))
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected106));
-                done();
-            });
+            .send(graphqlUtils.domainQuery([['name', 'Domain']]));
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected106));
     });
 
-    test('CLIENT_SUITE - Should return domain structure for a team member', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return domain structure for a team member', async () => {
+        const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]]))
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected107));
-                done();
-            });
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]]));
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected107));
     });
 
-    test('CLIENT_SUITE - Should return domain Flat-structure - By Switcher Key', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return domain Flat-structure - By Switcher Key', async () => {
+        const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(graphqlUtils.configurationQuery([['domain', domainId], ['key', keyConfig]]))
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected108));
-                done();
-            });
+            .send(graphqlUtils.configurationQuery([['domain', domainId], ['key', keyConfig]]));
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected108));
     });
 
-    test('CLIENT_SUITE - Should return domain Flat-structure - By Group', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return domain Flat-structure - By Group', async () => {
+        const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(graphqlUtils.configurationQuery([['domain', domainId], ['group', 'Group Test']]))
-            .expect(200)
-            .end((err, res) => {
-                const result = JSON.parse(res.text);
-                expect(result.data.configuration.group[0].name).toEqual('Group Test');
-                done();
-            });
+            .send(graphqlUtils.configurationQuery([['domain', domainId], ['group', 'Group Test']]));
+
+        const result = JSON.parse(req.text);
+        expect(req.statusCode).toBe(200);
+        expect(result.data.configuration.group[0].name).toEqual('Group Test');
     });
 
-    test('CLIENT_SUITE - Should return domain Flat-structure for a team member', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return domain Flat-structure for a team member', async () => {
+        const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send(graphqlUtils.configurationQuery([
                 ['domain', domainId], 
                 ['key', keyConfig], 
-                ['environment', EnvType.DEFAULT]]))
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected109));
-                done();
-            });
+                ['environment', EnvType.DEFAULT]]));
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected109));
     });
 
-    test('CLIENT_SUITE - Should return domain Flat-structure - By domain', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return domain Flat-structure - By domain',  async () => {
+        const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send(graphqlUtils.configurationQuery([
-                ['domain', domainId]]))
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected110));
-                done();
-            });
+                ['domain', domainId]]));
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected110));
     });
 
-    test('CLIENT_SUITE - Should return environments Flat-structure - By Slack Team ID', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should return environments Flat-structure - By Slack Team ID', async () => {
+        const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send(graphqlUtils.configurationQuery([
-                ['slack_team_id', slack.team_id]], false, false, false, false, true))
-            .expect(200)
-            .end((err, res) => {
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(graphqlUtils.expected111));
-                done();
-            });
+                ['slack_team_id', slack.team_id]], false, false, false, false, true));
+                
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected111));
     });
 
-    test('CLIENT_SUITE - Should NOT return domain structure for an excluded team member', async (done) => {
+    test('CLIENT_SUITE - Should NOT return domain structure for an excluded team member', async () => {
         //given
         const admin = await Admin.findById(adminAccountId);
         admin.teams = [];
         await admin.save();
         
-        request(app)
+        const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]]))
-            .expect(200)
-            .end((err, res) => {
-                const expected = '{"data":{"domain":null}}';
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
-                done();
-            });
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]]));
+
+        const expected = '{"data":{"domain":null}}';
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
     });
 
-    test('CLIENT_SUITE - Should NOT return domain Flat-structure for am excluded team member', (done) => {
-        request(app)
+    test('CLIENT_SUITE - Should NOT return domain Flat-structure for am excluded team member', async () => {
+        const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send(graphqlUtils.configurationQuery([
                 ['domain', domainId], 
                 ['key', keyConfig], 
-                ['environment', EnvType.DEFAULT]]))
-            .expect(200)
-            .end((err, res) => {
-                const expected = '{"data":{"configuration":{"domain":null,"group":null,"config":null,"strategies":null}}}';
-                expect(JSON.parse(res.text)).toMatchObject(JSON.parse(expected));
-                done();
-            });
+                ['environment', EnvType.DEFAULT]]));
+
+        const expected = '{"data":{"configuration":{"domain":null,"group":null,"config":null,"strategies":null}}}';
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
     });
 });
