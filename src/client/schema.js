@@ -12,16 +12,16 @@ const queryType = new GraphQLObjectType({
             type: criteriaType,
             args: {
                 key: {
-                    type: GraphQLNonNull(GraphQLString)
+                    type: new GraphQLNonNull(GraphQLString)
                 },
                 entry: {
-                    type: GraphQLList(strategyInputType)
+                    type: new GraphQLList(strategyInputType)
                 },
                 bypassMetric: {
                     type: GraphQLBoolean
                 }
             },
-            resolve: async (source, { key, entry, bypassMetric }, context) => {
+            resolve: async (_source, { key, entry, bypassMetric }, context) => {
                 context.entry = entry;
                 context.bypassMetric = bypassMetric;
                 return resolveConfigByKey(context.domain, key);
@@ -38,7 +38,7 @@ const queryType = new GraphQLObjectType({
                 },
                 activated: {
                     type: GraphQLBoolean,
-                    resolve: (source, args, { environment }) => {
+                    resolve: (source, _args, { environment }) => {
                         return source.activated.get(environment) === undefined ? 
                             source.activated.get(EnvType.DEFAULT) : source.activated.get(environment);
                     }
@@ -50,7 +50,7 @@ const queryType = new GraphQLObjectType({
                     type: GraphQLString
                 }
             },
-            resolve: async (source, { _id, name, activated, environment, _component }, context) => {
+            resolve: async (_source, { _id, name, activated, environment, _component }, context) => {
                 if (environment) context.environment = environment;
                 if (_component) context._component = _component;
                 return resolveDomain(_id, name, activated, context);
@@ -75,7 +75,7 @@ const queryType = new GraphQLObjectType({
                     type: GraphQLString
                 }
             },
-            resolve: async (source, args, context) => {
+            resolve: async (_source, args, context) => {
                 return resolveConfiguration(args, context);
             }
         },

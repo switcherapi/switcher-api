@@ -72,7 +72,7 @@ describe('Testing Switcher Relay', () => {
 
     afterAll(setupDatabase);
 
-    test('RELAY_SUITE - Should return success when validating relay using GET method', async (done) => {
+    test('RELAY_SUITE - Should return success when validating relay using GET method', async () => {
         //mock
         axiosStub = sinon.stub(axios, 'get');
 
@@ -87,7 +87,7 @@ describe('Testing Switcher Relay', () => {
             .send(bodyRelay(RelayMethods.GET, RelayTypes.VALIDATION)).expect(200);
 
         //test
-        request(app)
+        const req = await request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${token}`)
             .send({
@@ -100,17 +100,15 @@ describe('Testing Switcher Relay', () => {
                         strategy: StrategiesType.NETWORK,
                         input: '10.0.0.3'
                     }
-                ]})
-            .expect(200)
-            .end((err, { body }) => {
-                axiosStub.restore();
-                expect(body.reason).toEqual('Success');
-                expect(body.result).toBe(true);
-                done();
-            });
+                ]});
+            
+        axiosStub.restore();
+        expect(req.statusCode).toBe(200);
+        expect(req.body.reason).toEqual('Success');
+        expect(req.body.result).toBe(true);
     });
 
-    test('RELAY_SUITE - Should return success when validating relay using POST method', async (done) => {
+    test('RELAY_SUITE - Should return success when validating relay using POST method', async () => {
         //mock
         axiosStub = sinon.stub(axios, 'post');
 
@@ -125,7 +123,7 @@ describe('Testing Switcher Relay', () => {
             .send(bodyRelay(RelayMethods.POST, RelayTypes.VALIDATION)).expect(200);
 
         //test
-        request(app)
+        const req = await request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${token}`)
             .send({
@@ -138,17 +136,15 @@ describe('Testing Switcher Relay', () => {
                         strategy: StrategiesType.NETWORK,
                         input: '10.0.0.3'
                     }
-                ]})
-            .expect(200)
-            .end((err, { body }) => {
-                axiosStub.restore();
-                expect(body.reason).toEqual('Success');
-                expect(body.result).toBe(true);
-                done();
-            });
+                ]});
+
+        axiosStub.restore();
+        expect(req.statusCode).toBe(200);
+        expect(req.body.reason).toEqual('Success');
+        expect(req.body.result).toBe(true);
     });
 
-    test('RELAY_SUITE - Should return success when notifying relay using GET method', async (done) => {
+    test('RELAY_SUITE - Should return success when notifying relay using GET method', async () => {
         //mock
         axiosStub = sinon.stub(axios, 'get');
 
@@ -163,7 +159,7 @@ describe('Testing Switcher Relay', () => {
             .send(bodyRelay(RelayMethods.GET, RelayTypes.NOTIFICATION)).expect(200);
 
         //test
-        request(app)
+        const req = await request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${token}`)
             .send({
@@ -176,17 +172,15 @@ describe('Testing Switcher Relay', () => {
                         strategy: StrategiesType.NETWORK,
                         input: '10.0.0.3'
                     }
-                ]})
-            .expect(200)
-            .end((err, { body }) => {
-                axiosStub.restore();
-                expect(body.reason).toEqual('Success');
-                expect(body.result).toBe(true);
-                done();
-            });
+                ]});
+
+        axiosStub.restore();
+        expect(req.statusCode).toBe(200);
+        expect(req.body.reason).toEqual('Success');
+        expect(req.body.result).toBe(true);
     });
 
-    test('RELAY_SUITE - Should return success when notifying relay using POST method', async (done) => {
+    test('RELAY_SUITE - Should return success when notifying relay using POST method', async () => {
         //mock
         axiosStub = sinon.stub(axios, 'post');
 
@@ -201,7 +195,7 @@ describe('Testing Switcher Relay', () => {
             .send(bodyRelay(RelayMethods.POST, RelayTypes.NOTIFICATION)).expect(200);
 
         //test
-        request(app)
+       const req = await request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${token}`)
             .send({
@@ -214,17 +208,15 @@ describe('Testing Switcher Relay', () => {
                         strategy: StrategiesType.NETWORK,
                         input: '10.0.0.3'
                     }
-                ]})
-            .expect(200)
-            .end((err, { body }) => {
-                axiosStub.restore();
-                expect(body.reason).toEqual('Success');
-                expect(body.result).toBe(true);
-                done();
-            });
+                ]});
+
+        axiosStub.restore();
+        expect(req.statusCode).toBe(200);
+        expect(req.body.reason).toEqual('Success');
+        expect(req.body.result).toBe(true);
     });
 
-    test('RELAY_SUITE - Should return success when validating relay using GET method - no input', async (done) => {
+    test('RELAY_SUITE - Should return success when validating relay using GET method - no input', async () => {
         //mock
         axiosStub = sinon.stub(axios, 'get');
 
@@ -243,20 +235,18 @@ describe('Testing Switcher Relay', () => {
         await changeStrategy(configStrategyCIDRId, undefined, false, EnvType.DEFAULT);
 
         //test
-        request(app)
+        const req = await request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${token}`)
-            .send()
-            .expect(200)
-            .end((err, { body }) => {
-                axiosStub.restore();
-                expect(body.reason).toEqual('Success');
-                expect(body.result).toBe(true);
-                done();
-            });
+            .send();
+
+        axiosStub.restore();
+        expect(req.statusCode).toBe(200);
+        expect(req.body.reason).toEqual('Success');
+        expect(req.body.result).toBe(true);
     });
 
-    test('RELAY_SUITE - Should return success when validating relay using POST method - no input', async (done) => {
+    test('RELAY_SUITE - Should return success when validating relay using POST method - no input', async () => {
         //mock
         axiosStub = sinon.stub(axios, 'post');
 
@@ -275,20 +265,18 @@ describe('Testing Switcher Relay', () => {
         await changeStrategy(configStrategyCIDRId, undefined, false, EnvType.DEFAULT);
 
         //test
-        request(app)
+        const req = await request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${token}`)
-            .send()
-            .expect(200)
-            .end((err, { body }) => {
-                axiosStub.restore();
-                expect(body.reason).toEqual('Success');
-                expect(body.result).toBe(true);
-                done();
-            });
+            .send();
+
+        axiosStub.restore();
+        expect(req.statusCode).toBe(200);
+        expect(req.body.reason).toEqual('Success');
+        expect(req.body.result).toBe(true);
     });
 
-    test('RELAY_SUITE - Should NOT return success when validating relay using GET method - Service exception', async (done) => {
+    test('RELAY_SUITE - Should NOT return success when validating relay using GET method - Service exception', async () => {
         //mock
         axiosStub = sinon.stub(axios, 'get');
         axiosStub.throwsException();
@@ -300,21 +288,19 @@ describe('Testing Switcher Relay', () => {
             .send(bodyRelay(RelayMethods.GET, RelayTypes.VALIDATION)).expect(200);
 
         //test
-        request(app)
+        const req = await request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${token}`)
-            .send()
-            .expect(200)
-            .end((err, { body }) => {
-                axiosStub.restore();
-                expect(body.reason).toEqual('Relay service could not be reached');
-                expect(body.message).toEqual('Failed to reach http://localhost:3001 via GET');
-                expect(body.result).toBe(false);
-                done();
-            });
+            .send();
+
+        axiosStub.restore();
+        expect(req.statusCode).toBe(200);
+        expect(req.body.reason).toEqual('Relay service could not be reached');
+        expect(req.body.message).toEqual('Failed to reach http://localhost:3001 via GET');
+        expect(req.body.result).toBe(false);
     });
 
-    test('RELAY_SUITE - Should NOT return success when validating relay using POST method - Service exception', async (done) => {
+    test('RELAY_SUITE - Should NOT return success when validating relay using POST method - Service exception', async () => {
         //mock
         axiosStub = sinon.stub(axios, 'post');
         axiosStub.throwsException();
@@ -326,18 +312,16 @@ describe('Testing Switcher Relay', () => {
             .send(bodyRelay(RelayMethods.POST, RelayTypes.VALIDATION)).expect(200);
 
         //test
-        request(app)
+        const req = await request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${token}`)
-            .send()
-            .expect(200)
-            .end((err, { body }) => {
-                axiosStub.restore();
-                expect(body.reason).toEqual('Relay service could not be reached');
-                expect(body.message).toEqual('Failed to reach http://localhost:3001 via POST');
-                expect(body.result).toBe(false);
-                done();
-            });
+            .send();
+
+        axiosStub.restore();
+        expect(req.statusCode).toBe(200);
+        expect(req.body.reason).toEqual('Relay service could not be reached');
+        expect(req.body.message).toEqual('Failed to reach http://localhost:3001 via POST');
+        expect(req.body.result).toBe(false);
     });
 
 });
