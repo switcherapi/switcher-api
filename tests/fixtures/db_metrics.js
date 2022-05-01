@@ -153,12 +153,10 @@ export const setupDatabase = async () => {
     await Config.deleteMany();
     await Component.deleteMany();
 
-    const refreshTokenMaster = await bcrypt.hash(adminMasterAccountToken.split('.')[2], 8);
-    adminMasterAccount.token = refreshTokenMaster;
+    adminMasterAccount.token = Admin.extractTokenPart(adminMasterAccountToken);
     await new Admin(adminMasterAccount).save();
 
-    const refreshToken = await bcrypt.hash(adminAccountToken.split('.')[2], 8);
-    adminAccount.token = refreshToken;
+    adminAccount.token = Admin.extractTokenPart(adminAccountToken);
     await new Admin(adminAccount).save();
     
     await new Domain(domainDocument).save();
