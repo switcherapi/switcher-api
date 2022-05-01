@@ -191,7 +191,7 @@ router.patch('/config/removeRelay/:id/:env', [
     }
 });
 
-router.get('/config/spec/relay', auth, (req, res) => {
+router.get('/config/spec/relay', auth, (_req, res) => {
     res.send(relayOptions());
 });
 

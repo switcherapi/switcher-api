@@ -32,7 +32,7 @@ teamSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret) {
+    transform: function (_doc, ret) {
         if (ret.members_list) {
             ret.members = ret.members_list;
             delete ret.members_list;
