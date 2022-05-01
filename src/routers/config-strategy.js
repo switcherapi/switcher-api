@@ -105,7 +105,7 @@ router.get('/configstrategy/req/:strategy', [
     }
 });
 
-router.get('/configstrategy/spec/strategies', auth, (req, res) => {
+router.get('/configstrategy/spec/strategies', auth, (_req, res) => {
     res.send({
         strategiesAvailable: Object.values(StrategiesType)
     });

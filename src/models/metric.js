@@ -49,7 +49,7 @@ metricSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret) {
+    transform: function (_doc, ret) {
         ret.date = moment(ret.date).format('YYYY-MM-DD HH:mm:ss');
         if (!ret.id) {
             delete ret.id;
