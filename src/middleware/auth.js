@@ -1,7 +1,7 @@
-import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { getAdmin, getAdminById } from '../controller/admin';
 import { getComponentById } from '../controller/component';
+import Admin from '../models/admin';
 import Component from '../models/component';
 
 export async function auth(req, res, next) {
@@ -13,9 +13,8 @@ export async function auth(req, res, next) {
         if (!admin || !admin.active) {
             throw new Error();
         }
-
-        const isMatch = await bcrypt.compare(token.split('.')[2], admin.token);
-        if (!isMatch) {
+        
+        if (admin.token !== Admin.extractTokenPart(token)) {
             throw new Error();
         }
 
@@ -32,14 +31,14 @@ export async function authRefreshToken(req, res, next) {
         const token = req.header('Authorization').replace('Bearer ', '');
         const refreshToken = req.body.refreshToken;
         
-        const isMatch = await bcrypt.compare(token.split('.')[2], refreshToken);
-        if (!isMatch) {
+        const decodedRefreshToken = jwt.verify(refreshToken, process.env.JWT_SECRET);
+        if (decodedRefreshToken.subject !== Admin.extractTokenPart(token)) {
             throw new Error();
         }
 
         const decoded = await jwt.decode(token);
-        const admin = await getAdmin({ _id: decoded._id, token: refreshToken });
-
+        const admin = await getAdmin({ _id: decoded._id, token: decodedRefreshToken.subject });
+        
         if (!admin || !admin.active) {
             throw new Error();
         }
@@ -58,7 +57,7 @@ export async function appAuth(req, res, next) {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const component = await getComponentById(decoded.component);
 
-        if (component?.apihash.substring(50,component.apihash.length - 1) !== decoded.vc) {
+        if (component?.apihash.substring(50, component.apihash.length - 1) !== decoded.vc) {
             throw new Error();
         }
 

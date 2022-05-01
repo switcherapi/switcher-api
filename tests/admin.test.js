@@ -491,7 +491,7 @@ describe('Testing Admin insertion', () => {
 
         //DB validation
         let admin = await Admin.findById(adminAccount._id).lean();
-        expect(admin.token).toEqual(refreshToken);
+        expect(admin.token).toEqual(Admin.extractTokenPart(token));
 
         await new Promise(resolve => setTimeout(resolve, 1000));
         const responseRefresh = await request(app)
@@ -505,10 +505,6 @@ describe('Testing Admin insertion', () => {
         expect(responseRefresh.body.refreshToken).not.toBeNull();
         expect(responseRefresh.body.token).not.toEqual(token);
         expect(responseRefresh.body.refreshToken).not.toEqual(refreshToken);
-
-        //DB validation
-        admin = await Admin.findById(adminAccount._id).lean();
-        expect(admin.token).toEqual(responseRefresh.body.refreshToken);
     });
 
     test('ADMIN_SUITE - Should NOT renew access - using the same refreshToken', async () => {
@@ -525,14 +521,14 @@ describe('Testing Admin insertion', () => {
         expect(token).not.toBeNull();
         expect(refreshToken).not.toBeNull();
 
-        let responseRefresh = await request(app)
+        await request(app)
             .post('/admin/refresh/me')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
                 refreshToken
             }).expect(200);
 
-        responseRefresh = await request(app)
+        let responseRefresh = await request(app)
             .post('/admin/refresh/me')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send({
@@ -556,8 +552,6 @@ describe('Testing Admin insertion', () => {
             .get('/admin/me')
             .set('Authorization', `Bearer ${firstToken}`)
             .send().expect(200);
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
 
         // Logging again will make lost older sessions credentials
         responseLogin = await request(app)
@@ -606,13 +600,13 @@ describe('Testing Admin insertion', () => {
     test('ADMIN_SUITE - Should return token expired', async () => {
         const tempToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET || 'test_secret', { expiresIn: '0s' });
 
-        let response = await request(app)
+        await request(app)
             .get('/admin/me')
             .set('Authorization', `Bearer ${tempToken}`)
             .send().expect(401);
 
         // After login, it should just renew
-        response = await request(app)
+        let response = await request(app)
             .post('/admin/login')
             .send({
                 email: adminAccount.email,
@@ -638,7 +632,8 @@ describe('Testing Admin login and fetch', () => {
             }).expect(200);
 
         const admin = await Admin.findById(adminAccountId).lean();
-        expect(response.body.jwt.refreshToken).toBe(admin.token);
+        const token = response.body.jwt.token;
+        expect(Admin.extractTokenPart(token)).toBe(admin.token);
     });
 
     test('ADMIN_SUITE - Should not login non-existent admin', async () => {

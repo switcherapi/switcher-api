@@ -87,7 +87,7 @@ adminSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret) {
+    transform: function (_doc, ret) {
         if (ret.updatedAt || ret.createdAt) {
             ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
             ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
@@ -109,17 +109,20 @@ adminSchema.methods.generateAuthToken = async function () {
     const admin = this;
 
     const options = {
-        expiresIn: process.env.JWT_ADMIN_TOKEN_RENEW_INTERVAL
+        expiresIn: process.env.JWT_ADMIN_TOKEN_RENEW_INTERVAL,
+        issuer: 'switcher-api'
     };
 
-    const token = jwt.sign(({ _id: admin.id.toString() }), process.env.JWT_SECRET, options);
-    const refreshToken = await bcrypt.hash(token.split('.')[2], 8);
+    const token = jwt.sign(({ _id: admin.id.toString(), issued: Date.now() }), process.env.JWT_SECRET, options);
+    const refreshToken = jwt.sign(({ 
+        subject: Admin.extractTokenPart(token)
+    }), process.env.JWT_SECRET);
 
     admin.code = null;
     admin.active = true;
-    admin.token = refreshToken;
+    admin.token = Admin.extractTokenPart(token);
     await admin.save();
-
+    
     return {
         token,
         refreshToken
@@ -185,6 +188,10 @@ adminSchema.statics.createThirdPartyAccount = async (
     return admin;
 };
 
+adminSchema.statics.extractTokenPart = (token) => {
+    return token.substring(token.length - 8, token.length);
+};
+
 adminSchema.pre('save', async function (next) {
     const admin = this;
 
@@ -196,7 +203,7 @@ adminSchema.pre('save', async function (next) {
     next();
 });
 
-adminSchema.post('save', function(error, doc, next) {
+adminSchema.post('save', function(error, _doc, next) {
     if (error.name === 'MongoServerError' && error.code === 11000)
         return next(new Error('Account is already registered.'));
     

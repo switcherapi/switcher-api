@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 import Admin from '../../src/models/admin';
 import Domain from '../../src/models/domain';
 import GroupConfig from '../../src/models/group-config';
@@ -191,12 +190,10 @@ export const setupDatabase = async () => {
     await TeamInvite.deleteMany();
     await Role.deleteMany();
 
-    const refreshTokenMaster = await bcrypt.hash(adminMasterAccountToken.split('.')[2], 8);
-    adminMasterAccount.token = refreshTokenMaster;
+    adminMasterAccount.token = Admin.extractTokenPart(adminMasterAccountToken);
     await new Admin(adminMasterAccount).save();
 
-    const refreshToken = await bcrypt.hash(adminAccountToken.split('.')[2], 8);
-    adminAccount.token = refreshToken;
+    adminAccount.token = Admin.extractTokenPart(adminAccountToken);
     await new Admin(adminAccount).save();
 
     await new Environment(environment1).save();
