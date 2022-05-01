@@ -72,7 +72,7 @@ app.use('/adm-graphql', auth, graphqlHTTP({
     graphiql: true
 }));
 
-app.get('/check', (req, res) => {
+app.get('/check', (_req, res) => {
     res.status(200).send({ 
         message: 'All good',
         code: 200,
@@ -89,7 +89,7 @@ app.get('/check', (req, res) => {
     });
 });
 
-app.get('*', (req, res) => {
+app.get('*', (_req, res) => {
     res.status(404).send({ error: 'Operation not found' });
 });
 

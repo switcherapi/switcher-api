@@ -29,7 +29,7 @@ router.post('/role/create/:team', [check('team').isMongoId()],
     }
 });
 
-router.get('/role/routers', auth, (req, res) => {
+router.get('/role/routers', auth, (_req, res) => {
     res.send({
         routersAvailable: Object.values(RouterTypes)
     });
@@ -44,7 +44,7 @@ router.get('/role/spec/router/:router', auth, (req, res) => {
     }
 });
 
-router.get('/role/actions', auth, (req, res) => {
+router.get('/role/actions', auth, (_req, res) => {
     res.send({
         actionsAvailable: Object.values(ActionTypes)
     });

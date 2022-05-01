@@ -84,7 +84,7 @@ domainSchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret) {
+    transform: function (_doc, ret) {
         if (ret.updatedAt || ret.createdAt) {
             ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
             ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
@@ -132,7 +132,7 @@ domainSchema.pre('save', async function (next) {
     next();
 });
 
-domainSchema.post('save', function(error, doc, next) {
+domainSchema.post('save', function(error, _doc, next) {
     if (error.name === 'MongoServerError' && error.code === 11000)
         return next(new Error('The domain name is already in use.'));
 

@@ -67,14 +67,19 @@ export async function updateDomainVersion(domainId) {
 }
 
 export function formatInput(input, 
-    options = { toUpper: false, toLower: false, autoUnderscore: false, allowSpace: false }) {
+    options = { 
+        toUpper: false, 
+        toLower: false, 
+        autoUnderscore: false, 
+        allowSpace: false 
+    }) {
 
     let regexStr;
     if (options.autoUnderscore) {
         regexStr = /^[a-zA-Z0-9_\- ]*$/;
     } else {
         // eslint-disable-next-line no-useless-escape
-        regexStr = options.allowSpace ? /^[-a-zA-Z0-9_\- ]*$/ : /^[a-zA-Z0-9_\-]*$/;
+        regexStr = options.allowSpace ? /^[a-zA-Z0-9_\- ]*$/ : /^[a-zA-Z0-9_\-]*$/;
     }
 
     if (!input.match(regexStr)) {

@@ -33,7 +33,7 @@ const historySchema = new mongoose.Schema({
 historySchema.options.toJSON = {
     getters: true,
     minimize: false,
-    transform: function (doc, ret) {
+    transform: function (_doc, ret) {
         ret.date = moment(ret.date).format('YYYY-MM-DD HH:mm:ss');
         if (!ret.id) {
             delete ret.id;

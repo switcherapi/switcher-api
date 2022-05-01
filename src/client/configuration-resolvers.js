@@ -138,7 +138,7 @@ export async function resolveFlatGroupConfig(source, context) {
     return group;
 }
 
-export async function resolveFlatDomain(source, context) {
+export async function resolveFlatDomain(_source, context) {
     let domain;
 
     if (context.domain) {
