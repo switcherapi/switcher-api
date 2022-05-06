@@ -55,6 +55,7 @@ describe('Slack Feature Availability', () => {
     afterAll(() => {
         process.env.SWITCHER_API_ENABLE = false;
         process.env.SWITCHER_API_LOGGER = logger_status;
+        process.env.SWITCHER_SLACK_JWT_SECRET = 'SLACK_APP_SECRET';
     });
 
     test('SLACK_SUITE - Should check feature - Available', async () => {
@@ -69,7 +70,7 @@ describe('Slack Feature Availability', () => {
         expect(response.body.result).toBe(true);
     });
 
-    test('SLACK_SUITE - Should check feature - Available', async () => {
+    test('SLACK_SUITE - Should check feature - Not Available', async () => {
         Switcher.assume('SLACK_INTEGRATION').false();
         const response = await request(app)
             .post('/slack/v1/availability')
@@ -81,13 +82,25 @@ describe('Slack Feature Availability', () => {
         expect(response.body.result).toBe(false);
     });
 
-    test('SLACK_SUITE - Should check - Not available', async () => {
+    test('SLACK_SUITE - Should check - Not available: Invalid feature', async () => {
         await request(app)
             .post('/slack/v1/availability')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 feature: 'INVALID_FEATURE_KEY'
             }).expect(400);
+    });
+
+    test('SLACK_SUITE - Should check - Not available: No secret defined', async () => {
+        process.env.SWITCHER_SLACK_JWT_SECRET = '';
+        const response = await request(app)
+            .post('/slack/v1/availability')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                feature: 'SLACK_INTEGRATION'
+            }).expect(200);
+
+        expect(response.body.result).toBe(false);
     });
 });
 
@@ -149,14 +162,14 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should NOT save installation - Missing installation payload', async () => {
         //given
-        const slack = Object.assign({}, mock1_slack_installation);
-        delete slack.installation_payload;
+        const slack_install = Object.assign({}, mock1_slack_installation);
+        delete slack_install.installation_payload;
         
         //test
         await request(app)
             .post('/slack/v1/installation')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
-            .send(slack).expect(422);
+            .send(slack_install).expect(422);
     });
 
     test('SLACK_SUITE - Should authorize installation', async () => {
