@@ -1,7 +1,8 @@
-import { NotFoundError, PermissionError } from '../exceptions';
-import { checkSlackIntegration } from '../external/switcher-api-facade';
 import Slack from '../models/slack';
+import { checkValue, Switcher } from 'switcher-client';
 import { TicketStatusType, SLACK_SUB } from '../models/slack_ticket';
+import { NotFoundError, PermissionError } from '../exceptions';
+import { checkSlackIntegration, checkFeature, SwitcherKeys } from '../external/switcher-api-facade';
 import { getConfig } from './config';
 import { getDomainById } from './domain';
 import { getEnvironment } from './environment';
@@ -65,6 +66,22 @@ export async function getSlack(where) {
     if (where.enterprise_id) query.where('enterprise_id', where.enterprise_id);
 
     return query.exec();
+}
+
+export async function checkAvailability(admin, feature) {
+    if (!process.env.SWITCHER_SLACK_JWT_SECRET)
+        return false;
+
+    const result = await checkFeature(feature, [checkValue(admin._id)], [
+        SwitcherKeys.SLACK_INTEGRATION, 
+        SwitcherKeys.SLACK_UPDATE
+    ]);
+
+    if (process.env.SWITCHER_API_LOGGER == 'true')
+        console.log('\n### Switcher API Logger ###\n' + 
+            JSON.stringify(Switcher.getLogger(feature), undefined, 2));
+
+    return result;
 }
 
 export async function createSlackInstallation(args) {

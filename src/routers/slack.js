@@ -1,11 +1,10 @@
 import express from 'express';
 import { check, query } from 'express-validator';
-import { checkValue, Switcher } from 'switcher-client';
 import { NotFoundError, responseException } from '../exceptions';
 import { auth, slackAuth } from '../middleware/auth';
 import { validate } from '../middleware/validators';
 import { TicketStatusType } from '../models/slack_ticket';
-import { checkFeature, SwitcherKeys } from '../external/switcher-api-facade';
+import { SwitcherKeys } from '../external/switcher-api-facade';
 import { getDomainById } from '../controller/domain';
 import * as Controller from '../controller/slack';
 
@@ -49,18 +48,7 @@ const createTicketContent = (req) => {
 
 router.post('/slack/v1/availability', auth, async (req, res) => {
     try {
-        const result = await checkFeature(
-            req.body.feature, [
-                checkValue(req.admin._id)
-            ], [
-                SwitcherKeys.SLACK_INTEGRATION, 
-                SwitcherKeys.SLACK_UPDATE
-            ]);
-
-        if (process.env.SWITCHER_API_LOGGER == 'true')
-            console.log('\n### Switcher API Logger ###\n' + 
-                JSON.stringify(Switcher.getLogger(req.body.feature), undefined, 2));
-                
+        const result = await Controller.checkAvailability(req.admin, req.body.feature);
         res.send({ result });
     } catch (e) {
         responseException(res, e, 400, req.body.feature);
