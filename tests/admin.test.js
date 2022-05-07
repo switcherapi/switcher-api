@@ -472,7 +472,8 @@ describe('Testing Admin insertion', () => {
             .get('/check')
             .send().expect(200);
 
-        expect(response.body.message).toEqual('All good');
+        expect(response.body.status).toEqual('UP');
+        expect(response.body.attributes.version).toEqual(app.version);
     });
 
     test('ADMIN_SUITE - Should renew access', async () => {
