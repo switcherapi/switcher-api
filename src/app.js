@@ -22,6 +22,7 @@ import schema from './client/schema';
 import { appAuth, auth, slackAuth } from './middleware/auth';
 
 const app = express();
+app.version = 'v1.2.3';
 
 app.use(express.json());
 
@@ -74,9 +75,9 @@ app.use('/adm-graphql', auth, graphqlHTTP({
 
 app.get('/check', (_req, res) => {
     res.status(200).send({ 
-        message: 'All good',
-        code: 200,
+        status: 'UP',
         attributes: {
+            version: app.version,
             env: process.env.ENV,
             db_state: mongoose.connection.readyState,
             switcherapi: process.env.SWITCHER_API_ENABLE,
