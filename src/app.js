@@ -24,8 +24,6 @@ import schema from './client/schema';
 import { appAuth, auth, slackAuth } from './middleware/auth';
 
 const app = express();
-app.version = 'v1.2.3';
-
 app.use(express.json());
 
 /**

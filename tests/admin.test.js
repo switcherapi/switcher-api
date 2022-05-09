@@ -474,7 +474,7 @@ describe('Testing Admin insertion', () => {
             .send().expect(200);
 
         expect(response.body.status).toEqual('UP');
-        expect(response.body.attributes.version).toEqual(app.version);
+        expect(response.body.attributes.version).toEqual(swaggerDocument.info.version);
     });
 
     test('ADMIN_SUITE - Should return OpenAPI Swagger API document', async () => {
