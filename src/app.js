@@ -1,4 +1,5 @@
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
 import { graphqlHTTP } from 'express-graphql';
 import cors from 'cors';
 import helmet from 'helmet';    
@@ -6,6 +7,7 @@ import helmet from 'helmet';
 require('./db/mongoose');
 
 import mongoose from 'mongoose';
+import swaggerDocument from './routers/api-docs/swagger-document';
 import clientApiRouter from './routers/client-api';
 import adminRouter from './routers/admin';
 import environment from './routers/environment';
@@ -73,11 +75,25 @@ app.use('/adm-graphql', auth, graphqlHTTP({
     graphiql: true
 }));
 
+/**
+ * API Docs and Health Check
+ */
+
+app.use(
+    '/api-docs',
+    swaggerUi.serve, 
+    swaggerUi.setup(swaggerDocument)
+);
+
+app.get('/swagger.json', (_req, res) => {
+    res.status(200).send(swaggerDocument);
+});
+
 app.get('/check', (_req, res) => {
     res.status(200).send({ 
         status: 'UP',
         attributes: {
-            version: app.version,
+            version: swaggerDocument.info.version,
             env: process.env.ENV,
             db_state: mongoose.connection.readyState,
             switcherapi: process.env.SWITCHER_API_ENABLE,

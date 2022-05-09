@@ -41,6 +41,7 @@
     "moment": "^2.29.3",
     "mongodb": "^4.5.0",
     "mongoose": "^6.3.1",
+    "swagger-ui-express": "^4.3.0",
     "switcher-client": "^3.1.0",
     "validator": "^13.7.0"
   },
