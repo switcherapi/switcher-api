@@ -485,6 +485,14 @@ describe('Testing Admin insertion', () => {
         expect(response.body).toMatchObject(swaggerDocument);
     });
 
+    test('ADMIN_SUITE - Should return OpenAPI Swagger API document', async () => {
+        const response = await request(app)
+            .get('/swagger.json')
+            .send().expect(200);
+
+        expect(response.body).toMatchObject(swaggerDocument);
+    });
+
     test('ADMIN_SUITE - Should renew access', async () => {
         const responseLogin = await request(app)
             .post('/admin/login')
