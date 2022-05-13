@@ -1,3 +1,14 @@
+export const commonSchema = {
+    Message: {
+        type: 'object',
+        properties: {
+            message: {
+                type: 'string'
+            }
+        }
+    }
+};
+
 export const pagination = [
     {
         in: 'query',
