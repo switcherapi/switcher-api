@@ -35,6 +35,20 @@ export const admin = {
     }
 };
 
+export const jwt = {
+    type: 'object',
+    properties: {
+        token: {
+            type: 'string',
+            description: 'The JWT token'
+        },
+        refreshToken: {
+            type: 'string',
+            description: 'The JWT refresh token'
+        }
+    }
+};
+
 export default {
     Admin: admin,
     AdminLoginRequest: {
@@ -49,13 +63,26 @@ export default {
             }
         }
     },
+    AdminUpdateRequest: {
+        type: 'object',
+        properties: {
+            name: {
+                type: 'string'
+            },
+            email: {
+                type: 'string',
+                format: 'email'
+            },
+            password: {
+                type: 'string'
+            }
+        }
+    },
     AdminLoginResponse: {
         type: 'object',
         properties: {
             admin,
-            jwt: {
-                type: 'string'
-            }
+            jwt
         }
     },
     AdminSignupRequest: {
@@ -76,4 +103,47 @@ export default {
             }
         }
     },
+    AdminPermissionReadRequest: {
+        type: 'object',
+        properties: {
+            domain: {
+                type: 'string'
+            },
+            action: {
+                type: 'array',
+                items: {
+                    type: 'string',
+                    enum: ['READ', 'CREATE', 'UPDATE', 'DELETE']
+                }
+            },
+            router: {
+                type: 'string',
+                enum: ['DOMAIN', 'GROUP', 'CONFIG', 'STRATEGY', 'ALL']
+            },
+            element: {
+                type: 'object',
+                properties: {
+                    name: {
+                        type: 'string'
+                    }
+                }
+            }
+        }
+    },
+    AdminPermissionReadResponse: {
+        type: 'array',
+        items: {
+            type: 'object',
+            properties: {
+                action: {
+                    type: 'string',
+                    enum: ['READ', 'CREATE', 'UPDATE', 'DELETE']
+                },
+                result: {
+                    type: 'string',
+                    enum: ['ok', 'nok']
+                }
+            }
+        }
+    }
 };

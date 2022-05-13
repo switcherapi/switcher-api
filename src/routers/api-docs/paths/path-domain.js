@@ -1,12 +1,5 @@
 import { pagination } from '../schemas/common';
-
-const domainSchemaContent = {
-    'application/json': {
-        schema: {
-            $ref: '#/components/schemas/Domain'
-        }
-    }
-};
+import { commonSchemaContent } from './common';
 
 export default {
     '/domain': {
@@ -20,7 +13,7 @@ export default {
             responses: {
                 '200': {
                     description: 'Success',
-                    content: domainSchemaContent
+                    content: commonSchemaContent('Domain')
                 }
             }
         }
