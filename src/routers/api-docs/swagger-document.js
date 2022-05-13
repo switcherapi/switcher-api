@@ -1,5 +1,6 @@
 import pathAdmin from './paths/path-admin';
 import pathDomain from './paths/path-domain';
+import { commonSchema } from './schemas/common';
 import adminSchema from './schemas/admin';
 import domainSchema from './schemas/domain';
 import info from './swagger-info';
@@ -38,6 +39,7 @@ export default {
             }
         },
         schemas: {
+            ...commonSchema,
             ...adminSchema,
             ...domainSchema
         }
