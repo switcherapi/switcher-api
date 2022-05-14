@@ -15,7 +15,11 @@ import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
-router.post('/config/create', auth, async (req, res) => {
+router.post('/config/create', 
+    verifyInputUpdateParameters(['key', 'description', 'group']), [
+        check('group').isMongoId(), 
+        check('key').isLength({ min: 3, max: 50 })
+    ], validate, auth, async (req, res) => {
     try {
         const config = await Controller.createConfig(req.body, req.admin);
         res.status(201).send(config);

@@ -1,8 +1,11 @@
 import pathAdmin from './paths/path-admin';
 import pathDomain from './paths/path-domain';
+import pathConfig from './paths/path-config';
 import { commonSchema } from './schemas/common';
 import adminSchema from './schemas/admin';
 import domainSchema from './schemas/domain';
+import configSchema from './schemas/config';
+import componentSchema from './schemas/component';
 import info from './swagger-info';
 
 export default {
@@ -26,6 +29,9 @@ export default {
         },
         {
             name: 'Domain',
+        },
+        {
+            name: 'Config',
         }
     ],
     components: {
@@ -39,11 +45,14 @@ export default {
         schemas: {
             ...commonSchema,
             ...adminSchema,
-            ...domainSchema
+            ...domainSchema,
+            ...configSchema,
+            ...componentSchema
         }
     },
     paths: {
         ...pathAdmin,
-        ...pathDomain
+        ...pathDomain,
+        ...pathConfig
     }
 };

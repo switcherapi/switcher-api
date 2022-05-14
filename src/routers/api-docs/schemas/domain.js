@@ -30,7 +30,7 @@ export const domain = {
             }
         },
         owner: {
-            type: 'string',
+            type: 'uuid',
             description: 'The owner id of the domain'
         },
         transfer: {
