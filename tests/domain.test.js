@@ -55,7 +55,7 @@ describe('Testing Domain insertion', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Domain'
-            }).expect(400);
+            }).expect(422);
     });
 
     test('DOMAIN_SUITE - Should NOT create a new Domain - Already exists', async () => {

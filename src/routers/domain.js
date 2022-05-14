@@ -11,8 +11,11 @@ import { responseException } from '../exceptions';
 
 const router = new express.Router();
 
-router.post('/domain/create', verifyInputUpdateParameters(['name', 'description']),
-    auth, async (req, res) => {
+router.post('/domain/create', 
+    verifyInputUpdateParameters(['name', 'description']), [
+        check('name').isLength({ min: 5, max: 50 }), 
+        check('description').isLength({ min: 0, max: 500 })
+    ], validate, auth, async (req, res) => {
     try {
         await checkDomain(req);
         const domain = await Controller.createDomain(req.body, req.admin);
