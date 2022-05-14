@@ -1,6 +1,10 @@
+const createInput = input => `${input[0]}: "${input[1]}"`;
+const createStrategyInput = input => `{ strategy: "${input[0]}", input: "${input[1]}" }`;
+const isActivated = (element) => element ? 'true' : 'false';
+
 export const configurationQuery = (
     where, domain = true, group = true, config = true, strategy = true, env = false) => {
-    const query = `${where.map(input => `${input[0]}: "${input[1]}"`)}`;
+    const query = `${where.map(createInput)}`;
     return { 
         query: `
             {
@@ -16,17 +20,20 @@ export const configurationQuery = (
 };
 
 export const domainQuery = (where, group, config, strategy) => { 
-    const query = `${where.map(input => `${input[0]}: "${input[1]}"`)}`;
+    const query = `${where.map(createInput)}`;
+    const elementQuery = (element) => 
+        element != undefined ? `(activated: ${isActivated(element)})` : '';
+
     return { 
         query: `
             {
                 domain(${query}) { 
                     name version description activated statusByEnv { env value }
-                    group${group != undefined ? `(activated: ${group ? 'true' : 'false'})` : ''} { 
+                    group${elementQuery(group)} { 
                         name description activated statusByEnv { env value }
-                        config${config != undefined ? `(activated: ${config ? 'true' : 'false'})` : ''} { 
+                        config${elementQuery(config)} { 
                             key description activated statusByEnv { env value }
-                            strategies${strategy != undefined ? `(activated: ${strategy ? 'true' : 'false'})` : ''} { 
+                            strategies${elementQuery(strategy)} { 
                                 strategy activated operation values statusByEnv { env value }
                             }
                             components
@@ -53,7 +60,7 @@ export const criteriaResult = (result, reason) => `
     {  "data": { "criteria": { "response": { "result": ${result}, "reason": "${reason}" } } } }`;
 
 export const  buildEntries = (entries) => {
-    return `${entries.map(entry => `{ strategy: "${entry[0]}", input: "${entry[1]}" }`)}`;
+    return `${entries.map(createStrategyInput)}`;
 };
 
 export const expected100 = `
