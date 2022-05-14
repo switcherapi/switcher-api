@@ -391,7 +391,7 @@ describe('Testing reading strategies #2', () => {
                 env: EnvType.DEFAULT
             }).expect(201);
 
-        response = await request(app)
+        await request(app)
             .get('/configstrategy/' + response.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
