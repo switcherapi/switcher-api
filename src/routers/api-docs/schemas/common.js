@@ -6,6 +6,32 @@ export const commonSchema = {
                 type: 'string'
             }
         }
+    },
+    History: {
+        type: 'object',
+        properties: {
+            domainId: {
+                type: 'string',
+                format: 'uuid'
+            },
+            elementId: {
+                type: 'string',
+                format: 'uuid'
+            },
+            oldValue: {
+                type: 'object'
+            },
+            newValue: {
+                type: 'object'
+            },
+            updatedBy: {
+                type: 'string'
+            },
+            date: {
+                type: 'string',
+                format: 'date-time'
+            }
+        }
     }
 };
 
