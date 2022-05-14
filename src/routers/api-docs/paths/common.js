@@ -5,3 +5,14 @@ export const commonSchemaContent = (ref) => ({
         }
     }
 });
+
+export const commonArraySchemaContent = (ref) => ({
+    'application/json': {
+        schema: {
+            type: 'array',
+            items: {
+                $ref: `#/components/schemas/${ref}`
+            }
+        }
+    }
+});
