@@ -156,7 +156,7 @@ describe('Testing fetch Group info', () => {
                 domain: domainId
             }).expect(201);
 
-        response = await request(app)
+        await request(app)
             .get('/groupconfig/' + response.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);

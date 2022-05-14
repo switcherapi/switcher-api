@@ -136,7 +136,7 @@ describe('Testing fect Domain info', () => {
                 description: 'Description of my new Domain 2'
             }).expect(201);
 
-        response = await request(app)
+        await request(app)
             .get('/domain/' + response.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
@@ -639,17 +639,7 @@ describe('Testing transfer Domain', () => {
         expect(domain.owner).toMatchObject(adminMasterAccountId);
 
         let groups, configs, strategies, environment;
-        await Promise.all([
-            GroupConfig.find({ domain: domain._id, owner: adminMasterAccountId }).countDocuments(),
-            Config.find({ domain: domain._id, owner: adminMasterAccountId }).countDocuments(),
-            ConfigStrategy.find({ domain: domain._id, owner: adminMasterAccountId }).countDocuments(),
-            Environment.find({ domain: domain._id, owner: adminMasterAccountId }).countDocuments()
-        ]).then(data => {
-            groups = data[0];
-            configs = data[1];
-            strategies = data[2];
-            environment = data[3];
-        });
+        ({ groups, configs, strategies, environment } = await countDocuments(domain, adminMasterAccountId));
 
         expect(groups > 0).toBe(true);
         expect(configs > 0).toBe(true);
@@ -668,18 +658,7 @@ describe('Testing transfer Domain', () => {
         domain = await Domain.findById(domainId).lean();
         expect(domain.owner).toMatchObject(adminAccountId);
         
-        groups, configs, strategies, environment;
-        await Promise.all([
-            GroupConfig.find({ domain: domain._id, owner: adminAccountId }).countDocuments(),
-            Config.find({ domain: domain._id, owner: adminAccountId }).countDocuments(),
-            ConfigStrategy.find({ domain: domain._id, owner: adminAccountId }).countDocuments(),
-            Environment.find({ domain: domain._id, owner: adminAccountId }).countDocuments()
-        ]).then(data => {
-            groups = data[0];
-            configs = data[1];
-            strategies = data[2];
-            environment = data[3];
-        });
+        ({ groups, configs, strategies, environment } = await countDocuments(domain, adminAccountId));
 
         expect(groups > 0).toBe(true);
         expect(configs > 0).toBe(true);
@@ -687,3 +666,20 @@ describe('Testing transfer Domain', () => {
         expect(environment > 0).toBe(true);
     });
 });
+
+async function countDocuments(domain, owner) {
+    let groups, configs, strategies, environment;
+    await Promise.all([
+        GroupConfig.find({ domain: domain._id, owner }).countDocuments(),
+        Config.find({ domain: domain._id, owner }).countDocuments(),
+        ConfigStrategy.find({ domain: domain._id, owner }).countDocuments(),
+        Environment.find({ domain: domain._id, owner }).countDocuments()
+    ]).then(data => {
+        groups = data[0];
+        configs = data[1];
+        strategies = data[2];
+        environment = data[3];
+    });
+
+    return { groups, configs, strategies, environment };
+}

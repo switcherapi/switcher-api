@@ -159,7 +159,7 @@ describe('Testing fetch configuration info', () => {
                 group: groupConfigId
             }).expect(201);
 
-        response = await request(app)
+        await request(app)
             .get('/config/' + response.body._id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
