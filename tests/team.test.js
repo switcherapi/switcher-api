@@ -244,7 +244,7 @@ describe('Deletion tests', () => {
         let admin = await Admin.findById(adminAccountId);
         expect(admin.teams.includes(teamId)).toEqual(true);
 
-        response = await request(app)
+        await request(app)
             .delete('/team/' + teamId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
@@ -556,7 +556,7 @@ describe('Updating team members tests', () => {
 
         // given
         // account being deleted
-        response = await request(app)
+        await request(app)
             .delete('/admin/me')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send()
