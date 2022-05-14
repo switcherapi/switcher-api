@@ -13,11 +13,13 @@ const domainSchema = new mongoose.Schema({
         required: true,
         unique: true,
         trim: true,
-        minlength: 5
+        minlength: 5,
+        maxlength: 50
     },
     description: {
         type: String,
-        trim: true
+        trim: true,
+        maxlength: 500
     },
     activated: {
         type: Map,
