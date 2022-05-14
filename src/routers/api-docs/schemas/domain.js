@@ -24,11 +24,9 @@ export const domain = {
         },
         activated: {
             type: 'object',
-            properties: {
-                environment: {
-                    type: 'boolean',
-                    description: 'The environment is activated'
-                }
+            additionalProperties: {
+                type: 'boolean',
+                description: 'The environment status'
             }
         },
         owner: {
@@ -52,4 +50,17 @@ export const domain = {
 
 export default {
     Domain: domain,
+    DomainCreateRequest: {
+        type: 'object',
+        properties: {
+            name: {
+                type: 'string',
+                description: 'The name of the domain'
+            },
+            description: {
+                type: 'string',
+                description: 'The description of the domain'
+            }
+        }
+    }
 };

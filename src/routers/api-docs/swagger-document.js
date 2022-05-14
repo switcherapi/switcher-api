@@ -23,11 +23,9 @@ export default {
     tags: [
         {
             name: 'Admin',
-            description: 'Admin'
         },
         {
             name: 'Domain',
-            description: 'Domain'
         }
     ],
     components: {
