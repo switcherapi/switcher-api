@@ -16,3 +16,13 @@ export const commonArraySchemaContent = (ref) => ({
         }
     }
 });
+
+export const commonOneOfSchemaContent = (refs) => ({
+    'application/json': {
+        schema: {
+            oneOf: refs.map((ref) => ({
+                $ref: `#/components/schemas/${ref}`
+            }))
+        }
+    }
+});

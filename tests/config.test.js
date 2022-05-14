@@ -77,7 +77,7 @@ describe('Testing configuration insertion', () => {
                 key: 'NEW_CONFIG',
                 description: 'Description of my new Config',
                 group: 'INVALID_VALUE_ID'
-            }).expect(400);
+            }).expect(422);
     });
 });
 
