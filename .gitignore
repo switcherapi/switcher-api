@@ -8,5 +8,5 @@ test-report.xml
 package-lock.json
 dist
 build
-config
+config/.env
 snapshot

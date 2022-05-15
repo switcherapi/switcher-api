@@ -76,28 +76,17 @@ Main features:
 }
 ```
 
-### Running On-Prem via Docker Composer
+### Running Switcher API from Docker Composer script
 
-Consider running Switcher API locally. 
-This option leverages Switcher API and Switcher Management, allowing it to be configured separately as wish.
+This option leverages Switcher API and Switcher Management with minimum settings required to start using.
 
-1. Create folder/file "config/.env.dev" with the following content:
-```
-MONGODB_URI=mongodb://mongodb:27017/switcher-api
-JWT_SECRET=YOU_CANNOT_SEE_IT
-JWT_CLIENT_TOKEN_EXP_TIME=5m
-JWT_ADMIN_TOKEN_RENEW_INTERVAL=10m
-MAX_EXIST_STRATEGYOPERATION=100
-HISTORY_ACTIVATED=true
-METRICS_ACTIVATED=true
-METRICS_MAX_PAGE=50
-GOOGLE_SKIP_AUTH=true
-SWITCHER_API_ENABLE=false
-SWITCHERAPI_URL=http://localhost:3000
-SM_IP=localhost
-```
+1. Modify the minimal configuration file "config/.env.dev":
 
-Configure **SWITCHERAPI_URL** and **SM_IP** if you want to access Switcher Management from an external network.
+Change the values for:
+
+- JWT_SECRET: With your secure private key
+- SWITCHERAPI_URL: The Switcher API URL that Switcher Management will use internally
+- SM_IP: IP/DNS used by Switcher Management internal redirects
 
 2. Run the command: 
 

@@ -73,5 +73,9 @@ services:
     environment: 
       - SWITCHERAPI_URL=${SWITCHERAPI_URL}
       - SM_IP=${SM_IP}
+      - GOOGLE_RECAPTCHA=${GOOGLE_RECAPTCHA}
+      - GITHUB_CLIENTID=${GIT_OAUTH_CLIENT_ID}
+      - BITBUCKET_CLIENTID=${BITBUCKET_OAUTH_CLIENT_ID}
+      - SWITCHERSLACKAPP_URL=${SWITCHERSLACKAPP_URL}
     depends_on:
       - switcherapi
