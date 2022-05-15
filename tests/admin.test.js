@@ -471,6 +471,7 @@ describe('Testing Admin insertion', () => {
     test('ADMIN_SUITE - Should get API UP', async () => {
         const response = await request(app)
             .get('/check')
+            .auth('admin', 'admin')
             .send().expect(200);
 
         expect(response.body.status).toEqual('UP');
@@ -480,9 +481,16 @@ describe('Testing Admin insertion', () => {
     test('ADMIN_SUITE - Should return OpenAPI Swagger API document', async () => {
         const response = await request(app)
             .get('/swagger.json')
+            .auth('admin', 'admin')
             .send().expect(200);
 
         expect(response.body).toMatchObject(swaggerDocument);
+    });
+
+    test('ADMIN_SUITE - Should NOT return OpenAPI Swagger API document - Not authenticated', async () => {
+        await request(app)
+            .get('/swagger.json')
+            .send().expect(401);
     });
 
     test('ADMIN_SUITE - Should renew access', async () => {

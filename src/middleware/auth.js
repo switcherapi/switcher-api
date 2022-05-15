@@ -1,3 +1,4 @@
+import basicAuth from 'express-basic-auth';
 import jwt from 'jsonwebtoken';
 import { getAdmin, getAdminById } from '../controller/admin';
 import { getComponentById } from '../controller/component';
@@ -80,6 +81,15 @@ export async function slackAuth(req, res, next) {
     } catch (e) {
         res.status(401).send({ error: 'Invalid API token.' });
     }
+}
+
+export function resourcesAuth() {
+    return basicAuth({
+        users: {
+            admin: process.env.RESOURCE_SECRECT || 'admin',
+        },
+        challenge: true,
+    });
 }
 
 export async function appGenerateCredentials(req, res, next) {

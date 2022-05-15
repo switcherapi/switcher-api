@@ -140,7 +140,7 @@ describe('Testing criteria [GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected101));
     });
 
-    test('CLIENT_SUITE - Should return success on Flat view resolved by Config Key - Uncovered environment, should look to production', async () => {
+    test('CLIENT_SUITE - Should return success on Flat view resolved by Config Key - Unknown environment, should look to production', async () => {
         const response = await request(app)
             .post('/criteria/auth')
             .set('switcher-api-key', `${apiKey}`)
@@ -155,6 +155,17 @@ describe('Testing criteria [GraphQL] ', () => {
             .set('Authorization', `Bearer ${response.body.token}`)
             .send(graphqlUtils.configurationQuery([['key', keyConfig]]))
             .expect(200);
+    });
+
+    test('CLIENT_SUITE - Should NOT authenticate invalid component', async () => {
+        await request(app)
+            .post('/criteria/auth')
+            .set('switcher-api-key', `${apiKey}`)
+            .send({
+                domain: domainDocument.name,
+                component: 'UNKNOWN COMPONENT',
+                environment: EnvType.DEFAULT
+            }).expect(401);
     });
 
     test('CLIENT_SUITE - Should NOT return on Flat view resolved by an unknown Config Key', async () => {

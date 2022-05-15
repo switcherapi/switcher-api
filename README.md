@@ -32,49 +32,8 @@ Main features:
 
 ### Local setup
 1. npm install
-2. Add .env-cmdrc file into the project directory.
-3. Fill it according to the description below.
-
-```
-{
-  "dev": {
-    "PORT": "3000",
-    "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-dev",
-    "JWT_SECRET": "PUT_HERE_YOUR_SUPER_SECRET_JWT_CODE",
-    "JWT_ADMIN_TOKEN_RENEW_INTERVAL": "5m",
-    "JWT_CLIENT_TOKEN_EXP_TIME": "5m",
-    "MAX_EXIST_STRATEGYOPERATION": 100,
-    "HISTORY_ACTIVATED": true,
-    "METRICS_ACTIVATED": true,
-    "METRICS_MAX_PAGE": 50,
-    "SENDGRID_API_KEY": "[SENDGRID_API_KEY]",
-    "SENDGRID_MAIL_FROM": "[SENDGRID_MAIL_FROM]",
-    "SENDGRID_CONFIRMATION_TEMPLATE": "[SENDGRID_CONFIRMATION_TEMPLATE]",
-    "SENDGRID_RECOVERY_TEMPLATE": "[SENDGRID_RECOVERY_TEMPLATE]",
-    "GIT_OAUTH_CLIENT_ID": "[GITHUB_CLIENT_ID]",
-    "GIT_OAUTH_SECRET": "[GITHUB_API_SECRET]",
-    "BITBUCKET_OAUTH_CLIENT_ID": "[BITBUCKET_CLIENT_ID]",
-    "BITBUCKET_OAUTH_SECRET": "[BITBUCKET_API_SECRET]",
-    "GOOGLE_RECAPTCHA_SECRET": "[GOOGLE_RECAPTCHA_SECRET]",
-    "GOOGLE_SKIP_AUTH": false,
-
-    "SWITCHER_API_LOGGER": true,
-    "SWITCHER_API_ENABLE": false,
-    "SWITCHER_API_URL": "http://localhost:3000",
-    "SWITCHER_API_KEY": "[SWITCHER_API_KEY]",
-    "SWITCHER_API_DOMAIN": "[SWITCHER_API_DOMAIN]",
-    "SWITCHER_API_ENVIRONMENT": "default",
-
-    "SWITCHER_SLACK_JWT_SECRET": [SWITCHER_SLACK_APP_SECRET]
-  },
-  "prod": {
-  },
-  "test": {
-    "PORT": "3000",
-    "MONGODB_URI": "mongodb://127.0.0.1:27017/switcher-api-test"
-  }
-}
-```
+2. Add .env-cmdrc file into the project directory (use '.env-cmdrc-template')
+3. Replace values such as secret keys and URLs
 
 ### Running Switcher API from Docker Composer script
 
