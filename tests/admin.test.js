@@ -16,7 +16,7 @@ import {
     team1Id
 } from './fixtures/db_api';
 import { Team } from '../src/models/team';
-import swaggerDocument from '../api-docs/swagger-document';
+import swaggerDocument from '../src/api-docs/swagger-document';
 
 afterAll(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
