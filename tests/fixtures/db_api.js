@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Admin from '../../src/models/admin';
 import Domain from '../../src/models/domain';
@@ -53,6 +54,15 @@ export const role1 = {
     router: RouterTypes.GROUP
 };
 
+export const component1Id = new mongoose.Types.ObjectId();
+export const component1 = {
+    _id: component1Id,
+    name: 'TestApp',
+    description: 'Test app',
+    domain: domainId,
+    owner: adminMasterAccountId
+};
+
 export const environment1Id = new mongoose.Types.ObjectId();
 export const environment1 = {
     _id: environment1Id,
@@ -79,7 +89,8 @@ export const config1Document = {
     activated: new Map().set(EnvType.DEFAULT, true),
     owner: adminMasterAccountId,
     group: groupConfigId,
-    domain: domainId
+    domain: domainId,
+    components: [component1Id]
 };
 
 export const configId2 = new mongoose.Types.ObjectId();
@@ -211,4 +222,9 @@ export const setupDatabase = async () => {
     await new Role(roleAll2).save();
     await new Role(roleAll3).save();
     await new Role(roleAll4).save();
+
+    const hashApiKey = await bcrypt.hash(component1._id + component1.name, 8);
+    const hash = await bcrypt.hash(hashApiKey, 8);
+    component1.apihash = hash;
+    await new Component(component1).save();
 };

@@ -86,7 +86,7 @@ app.get('/swagger.json', resourcesAuth(), (_req, res) => {
     res.status(200).send(swaggerDocument);
 });
 
-app.get('/check', resourcesAuth(), (_req, res) => {
+app.get('/check', (_req, res) => {
     res.status(200).send({ 
         status: 'UP',
         attributes: {

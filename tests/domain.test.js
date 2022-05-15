@@ -21,8 +21,10 @@ import {
     configId2,
     configStrategyId,
     environment1Id,
-    adminAccountId
+    adminAccountId,
+    component1Id
 } from './fixtures/db_api';
+import Component from '../src/models/component';
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -180,6 +182,9 @@ describe('Testing fect Domain info', () => {
 
         let environment = await Environment.findById(environment1Id).lean();
         expect(environment).not.toBeNull();
+
+        let component = await Component.findById(component1Id).lean();
+        expect(component).not.toBeNull();
         
         await request(app)
             .delete('/domain/' + domainId)
@@ -207,6 +212,9 @@ describe('Testing fect Domain info', () => {
 
         environment = await Environment.findById(environment1Id).lean();
         expect(environment).toBeNull();
+
+        component = await Component.findById(component1Id).lean();
+        expect(component).toBeNull();
     });
 
     test('DOMAIN_SUITE - Should NOT delete Domain', async () => {

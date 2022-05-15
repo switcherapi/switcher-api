@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
+import Component from './component';
 import GroupConfig from './group-config';
 import History from './history';
-import { Metric } from '../models/metric';
+import { Metric } from './metric';
 import { Team } from './team';
 import { EnvType, Environment } from './environment';
 import { recordHistory } from './common/index';
@@ -113,6 +114,7 @@ domainSchema.pre('remove', async function (next) {
     }
 
     await Promise.all([
+        Component.deleteMany({ domain: domain._id }),
         Environment.deleteMany({ domain: domain._id }), 
         History.deleteMany({ domainId: domain._id }), 
         Metric.deleteMany({ domain: domain._id })
