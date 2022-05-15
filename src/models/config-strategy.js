@@ -284,7 +284,8 @@ async function existStrategy(strategyConfig) {
 const configStrategySchema = new mongoose.Schema({
     description: {
         type: String,
-        trim: true
+        trim: true,
+        maxlength: 256
     },
     activated: {
         type: Map,
@@ -332,7 +333,7 @@ configStrategySchema.options.toJSON = {
     getters: true,
     virtuals: true,
     minimize: false,
-    transform: function (doc, ret) {
+    transform: function (_doc, ret) {
         if (ret.updatedAt || ret.createdAt) {
             ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
             ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');

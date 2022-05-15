@@ -49,8 +49,9 @@ router.get('/config', auth, async (req, res) => {
 });
 
 // GET /config/ID?resolveComponents=true
-router.get('/config/:id', [
-    check('id').isMongoId()], validate, auth, async (req, res) => {
+router.get('/config/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         let config = await Controller.getConfigById(req.params.id);
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
@@ -68,8 +69,9 @@ router.get('/config/:id', [
 // GET /config/ID?sortBy=date:desc
 // GET /config/ID?limit=10&skip=20
 // GET /config/ID
-router.get('/config/history/:id', [
-    check('id').isMongoId()], validate, auth, async (req, res) => {
+router.get('/config/history/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const config = await Controller.getConfigById(req.params.id);
         const history = await History.find({ domainId: config.domain, elementId: config._id })
@@ -86,8 +88,9 @@ router.get('/config/history/:id', [
     }
 });
 
-router.delete('/config/history/:id', [
-    check('id').isMongoId()], validate, auth, async (req, res) => {
+router.delete('/config/history/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const config = await Controller.getConfigById(req.params.id);
         await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
@@ -99,8 +102,9 @@ router.delete('/config/history/:id', [
     }
 });
 
-router.delete('/config/:id', [
-    check('id').isMongoId()], validate, auth, async (req, res) => {
+router.delete('/config/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const config = await Controller.deleteConfig(req.params.id, req.admin);
         res.send(config);
@@ -109,9 +113,11 @@ router.delete('/config/:id', [
     }
 });
 
-router.patch('/config/:id', [
-    check('id').isMongoId()], validate, auth, verifyInputUpdateParameters([
-    'key', 'description', 'relay', 'disable_metrics']), async (req, res) => {
+router.patch('/config/:id', auth, [
+    check('id').isMongoId()
+], validate, verifyInputUpdateParameters([
+    'key', 'description', 'relay', 'disable_metrics'
+]), async (req, res) => {
     try {
         const config = await Controller.updateConfig(req.params.id, req.body, req.admin);
         res.send(config);
@@ -120,8 +126,9 @@ router.patch('/config/:id', [
     }
 });
 
-router.patch('/config/updateRelay/:id', [
-    check('id').isMongoId()], validate, auth, async (req, res) => {
+router.patch('/config/updateRelay/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         let config = await Controller.updateConfigRelay(req.params.id, req.body, req.admin);
         res.send(config);
@@ -130,8 +137,9 @@ router.patch('/config/updateRelay/:id', [
     }
 });
 
-router.patch('/config/updateStatus/:id', [
-    check('id').isMongoId()], validate,auth, async (req, res) => {
+router.patch('/config/updateStatus/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         let config = await Controller.updateConfigStatus(req.params.id, req.body, req.admin);
         res.send(config);
@@ -140,8 +148,9 @@ router.patch('/config/updateStatus/:id', [
     }
 });
 
-router.patch('/config/removeStatus/:id', [
-    check('id').isMongoId()], validate,auth, async (req, res) => {
+router.patch('/config/removeStatus/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const config = await Controller.removeConfigStatusEnv(req.params.id, req.body.env, req.admin);
         res.send(config);
@@ -150,8 +159,9 @@ router.patch('/config/removeStatus/:id', [
     }
 });
 
-router.patch('/config/addComponent/:id', [
-    check('id').isMongoId()], validate,auth, async (req, res) => {
+router.patch('/config/addComponent/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const config = await Controller.addComponent(req.params.id, req.body, req.admin);
         res.send(config);
@@ -160,8 +170,9 @@ router.patch('/config/addComponent/:id', [
     }
 });
 
-router.patch('/config/removeComponent/:id', [
-    check('id').isMongoId()], validate,auth, async (req, res) => {
+router.patch('/config/removeComponent/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const config = await Controller.removeComponent(req.params.id, req.body, req.admin);
         res.send(config);
@@ -170,8 +181,9 @@ router.patch('/config/removeComponent/:id', [
     }
 });
 
-router.patch('/config/updateComponents/:id', [
-    check('id').isMongoId()], validate,auth, async (req, res) => {
+router.patch('/config/updateComponents/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const config = await Controller.updateComponent(req.params.id, req.body, req.admin);
         res.send(config);
@@ -180,9 +192,10 @@ router.patch('/config/updateComponents/:id', [
     }
 });
 
-router.patch('/config/removeRelay/:id/:env', [
+router.patch('/config/removeRelay/:id/:env', auth, [
     check('id').isMongoId(),
-    check('env').isLength({ min: 1 })], validate,auth, async (req, res) => {
+    check('env').isLength({ min: 1 })
+], validate, async (req, res) => {
     try {
         let config = await Controller.removeRelay(req.params.id, req.params.env, req.admin);
         res.send(config);

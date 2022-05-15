@@ -11,8 +11,9 @@ import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
-router.post('/team/create', [check('name').isLength({ min: 2, max: 50 })], 
-    validate, auth, async (req, res) => {
+router.post('/team/create', auth, [
+    check('name').isLength({ min: 2, max: 50 })
+], validate, async (req, res) => {
     try {
         const team = await Controller.createTeam(req.body, req.admin, req.query.defaultActions);
         res.status(201).send(team);
@@ -24,8 +25,9 @@ router.post('/team/create', [check('name').isLength({ min: 2, max: 50 })],
 // GET /team?domain=ID&limit=10&skip=20
 // GET /team?domain=ID&sort=desc
 // GET /team?domain=ID
-router.get('/team', [query('domain', 'Please, specify the \'domain\' id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.get('/team', auth, [
+    query('domain', 'Please, specify the \'domain\' id').isMongoId()
+], validate, async (req, res) => {
     try {
         let teams = await Controller.getTeamsSort(
             { domain: req.query.domain }, null, 
@@ -39,8 +41,9 @@ router.get('/team', [query('domain', 'Please, specify the \'domain\' id').isMong
     }
 });
 
-router.get('/team/:id', [check('id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.get('/team/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const team = await Controller.verifyRequestedTeam(
             req.params.id, req.admin, ActionTypes.READ);
@@ -55,8 +58,9 @@ router.get('/team/:id', [check('id').isMongoId()],
     }
 });
 
-router.patch('/team/:id', [check('id').isMongoId()], 
-    validate, auth, verifyInputUpdateParameters(['name', 'active']), async (req, res) => {
+router.patch('/team/:id', auth, [
+    check('id').isMongoId()
+], validate, verifyInputUpdateParameters(['name', 'active']), async (req, res) => {
     try {
         const team = await Controller.updateTeam(req.body, req.params.id, req.admin);
         res.send(team);
@@ -65,8 +69,9 @@ router.patch('/team/:id', [check('id').isMongoId()],
     }
 });
 
-router.delete('/team/:id', [check('id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.delete('/team/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const team = await Controller.deleteTeam(req.params.id, req.admin);
         res.send(team);
@@ -75,8 +80,9 @@ router.delete('/team/:id', [check('id').isMongoId()],
     }
 });
 
-router.post('/team/member/invite/:id', [check('id').isMongoId()], 
-    validate, auth, verifyInputUpdateParameters(['email']), async (req, res) => {
+router.post('/team/member/invite/:id', auth, [
+    check('id').isMongoId()
+], validate, verifyInputUpdateParameters(['email']), async (req, res) => {
     try {
         const teamInvite = await Controller.inviteMember(req.params.id, req.body.email, req.admin);
         res.status(201).send(teamInvite);
@@ -85,8 +91,9 @@ router.post('/team/member/invite/:id', [check('id').isMongoId()],
     }
 });
 
-router.get('/team/member/invite/:id', [check('id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.get('/team/member/invite/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const teamInvite = await Controller.getTeamInviteById(req.params.id);
 
@@ -105,8 +112,9 @@ router.get('/team/member/invite/:id', [check('id').isMongoId()],
     }
 });
 
-router.get('/team/member/invite/pending/:id', [check('id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.get('/team/member/invite/pending/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const teamInvites = await Controller.getTeamInvites({ teamid: req.params.id });
         res.send(teamInvites);
@@ -115,8 +123,9 @@ router.get('/team/member/invite/pending/:id', [check('id').isMongoId()],
     }
 });
 
-router.post('/team/member/invite/accept/:request_id', [check('request_id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.post('/team/member/invite/accept/:request_id', auth, [
+    check('request_id').isMongoId()
+], validate, async (req, res) => {
     try {
         const admin = await Controller.acceptInvite(req.params.request_id, req.admin);
         res.send(admin);
@@ -125,9 +134,10 @@ router.post('/team/member/invite/accept/:request_id', [check('request_id').isMon
     }
 });
 
-router.delete('/team/member/invite/remove/:id/:request_id', [
-    check('id').isMongoId(), check('request_id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.delete('/team/member/invite/remove/:id/:request_id', auth, [
+    check('id').isMongoId(), 
+    check('request_id').isMongoId()
+], validate, async (req, res) => {
     try {
         const teamInvite = await Controller.removeInvite(req.params.request_id, req.params.id, req.admin); 
         res.send(teamInvite);
@@ -136,8 +146,9 @@ router.delete('/team/member/invite/remove/:id/:request_id', [
     }
 });
 
-router.patch('/team/member/add/:id', [check('id').isMongoId()], 
-    validate, auth, verifyInputUpdateParameters(['member']), async (req, res) => {
+router.patch('/team/member/add/:id', auth, [
+    check('id').isMongoId()
+], validate, verifyInputUpdateParameters(['member']), async (req, res) => {
     try {
         const adminMember = await Controller.addTeamMember(req.body.member, req.params.id, req.admin);
         res.send(adminMember);
@@ -146,8 +157,9 @@ router.patch('/team/member/add/:id', [check('id').isMongoId()],
     }
 });
 
-router.patch('/team/member/remove/:id', [check('id').isMongoId()], 
-    validate, auth, verifyInputUpdateParameters(['member']), async (req, res) => {
+router.patch('/team/member/remove/:id', auth, [
+    check('id').isMongoId()
+], validate, verifyInputUpdateParameters(['member']), async (req, res) => {
     try {
         const adminMember = await Controller.removeTeamMember(req.body.member, req.params.id, req.admin);
         res.send(adminMember);
@@ -156,8 +168,9 @@ router.patch('/team/member/remove/:id', [check('id').isMongoId()],
     }
 });
 
-router.patch('/team/role/remove/:id',  [check('id').isMongoId()], 
-    validate, auth, verifyInputUpdateParameters(['role']), async (req, res) => {
+router.patch('/team/role/remove/:id', auth, [
+    check('id').isMongoId()
+], validate, verifyInputUpdateParameters(['role']), async (req, res) => {
     try {
         const team = await Controller.removeTeamRole(req.body.role, req.params.id, req.admin);
         res.send(team);

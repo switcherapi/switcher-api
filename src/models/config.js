@@ -30,10 +30,13 @@ const configSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
+        maxlength: 30,
+        minlength: 3
     },
     description: {
         type: String,
-        trim: true
+        trim: true,
+        maxlength: 256
     },
     activated: {
         type: Map,
@@ -72,7 +75,8 @@ const configSchema = new mongoose.Schema({
             enum: Object.values(RelayTypes)
         },
         description: {
-            type: String
+            type: String,
+            maxlength: 256
         },
         activated: {
             type: Map,

@@ -5,7 +5,9 @@ const teamInviteSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        trim: true
+        trim: true,
+        maxlength: 128,
+        minlength: 2
     },
     teamid: {
         type: mongoose.Schema.Types.ObjectId,

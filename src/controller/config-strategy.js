@@ -17,6 +17,13 @@ async function verifyStrategyValueInput(strategyId, value) {
     return configStrategy;
 }
 
+function validateValues(values) {
+    const invalidValue = values.find(value => value.length > 128);
+    if (invalidValue) {
+        throw new BadRequestError('Value cannot be longer than 128 characters');
+    }
+}
+
 export async function getStrategyById(id) {
     let strategy = await ConfigStrategy.findById(id);
     return response(strategy, 'Strategy not found');
@@ -36,6 +43,7 @@ export async function createStrategy(args, admin) {
         throw new BadRequestError('Must specify environment');
     }
 
+    validateValues(args.values);
     const environment = await getEnvironment({ name: args.env, domain: config.domain });
 
     let configStrategy = new ConfigStrategy({
@@ -82,6 +90,7 @@ export async function addVal(id, args, admin) {
     const value = args.value.trim();
     const foundExistingOne = configStrategy.values.find((element) => element === value);
 
+    validateValues([value]);
     if (foundExistingOne) {
         throw new BadRequestError(`Value '${value}' already exist`);
     }
@@ -113,6 +122,7 @@ export async function updateVal(id, args, admin) {
     const newvalue = args.newvalue.trim();
     const indexNewValue = configStrategy.values.indexOf(newvalue);
 
+    validateValues([newvalue]);
     if (indexNewValue >= 0) {
         throw new BadRequestError(`Value '${newvalue}' already exist`);
     }

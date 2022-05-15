@@ -8,10 +8,10 @@ import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
-router.post('/component/create', [
+router.post('/component/create', auth, [
     check('name').isLength({ min: 2, max: 50 }),
-    check('description').isLength({ min: 2, max: 500 })
-], validate, auth, async (req, res) => {
+    check('description').isLength({ max: 256 })
+], validate, async (req, res) => {
     try {
         const { component, apiKey } = await Controller.createComponent(req.body, req.admin);
         res.status(201).send({ component, apiKey });
@@ -20,9 +20,9 @@ router.post('/component/create', [
     }
 });
 
-router.get('/component/generateApiKey/:component/', [
+router.get('/component/generateApiKey/:component/', auth, [
     check('component', 'Invalid Id for component').isMongoId()
-], validate, auth, async (req, res) => {
+], validate, async (req, res) => {
     try {
         const apiKey = await Controller.generateApiKey(req.params.component, req.admin);
         res.status(201).send({ apiKey });
@@ -34,8 +34,9 @@ router.get('/component/generateApiKey/:component/', [
 // GET /component?domain=ID&limit=10&skip=20
 // GET /component?domain=ID&sort=desc
 // GET /component?domain=ID
-router.get('/component', [query('domain', 'Please, specify the \'domain\' id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.get('/component', auth, [
+    query('domain', 'Please, specify the \'domain\' id').isMongoId()
+], validate, async (req, res) => {
     try {
         let components = await Controller.getComponents({ domain: req.query.domain },
             ['_id', 'name', 'description'],
@@ -53,8 +54,9 @@ router.get('/component', [query('domain', 'Please, specify the \'domain\' id').i
     }
 });
 
-router.get('/component/:id', [check('id', 'Invalid Id for component').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.get('/component/:id', auth, [
+    check('id', 'Invalid Id for component').isMongoId()
+], validate, async (req, res) => {
     try {
         const component = await Controller.getComponentById(req.params.id);
         res.send(component);
@@ -63,10 +65,9 @@ router.get('/component/:id', [check('id', 'Invalid Id for component').isMongoId(
     }
 });
 
-router.patch('/component/:id', [
-    check('id', 'Invalid Id for component').isMongoId()], 
-    verifyInputUpdateParameters(['name', 'description']),
-    validate, auth, async (req, res) => {
+router.patch('/component/:id', auth, verifyInputUpdateParameters(['name', 'description']), [
+    check('id', 'Invalid Id for component').isMongoId()
+], validate, async (req, res) => {
     try {
         const component = await Controller.updateComponent(req.params.id, req.body, req.admin);
         res.send(component);
@@ -75,9 +76,9 @@ router.patch('/component/:id', [
     }
 });
 
-router.delete('/component/:id', [
-    check('id', 'Invalid Id for component').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.delete('/component/:id', auth, [
+    check('id', 'Invalid Id for component').isMongoId()
+], validate, async (req, res) => {
     try {
         const component = await Controller.deleteComponent(req.params.id, req.admin);
         res.send(component);

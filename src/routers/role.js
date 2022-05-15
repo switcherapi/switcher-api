@@ -19,8 +19,9 @@ async function updateRole(req, res) {
     }
 }
 
-router.post('/role/create/:team', [check('team').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.post('/role/create/:team', auth, [
+    check('team').isMongoId()
+], validate, async (req, res) => {
     try {
         const role = await Controller.createRole(req.body, req.params.team, req.admin);
         res.status(201).send(role);
@@ -51,8 +52,9 @@ router.get('/role/actions', auth, (_req, res) => {
 });
 
 // GET /role?team=ID
-router.get('/role', [query('team').isMongoId()], validate, 
-    auth, async (req, res) => {
+router.get('/role', auth, [
+    query('team').isMongoId()
+], validate, async (req, res) => {
     try {
         const team = await getTeamById(req.query.team);
         await verifyOwnership(req.admin, team, team.domain, ActionTypes.READ, RouterTypes.ADMIN);
@@ -64,8 +66,9 @@ router.get('/role', [query('team').isMongoId()], validate,
     }
 });
 
-router.get('/role/:id', [check('id').isMongoId()], validate, 
-    auth, async (req, res) => {
+router.get('/role/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const role = await Controller.getRoleById(req.params.id, true);
         res.send(role);
@@ -74,13 +77,17 @@ router.get('/role/:id', [check('id').isMongoId()], validate,
     }
 });
 
-router.patch('/role/:id', [check('id').isMongoId()], validate, auth, 
-    verifyInputUpdateParameters(['action', 'active', 'router', 'identifiedBy']), async (req, res) => {
+router.patch('/role/:id', auth, verifyInputUpdateParameters([
+    'action', 'active', 'router', 'identifiedBy'
+]), [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     await updateRole(req, res);
 });
 
-router.delete('/role/:id', [check('id').isMongoId()], validate, 
-    auth, async (req, res) => {
+router.delete('/role/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const role = await Controller.deleteRole(req.params.id, req.admin);
         res.send(role);
@@ -89,8 +96,9 @@ router.delete('/role/:id', [check('id').isMongoId()], validate,
     }
 });
 
-router.patch('/role/value/add/:id', [check('id').isMongoId()], validate, 
-    auth, verifyInputUpdateParameters(['value']), async (req, res) => {
+router.patch('/role/value/add/:id', auth, verifyInputUpdateParameters(['value']), [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const role = await Controller.addValue(req.body, req.params.id, req.admin);
         res.send(role);
@@ -99,8 +107,9 @@ router.patch('/role/value/add/:id', [check('id').isMongoId()], validate,
     }
 });
 
-router.patch('/role/value/remove/:id', [check('id').isMongoId()], validate,
-    auth, verifyInputUpdateParameters(['value']), async (req, res) => {
+router.patch('/role/value/remove/:id', auth, [
+    check('id').isMongoId()
+], validate, verifyInputUpdateParameters(['value']), async (req, res) => {
     try {
         const role = await Controller.removeValue(req.body, req.params.id, req.admin);
         res.send(role);
@@ -109,8 +118,9 @@ router.patch('/role/value/remove/:id', [check('id').isMongoId()], validate,
     }
 });
 
-router.patch('/role/updateValues/:id', [check('id').isMongoId()], validate, 
-    auth, async (req, res) => {
+router.patch('/role/updateValues/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     await updateRole(req, res);
 });
 

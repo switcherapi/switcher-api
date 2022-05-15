@@ -20,8 +20,9 @@ router.post('/environment/create', auth, async (req, res) => {
 // GET /environment?domain=ID&limit=10&skip=20
 // GET /environment?domain=ID&sort=desc
 // GET /environment?domain=ID
-router.get('/environment', [query('domain', 'Please, specify the \'domain\' id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.get('/environment', auth, [
+    query('domain', 'Please, specify the \'domain\' id').isMongoId()
+], validate, async (req, res) => {
     try {
         let environments = await Controller.getEnvironments({ domain: req.query.domain },
             ['_id', 'name'],
@@ -39,8 +40,9 @@ router.get('/environment', [query('domain', 'Please, specify the \'domain\' id')
     }
 });
 
-router.get('/environment/:id', [check('id', 'Invalid Id for environment').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.get('/environment/:id', auth, [
+    check('id', 'Invalid Id for environment').isMongoId()
+], validate, async (req, res) => {
     try {
         const environment = await Controller.getEnvironmentById(req.params.id);
         res.send(environment);
@@ -49,8 +51,9 @@ router.get('/environment/:id', [check('id', 'Invalid Id for environment').isMong
     }
 });
 
-router.delete('/environment/:id', [check('id', 'Invalid Id for environment').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.delete('/environment/:id', auth, [
+    check('id', 'Invalid Id for environment').isMongoId()
+], validate, async (req, res) => {
     try {
         const environment = await Controller.deleteEnvironment(req.params.id, req.admin);
         await environment.remove();
@@ -60,8 +63,9 @@ router.delete('/environment/:id', [check('id', 'Invalid Id for environment').isM
     }
 });
 
-router.patch('/environment/recover/:id', [check('id', 'Invalid Id for environment').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.patch('/environment/recover/:id', auth, [
+    check('id', 'Invalid Id for environment').isMongoId()
+], validate, async (req, res) => {
     try {
         const environment = await Controller.recoverEnvironment(req.params.id, req.admin);
         res.send({ message: `Environment '${environment.name}' recovered` });
