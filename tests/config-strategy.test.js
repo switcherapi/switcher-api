@@ -673,8 +673,8 @@ describe('Testing update strategies #1', () => {
         expect('USER_4').toEqual(foundExistingOne);
     });
 
-    test('STRATEGY_SUITE - Should NOT add new value to Strategy values', async () => {
-        let response = await request(app)
+    test('STRATEGY_SUITE - Should NOT add new value to Strategy values - Value already exist', async () => {
+        const response = await request(app)
             .patch('/configstrategy/addval/' + configStrategyId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
@@ -682,8 +682,10 @@ describe('Testing update strategies #1', () => {
             }).expect(400);
 
         expect(response.body.error).toEqual('Value \'USER_3\' already exist');
+    });
 
-        response = await request(app)
+    test('STRATEGY_SUITE - Should NOT add new value to Strategy values - Invalid parameter', async () => {
+        const response = await request(app)
             .patch('/configstrategy/addval/' + configStrategyId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
@@ -691,21 +693,38 @@ describe('Testing update strategies #1', () => {
             }).expect(400);
 
         expect(response.body.error).toEqual('Invalid update parameters');
+    });
 
-        response = await request(app)
+    test('STRATEGY_SUITE - Should NOT add new value to Strategy values - Unassigned attribute', async () => {
+        const response = await request(app)
             .patch('/configstrategy/addval/' + configStrategyId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(400);
 
         expect(response.body.error).toEqual('The attribute \'value\' must be assigned');
+    });
 
+    test('STRATEGY_SUITE - Should NOT add new value to Strategy values - Value too big', async () => {
+        const response = await request(app)
+            .patch('/configstrategy/addval/' + configStrategyId)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                value: 'A'.repeat(129)
+            }).expect(400);
+
+        expect(response.body.error).toEqual('Value cannot be longer than 128 characters');
+    });
+
+    test('STRATEGY_SUITE - Should NOT add new value to Strategy values - Invalid Strategy Id', async () => {
         await request(app)
             .patch('/configstrategy/addval/INVALID_STRATEGY_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'USER_3'
             }).expect(422);
+    });
 
+    test('STRATEGY_SUITE - Should NOT add new value to Strategy values - Strategy Id Not Found', async () => {
         await request(app)
             .patch('/configstrategy/addval/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)

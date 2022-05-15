@@ -9,11 +9,14 @@ const groupConfigSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        maxlength: 30,
+        minlength: 2
     },
     description: {
         type: String,
-        trim: true
+        trim: true,
+        maxlength: 256
     },
     activated: {
         type: Map,

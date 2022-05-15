@@ -55,10 +55,10 @@ router.post('/slack/v1/availability', auth, async (req, res) => {
     }
 });
 
-router.post('/slack/v1/installation', [
+router.post('/slack/v1/installation', slackAuth, [
     check('installation_payload').exists(),
     check('bot_payload').exists()
-], validate, slackAuth, async (req, res) => {
+], validate, async (req, res) => {
     try {
         const slackInstallation = await Controller.createSlackInstallation(req.body);
         res.status(201).send(slackInstallation);
@@ -67,7 +67,7 @@ router.post('/slack/v1/installation', [
     }
 });
 
-router.post('/slack/v1/authorize', [
+router.post('/slack/v1/authorize', auth, [
     check('domain').isMongoId(),
     check('team_id').exists()
 ], validate, auth, async (req, res) => {
@@ -81,9 +81,9 @@ router.post('/slack/v1/authorize', [
     }
 });
 
-router.post('/slack/v1/ticket/clear', [
+router.post('/slack/v1/ticket/clear', auth, [
     check('team_id').exists()
-], validate, auth, async (req, res) => {
+], validate, async (req, res) => {
     try {
         await Controller.resetTicketHistory(
             req.body.enterprise_id, req.body.team_id, req.admin);
@@ -94,13 +94,13 @@ router.post('/slack/v1/ticket/clear', [
     }
 });
 
-router.post('/slack/v1/ticket/validate', [
+router.post('/slack/v1/ticket/validate', slackAuth, [
     check('team_id').exists(),
     check('ticket_content.environment').exists(),
     check('ticket_content.group').exists(),
     check('ticket_content.switcher').isLength({ min: 0 }),
     check('ticket_content.status').isBoolean()
-], validate, slackAuth, async (req, res) => {
+], validate, async (req, res) => {
     try {
         const ticket_content = createTicketContent(req);
         await Controller.validateTicket(
@@ -112,14 +112,14 @@ router.post('/slack/v1/ticket/validate', [
     }
 });
 
-router.post('/slack/v1/ticket/create', [
+router.post('/slack/v1/ticket/create', slackAuth, [
     check('team_id').exists(),
     check('ticket_content.environment').exists(),
     check('ticket_content.group').exists(),
     check('ticket_content.switcher').isLength({ min: 0 }),
     check('ticket_content.observations', 'Max-length is 2000').isLength({ max: 2000 }),
     check('ticket_content.status').isBoolean()
-], validate, slackAuth, async (req, res) => {
+], validate, async (req, res) => {
     try {
         const ticket_content = createTicketContent(req);
         const ticket = await Controller.createTicket(
@@ -131,11 +131,11 @@ router.post('/slack/v1/ticket/create', [
     }
 });
 
-router.post('/slack/v1/ticket/process', [
+router.post('/slack/v1/ticket/process', slackAuth, [
     check('team_id').exists(),
     check('ticket_id').isMongoId(),
     check('approved').isBoolean()
-], validate, slackAuth, async (req, res) => {
+], validate, async (req, res) => {
     try {
         const ticket = await Controller.processTicket(
             req.body.enterprise_id, req.body.team_id, 
@@ -147,9 +147,9 @@ router.post('/slack/v1/ticket/process', [
     }
 });
 
-router.get('/slack/v1/findbot', [
+router.get('/slack/v1/findbot', slackAuth, [
     query('team_id').exists()
-], validate, slackAuth, async (req, res) => {
+], validate, async (req, res) => {
     try {
         const slack = await Controller.getSlack({
             enterprise_id: req.query.enterprise_id, 
@@ -163,21 +163,21 @@ router.get('/slack/v1/findbot', [
     }
 });
 
-router.get('/slack/v1/findinstallation', [
+router.get('/slack/v1/findinstallation', slackAuth, [
     query('team_id').exists()
-], validate, slackAuth, async (req, res) => {
+], validate, async (req, res) => {
     await findInstallation(req, res);
 });
 
-router.get('/slack/v1/installation/find', [
+router.get('/slack/v1/installation/find', auth, [
     query('team_id').exists()
-], validate, auth, async (req, res) => {
+], validate, async (req, res) => {
     await findInstallation(req, res, true);
 });
 
-router.get('/slack/v1/installation/:domain', [
+router.get('/slack/v1/installation/:domain', auth, [
     check('domain').isMongoId()
-], validate, auth, async (req, res) => {
+], validate, async (req, res) => {
     try {
         const domain = await getDomainById(req.params.domain);
         const { tickets, installation_payload, settings } = 
@@ -203,21 +203,21 @@ router.get('/slack/v1/installation/:domain', [
     }
 });
 
-router.delete('/slack/v1/installation', [
+router.delete('/slack/v1/installation', slackAuth, [
     query('team_id').exists()
-], validate, slackAuth, async (req, res) => {
+], validate, async (req, res) => {
     await deleteInstallation(req, res);
 });
 
-router.delete('/slack/v1/installation/decline', [
+router.delete('/slack/v1/installation/decline', auth, [
     query('team_id').exists()
-], validate, auth, async (req, res) => {
+], validate, async (req, res) => {
     await deleteInstallation(req, res);
 });
 
-router.delete('/slack/v1/installation/unlink', [
+router.delete('/slack/v1/installation/unlink', auth, [
     query('domain').exists()
-], validate, auth, async (req, res) => {
+], validate, async (req, res) => {
     try {
         await Controller.unlinkSlack(req.query.domain, req.admin);
         res.send({ message: 'Slack Integration uninstalled with success' });

@@ -13,7 +13,9 @@ import { responseException } from '../exceptions';
 
 const router = new express.Router();
 
-router.post('/configstrategy/create', auth, async (req, res) => {
+router.post('/configstrategy/create', auth, [
+    check('description').isLength({ max: 256 })
+], validate, async (req, res) => {
     try {
         const configStrategy = await Controller.createStrategy(req.body, req.admin);
         res.status(201).send(configStrategy);
@@ -49,8 +51,9 @@ router.get('/configstrategy', auth, async (req, res) => {
     }
 });
 
-router.get('/configstrategy/:id', [
-    check('id').isMongoId()], validate, auth, async (req, res) => {
+router.get('/configstrategy/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         let configStrategy = await Controller.getStrategyById(req.params.id);
         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY);
@@ -64,8 +67,9 @@ router.get('/configstrategy/:id', [
 // GET /configstrategy/ID?sortBy=date:desc
 // GET /configstrategy/ID?limit=10&skip=20
 // GET /configstrategy/ID
-router.get('/configstrategy/history/:id', [
-    check('id').isMongoId()], validate, auth, async (req, res) => {
+router.get('/configstrategy/history/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const configStrategy = await Controller.getStrategyById(req.params.id);
         const history = await History.find({ domainId: configStrategy.domain, elementId: configStrategy._id })
@@ -82,8 +86,9 @@ router.get('/configstrategy/history/:id', [
     }
 });
 
-router.delete('/configstrategy/history/:id', [
-    check('id').isMongoId()], validate, auth, async (req, res) => {
+router.delete('/configstrategy/history/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const configStrategy = await Controller.getStrategyById(req.params.id);
         await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
@@ -95,8 +100,9 @@ router.delete('/configstrategy/history/:id', [
     }
 });
 
-router.get('/configstrategy/req/:strategy', [
-    check('strategy').isLength({ min: 1 })], validate, auth, (req, res) => {
+router.get('/configstrategy/req/:strategy', auth, [
+    check('strategy').isLength({ min: 1 })
+], validate, (req, res) => {
     try {
         const strategy = req.params.strategy.toString();
         res.send(strategyRequirements(strategy));
@@ -111,8 +117,9 @@ router.get('/configstrategy/spec/strategies', auth, (_req, res) => {
     });
 });
 
-router.delete('/configstrategy/:id', [check('id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.delete('/configstrategy/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const configStrategy = await Controller.deleteStrategy(req.params.id, req.admin);
         res.send(configStrategy);
@@ -121,8 +128,11 @@ router.delete('/configstrategy/:id', [check('id').isMongoId()],
     }
 });
 
-router.patch('/configstrategy/:id', [check('id').isMongoId()], 
-    validate, auth, verifyInputUpdateParameters(['description', 'values', 'operation']), async (req, res) => {
+router.patch('/configstrategy/:id', auth, verifyInputUpdateParameters([
+    'description', 'values', 'operation'
+]), [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const configStrategy = await Controller.updateStrategy(req.params.id, req.body, req.admin);
         res.send(configStrategy);
@@ -131,8 +141,9 @@ router.patch('/configstrategy/:id', [check('id').isMongoId()],
     }
 });
 
-router.patch('/configstrategy/addval/:id', [check('id').isMongoId()], 
-    validate, auth, verifyInputUpdateParameters(['value']), async (req, res) => {
+router.patch('/configstrategy/addval/:id', auth, [
+    check('id').isMongoId()
+], validate, verifyInputUpdateParameters(['value']), async (req, res) => {
     try {
         const configStrategy = await Controller.addVal(req.params.id, req.body, req.admin);
         res.send(configStrategy);
@@ -141,8 +152,9 @@ router.patch('/configstrategy/addval/:id', [check('id').isMongoId()],
     }
 });
 
-router.patch('/configstrategy/updateval/:id', [check('id').isMongoId()], 
-    validate, auth, verifyInputUpdateParameters(['oldvalue', 'newvalue']), async (req, res) => {
+router.patch('/configstrategy/updateval/:id', auth, [
+    check('id').isMongoId()
+], validate, verifyInputUpdateParameters(['oldvalue', 'newvalue']), async (req, res) => {
     try {
         const configStrategy = await Controller.updateVal(req.params.id, req.body, req.admin);
         res.send(configStrategy);
@@ -151,8 +163,9 @@ router.patch('/configstrategy/updateval/:id', [check('id').isMongoId()],
     }
 });
 
-router.patch('/configstrategy/removeval/:id', [check('id').isMongoId()], 
-    validate, auth, verifyInputUpdateParameters(['value']),  async (req, res) => {
+router.patch('/configstrategy/removeval/:id', auth, [
+    check('id').isMongoId()
+], validate, verifyInputUpdateParameters(['value']),  async (req, res) => {
     try {
         const configStrategy = await Controller.removeVal(req.params.id, req.body, req.admin);
         res.send(configStrategy);
@@ -163,8 +176,9 @@ router.patch('/configstrategy/removeval/:id', [check('id').isMongoId()],
 
 // GET /configstrategy/values:id?sort=true
 // GET /configstrategy/values:id?limit=10&skip=20
-router.get('/configstrategy/values/:id', [check('id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.get('/configstrategy/values/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const configStrategy = await Controller.getStrategyById(req.params.id);
         
@@ -186,8 +200,9 @@ router.get('/configstrategy/values/:id', [check('id').isMongoId()],
     }
 });
 
-router.patch('/configstrategy/updateStatus/:id', [check('id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.patch('/configstrategy/updateStatus/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const configStrategy = await Controller.updateStatusEnv(req.params.id, req.body, req.admin);
         res.send(configStrategy);

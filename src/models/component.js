@@ -9,11 +9,14 @@ const componentSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        maxlength: 50,
+        minlength: 2
     },
     description: {
         type: String,
-        trim: true
+        trim: true,
+        maxlength: 256
     },
     domain: {
         type: mongoose.Schema.Types.ObjectId,

@@ -11,7 +11,10 @@ import { responseException } from '../exceptions';
 
 const router = new express.Router();
 
-router.post('/domain/create', auth, async (req, res) => {
+router.post('/domain/create', auth, verifyInputUpdateParameters(['name', 'description']), [
+    check('name').isLength({ min: 5, max: 30 }), 
+    check('description').isLength({ min: 0, max: 256 })
+], validate, async (req, res) => {
     try {
         await checkDomain(req);
         const domain = await Controller.createDomain(req.body, req.admin);
@@ -35,8 +38,9 @@ router.get('/domain', auth, async (req, res) => {
     res.send(req.admin.domain);
 });
 
-router.get('/domain/:id', [check('id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.get('/domain/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         let domain = await Controller.getDomainById(req.params.id);
         domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN, true);
@@ -49,8 +53,9 @@ router.get('/domain/:id', [check('id').isMongoId()],
 // GET /domain/ID?sortBy=date:desc
 // GET /domain/ID?limit=10&skip=20
 // GET /domain/ID
-router.get('/domain/history/:id', [check('id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.get('/domain/history/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const domain = await Controller.getDomainById(req.params.id);
         const history = await History.find({ elementId: domain._id })
@@ -67,8 +72,9 @@ router.get('/domain/history/:id', [check('id').isMongoId()],
     }
 });
 
-router.delete('/domain/history/:id', [check('id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.delete('/domain/history/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const domain = await Controller.deleteDomainHistory(req.params.id, req.admin);
         res.send(domain);
@@ -77,8 +83,9 @@ router.delete('/domain/history/:id', [check('id').isMongoId()],
     }
 });
 
-router.delete('/domain/:id', [check('id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.delete('/domain/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         let domain = await Controller.deleteDomain(req.params.id, req.admin);
         res.send(domain);
@@ -87,8 +94,9 @@ router.delete('/domain/:id', [check('id').isMongoId()],
     }
 });
 
-router.patch('/domain/transfer/request', [check('domain').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.patch('/domain/transfer/request', auth, [
+    check('domain').isMongoId()
+], validate, async (req, res) => {
     try {
         let domain = await Controller.transferDomain(req.body, req.admin);
         res.send(domain);
@@ -97,8 +105,9 @@ router.patch('/domain/transfer/request', [check('domain').isMongoId()],
     }
 });
 
-router.patch('/domain/transfer/accept', [check('domain').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.patch('/domain/transfer/accept', auth, [
+    check('domain').isMongoId()
+], validate, async (req, res) => {
     try {
         const domain = await Controller.transferDomainAccept(req.body, req.admin);
         res.send(domain);
@@ -107,8 +116,10 @@ router.patch('/domain/transfer/accept', [check('domain').isMongoId()],
     }
 });
 
-router.patch('/domain/:id', [check('id').isMongoId()], validate, auth,
-    verifyInputUpdateParameters(['description']), async (req, res) => {
+router.patch('/domain/:id', auth, verifyInputUpdateParameters(['description']), [
+    check('id').isMongoId(),
+    check('description').isLength({ min: 0, max: 256 })
+], validate, async (req, res) => {
     try {
         const domain = await Controller.updateDomain(req.params.id, req.body, req.admin);
         res.send(domain);
@@ -117,8 +128,9 @@ router.patch('/domain/:id', [check('id').isMongoId()], validate, auth,
     }
 });
 
-router.patch('/domain/updateStatus/:id', [check('id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.patch('/domain/updateStatus/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const domain = await Controller.updateDomainStatus(req.params.id, req.body, req.admin);
         res.send(domain);
@@ -127,8 +139,9 @@ router.patch('/domain/updateStatus/:id', [check('id').isMongoId()],
     }
 });
 
-router.patch('/domain/removeStatus/:id', [check('id').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.patch('/domain/removeStatus/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         let domain = await Controller.removeDomainStatusEnv(req.params.id, req.body.env, req.admin);
         res.send(domain);

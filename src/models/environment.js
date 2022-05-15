@@ -10,7 +10,9 @@ const environmentSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        default: EnvType.DEFAULT
+        default: EnvType.DEFAULT,
+        maxlength: 30,
+        minlength: 2
     },
     domain: {
         type: mongoose.Schema.Types.ObjectId,

@@ -65,8 +65,9 @@ router.post('/admin/login', [
     }
 });
 
-router.post('/admin/login/request/recovery', 
-    check('email').isEmail(), validate, async (req, res) => {
+router.post('/admin/login/request/recovery', [ 
+    check('email').isEmail()
+], validate, async (req, res) => {
     await Controller.loginRequestRecovery(req.body.email);
     res.status(200).send({ message: 'Request received' });
 });
@@ -96,11 +97,11 @@ router.get('/admin/me', auth, async (req, res) => {
     res.send(req.admin);
 });
 
-router.post('/admin/collaboration/permission', [
+router.post('/admin/collaboration/permission', auth, [
     check('domain', 'Domain Id is required').isMongoId(),
     check('action', 'Array of actions is required').isArray({ min: 1 }),
     check('router', 'Router name is required').isLength({ min: 1 })
-], validate, auth, async (req, res) => {
+], validate, async (req, res) => {
     const element = {
         _id: req.body.element.id,
         name: req.body.element.name,
@@ -145,14 +146,16 @@ router.delete('/admin/me', auth, async (req, res) => {
     }
 });
 
-router.patch('/admin/me', verifyInputUpdateParameters(['name', 'email', 'password']), 
-    auth, async (req, res) => {
+router.patch('/admin/me', auth, verifyInputUpdateParameters([
+    'name', 'email', 'password'
+]), async (req, res) => {
     const admin = await Controller.updateAccount(req.body, req.admin);
     res.send(admin);
 });
 
-router.patch('/admin/me/team/leave/:domainid', [check('domainid').isMongoId()], 
-    validate, auth, async (req, res) => {
+router.patch('/admin/me/team/leave/:domainid', auth, [
+    check('domainid').isMongoId()
+], validate, async (req, res) => {
     try {
         const admin = await Controller.leaveDomain(req.params.domainid, req.admin);
         res.send(admin);

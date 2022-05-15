@@ -19,10 +19,10 @@ const router = new express.Router();
 // GET /metric/data/ID??key=&component=&result=&group=&dateBefore=&dateAfter=
 // GET /metric/data/ID?sortBy=-date;key;component;result
 // GET /metric/data/ID?page=1
-router.get('/metric/data/', [
+router.get('/metric/data/', auth, [
     check('domainid').isMongoId(), 
     check('page', 'page is required as query parameter').isLength({ min: 1 })
-], validate, auth, async (req, res) => {
+], validate, async (req, res) => {
     try {
         let { args } = buildMetricsFilter(req);
         const page = req.query.page.toString();
@@ -57,10 +57,10 @@ router.get('/metric/data/', [
     }
 });
 
-router.get('/metric/statistics/', [
+router.get('/metric/statistics/', auth, [
     check('domainid').isMongoId(),
     check('statistics', 'add one or more options {swicthers,components,reasons,all} separed by comma').isLength({ min: 3 })
-], validate, auth, async (req, res) => {
+], validate, async (req, res) => {
     try {
         const switcher = buildMetricsFilter(req);
         const components = buildMetricsFilter(req);
@@ -98,10 +98,10 @@ router.get('/metric/statistics/', [
 
 });
 
-router.delete('/metric', [
+router.delete('/metric', auth, [
     check('domainid').isMongoId(),
     check('key', 'switcher key must be provided').isLength({ min: 1 })
-], validate, auth, async (req, res) => {
+], validate, async (req, res) => {
     try {
         let config = await getConfig({ domain: req.query.domainid, key: req.query.key });
         if (!config) {

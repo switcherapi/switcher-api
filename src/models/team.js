@@ -6,7 +6,9 @@ const teamSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        maxlength: 30,
+        minlength: 2
     },
     active: {
         type: Boolean,

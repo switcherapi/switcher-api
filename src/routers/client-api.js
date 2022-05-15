@@ -12,8 +12,9 @@ const router = new express.Router();
 // GET /check?key=KEY&showReason=true
 // GET /check?key=KEY&showStrategy=true
 // GET /check?key=KEY&bypassMetric=true
-router.post('/criteria', [query('key').isLength({ min: 1 })], 
-    validate, appAuth, checkConfig, checkConfigComponent, async (req, res) => {
+router.post('/criteria', appAuth, [
+    query('key').isLength({ min: 1 })
+], validate, checkConfig, checkConfigComponent, async (req, res) => {
     try {
         const environment = req.environment;
         const domain = req.domain;
@@ -59,9 +60,9 @@ router.get('/criteria/snapshot_check/:version', appAuth, async (req, res) => {
     }
 });
 
-router.post('/criteria/switchers_check', [
-    check('switchers', 'Switcher Key is required').isLength({ min: 1 })], 
-    validate, appAuth, async (req, res) => {
+router.post('/criteria/switchers_check', appAuth, [
+    check('switchers', 'Switcher Key is required').isLength({ min: 1 })
+], validate, async (req, res) => {
     try {
         const configsFound = await getConfigs({ domain: req.domain, components: req.componentId });
         const configs = configsFound.map(config => config.key);
