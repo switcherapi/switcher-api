@@ -3,7 +3,7 @@ import axios from 'axios';
 export const url = 'https://www.google.com/recaptcha/api/siteverify';
 
 export async function validate_token(token, remoteAddress) {
-    if (!process.env.GOOGLE_RECAPTCHA_SECRET)
+    if (!process.env.GOOGLE_RECAPTCHA_SECRET || process.env.GOOGLE_SKIP_AUTH == 'true')
         return;
 
     if (token === null || token === undefined)

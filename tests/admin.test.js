@@ -16,6 +16,7 @@ import {
     team1Id
 } from './fixtures/db_api';
 import { Team } from '../src/models/team';
+import swaggerDocument from '../api-docs/swagger-document';
 
 afterAll(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -467,13 +468,21 @@ describe('Testing Admin insertion', () => {
         expect(response.body.error).toEqual('Operation not found');
     });
 
-    test('ADMIN_SUITE - Should get All Good', async () => {
+    test('ADMIN_SUITE - Should get API UP', async () => {
         const response = await request(app)
             .get('/check')
             .send().expect(200);
 
         expect(response.body.status).toEqual('UP');
-        expect(response.body.attributes.version).toEqual(app.version);
+        expect(response.body.attributes.version).toEqual(swaggerDocument.info.version);
+    });
+
+    test('ADMIN_SUITE - Should return OpenAPI Swagger API document', async () => {
+        const response = await request(app)
+            .get('/swagger.json')
+            .send().expect(200);
+
+        expect(response.body).toMatchObject(swaggerDocument);
     });
 
     test('ADMIN_SUITE - Should renew access', async () => {
