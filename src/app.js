@@ -21,7 +21,7 @@ import teamRouter from './routers/team';
 import roleRouter from './routers/role';
 import slackRouter from './routers/slack';
 import schema from './client/schema';
-import { appAuth, auth, slackAuth } from './middleware/auth';
+import { appAuth, auth, resourcesAuth, slackAuth } from './middleware/auth';
 
 const app = express();
 app.use(express.json());
@@ -77,17 +77,16 @@ app.use('/adm-graphql', auth, graphqlHTTP({
  * API Docs and Health Check
  */
 
-app.use(
-    '/api-docs',
+app.use('/api-docs', resourcesAuth(),
     swaggerUi.serve, 
     swaggerUi.setup(swaggerDocument)
 );
 
-app.get('/swagger.json', (_req, res) => {
+app.get('/swagger.json', resourcesAuth(), (_req, res) => {
     res.status(200).send(swaggerDocument);
 });
 
-app.get('/check', (_req, res) => {
+app.get('/check', resourcesAuth(), (_req, res) => {
     res.status(200).send({ 
         status: 'UP',
         attributes: {
