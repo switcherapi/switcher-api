@@ -7,7 +7,7 @@ import helmet from 'helmet';
 require('./db/mongoose');
 
 import mongoose from 'mongoose';
-import swaggerDocument from './routers/api-docs/swagger-document';
+import swaggerDocument from '../api-docs/swagger-document.js';
 import clientApiRouter from './routers/client-api';
 import adminRouter from './routers/admin';
 import environment from './routers/environment';
