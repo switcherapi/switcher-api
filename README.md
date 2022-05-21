@@ -15,11 +15,11 @@ Main features:
 - Control & track more using little effort by sharing switchers among application components.
 - Cross environment. Generate zero impact when manipulating your project features.
 - Customizable environment strategies. Setup switchers using variables per environment.
+- Delegate Switcher analysis to external services with secured Switcher Relay.
 - Create manageable teams to collaborate.
 - Keep track of every modification and features usage.
 - Detailed metrics.
-- Client endpoints exposed in **REST** and **GraphQL**.
-- Zero-latency mode also enables your applications to work with zero latency.
+- SDKs support zero-latency mode for performance improvement.
 - Exclusive Slack App to control and test changes.
  
 
@@ -35,7 +35,7 @@ Main features:
 2. Add .env-cmdrc file into the project directory (use '.env-cmdrc-template')
 3. Replace values such as secret keys and URLs
 
-### Running Switcher API from Docker Composer script
+### Running Switcher API from Docker Composer manifest file
 
 This option leverages Switcher API and Switcher Management with minimum settings required to start using.
 
@@ -53,201 +53,57 @@ Change the values for:
 docker-compose --env-file ./config/.env.dev up -d
 ```
 
-# Usage
-### API configuration
-#### Signing up
-Signing up to Switcher API must be made via Switcher Management.
-<br />It can be done by using an email address or linking it to a GitHub or BitBucket account.
+# Quick start
 
-- **Singing up via email** - /admin/signup [POST]
-```json
-{
-    "name": "[USER NAME]",
-    "email": "[EMAIL ADDRESS]",
-    "password": "[PASSWORD]",
-    "token": "[GOOGLE reCAPTCHA TOKEN]"
-}
-```
+Initialize Swagger UI by accessing the URL: http://localhost:3000/api-docs
+Or import either the OpenAPI docs from "http://localhost:3000/swagger.json" or Postman Collection from "requests/Switcher API*"
 
-- **Singing up via GitHub** - /admin/github/auth?code= [POST]
-  Code must be set by the API service provider.
+## API configuration
+### Signing up
+Signing up to Switcher API using email/password or linking it to a GitHub or Bitbucket account.
 
-- **Singing up via BitBucket** - /admin/bitbucket/auth?code= [POST]
-  Code must be set by the API service provider.
+- **Singing up via email** - Admin: /admin/signup [POST]
+- **Singing up via GitHub** - Admin: /admin/github/auth?code= [POST]
+- **Singing up via BitBucket** - Admin: /admin/bitbucket/auth?code= [POST]
+- **Access confirmation** - Admin: /admin/signup/authorization?code= [POST]
 
-- **Access confirmation** - /admin/signup/authorization?code=[GENERATED_CODE] [POST]
-  Code must be generated via /admin/signup.
+### Domain
+Domains are responsible for centralizing all settings and configurations. It is equivalent to an organization that can manage multiple projects, users, and environments.
 
-#### Domain
+- **New domain** - Domain: /domain/create [POST]
 
-- **New domain** - /domain/create [POST]
-  Domains is big wrapper which allows you centralize releases, teams, environment, components, and much more.
-```json
-{
-    "name": "[DOMAIN NAME]",
-    "description": "[DOMAIN DESCRIPTION]"
-}
-```
+### Component
+Components are applications that are using Switcher API. Each component has its own access token and need to be linked to Switchers.
 
-#### Component
+- **Create a component** - Component: /component/create [POST]
+- **Generating a new API Key** - Component: /component/generateApiKey [GET]
 
-- **Create a component** - /component/create [POST]
-  Name here all your applications that will be using Switchers. 
-  Each application has its API Key.
-```json
-{
-    "name": "[COMPONENT NAME]",
-    "description": "[COMPONENT DESCRIPTION]",
-    "domain": "[DOMAIN ID]"
-}
-```
+### Group
+Groups are used to organize Switchers that share the same scope.
 
-- **Generating a new API Key** - /component/generateApiKeyCOMPONENT_ID [GET]
-  This operation cannot be undone.
+- **New Group** - GroupConfig: /groupconfig/create [POST]
 
-#### Group
+### Switcher
+Switchers are the main entities to control features.
 
-- **New Group** - /groupconfig/create [POST]
-```json
-{
-    "name": "[GROUP NAME]",
-    "description": "[GROUP DESCRIPTION]",
-    "domain": "[DOMAIN ID]"
-}
-```
+- **New Switcher** - Config: /config/create [POST]
 
-#### Switcher
+### Strategy
+Customize the behavior of the Switcher by including strategies rules.
 
-- **New Switcher** - /config/create [POST]
-```json
-{
-    "key": "[SWITCHER KEY]",
-    "description": "[SWITCHER DESCRIPTION]",
-    "group": "[GROUP ID]"
-}
-```
+- **New Strategy** - ConfigStrategy: /configstrategy/create [POST]
 
-#### Strategy
+## API usage
+In order to use Switcher API, you need authenticate an component before using it.
+See our SDKs to integrate Switcher API with your application.
 
-- **New Strategy** - /configstrategy/create [POST]
-```json
-{
-    "description": "[STRATEGY DESCRIPTION]",
-    "strategy": "[STRATEGY TYPE]",
-    "values": ["ARRAY OF VALUES"],
-    "operation": "[SRATEGY OPERATION]",
-    "config": "[CONFIG ID]",
-    "env": "default"
-}
-```
-
-*env can be replaced by the environment your application is currently running.*
-
-  - **Strategy types**
-    - VALUE_VALIDATION
-
-      Plain text validation. No format required.
-
-    - NUMERIC_VALIDATION
-
-      Integer or Decimal value validation.
-
-    - NETWORK_VALIDATION
-
-      This validation accept CIDR (e.g. 10.0.0.0/24) or IPv4 (e.g. 10.0.0.1) formats.
-
-    - TIME_VALIDATION
-
-      This validation accept only HH:mm format input.
-
-    - DATE_VALIDATION
-
-      Date validation accept both date and time input (e.g. YYYY-MM-DD or YYYY-MM-DDTHH:mm) formats.
-
-    - REGEX_VALIDATION
-
-      Regular expression based validation. No format required.
-
-  - **Strategy operations**
-    - EXIST / NOT_EXIST
-    - EQUAL / NOT_EQUAL
-    - GREATER / LOWER / BETWEEN
-
-* * *
-
-### API usage
-To use the API, each component must authenticate before executing the API criteria evaluation.
-
-- **Auth** - /criteria/auth [POST]
-The header must contain the following:
-```
-'headers': {
-    'switcher-api-key': '[API_KEY]'
-}
-```
-The body must contain the exact registered domain, component, and environment name.
-```json
-{
-   "domain": "[DOMAIN NAME]",
-   "component": "[COMPONENT NAME]",
-   "environment": "default"
-}
-```
-
-- **Executing** - /criteria?key=SWITCHER_KEY [POST]
-The header must contain the authorization token provided by the criteria/auth endpoint.
-```
-Bearer Token: [TOKEN]
-```
-
-**Optional parameters**
-
-- showReason [true/false]: returns the criteria result.
-- showStrategy [true/false]: returns the configured strategy.
-- bypassMetric [true'false]: bypass registering the execution result.
-
-**REST - Strategy input**
-
-Multiple input can be provided to the API. In case the registered Switcher does not contain any configured strategy, the input sent is going to be ignored.
-
-```json
-{
-  "entry": [
-    {
-      "strategy": "[STRATEGY TYPE]",
-      "input": "[VALUE]"
-    }]
-}
-```
-
-**GraphQL - Strategy input** - /graphql [POST]
-
-A GraphQL endpoint can also be used to execute the API. Extra return information can be specified under response block request.
-
-```
-{
-  criteria(
-    key: "[SWITCHER KEY]", 
-    bypassMetric: [true/false],
-    entry: [
-        {
-          strategy: "[STRATEGY TYPE]", 
-          input: "[VALUE]"
-        }
-      ]
-    ) {
-    response {
-      result
-      reason
-    }
-  }
-}
-```
+- **Auth** - Client API: /criteria/auth [POST]
+- **Executing** -  Client API: /criteria?key=SWITCHER_KEY [POST]
 
 * * *
 
 ## Donations
-Donations for coffee, cookies or pizza are extremely welcomed.</br>
+Donations for coffee, cookies or pizza are extremely welcomed.
 Please, find the sponsor button at the top for more options.
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9FKW64V67RKXW&source=url)

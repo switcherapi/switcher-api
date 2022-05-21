@@ -12,7 +12,7 @@ export default {
             },
             responses: {
                 '201': {
-                    description: 'Successful Config created',
+                    description: 'Config created',
                     content: commonSchemaContent('Config')
                 }
             }
@@ -62,7 +62,7 @@ export default {
             },
             responses: {
                 '200': {
-                    description: 'Successful Config update',
+                    description: 'Config updated',
                     content: commonSchemaContent('Config')
                 }
             }
@@ -95,7 +95,7 @@ export default {
             },
             responses: {
                 '200': {
-                    description: 'Successful Config update',
+                    description: 'Config updated',
                     content: commonSchemaContent('Config')
                 }
             }
@@ -124,7 +124,7 @@ export default {
             },
             responses: {
                 '200': {
-                    description: 'Successful Config environment update',
+                    description: 'Config environment updated',
                     content: commonSchemaContent('Config')
                 }
             }
@@ -155,7 +155,7 @@ export default {
             },
             responses: {
                 '200': {
-                    description: 'Successful Config environment remove',
+                    description: 'Config environment removed',
                     content: commonSchemaContent('Config')
                 }
             }
@@ -186,7 +186,7 @@ export default {
             },
             responses: {
                 '200': {
-                    description: 'Successful Config component add',
+                    description: 'Config component added',
                     content: commonSchemaContent('Config')
                 }
             }
@@ -220,7 +220,7 @@ export default {
             },
             responses: {
                 '200': {
-                    description: 'Successful Config components update',
+                    description: 'Config components updated',
                     content: commonSchemaContent('Config')
                 }
             }
@@ -251,7 +251,7 @@ export default {
             },
             responses: {
                 '200': {
-                    description: 'Successful Config component remove',
+                    description: 'Config component removed',
                     content: commonSchemaContent('Config')
                 }
             }
@@ -268,7 +268,7 @@ export default {
             ],
             responses: {
                 '200': {
-                    description: 'Successful Config Relay remove',
+                    description: 'Config Relay removed',
                     content: commonSchemaContent('Config')
                 }
             }

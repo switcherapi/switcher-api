@@ -41,5 +41,18 @@ export const component = {
 };
 
 export default {
-    Component: component
+    Component: component,
+    ComponentCreateRequest: {
+        type: 'object',
+        properties: {
+            name: {
+                type: 'string',
+                description: 'The name given to the component'
+            },
+            description: {
+                type: 'string',
+                description: 'The description of the component'
+            }
+        }
+    }
 };
