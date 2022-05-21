@@ -1,4 +1,5 @@
 import { jwt } from '../schemas/admin';
+import { pathParameter, queryParameter } from '../schemas/common';
 import { commonSchemaContent } from './common';
 
 export default {
@@ -21,14 +22,9 @@ export default {
         post: {
             tags: ['Admin'],
             description: 'Admin signup authorization',
-            parameters: [{
-                in: 'query',
-                name: 'code',
-                description: 'Authorization code',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+               queryParameter('code', 'Authorization code', true)
+            ],
             responses: {
                 '201': {
                     description: 'Admin signup authorization',
@@ -41,14 +37,9 @@ export default {
         post: {
             tags: ['Admin'],
             description: 'Admin signup via GitHub',
-            parameters: [{
-                in: 'query',
-                name: 'code',
-                description: 'Authorization code',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                queryParameter('code', 'Authorization code', true)
+            ],
             responses: {
                 '201': {
                     description: 'Admin signup via GitHub',
@@ -61,14 +52,9 @@ export default {
         post: {
             tags: ['Admin'],
             description: 'Admin signup via Bitbucket',
-            parameters: [{
-                in: 'query',
-                name: 'code',
-                description: 'Authorization code',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                queryParameter('code', 'Authorization code', true)
+            ],
             responses: {
                 '201': {
                     description: 'Admin signup via Bitbucket',
@@ -244,14 +230,9 @@ export default {
             tags: ['Admin'],
             description: 'Get single admin',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'adminid',
-                description: 'Admin ID',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('adminid', 'Admin ID', true)
+            ],
             responses: {
                 '200': {
                     description: 'Success',

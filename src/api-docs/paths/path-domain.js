@@ -1,4 +1,4 @@
-import { pagination } from '../schemas/common';
+import { pagination, pathParameter } from '../schemas/common';
 import { commonArraySchemaContent, commonSchemaContent } from './common';
 
 export default {
@@ -23,14 +23,9 @@ export default {
             tags: ['Domain'],
             description: 'Get domain by id',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Domain ID',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Domain ID', true)
+            ],
             responses: {
                 '200': {
                     description: 'Success',
@@ -42,14 +37,9 @@ export default {
             tags: ['Domain'],
             description: 'Domain update',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Domain ID',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Domain ID', true)
+            ],
             requestBody: {
                 content: {
                     'application/json': {
@@ -76,14 +66,9 @@ export default {
             tags: ['Domain'],
             description: 'Delete domain',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Domain ID',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Domain ID', true)
+            ],
             responses: {
                 '200': {
                     description: 'Success',
@@ -153,14 +138,9 @@ export default {
             tags: ['Domain'],
             description: 'Domain environment update',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Domain ID',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Domain ID', true)
+            ],
             requestBody: {
                 content: {
                     'application/json': {
@@ -187,14 +167,9 @@ export default {
             tags: ['Domain'],
             description: 'Domain environment remove',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Domain ID',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Domain ID', true)
+            ],
             requestBody: {
                 content: {
                     'application/json': {
