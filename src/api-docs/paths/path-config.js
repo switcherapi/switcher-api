@@ -1,8 +1,8 @@
-import { pagination } from '../schemas/common';
+import { pagination, pathParameter, queryParameter } from '../schemas/common';
 import { commonArraySchemaContent, commonOneOfSchemaContent, commonSchemaContent } from './common';
 
 export default {
-    'config/create': {
+    '/config/create': {
         post: {
             tags: ['Config'],
             description: 'Config creation',
@@ -12,7 +12,7 @@ export default {
             },
             responses: {
                 '201': {
-                    description: 'Successful Config creation',
+                    description: 'Successful Config created',
                     content: commonSchemaContent('Config')
                 }
             }
@@ -23,21 +23,10 @@ export default {
             tags: ['Config'],
             description: 'Get Config by id',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Config ID',
-                schema: {
-                    type: 'string'
-                }
-            }, {
-                in: 'query',
-                name: 'resolveComponents',
-                description: 'Resolve components',
-                schema: {
-                    type: 'boolean'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Config ID', true),
+                queryParameter('resolveComponents', 'Resolve components', false, 'boolean')
+            ],
             responses: {
                 '200': {
                     description: 'Success',
@@ -49,14 +38,9 @@ export default {
             tags: ['Config'],
             description: 'Config update',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Config ID',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Config ID', true)
+            ],
             requestBody: {
                 content: {
                     'application/json': {
@@ -87,14 +71,9 @@ export default {
             tags: ['Config'],
             description: 'Delete Config',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Config ID',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Config ID', true)
+            ],
             responses: {
                 '200': {
                     description: 'Success',
@@ -108,14 +87,9 @@ export default {
             tags: ['Config'],
             description: 'Config Relay update',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Config ID',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Config ID', true)
+            ],
             requestBody: {
                 content: commonSchemaContent('Relay')
             },
@@ -132,14 +106,9 @@ export default {
             tags: ['Config'],
             description: 'Config environment update',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Config ID',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Config ID', true)
+            ],
             requestBody: {
                 content: {
                     'application/json': {
@@ -166,14 +135,9 @@ export default {
             tags: ['Config'],
             description: 'Config environment remove',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Config ID',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Config ID', true)
+            ],
             requestBody: {
                 content: {
                     'application/json': {
@@ -202,14 +166,9 @@ export default {
             tags: ['Config'],
             description: 'Config component add',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Config ID',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Config ID', true)
+            ],
             requestBody: {
                 content: {
                     'application/json': {
@@ -238,14 +197,9 @@ export default {
             tags: ['Config'],
             description: 'Config components update',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Config ID',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Config ID', true)
+            ],
             requestBody: {
                 content: {
                     'application/json': {
@@ -277,14 +231,9 @@ export default {
             tags: ['Config'],
             description: 'Config component remove',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Config ID',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Config ID', true)
+            ],
             requestBody: {
                 content: {
                     'application/json': {
@@ -313,21 +262,10 @@ export default {
             tags: ['Config'],
             description: 'Config Relay remove',
             security: [{ bearerAuth: [] }],
-            parameters: [{
-                in: 'path',
-                name: 'id',
-                description: 'Config ID',
-                schema: {
-                    type: 'string'
-                }
-            }, {
-                in: 'path',
-                name: 'env',
-                description: 'Environment name',
-                schema: {
-                    type: 'string'
-                }
-            }],
+            parameters: [
+                pathParameter('id', 'Config ID', true),
+                pathParameter('env', 'Environment name', true)
+            ],
             responses: {
                 '200': {
                     description: 'Successful Config Relay remove',
@@ -356,15 +294,8 @@ export default {
             security: [{ bearerAuth: [] }],
             parameters: [
                 ...pagination,
-            {
-                in: 'query',
-                name: 'group',
-                description: 'Group ID',
-                required: true,
-                schema: {
-                    type: 'string'
-                }
-            }],
+                queryParameter('group', 'Group ID', true)
+            ],
             responses: {
                 '200': {
                     description: 'Success',
