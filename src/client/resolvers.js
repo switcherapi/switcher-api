@@ -164,7 +164,7 @@ async function checkGroup(configId) {
     return GroupConfig.findOne({ _id: config.group }, null, { lean: true });
 }
 
-async function checkConfigStrategies (configId, strategyFilter) {
+async function checkConfigStrategies(configId, strategyFilter) {
     return ConfigStrategy.find({ config: configId }, strategyFilter).lean();
 }
 
