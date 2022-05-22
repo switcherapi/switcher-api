@@ -37,49 +37,56 @@ Main features:
 
 ### Running Switcher API from Docker Composer manifest file
 
-This option leverages Switcher API and Switcher Management with minimum settings required to start using.
+This option leverages Switcher API and Switcher Management with minimum settings required.
 
-1. Modify the minimal configuration file "config/.env.dev":
-
-Change the values for:
+1. Modify the configuration file "config/.env.dev":
 
 - JWT_SECRET: With your secure private key
 - SWITCHERAPI_URL: The Switcher API URL that Switcher Management will use internally
 - SM_IP: IP/DNS used by Switcher Management internal redirects
 
-2. Run the command: 
+2. Run:
 
 ```
 docker-compose --env-file ./config/.env.dev up -d
 ```
 
+3. Open Switcher Management:
+
+```
+http://localhost
+```
+
 # Quick start
 
-Initialize Swagger UI by accessing the URL: http://localhost:3000/api-docs
-Or import either the OpenAPI docs from "http://localhost:3000/swagger.json" or Postman Collection from "requests/Switcher API*"
+Open Swagger UI by accessing the URL: http://localhost:3000/api-docs<br>
+Or use Postman by importing either the OpenAPI json from http://localhost:3000/swagger.json or Postman Collection from "requests/Switcher API*"
 
 ## API configuration
+
 ### Signing up
-Signing up to Switcher API using email/password or linking it to a GitHub or Bitbucket account.
+Signing up an account to use Switcher API with an email/password or linking it to a GitHub or Bitbucket account.
 
 - **Singing up via email** - Admin: /admin/signup [POST]
 - **Singing up via GitHub** - Admin: /admin/github/auth?code= [POST]
-- **Singing up via BitBucket** - Admin: /admin/bitbucket/auth?code= [POST]
+- **Singing up via Bitbucket** - Admin: /admin/bitbucket/auth?code= [POST]
 - **Access confirmation** - Admin: /admin/signup/authorization?code= [POST]
 
 ### Domain
-Domains are responsible for centralizing all settings and configurations. It is equivalent to an organization that can manage multiple projects, users, and environments.
+Domains are responsible for centralizing all settings and configurations.<br>
+It is equivalent to an organization that can manage multiple projects, users, and environments.
 
 - **New domain** - Domain: /domain/create [POST]
 
 ### Component
-Components are applications that are using Switcher API. Each component has its own access token and need to be linked to Switchers.
+Components are applications that are using Switcher API.<br>
+Each component has its own access token and needs to be linked to Switchers.
 
 - **Create a component** - Component: /component/create [POST]
 - **Generating a new API Key** - Component: /component/generateApiKey [GET]
 
 ### Group
-Groups are used to organize Switchers that share the same scope.
+Groups are used to organize Switchers that share the same feature scope.
 
 - **New Group** - GroupConfig: /groupconfig/create [POST]
 
@@ -89,13 +96,13 @@ Switchers are the main entities to control features.
 - **New Switcher** - Config: /config/create [POST]
 
 ### Strategy
-Customize the behavior of the Switcher by including strategies rules.
+Customize the behavior of the Switcher by including strategy rules to your Switchers.
 
 - **New Strategy** - ConfigStrategy: /configstrategy/create [POST]
 
 ## API usage
-In order to use Switcher API, you need authenticate an component before using it.
-See our SDKs to integrate Switcher API with your application.
+In order to use Switcher API, you need to authenticate the component before using it.<br>
+See also our SDKs to integrate Switcher API with your application.
 
 - **Auth** - Client API: /criteria/auth [POST]
 - **Executing** -  Client API: /criteria?key=SWITCHER_KEY [POST]
@@ -103,7 +110,7 @@ See our SDKs to integrate Switcher API with your application.
 * * *
 
 ## Donations
-Donations for coffee, cookies or pizza are extremely welcomed.
+Donations for coffee, cookies or pizza are extremely welcomed.<br>
 Please, find the sponsor button at the top for more options.
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9FKW64V67RKXW&source=url)
