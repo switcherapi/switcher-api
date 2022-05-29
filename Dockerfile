@@ -1,5 +1,5 @@
 # ---------- Base ----------
-FROM node:16.13-alpine3.15 AS base
+FROM node:gallium-alpine AS base
 
 WORKDIR /app
 
@@ -17,11 +17,9 @@ RUN npm install
 # Copy the source files
 COPY ./src ./src
 
-# Build
-RUN npm run build
-
-# Remove dev dependencies
-RUN npm prune --production
+# Build & Remove dev dependencies
+RUN npm run build && \
+    npm prune --production
 
 # ---------- Release ----------
 FROM base AS release
