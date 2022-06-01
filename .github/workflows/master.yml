@@ -27,9 +27,16 @@ jobs:
         with:
           mongodb-version: 4.4
 
-      - run: npm install
-      - run: npx eslint ./src
-      - run: npm test
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint
+        run: npx eslint ./src
+
+      - name: Run tests
+        run: npm test
+        env:
+          MONGODB_URI: mongodb://127.0.0.1:27017/switcher-api-test
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
