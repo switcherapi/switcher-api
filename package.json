@@ -14,7 +14,6 @@
     "clean": "rm -rf build && mkdir build",
     "dev": "env-cmd -e dev nodemon ./src/start.js",
     "prod": "env-cmd -e prod nodemon ./src/start.js",
-    "coveralls": "cat ./coverage/lcov.info | coveralls",
     "test": "jest --runInBand --collect-coverage",
     "test-local": "env-cmd -e test jest --runInBand --collect-coverage"
   },
@@ -53,7 +52,6 @@
     "@babel/register": "^7.17.7",
     "babel-jest": "^28.0.3",
     "babel-polyfill": "^6.26.0",
-    "coveralls": "^3.1.1",
     "env-cmd": "^10.1.0",
     "eslint": "^8.14.0",
     "jest": "^28.1.0",
