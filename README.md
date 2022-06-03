@@ -1,8 +1,21 @@
-[![Master Branch](https://github.com/switcherapi/switcher-api/actions/workflows/master.yml/badge.svg)](https://github.com/switcherapi/switcher-api/actions/workflows/master.yml)
+***
+
+<div align="center">
+<b>Switcher API</b><br>
+Switching fast. Adapt everywhere.
+</div>
+
+<div align="center">
+
+[![Master CI](https://github.com/switcherapi/switcher-api/actions/workflows/master.yml/badge.svg)](https://github.com/switcherapi/switcher-api/actions/workflows/master.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=switcherapi_switcher-api&metric=alert_status)](https://sonarcloud.io/dashboard?id=switcherapi_switcher-api)
 [![Known Vulnerabilities](https://snyk.io/test/github/switcherapi/switcher-api/badge.svg)](https://snyk.io/test/github/switcherapi/switcher-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Slack: Switcher-HQ](https://img.shields.io/badge/slack-@switcher/hq-blue.svg?logo=slack)](https://switcher-hq.slack.com/)
+
+</div>
+
+***
 
 ![Switcher API: Cloud-based Feature Flag API](https://github.com/switcherapi/switcherapi-assets/blob/master/logo/switcherapi_grey.png)
 
