@@ -3,7 +3,7 @@ import { checkEnvironment } from '../external/switcher-api-facade';
 import { ConfigStrategy } from '../models/config-strategy';
 import { Environment, EnvType } from '../models/environment';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { formatInput, removeConfigStatus, removeDomainStatus, removeGroupStatus, verifyOwnership } from '../routers/common';
+import { formatInput, removeConfigStatus, removeDomainStatus, removeGroupStatus, verifyOwnership } from '../helpers';
 import { response } from './common';
 import { getConfigs } from './config';
 import { getDomainById } from './domain';

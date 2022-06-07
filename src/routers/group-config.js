@@ -3,7 +3,7 @@ import { check, query } from 'express-validator';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
-import { sortBy, verifyOwnership } from './common/index';
+import { sortBy, verifyOwnership } from '../helpers';
 import { responseException } from '../exceptions';
 import { ActionTypes, RouterTypes } from '../models/role';
 import * as Controller from '../controller/group-config';

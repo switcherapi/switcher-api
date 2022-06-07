@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { response } from './common';
 import { Config } from '../models/config';
-import { formatInput, removeConfigStatus, updateDomainVersion, verifyOwnership } from '../routers/common';
+import { formatInput, removeConfigStatus, updateDomainVersion, verifyOwnership } from '../helpers';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { getGroupConfigById } from './group-config';
 import { checkSwitcher } from '../external/switcher-api-facade';

@@ -2,7 +2,7 @@ import express from 'express';
 import { auth, authRefreshToken } from '../middleware/auth';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { check } from 'express-validator';
-import { verifyOwnership } from './common';
+import { verifyOwnership } from '../helpers';
 import { responseException } from '../exceptions';
 import * as Controller from '../controller/admin';
 import { SwitcherKeys } from '../external/switcher-api-facade';

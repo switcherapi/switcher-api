@@ -1,6 +1,6 @@
 import { BadRequestError, NotFoundError } from '../exceptions';
 import { ActionTypes, Role, RouterTypes } from '../models/role';
-import { verifyOwnership } from '../routers/common';
+import { verifyOwnership } from '../helpers';
 import { response } from './common';
 import { getTeam, getTeams, verifyRequestedTeam } from './team';
 

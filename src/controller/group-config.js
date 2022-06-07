@@ -1,6 +1,6 @@
 import { response } from './common';
 import GroupConfig from '../models/group-config';
-import { formatInput, removeGroupStatus, updateDomainVersion, verifyOwnership } from '../routers/common';
+import { formatInput, removeGroupStatus, updateDomainVersion, verifyOwnership } from '../helpers';
 import { BadRequestError } from '../exceptions';
 import { checkGroup } from '../external/switcher-api-facade';
 import { ActionTypes, RouterTypes } from '../models/role';

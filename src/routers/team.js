@@ -3,7 +3,7 @@ import { auth } from '../middleware/auth';
 import { check, query } from 'express-validator';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
-import { verifyOwnership } from './common/index';
+import { verifyOwnership } from '../helpers';
 import { responseException } from '../exceptions';
 import * as Controller from '../controller/team';
 import { getDomainById } from '../controller/domain';

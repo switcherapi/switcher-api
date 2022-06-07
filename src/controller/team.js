@@ -4,7 +4,7 @@ import Admin from '../models/admin';
 import { ActionTypes, checkActionType, Role, RouterTypes } from '../models/role';
 import { addDefaultRole, Team } from '../models/team';
 import TeamInvite from '../models/team-invite';
-import { verifyOwnership } from '../routers/common';
+import { verifyOwnership } from '../helpers';
 import { response } from './common';
 
 async function addMemberToTeam(admin, team) {

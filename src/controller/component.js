@@ -1,7 +1,7 @@
 import { checkComponent } from '../external/switcher-api-facade';
 import Component from '../models/component';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { formatInput, verifyOwnership } from '../routers/common';
+import { formatInput, verifyOwnership } from '../helpers';
 import { response } from './common';
 
 export async function getComponentById(id) {

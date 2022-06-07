@@ -3,7 +3,7 @@ import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { check } from 'express-validator';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
-import { verifyOwnership, sortBy } from './common/index';
+import { verifyOwnership, sortBy } from '../helpers';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { checkDomain, SwitcherKeys } from '../external/switcher-api-facade';
 import * as Controller from '../controller/domain';

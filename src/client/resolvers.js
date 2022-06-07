@@ -5,7 +5,7 @@ import { Config, RelayTypes} from '../models/config';
 import { addMetrics } from '../models/metric';
 import { ConfigStrategy, processOperation } from '../models/config-strategy';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { verifyOwnership } from '../routers/common/index';
+import { verifyOwnership } from '../helpers';
 import { resolveNotification, resolveValidation } from './relay/index';
 import Component from '../models/component';
 

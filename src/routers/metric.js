@@ -3,7 +3,7 @@ import { Metric } from '../models/metric';
 import { getConfig } from '../controller/config';
 import { check } from 'express-validator';
 import { auth } from '../middleware/auth';
-import { verifyOwnership } from './common/index';
+import { verifyOwnership } from '../helpers';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { responseException } from '../exceptions';
 import { 

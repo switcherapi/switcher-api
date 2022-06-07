@@ -8,7 +8,7 @@ import { responseException } from '../exceptions';
 import {
     validate,
     verifyInputUpdateParameters } from '../middleware/validators';
-import { sortBy, verifyOwnership } from './common/index';
+import { sortBy, verifyOwnership } from '../helpers';
 import * as Controller from '../controller/config';
 import { getGroupConfigById } from '../controller/group-config';
 import { SwitcherKeys } from '../external/switcher-api-facade';

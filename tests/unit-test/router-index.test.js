@@ -1,4 +1,4 @@
-const { formatInput } = require('../../src/routers/common');
+const { formatInput } = require('../../src/helpers');
 
 describe('Test formatInput', () => {
 

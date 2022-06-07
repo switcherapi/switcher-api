@@ -2,7 +2,7 @@ import express from 'express';
 import { auth } from '../middleware/auth';
 import { RouterTypes, ActionTypes, getKeysByRouter } from '../models/role';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
-import { verifyOwnership } from './common';
+import { verifyOwnership } from '../helpers';
 import { responseException } from '../exceptions';
 import { check, query } from 'express-validator';
 import * as Controller from '../controller/role';

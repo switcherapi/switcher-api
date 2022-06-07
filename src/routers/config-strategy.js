@@ -5,7 +5,7 @@ import { EnvType } from '../models/environment';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { strategyRequirements, StrategiesType } from '../models/config-strategy';
 import { auth } from '../middleware/auth';
-import { verifyOwnership, sortBy } from './common/index';
+import { verifyOwnership, sortBy } from '../helpers';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { getConfigById } from '../controller/config';
 import * as Controller from '../controller/config-strategy';

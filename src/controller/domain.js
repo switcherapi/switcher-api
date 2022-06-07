@@ -7,7 +7,7 @@ import { Environment } from '../models/environment';
 import GroupConfig from '../models/group-config';
 import History from '../models/history';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { formatInput, removeDomainStatus, verifyOwnership } from '../routers/common';
+import { formatInput, removeDomainStatus, verifyOwnership } from '../helpers';
 import { response } from './common';
 
 export async function getDomainById(id, lean = false) {

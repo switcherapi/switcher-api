@@ -1,4 +1,4 @@
-import { verifyOwnership } from '../routers/common';
+import { verifyOwnership } from '../helpers';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { getGroupConfigById, getGroupConfigs } from '../controller/group-config';
 import { getConfigs } from '../controller/config';

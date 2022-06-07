@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import GroupConfig from '../../src/models/group-config';
 import { Team } from '../../src/models/team';
 import { Role, ActionTypes, RouterTypes } from '../../src/models/role';
-import { verifyOwnership } from '../../src/routers/common/index';
+import { verifyOwnership } from '../../src/helpers';
 import { 
     setupDatabase, 
     adminMasterAccount,
