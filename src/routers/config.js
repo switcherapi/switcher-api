@@ -9,8 +9,8 @@ import {
     validate,
     verifyInputUpdateParameters } from '../middleware/validators';
 import { sortBy, verifyOwnership } from '../helpers';
-import * as Controller from '../controller/config';
-import { getGroupConfigById } from '../controller/group-config';
+import * as Controller from '../services/config';
+import { getGroupConfigById } from '../services/group-config';
 import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();

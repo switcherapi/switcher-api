@@ -5,8 +5,8 @@ import { validate, verifyInputUpdateParameters } from '../middleware/validators'
 import { verifyOwnership } from '../helpers';
 import { responseException } from '../exceptions';
 import { check, query } from 'express-validator';
-import * as Controller from '../controller/role';
-import { getTeamById } from '../controller/team';
+import * as Controller from '../services/role';
+import { getTeamById } from '../services/team';
 
 const router = new express.Router();
 

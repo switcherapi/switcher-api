@@ -1,10 +1,10 @@
 import { BadRequestError, PermissionError } from '../exceptions';
 import { EnvType } from '../models/environment';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { getDomainById } from '../controller/domain';
-import { getEnvironments } from '../controller/environment';
-import { getTeams } from '../controller/team';
-import { getRole, getRoles } from '../controller/role';
+import { getDomainById } from '../services/domain';
+import { getEnvironments } from '../services/environment';
+import { getTeams } from '../services/team';
+import { getRole, getRoles } from '../services/role';
 
 async function checkEnvironmentStatusRemoval(domainId, environmentName, strategy = false) {
     const environment = await getEnvironments({ domain: domainId }, ['_id', 'name']);

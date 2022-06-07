@@ -5,8 +5,8 @@ import { auth, slackAuth } from '../middleware/auth';
 import { validate } from '../middleware/validators';
 import { TicketStatusType } from '../models/slack_ticket';
 import { SwitcherKeys } from '../external/switcher-api-facade';
-import { getDomainById } from '../controller/domain';
-import * as Controller from '../controller/slack';
+import { getDomainById } from '../services/domain';
+import * as Controller from '../services/slack';
 
 const router = new express.Router();
 

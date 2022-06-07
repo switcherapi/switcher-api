@@ -1,12 +1,12 @@
 import { Switcher, checkNumeric, checkValue } from 'switcher-client';
 import { EnvType } from '../models/environment';
 import { BadRequestError, FeatureUnavailableError } from '../exceptions';
-import { getDomainById, getTotalDomainsByOwner } from '../controller/domain';
-import { getTotalGroupsByDomainId } from '../controller/group-config';
-import { getTotalConfigsByDomainId } from '../controller/config';
-import { getTotalComponentsByDomainId } from '../controller/component';
-import { getTotalEnvByDomainId } from '../controller/environment';
-import { getTotalTeamsByDomainId } from '../controller/team';
+import { getDomainById, getTotalDomainsByOwner } from '../services/domain';
+import { getTotalGroupsByDomainId } from '../services/group-config';
+import { getTotalConfigsByDomainId } from '../services/config';
+import { getTotalComponentsByDomainId } from '../services/component';
+import { getTotalEnvByDomainId } from '../services/environment';
+import { getTotalTeamsByDomainId } from '../services/team';
 
 const apiKey = process.env.SWITCHER_API_KEY;
 const environment = process.env.SWITCHER_API_ENVIRONMENT;

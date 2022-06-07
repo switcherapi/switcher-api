@@ -7,8 +7,8 @@ import { strategyRequirements, StrategiesType } from '../models/config-strategy'
 import { auth } from '../middleware/auth';
 import { verifyOwnership, sortBy } from '../helpers';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { getConfigById } from '../controller/config';
-import * as Controller from '../controller/config-strategy';
+import { getConfigById } from '../services/config';
+import * as Controller from '../services/config-strategy';
 import { responseException } from '../exceptions';
 
 const router = new express.Router();

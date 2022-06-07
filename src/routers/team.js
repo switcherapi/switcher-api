@@ -5,8 +5,8 @@ import { ActionTypes, RouterTypes } from '../models/role';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { verifyOwnership } from '../helpers';
 import { responseException } from '../exceptions';
-import * as Controller from '../controller/team';
-import { getDomainById } from '../controller/domain';
+import * as Controller from '../services/team';
+import { getDomainById } from '../services/domain';
 import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();

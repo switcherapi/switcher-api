@@ -2,7 +2,7 @@ import express from 'express';
 import { auth } from '../middleware/auth';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { check, query } from 'express-validator';
-import * as Controller from '../controller/component';
+import * as Controller from '../services/component';
 import { responseException } from '../exceptions';
 import { SwitcherKeys } from '../external/switcher-api-facade';
 

@@ -3,7 +3,7 @@ import { check, query } from 'express-validator';
 import { auth } from '../middleware/auth';
 import { responseException } from '../exceptions';
 import { validate } from '../middleware/validators';
-import * as Controller from '../controller/environment';
+import * as Controller from '../services/environment';
 import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();

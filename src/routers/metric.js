@@ -1,6 +1,6 @@
 import express from 'express';
 import { Metric } from '../models/metric';
-import { getConfig } from '../controller/config';
+import { getConfig } from '../services/config';
 import { check } from 'express-validator';
 import { auth } from '../middleware/auth';
 import { verifyOwnership } from '../helpers';
@@ -11,7 +11,7 @@ import {
     aggregateComponents, 
     aggregateSwitchers, 
     buildMetricsFilter 
-} from '../controller/metric';
+} from '../services/metric';
 import { validate } from '../middleware/validators';
 
 const router = new express.Router();

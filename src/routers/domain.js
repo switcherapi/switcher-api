@@ -6,7 +6,7 @@ import { validate, verifyInputUpdateParameters } from '../middleware/validators'
 import { verifyOwnership, sortBy } from '../helpers';
 import { ActionTypes, RouterTypes } from '../models/role';
 import { checkDomain, SwitcherKeys } from '../external/switcher-api-facade';
-import * as Controller from '../controller/domain';
+import * as Controller from '../services/domain';
 import { responseException } from '../exceptions';
 
 const router = new express.Router();

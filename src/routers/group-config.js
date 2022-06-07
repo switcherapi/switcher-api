@@ -6,8 +6,8 @@ import { validate, verifyInputUpdateParameters } from '../middleware/validators'
 import { sortBy, verifyOwnership } from '../helpers';
 import { responseException } from '../exceptions';
 import { ActionTypes, RouterTypes } from '../models/role';
-import * as Controller from '../controller/group-config';
-import { getDomainById } from '../controller/domain';
+import * as Controller from '../services/group-config';
+import { getDomainById } from '../services/domain';
 import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();
