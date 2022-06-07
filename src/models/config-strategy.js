@@ -147,7 +147,7 @@ export function processOperation(strategy, operation, input, values) {
 }
 
 function processNETWORK(operation, input, values) {
-    const cidrRegex = /^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$/;
+    const cidrRegex = /^(\d{1,3}\.){3}\d{1,3}(\/(\d|[1-2]\d|3[0-2]))$/;
     switch(operation) {
         case OperationsType.EXIST:
             return processNETWORK_Exist(input, values, cidrRegex);

@@ -13,7 +13,7 @@ export const resolveConfigByKey = async (domain, key) => Config.findOne({ domain
 
 export function resolveEnvStatus(source) {
     const key = Object.keys(source.activated);
-    var arrStatus = [];
+    const arrStatus = [];
 
     key.forEach(k => {
         arrStatus.push({

@@ -1,10 +1,10 @@
 import { response } from './common';
 import GroupConfig from '../models/group-config';
-import { formatInput, removeGroupStatus, updateDomainVersion, verifyOwnership } from '../helpers';
+import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers';
 import { BadRequestError } from '../exceptions';
 import { checkGroup } from '../external/switcher-api-facade';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { getDomainById } from './domain';
+import { getDomainById, updateDomainVersion } from './domain';
 import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';
 
 async function verifyGroupInput(groupId, admin) {
@@ -115,4 +115,15 @@ export async function removeGroupStatusEnv(id, args, admin) {
     groupconfig.updatedBy = admin.email;
     updateDomainVersion(groupconfig.domain);
     return removeGroupStatus(groupconfig, args.env);
+}
+
+export async function removeGroupStatus(groupconfig, environmentName) {
+    try {
+        await checkEnvironmentStatusRemoval(groupconfig.domain, environmentName);
+
+        groupconfig.activated.delete(environmentName);
+        return await groupconfig.save();
+    } catch (e) {
+        throw new Error(e.message);
+    }
 }

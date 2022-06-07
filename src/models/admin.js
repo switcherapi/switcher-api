@@ -211,7 +211,7 @@ adminSchema.post('save', function(error, _doc, next) {
 });
 
 adminSchema.pre('remove', async function (next) {
-    var ObjectId = (require('mongoose').Types.ObjectId);
+    const ObjectId = (require('mongoose').Types.ObjectId);
 
     const admin = this;
     const domains = await Domain.find({ owner: new ObjectId(admin._id) });

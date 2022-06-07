@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
 import { response } from './common';
 import { Config } from '../models/config';
-import { formatInput, removeConfigStatus, updateDomainVersion, verifyOwnership } from '../helpers';
+import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers';
 import { ActionTypes, RouterTypes } from '../models/role';
+import { updateDomainVersion } from './domain';
 import { getGroupConfigById } from './group-config';
 import { checkSwitcher } from '../external/switcher-api-facade';
 import { BadRequestError, NotFoundError } from '../exceptions';
@@ -172,6 +173,28 @@ export async function removeConfigStatusEnv(id, env, admin) {
 
     updateDomainVersion(config.domain);
     return removeConfigStatus(config, env);
+}
+
+export async function removeConfigStatus(config, environmentName) {
+    try {
+        await checkEnvironmentStatusRemoval(config.domain, environmentName);
+
+        config.activated.delete(environmentName);
+
+        if (config.relay.activated) {
+            config.relay.activated.delete(environmentName);
+            config.relay.endpoint.delete(environmentName);
+            config.relay.auth_token.delete(environmentName);
+        }
+
+        if (config.disable_metrics) {
+            config.disable_metrics.delete(environmentName);
+        }
+
+        return await config.save();
+    } catch (e) {
+        throw new Error(e.message);
+    }
 }
 
 export async function addComponent(id, args, admin) {

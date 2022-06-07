@@ -6,7 +6,7 @@ import { getEnvironments } from '../services/environment';
 import { getTeams } from '../services/team';
 import { getRole, getRoles } from '../services/role';
 
-async function checkEnvironmentStatusRemoval(domainId, environmentName, strategy = false) {
+export async function checkEnvironmentStatusRemoval(domainId, environmentName, strategy = false) {
     const environment = await getEnvironments({ domain: domainId }, ['_id', 'name']);
     const isValidOperation = environment.filter((e) => 
         e.name === environmentName && 
@@ -15,55 +15,6 @@ async function checkEnvironmentStatusRemoval(domainId, environmentName, strategy
     if (!isValidOperation) {
         throw new BadRequestError('Invalid environment');
     }
-}
-
-export async function removeDomainStatus(domain, environmentName) {
-    try {
-        await checkEnvironmentStatusRemoval(domain._id, environmentName);
-        domain.activated.delete(environmentName);
-        return await domain.save();
-    } catch (e) {
-        throw new Error(e.message);
-    }
-}
-
-export async function removeGroupStatus(groupconfig, environmentName) {
-    try {
-        await checkEnvironmentStatusRemoval(groupconfig.domain, environmentName);
-
-        groupconfig.activated.delete(environmentName);
-        return await groupconfig.save();
-    } catch (e) {
-        throw new Error(e.message);
-    }
-}
-
-export async function removeConfigStatus(config, environmentName) {
-    try {
-        await checkEnvironmentStatusRemoval(config.domain, environmentName);
-
-        config.activated.delete(environmentName);
-
-        if (config.relay.activated) {
-            config.relay.activated.delete(environmentName);
-            config.relay.endpoint.delete(environmentName);
-            config.relay.auth_token.delete(environmentName);
-        }
-
-        if (config.disable_metrics) {
-            config.disable_metrics.delete(environmentName);
-        }
-
-        return await config.save();
-    } catch (e) {
-        throw new Error(e.message);
-    }
-}
-
-export async function updateDomainVersion(domainId) {
-    const domain = await getDomainById(domainId);
-    domain.lastUpdate = Date.now();
-    domain.save();
 }
 
 export function formatInput(input, 

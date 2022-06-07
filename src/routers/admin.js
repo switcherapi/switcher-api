@@ -4,7 +4,7 @@ import { validate, verifyInputUpdateParameters } from '../middleware/validators'
 import { check } from 'express-validator';
 import { verifyOwnership } from '../helpers';
 import { responseException } from '../exceptions';
-import * as Controller from '../services/admin';
+import * as Services from '../services/admin';
 import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();
@@ -15,7 +15,7 @@ router.post('/admin/signup', [
     check('password').isLength({ min: 5 })
 ], validate, async (req, res) => {
     try {
-        const admin = await Controller.signUp(
+        const admin = await Services.signUp(
             req.body, req.connection.remoteAddress);
 
         res.status(201).send({ admin });
@@ -26,7 +26,7 @@ router.post('/admin/signup', [
 
 router.post('/admin/signup/authorization', async (req, res) => {
     try {
-        const { admin, jwt } = await Controller.signUpAuth(req.query.code);
+        const { admin, jwt } = await Services.signUpAuth(req.query.code);
         res.status(201).send({ admin, jwt });
     } catch (e) {
         responseException(res, e, 400);
@@ -35,7 +35,7 @@ router.post('/admin/signup/authorization', async (req, res) => {
 
 router.post('/admin/github/auth', async (req, res) => {
     try {
-        const { admin, jwt } = await Controller.signUpGitHub(req.query.code);
+        const { admin, jwt } = await Services.signUpGitHub(req.query.code);
         res.status(201).send({ admin, jwt });
     } catch (e) {
         res.status(401).send({ error: e.message });
@@ -44,7 +44,7 @@ router.post('/admin/github/auth', async (req, res) => {
 
 router.post('/admin/bitbucket/auth', async (req, res) => {
     try {
-        const { admin, jwt } = await Controller.signUpBitbucket(req.query.code);
+        const { admin, jwt } = await Services.signUpBitbucket(req.query.code);
         res.status(201).send({ admin, jwt });
     } catch (e) {
         res.status(401).send({ error: e.message });
@@ -56,7 +56,7 @@ router.post('/admin/login', [
     check('password').isLength({ min: 5 })
 ], validate, async (req, res) => {
     try {
-        const { admin, jwt } = await Controller.signIn(
+        const { admin, jwt } = await Services.signIn(
             req.body.email, req.body.password);
 
         res.send({ admin, jwt });
@@ -68,13 +68,13 @@ router.post('/admin/login', [
 router.post('/admin/login/request/recovery', [ 
     check('email').isEmail()
 ], validate, async (req, res) => {
-    await Controller.loginRequestRecovery(req.body.email);
+    await Services.loginRequestRecovery(req.body.email);
     res.status(200).send({ message: 'Request received' });
 });
 
 router.post('/admin/login/recovery', async (req, res) => {
     try {
-        const { admin, jwt } = await Controller.loginRecovery(
+        const { admin, jwt } = await Services.loginRecovery(
             req.body, req.connection.remoteAddress);
 
         res.status(200).send({ admin, jwt });
@@ -84,7 +84,7 @@ router.post('/admin/login/recovery', async (req, res) => {
 });
 
 router.post('/admin/logout', auth, async (req, res) => {
-    await Controller.logout(req.admin);
+    await Services.logout(req.admin);
     res.send();
 });
 
@@ -130,7 +130,7 @@ router.get('/admin/collaboration', auth, async (req, res) => {
 
 router.get('/admin/:id', auth, async (req, res) => {
     try {
-        const admin = await Controller.getAdminById(req.params.id);
+        const admin = await Services.getAdminById(req.params.id);
         res.send(admin);
     } catch (e) {
         responseException(res, e, 400);
@@ -139,7 +139,7 @@ router.get('/admin/:id', auth, async (req, res) => {
 
 router.delete('/admin/me', auth, async (req, res) => {
     try {
-        const admin = await Controller.deleteAccount(req.admin);
+        const admin = await Services.deleteAccount(req.admin);
         res.send(admin);
     } catch (e) {
         responseException(res, e, 400);
@@ -149,7 +149,7 @@ router.delete('/admin/me', auth, async (req, res) => {
 router.patch('/admin/me', auth, verifyInputUpdateParameters([
     'name', 'email', 'password'
 ]), async (req, res) => {
-    const admin = await Controller.updateAccount(req.body, req.admin);
+    const admin = await Services.updateAccount(req.body, req.admin);
     res.send(admin);
 });
 
@@ -157,7 +157,7 @@ router.patch('/admin/me/team/leave/:domainid', auth, [
     check('domainid').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const admin = await Controller.leaveDomain(req.params.domainid, req.admin);
+        const admin = await Services.leaveDomain(req.params.domainid, req.admin);
         res.send(admin);
     } catch (e) {
         responseException(res, e, 400);

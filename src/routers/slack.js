@@ -6,13 +6,13 @@ import { validate } from '../middleware/validators';
 import { TicketStatusType } from '../models/slack_ticket';
 import { SwitcherKeys } from '../external/switcher-api-facade';
 import { getDomainById } from '../services/domain';
-import * as Controller from '../services/slack';
+import * as Services from '../services/slack';
 
 const router = new express.Router();
 
 const findInstallation = async (req, res, checkDomain = false) => {
     try {
-        const slack = await Controller.getSlack({
+        const slack = await Services.getSlack({
             enterprise_id: req.query.enterprise_id, 
             team_id: req.query.team_id
         });
@@ -26,7 +26,7 @@ const findInstallation = async (req, res, checkDomain = false) => {
 
 const deleteInstallation = async (req, res) => {
     try {
-        const slack = await Controller.deleteSlack(
+        const slack = await Services.deleteSlack(
             req.query.enterprise_id, req.query.team_id);
 
         if (!slack) throw new NotFoundError();
@@ -48,7 +48,7 @@ const createTicketContent = (req) => {
 
 router.post('/slack/v1/availability', auth, async (req, res) => {
     try {
-        const result = await Controller.checkAvailability(req.admin, req.body.feature);
+        const result = await Services.checkAvailability(req.admin, req.body.feature);
         res.send({ result });
     } catch (e) {
         responseException(res, e, 400, req.body.feature);
@@ -60,7 +60,7 @@ router.post('/slack/v1/installation', slackAuth, [
     check('bot_payload').exists()
 ], validate, async (req, res) => {
     try {
-        const slackInstallation = await Controller.createSlackInstallation(req.body);
+        const slackInstallation = await Services.createSlackInstallation(req.body);
         res.status(201).send(slackInstallation);
     } catch (e) {
         responseException(res, e, 400, SwitcherKeys.SLACK_INTEGRATION);
@@ -72,7 +72,7 @@ router.post('/slack/v1/authorize', auth, [
     check('team_id').exists()
 ], validate, auth, async (req, res) => {
     try {
-        await Controller.authorizeSlackInstallation(
+        await Services.authorizeSlackInstallation(
             req.body.domain, req.body.team_id, req.admin);
 
         res.status(200).send({ message: 'Authorization completed' });
@@ -85,7 +85,7 @@ router.post('/slack/v1/ticket/clear', auth, [
     check('team_id').exists()
 ], validate, async (req, res) => {
     try {
-        await Controller.resetTicketHistory(
+        await Services.resetTicketHistory(
             req.body.enterprise_id, req.body.team_id, req.admin);
 
         res.status(200).send({ message: 'Tickets cleared with success' });
@@ -103,7 +103,7 @@ router.post('/slack/v1/ticket/validate', slackAuth, [
 ], validate, async (req, res) => {
     try {
         const ticket_content = createTicketContent(req);
-        await Controller.validateTicket(
+        await Services.validateTicket(
             ticket_content, req.body.enterprise_id, req.body.team_id);
             
         res.status(200).send({ message: 'Ticket verified' });
@@ -122,7 +122,7 @@ router.post('/slack/v1/ticket/create', slackAuth, [
 ], validate, async (req, res) => {
     try {
         const ticket_content = createTicketContent(req);
-        const ticket = await Controller.createTicket(
+        const ticket = await Services.createTicket(
             ticket_content, req.body.enterprise_id, req.body.team_id);
             
         res.status(201).send(ticket);
@@ -137,7 +137,7 @@ router.post('/slack/v1/ticket/process', slackAuth, [
     check('approved').isBoolean()
 ], validate, async (req, res) => {
     try {
-        const ticket = await Controller.processTicket(
+        const ticket = await Services.processTicket(
             req.body.enterprise_id, req.body.team_id, 
             req.body.ticket_id, req.body.approved);
 
@@ -151,7 +151,7 @@ router.get('/slack/v1/findbot', slackAuth, [
     query('team_id').exists()
 ], validate, async (req, res) => {
     try {
-        const slack = await Controller.getSlack({
+        const slack = await Services.getSlack({
             enterprise_id: req.query.enterprise_id, 
             team_id: req.query.team_id
         });
@@ -181,7 +181,7 @@ router.get('/slack/v1/installation/:domain', auth, [
     try {
         const domain = await getDomainById(req.params.domain);
         const { tickets, installation_payload, settings } = 
-            await Controller.getSlackOrError({ id: domain.integrations.slack });
+            await Services.getSlackOrError({ id: domain.integrations.slack });
 
         const openedTickets = tickets.filter(t => t.ticket_status === TicketStatusType.OPENED).length;
         const approvedTickets = tickets.filter(t => t.ticket_status === TicketStatusType.APPROVED).length;
@@ -219,7 +219,7 @@ router.delete('/slack/v1/installation/unlink', auth, [
     query('domain').exists()
 ], validate, async (req, res) => {
     try {
-        await Controller.unlinkSlack(req.query.domain, req.admin);
+        await Services.unlinkSlack(req.query.domain, req.admin);
         res.send({ message: 'Slack Integration uninstalled with success' });
     } catch (e) {
         responseException(res, e, 400);

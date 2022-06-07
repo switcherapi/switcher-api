@@ -22,7 +22,7 @@ export async function getBitBucketToken(code) {
             
         return response.data.access_token;
     } catch (error) {
-        throw new BitBucketAuthError('Failed to get BitBucket access token');
+        throw new BitBucketAuthError('Failed to get Bitbucket access token');
     }
 }
 
@@ -42,7 +42,7 @@ export async function getBitBucketUserInfo(token) {
             avatar: response.data?.links?.avatar?.href
         };
    } catch (error) {
-       throw new BitBucketAuthError('Failed to get BitBucket user info');
+       throw new BitBucketAuthError('Failed to get Bitbucket user info');
    }
 }
 

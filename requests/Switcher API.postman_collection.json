@@ -171,7 +171,7 @@
 					"response": []
 				},
 				{
-					"name": "Admin - BitBucket Auth",
+					"name": "Admin - Bitbucket Auth",
 					"event": [
 						{
 							"listen": "test",

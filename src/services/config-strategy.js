@@ -1,7 +1,8 @@
 import { response } from './common';
 import { ConfigStrategy } from '../models/config-strategy';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { updateDomainVersion, verifyOwnership } from '../helpers';
+import { verifyOwnership } from '../helpers';
+import { updateDomainVersion } from './domain';
 import { getConfigById } from './config';
 import { BadRequestError } from '../exceptions';
 import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';

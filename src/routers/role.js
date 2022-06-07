@@ -5,14 +5,14 @@ import { validate, verifyInputUpdateParameters } from '../middleware/validators'
 import { verifyOwnership } from '../helpers';
 import { responseException } from '../exceptions';
 import { check, query } from 'express-validator';
-import * as Controller from '../services/role';
+import * as Services from '../services/role';
 import { getTeamById } from '../services/team';
 
 const router = new express.Router();
 
 async function updateRole(req, res) {
     try {
-        const role = await Controller.updateRole(req.body, req.params.id, req.admin);
+        const role = await Services.updateRole(req.body, req.params.id, req.admin);
         res.send(role);
     } catch (e) {
         responseException(res, e, 400);
@@ -23,7 +23,7 @@ router.post('/role/create/:team', auth, [
     check('team').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const role = await Controller.createRole(req.body, req.params.team, req.admin);
+        const role = await Services.createRole(req.body, req.params.team, req.admin);
         res.status(201).send(role);
     } catch (e) {
         responseException(res, e, 400);
@@ -59,7 +59,7 @@ router.get('/role', auth, [
         const team = await getTeamById(req.query.team);
         await verifyOwnership(req.admin, team, team.domain, ActionTypes.READ, RouterTypes.ADMIN);
 
-        const roles = await Controller.getRoles({ _id: { $in: team.roles } });
+        const roles = await Services.getRoles({ _id: { $in: team.roles } });
         res.send(roles);
     } catch (e) {
         responseException(res, e, 400);
@@ -70,7 +70,7 @@ router.get('/role/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const role = await Controller.getRoleById(req.params.id, true);
+        const role = await Services.getRoleById(req.params.id, true);
         res.send(role);
     } catch (e) {
         responseException(res, e, 400);
@@ -89,7 +89,7 @@ router.delete('/role/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const role = await Controller.deleteRole(req.params.id, req.admin);
+        const role = await Services.deleteRole(req.params.id, req.admin);
         res.send(role);
     } catch (e) {
         responseException(res, e, 400);
@@ -100,7 +100,7 @@ router.patch('/role/value/add/:id', auth, verifyInputUpdateParameters(['value'])
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const role = await Controller.addValue(req.body, req.params.id, req.admin);
+        const role = await Services.addValue(req.body, req.params.id, req.admin);
         res.send(role);
     } catch (e) {
         responseException(res, e, 400);
@@ -111,7 +111,7 @@ router.patch('/role/value/remove/:id', auth, [
     check('id').isMongoId()
 ], validate, verifyInputUpdateParameters(['value']), async (req, res) => {
     try {
-        const role = await Controller.removeValue(req.body, req.params.id, req.admin);
+        const role = await Services.removeValue(req.body, req.params.id, req.admin);
         res.send(role);
     } catch (e) {
         responseException(res, e, 400);

@@ -6,7 +6,7 @@ import { validate, verifyInputUpdateParameters } from '../middleware/validators'
 import { sortBy, verifyOwnership } from '../helpers';
 import { responseException } from '../exceptions';
 import { ActionTypes, RouterTypes } from '../models/role';
-import * as Controller from '../services/group-config';
+import * as Services from '../services/group-config';
 import { getDomainById } from '../services/domain';
 import { SwitcherKeys } from '../external/switcher-api-facade';
 
@@ -14,7 +14,7 @@ const router = new express.Router();
 
 router.post('/groupconfig/create', auth, async (req, res) => {
     try {
-        const groupconfig = await Controller.createGroup(req.body, req.admin);
+        const groupconfig = await Services.createGroup(req.body, req.admin);
         res.status(201).send(groupconfig);
     } catch (e) {
         responseException(res, e, 500, SwitcherKeys.ELEMENT_CREATION);
@@ -51,7 +51,7 @@ router.get('/groupconfig/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        let groupconfig = await Controller.getGroupConfigById(req.params.id);
+        let groupconfig = await Services.getGroupConfigById(req.params.id);
         groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP);
 
         res.send(groupconfig);
@@ -67,7 +67,7 @@ router.get('/groupconfig/history/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const groupconfig = await Controller.getGroupConfigById(req.params.id);
+        const groupconfig = await Services.getGroupConfigById(req.params.id);
         const history = await History.find({ domainId: groupconfig.domain, elementId: groupconfig._id })
             .select('oldValue newValue updatedBy date -_id')
             .sort(sortBy(req.query))
@@ -86,7 +86,7 @@ router.delete('/groupconfig/history/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const groupconfig = await Controller.getGroupConfigById(req.params.id);
+        const groupconfig = await Services.getGroupConfigById(req.params.id);
         await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
 
         await History.deleteMany({ domainId: groupconfig.domain, elementId: groupconfig._id });
@@ -100,7 +100,7 @@ router.delete('/groupconfig/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        let groupconfig = await Controller.deleteGroup(req.params.id, req.admin);
+        let groupconfig = await Services.deleteGroup(req.params.id, req.admin);
         res.send(groupconfig);
     } catch (e) {
         responseException(res, e, 500);
@@ -113,7 +113,7 @@ router.patch('/groupconfig/:id', auth, verifyInputUpdateParameters([
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const groupconfig = await Controller.updateGroup(req.params.id, req.body, req.admin);
+        const groupconfig = await Services.updateGroup(req.params.id, req.body, req.admin);
         res.send(groupconfig);
     } catch (e) {
         responseException(res, e, 500);
@@ -124,7 +124,7 @@ router.patch('/groupconfig/updateStatus/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const groupconfig = await Controller.updateGroupStatusEnv(req.params.id, req.body, req.admin);
+        const groupconfig = await Services.updateGroupStatusEnv(req.params.id, req.body, req.admin);
         res.send(groupconfig);
     } catch (e) {
         responseException(res, e, 500);
@@ -135,7 +135,7 @@ router.patch('/groupconfig/removeStatus/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const groupconfig = await Controller.removeGroupStatusEnv(req.params.id, req.body, req.admin);
+        const groupconfig = await Services.removeGroupStatusEnv(req.params.id, req.body, req.admin);
         res.send(groupconfig);
     } catch (e) {
         responseException(res, e, 500);
