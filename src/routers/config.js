@@ -8,9 +8,9 @@ import { responseException } from '../exceptions';
 import {
     validate,
     verifyInputUpdateParameters } from '../middleware/validators';
-import { sortBy, verifyOwnership } from './common/index';
-import * as Controller from '../controller/config';
-import { getGroupConfigById } from '../controller/group-config';
+import { sortBy, verifyOwnership } from '../helpers';
+import * as Services from '../services/config';
+import { getGroupConfigById } from '../services/group-config';
 import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();
@@ -21,7 +21,7 @@ router.post('/config/create',
         check('key').isLength({ min: 3, max: 50 })
     ], validate, auth, async (req, res) => {
     try {
-        const config = await Controller.createConfig(req.body, req.admin);
+        const config = await Services.createConfig(req.body, req.admin);
         res.status(201).send(config);
     } catch (e) {
         responseException(res, e, 400, SwitcherKeys.ELEMENT_CREATION);
@@ -57,7 +57,7 @@ router.get('/config/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        let config = await Controller.getConfigById(req.params.id);
+        let config = await Services.getConfigById(req.params.id);
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
 
         if (req.query.resolveComponents) {
@@ -77,7 +77,7 @@ router.get('/config/history/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const config = await Controller.getConfigById(req.params.id);
+        const config = await Services.getConfigById(req.params.id);
         const history = await History.find({ domainId: config.domain, elementId: config._id })
             .select('oldValue newValue updatedBy date -_id')
             .sort(sortBy(req.query))
@@ -96,7 +96,7 @@ router.delete('/config/history/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const config = await Controller.getConfigById(req.params.id);
+        const config = await Services.getConfigById(req.params.id);
         await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
 
         await History.deleteMany({ domainId: config.domain, elementId: config._id });
@@ -110,7 +110,7 @@ router.delete('/config/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const config = await Controller.deleteConfig(req.params.id, req.admin);
+        const config = await Services.deleteConfig(req.params.id, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);
@@ -123,7 +123,7 @@ router.patch('/config/:id', auth, [
     'key', 'description', 'relay', 'disable_metrics'
 ]), async (req, res) => {
     try {
-        const config = await Controller.updateConfig(req.params.id, req.body, req.admin);
+        const config = await Services.updateConfig(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);
@@ -134,7 +134,7 @@ router.patch('/config/updateRelay/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        let config = await Controller.updateConfigRelay(req.params.id, req.body, req.admin);
+        let config = await Services.updateConfigRelay(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 400);
@@ -145,7 +145,7 @@ router.patch('/config/updateStatus/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        let config = await Controller.updateConfigStatus(req.params.id, req.body, req.admin);
+        let config = await Services.updateConfigStatus(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 400);
@@ -156,7 +156,7 @@ router.patch('/config/removeStatus/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const config = await Controller.removeConfigStatusEnv(req.params.id, req.body.env, req.admin);
+        const config = await Services.removeConfigStatusEnv(req.params.id, req.body.env, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 400);
@@ -167,7 +167,7 @@ router.patch('/config/addComponent/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const config = await Controller.addComponent(req.params.id, req.body, req.admin);
+        const config = await Services.addComponent(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);
@@ -178,7 +178,7 @@ router.patch('/config/removeComponent/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const config = await Controller.removeComponent(req.params.id, req.body, req.admin);
+        const config = await Services.removeComponent(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);
@@ -189,7 +189,7 @@ router.patch('/config/updateComponents/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const config = await Controller.updateComponent(req.params.id, req.body, req.admin);
+        const config = await Services.updateComponent(req.params.id, req.body, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 400);
@@ -201,7 +201,7 @@ router.patch('/config/removeRelay/:id/:env', auth, [
     check('env').isLength({ min: 1 })
 ], validate, async (req, res) => {
     try {
-        let config = await Controller.removeRelay(req.params.id, req.params.env, req.admin);
+        let config = await Services.removeRelay(req.params.id, req.params.env, req.admin);
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);

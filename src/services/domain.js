@@ -7,8 +7,18 @@ import { Environment } from '../models/environment';
 import GroupConfig from '../models/group-config';
 import History from '../models/history';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { formatInput, removeDomainStatus, verifyOwnership } from '../routers/common';
+import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers';
 import { response } from './common';
+
+export async function removeDomainStatus(domain, environmentName) {
+    try {
+        await checkEnvironmentStatusRemoval(domain._id, environmentName);
+        domain.activated.delete(environmentName);
+        return await domain.save();
+    } catch (e) {
+        throw new Error(e.message);
+    }
+}
 
 export async function getDomainById(id, lean = false) {
     let domain = await Domain.findById(id, null, { lean });
@@ -117,4 +127,10 @@ export async function removeDomainStatusEnv(id, env, admin) {
     domain.lastUpdate = Date.now();
     
     return removeDomainStatus(domain, env);
+}
+
+export async function updateDomainVersion(domainId) {
+    const domain = await getDomainById(domainId);
+    domain.lastUpdate = Date.now();
+    domain.save();
 }

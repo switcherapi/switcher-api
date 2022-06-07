@@ -1,7 +1,7 @@
 import basicAuth from 'express-basic-auth';
 import jwt from 'jsonwebtoken';
-import { getAdmin, getAdminById } from '../controller/admin';
-import { getComponentById } from '../controller/component';
+import { getAdmin, getAdminById } from '../services/admin';
+import { getComponentById } from '../services/component';
 import Admin from '../models/admin';
 import Component from '../models/component';
 

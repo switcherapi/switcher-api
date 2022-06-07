@@ -10,8 +10,8 @@ import { response } from './common';
 import { getTeams } from './team';
 
 export async function getAdminById(id) {
-    let component = await Admin.findById(id);
-    return response(component, 'Admin not found');
+    let admin = await Admin.findById(id);
+    return response(admin, 'Admin not found');
 }
 
 export async function getAdmin(where) {

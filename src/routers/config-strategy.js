@@ -5,10 +5,10 @@ import { EnvType } from '../models/environment';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { strategyRequirements, StrategiesType } from '../models/config-strategy';
 import { auth } from '../middleware/auth';
-import { verifyOwnership, sortBy } from './common/index';
+import { verifyOwnership, sortBy } from '../helpers';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { getConfigById } from '../controller/config';
-import * as Controller from '../controller/config-strategy';
+import { getConfigById } from '../services/config';
+import * as Services from '../services/config-strategy';
 import { responseException } from '../exceptions';
 
 const router = new express.Router();
@@ -17,7 +17,7 @@ router.post('/configstrategy/create', auth, [
     check('description').isLength({ max: 256 })
 ], validate, async (req, res) => {
     try {
-        const configStrategy = await Controller.createStrategy(req.body, req.admin);
+        const configStrategy = await Services.createStrategy(req.body, req.admin);
         res.status(201).send(configStrategy);
     } catch (e) {
         responseException(res, e, 400);
@@ -55,7 +55,7 @@ router.get('/configstrategy/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        let configStrategy = await Controller.getStrategyById(req.params.id);
+        let configStrategy = await Services.getStrategyById(req.params.id);
         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY);
 
         res.send(configStrategy);
@@ -71,7 +71,7 @@ router.get('/configstrategy/history/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const configStrategy = await Controller.getStrategyById(req.params.id);
+        const configStrategy = await Services.getStrategyById(req.params.id);
         const history = await History.find({ domainId: configStrategy.domain, elementId: configStrategy._id })
             .select('oldValue newValue updatedBy date -_id')
             .sort(sortBy(req.query))
@@ -90,7 +90,7 @@ router.delete('/configstrategy/history/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const configStrategy = await Controller.getStrategyById(req.params.id);
+        const configStrategy = await Services.getStrategyById(req.params.id);
         await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
 
         await History.deleteMany({ domainId: configStrategy.domain, elementId: configStrategy._id });
@@ -121,7 +121,7 @@ router.delete('/configstrategy/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const configStrategy = await Controller.deleteStrategy(req.params.id, req.admin);
+        const configStrategy = await Services.deleteStrategy(req.params.id, req.admin);
         res.send(configStrategy);
     } catch (e) {
         responseException(res, e, 500);
@@ -134,7 +134,7 @@ router.patch('/configstrategy/:id', auth, verifyInputUpdateParameters([
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const configStrategy = await Controller.updateStrategy(req.params.id, req.body, req.admin);
+        const configStrategy = await Services.updateStrategy(req.params.id, req.body, req.admin);
         res.send(configStrategy);
     } catch (e) {
         responseException(res, e, 400);
@@ -145,7 +145,7 @@ router.patch('/configstrategy/addval/:id', auth, [
     check('id').isMongoId()
 ], validate, verifyInputUpdateParameters(['value']), async (req, res) => {
     try {
-        const configStrategy = await Controller.addVal(req.params.id, req.body, req.admin);
+        const configStrategy = await Services.addVal(req.params.id, req.body, req.admin);
         res.send(configStrategy);
     } catch (e) {
         responseException(res, e, 400);
@@ -156,7 +156,7 @@ router.patch('/configstrategy/updateval/:id', auth, [
     check('id').isMongoId()
 ], validate, verifyInputUpdateParameters(['oldvalue', 'newvalue']), async (req, res) => {
     try {
-        const configStrategy = await Controller.updateVal(req.params.id, req.body, req.admin);
+        const configStrategy = await Services.updateVal(req.params.id, req.body, req.admin);
         res.send(configStrategy);
     } catch (e) {
         responseException(res, e, 400);
@@ -167,7 +167,7 @@ router.patch('/configstrategy/removeval/:id', auth, [
     check('id').isMongoId()
 ], validate, verifyInputUpdateParameters(['value']),  async (req, res) => {
     try {
-        const configStrategy = await Controller.removeVal(req.params.id, req.body, req.admin);
+        const configStrategy = await Services.removeVal(req.params.id, req.body, req.admin);
         res.send(configStrategy);
     } catch (e) {
         responseException(res, e, 400);
@@ -180,7 +180,7 @@ router.get('/configstrategy/values/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const configStrategy = await Controller.getStrategyById(req.params.id);
+        const configStrategy = await Services.getStrategyById(req.params.id);
         
         let values = configStrategy.values;
         if (req.query.sort === 'true') {
@@ -204,7 +204,7 @@ router.patch('/configstrategy/updateStatus/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const configStrategy = await Controller.updateStatusEnv(req.params.id, req.body, req.admin);
+        const configStrategy = await Services.updateStatusEnv(req.params.id, req.body, req.admin);
         res.send(configStrategy);
     } catch (e) {
         responseException(res, e, 400);

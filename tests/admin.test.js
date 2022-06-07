@@ -311,7 +311,7 @@ describe('Testing Admin insertion', () => {
         axiosGetStub.restore();
     });
 
-    test('ADMIN_SUITE - Should signup a new Admin - From BitBucket', async () => {
+    test('ADMIN_SUITE - Should signup a new Admin - From Bitbucket', async () => {
         // mock
         axiosPostStub = sinon.stub(axios, 'post');
         axiosGetStub = sinon.stub(axios, 'get');
@@ -322,7 +322,7 @@ describe('Testing Admin insertion', () => {
             { 
                 account_id: 123456789,
                 nickname: 'bitbucketuser',
-                display_name: 'Mocked BitBucket User'
+                display_name: 'Mocked Bitbucket User'
             } 
         };
 
@@ -402,7 +402,7 @@ describe('Testing Admin insertion', () => {
         axiosGetStub.restore();
     });
 
-    test('ADMIN_SUITE - Should NOT signup - Access denied to BitBucket User Info', async () => {
+    test('ADMIN_SUITE - Should NOT signup - Access denied to Bitbucket User Info', async () => {
         // mock
         axiosPostStub = sinon.stub(axios, 'post');
         axiosGetStub = sinon.stub(axios, 'get');
@@ -423,14 +423,14 @@ describe('Testing Admin insertion', () => {
             .post('/admin/bitbucket/auth?code=BITBUCKET_CODE')
             .send().expect(401);
 
-        expect(response.body.error).toEqual('Failed to get BitBucket user info');
+        expect(response.body.error).toEqual('Failed to get Bitbucket user info');
 
         // restore
         axiosPostStub.restore();
         axiosGetStub.restore();
     });
 
-    test('ADMIN_SUITE - Should NOT signup - Access denied to BitBucket Token', async () => {
+    test('ADMIN_SUITE - Should NOT signup - Access denied to Bitbucket Token', async () => {
         // mock
         axiosPostStub = sinon.stub(axios, 'post');
 
@@ -442,7 +442,7 @@ describe('Testing Admin insertion', () => {
             .post('/admin/bitbucket/auth?code=BITBUCKET_CODE')
             .send().expect(401);
 
-        expect(response.body.error).toEqual('Failed to get BitBucket access token');
+        expect(response.body.error).toEqual('Failed to get Bitbucket access token');
 
         // restore
         axiosPostStub.restore();

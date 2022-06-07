@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { checkConfig, checkConfigComponent, validate } from '../middleware/validators';
 import { appAuth, appGenerateCredentials } from '../middleware/auth';
 import { resolveCriteria, checkDomain } from '../client/resolvers';
-import { getConfigs } from '../controller/config';
+import { getConfigs } from '../services/config';
 import { check, query } from 'express-validator';
 
 const router = new express.Router();

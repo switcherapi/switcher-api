@@ -5,7 +5,7 @@ import { Config, RelayTypes} from '../models/config';
 import { addMetrics } from '../models/metric';
 import { ConfigStrategy, processOperation } from '../models/config-strategy';
 import { ActionTypes, RouterTypes } from '../models/role';
-import { verifyOwnership } from '../routers/common/index';
+import { verifyOwnership } from '../helpers';
 import { resolveNotification, resolveValidation } from './relay/index';
 import Component from '../models/component';
 
@@ -13,7 +13,7 @@ export const resolveConfigByKey = async (domain, key) => Config.findOne({ domain
 
 export function resolveEnvStatus(source) {
     const key = Object.keys(source.activated);
-    var arrStatus = [];
+    const arrStatus = [];
 
     key.forEach(k => {
         arrStatus.push({

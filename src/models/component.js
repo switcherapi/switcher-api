@@ -64,7 +64,7 @@ componentSchema.methods.generateApiKey = async function () {
 componentSchema.methods.generateAuthToken = async function (environment) {
     const component = this;
 
-    var options = {
+    const options = {
         expiresIn: process.env.JWT_CLIENT_TOKEN_EXP_TIME
     };
 

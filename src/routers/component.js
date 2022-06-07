@@ -2,7 +2,7 @@ import express from 'express';
 import { auth } from '../middleware/auth';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { check, query } from 'express-validator';
-import * as Controller from '../controller/component';
+import * as Services from '../services/component';
 import { responseException } from '../exceptions';
 import { SwitcherKeys } from '../external/switcher-api-facade';
 
@@ -13,7 +13,7 @@ router.post('/component/create', auth, [
     check('description').isLength({ max: 256 })
 ], validate, async (req, res) => {
     try {
-        const { component, apiKey } = await Controller.createComponent(req.body, req.admin);
+        const { component, apiKey } = await Services.createComponent(req.body, req.admin);
         res.status(201).send({ component, apiKey });
     } catch (e) {
         responseException(res, e, 400, SwitcherKeys.ELEMENT_CREATION);
@@ -24,7 +24,7 @@ router.get('/component/generateApiKey/:component/', auth, [
     check('component', 'Invalid Id for component').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const apiKey = await Controller.generateApiKey(req.params.component, req.admin);
+        const apiKey = await Services.generateApiKey(req.params.component, req.admin);
         res.status(201).send({ apiKey });
     } catch (e) {
         responseException(res, e, 400);
@@ -38,7 +38,7 @@ router.get('/component', auth, [
     query('domain', 'Please, specify the \'domain\' id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        let components = await Controller.getComponents({ domain: req.query.domain },
+        let components = await Services.getComponents({ domain: req.query.domain },
             ['_id', 'name', 'description'],
             {
                 skip: parseInt(req.query.skip || 0),
@@ -58,7 +58,7 @@ router.get('/component/:id', auth, [
     check('id', 'Invalid Id for component').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const component = await Controller.getComponentById(req.params.id);
+        const component = await Services.getComponentById(req.params.id);
         res.send(component);
     } catch (e) {
         responseException(res, e, 400);
@@ -69,7 +69,7 @@ router.patch('/component/:id', auth, verifyInputUpdateParameters(['name', 'descr
     check('id', 'Invalid Id for component').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const component = await Controller.updateComponent(req.params.id, req.body, req.admin);
+        const component = await Services.updateComponent(req.params.id, req.body, req.admin);
         res.send(component);
     } catch (e) {
         responseException(res, e, 400);
@@ -80,7 +80,7 @@ router.delete('/component/:id', auth, [
     check('id', 'Invalid Id for component').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const component = await Controller.deleteComponent(req.params.id, req.admin);
+        const component = await Services.deleteComponent(req.params.id, req.admin);
         res.send(component);
     } catch (e) {
         responseException(res, e, 400);

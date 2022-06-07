@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import app from '../src/app';
-import * as Controller from '../src/controller/slack';
-import { getDomainById } from '../src/controller/domain';
+import * as Services from '../src/services/slack';
+import { getDomainById } from '../src/services/domain';
 import { mock1_slack_installation } from './fixtures/db_slack';
 import { EnvType } from '../src/models/environment';
 import Slack from '../src/models/slack';
@@ -38,7 +38,7 @@ const buildInstallation = async (team_id, domain) => {
     installation.domain = domain;
     installation.team_id = team_id;
     installation.bot_payload.app_id = 'APP_ID';
-    await Controller.createSlackInstallation(installation);
+    await Services.createSlackInstallation(installation);
     return installation;
 };
 
@@ -268,7 +268,7 @@ describe('Slack Installation', () => {
         const installation = Object.assign({}, mock1_slack_installation);
         installation.team_id = 'T_FIND_BOT';
         installation.bot_payload.app_id = 'TEST_FIND_BOT1';
-        await Controller.createSlackInstallation(installation);
+        await Services.createSlackInstallation(installation);
 
         //test
         const response = await request(app)
@@ -298,7 +298,7 @@ describe('Slack Installation', () => {
         const installation = Object.assign({}, mock1_slack_installation);
         installation.team_id = 'T_FIND_INSTALL';
         installation.installation_payload.app_id = 'TEST_FIND_INSTALLATION1';
-        await Controller.createSlackInstallation(installation);
+        await Services.createSlackInstallation(installation);
 
         //test
         const response = await request(app)
@@ -328,7 +328,7 @@ describe('Slack Installation', () => {
         const installation = Object.assign({}, mock1_slack_installation);
         installation.team_id = 'T_FIND_INSTALL_ADMIN';
         installation.installation_payload.app_id = 'TEST_FIND_INSTALLATION2';
-        await Controller.createSlackInstallation(installation);
+        await Services.createSlackInstallation(installation);
 
         //test
         const response = await request(app)
@@ -344,7 +344,7 @@ describe('Slack Installation', () => {
         const installation = Object.assign({}, mock1_slack_installation);
         installation.team_id = 'T_DELETE_INSTALL';
         installation.installation_payload.app_id = 'TEST_DELETE_INSTALLATION1';
-        await Controller.createSlackInstallation(installation);
+        await Services.createSlackInstallation(installation);
 
         //test
         await request(app)
@@ -353,7 +353,7 @@ describe('Slack Installation', () => {
             .send().expect(200);
 
         //check DB
-        const slackDb = await Controller.getSlack({
+        const slackDb = await Services.getSlack({
             enterprise_id: installation.enterprise_id, 
             team_id: installation.team_id
         });
@@ -375,7 +375,7 @@ describe('Slack Installation', () => {
         domain = await getDomainById(domainId);
         expect(domain.integrations.slack).toBe(null);
 
-        const slackDb = await Controller.getSlack({
+        const slackDb = await Services.getSlack({
             team_id: 'SHOULD_AUTHORIZE_DOMAIN'
         });
         expect(slackDb).toBe(null);
@@ -420,7 +420,7 @@ describe('Slack Installation', () => {
         domain = await getDomainById(domainId);
         expect(domain.integrations.slack).toBe(null);
 
-        const slackDb = await Controller.getSlack({
+        const slackDb = await Services.getSlack({
             team_id: 'SHOULD_UNLINK_INTEGRATION'
         });
         expect(slackDb).toBe(null);
@@ -452,7 +452,7 @@ describe('Slack Installation', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
-        const slackDb = await Controller.getSlack({
+        const slackDb = await Services.getSlack({
             team_id: 'SHOULD_DECLINE_INTEGRATION'
         });
         expect(slackDb).toBe(null);
@@ -527,7 +527,7 @@ describe('Slack Route - Create Ticket', () => {
         };
 
         // Retrieve existing ticket
-        const ticket = await Controller.validateTicket(
+        const ticket = await Services.validateTicket(
             ticket_content, undefined, slack.team_id);
 
         const response = await request(app)
