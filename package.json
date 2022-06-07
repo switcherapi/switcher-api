@@ -14,6 +14,7 @@
     "clean": "rm -rf build && mkdir build",
     "dev": "env-cmd -e dev nodemon ./src/start.js",
     "prod": "env-cmd -e prod nodemon ./src/start.js",
+    "lint": "eslint src",
     "test": "jest --runInBand --collect-coverage",
     "test-local": "env-cmd -e test jest --runInBand --collect-coverage"
   },
