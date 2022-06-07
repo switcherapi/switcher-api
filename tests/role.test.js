@@ -41,7 +41,7 @@ describe('Insertion tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 action: ActionTypes.READ
-            }).expect(400);
+            }).expect(422);
     });
 
     test('ROLE_SUITE - Should NOT create a new Role - Team not found', async () => {
@@ -143,11 +143,13 @@ describe('Reading tests', () => {
         expect(response.body.key).toEqual(KeyTypes.NAME);
     });
 
-    test('ROLE_SUITE - Should NOT get the router specification', async () => {
-        await request(app)
+    test('ROLE_SUITE - Should get an empty router specification', async () => {
+        const response = await request(app)
             .get('/role/spec/router/' + RouterTypes.ADMIN)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404);
+            .send().expect(200);
+
+        expect(response.body.key).toBeUndefined();
     });
 
     test('ROLE_SUITE - Should get all available actions', async () => {
