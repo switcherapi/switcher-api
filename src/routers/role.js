@@ -4,7 +4,7 @@ import { RouterTypes, ActionTypes, getKeysByRouter } from '../models/role';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { verifyOwnership } from '../helpers';
 import { responseException } from '../exceptions';
-import { check, query } from 'express-validator';
+import { body, check, query } from 'express-validator';
 import * as Services from '../services/role';
 import { getTeamById } from '../services/team';
 
@@ -20,7 +20,9 @@ async function updateRole(req, res) {
 }
 
 router.post('/role/create/:team', auth, [
-    check('team').isMongoId()
+    check('team').isMongoId(),
+    body('action').not().isEmpty(),
+    body('router').not().isEmpty()
 ], validate, async (req, res) => {
     try {
         const role = await Services.createRole(req.body, req.params.team, req.admin);

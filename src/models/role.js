@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { NotFoundError } from '../exceptions';
 
 export const ActionTypes = Object.freeze({
     ALL: 'ALL',
@@ -48,14 +47,11 @@ const RouterKeySpec = [
 ];
 
 export function getKeysByRouter(router) {
-    const foundRouterSpec = Object.values(RouterKeySpec).find(routerSpec => routerSpec.router === router);
-
-    if (!foundRouterSpec) {
-        throw new NotFoundError(`Router '${router}' not found. You might want one of these: ${Object.values(RouterTypes)}`);
-    }
+    const foundRouterSpec = Object.values(RouterKeySpec)
+        .find(routerSpec => routerSpec.router === router);
 
     return {
-        key: foundRouterSpec.key
+        key: foundRouterSpec?.key
     };
 }
 
