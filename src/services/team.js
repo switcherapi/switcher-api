@@ -1,8 +1,8 @@
 import { BadRequestError, NotFoundError } from '../exceptions';
 import { checkTeam } from '../external/switcher-api-facade';
 import Admin from '../models/admin';
-import { ActionTypes, checkActionType, Role, RouterTypes } from '../models/role';
-import { addDefaultRole, Team } from '../models/team';
+import { ActionTypes, checkActionType, Permission, RouterTypes } from '../models/permission';
+import { addDefaultPermission, Team } from '../models/team';
 import TeamInvite from '../models/team-invite';
 import { verifyOwnership } from '../helpers';
 import { response } from './common';
@@ -35,7 +35,7 @@ export async function getTeamById(id) {
 export async function getTeam(where) {
     const query = Team.findOne();
 
-    if (where.roles) query.where('roles', where.roles);
+    if (where.permissions) query.where('permissions', where.permissions);
 
     let team = await query.exec();
     return response(team, 'Team not found');
@@ -89,7 +89,7 @@ export async function createTeam(args, admin, defaultActions) {
         const actions = defaultActions.split(',');
         checkActionType(actions);
         for (const action of actions) {
-            await addDefaultRole(action, team);
+            await addDefaultPermission(action, team);
         }
     }
 
@@ -126,7 +126,7 @@ export async function inviteMember(id, email, admin) {
 
 export async function acceptInvite(request_id, admin) {
     const teamInvite = await getTeamInvite(
-        { _id: request_id, email: admin.email });
+        { _id: request_id });
 
     await teamInvite.populate({
         path: 'team'
@@ -182,17 +182,17 @@ export async function removeTeamMember(member, id, admin) {
     return adminMember.save();
 }
 
-export async function removeTeamRole(role, id, admin) {
+export async function removeTeamPermission(permission, id, admin) {
     const team = await verifyRequestedTeam(id, admin, ActionTypes.UPDATE);
-    const roleToRemove = await Role.findById(role.trim());
+    const permissionToRemove = await Permission.findById(permission.trim());
     
-    if (!roleToRemove) {
-        throw new NotFoundError('Role not found');
+    if (!permissionToRemove) {
+        throw new NotFoundError('Permission not found');
     }
 
-    const indexRoles = team.roles.indexOf(roleToRemove._id);
-    await Role.deleteOne({ _id: role.trim() });
-    team.roles.splice(indexRoles, 1);
+    const indexPermissions = team.permissions.indexOf(permissionToRemove._id);
+    await Permission.deleteOne({ _id: permission.trim() });
+    team.permissions.splice(indexPermissions, 1);
     
     return team.save();
 }

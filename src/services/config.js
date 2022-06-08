@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { response } from './common';
 import { Config } from '../models/config';
 import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers';
-import { ActionTypes, RouterTypes } from '../models/role';
+import { ActionTypes, RouterTypes } from '../models/permission';
 import { updateDomainVersion } from './domain';
 import { getGroupConfigById } from './group-config';
 import { checkSwitcher } from '../external/switcher-api-facade';

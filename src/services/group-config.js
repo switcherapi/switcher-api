@@ -3,7 +3,7 @@ import GroupConfig from '../models/group-config';
 import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers';
 import { BadRequestError } from '../exceptions';
 import { checkGroup } from '../external/switcher-api-facade';
-import { ActionTypes, RouterTypes } from '../models/role';
+import { ActionTypes, RouterTypes } from '../models/permission';
 import { getDomainById, updateDomainVersion } from './domain';
 import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';
 

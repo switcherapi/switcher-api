@@ -6,7 +6,7 @@ import Domain from '../models/domain';
 import { Environment } from '../models/environment';
 import GroupConfig from '../models/group-config';
 import History from '../models/history';
-import { ActionTypes, RouterTypes } from '../models/role';
+import { ActionTypes, RouterTypes } from '../models/permission';
 import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers';
 import { response } from './common';
 

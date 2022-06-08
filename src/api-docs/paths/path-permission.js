@@ -1,30 +1,30 @@
-import { ActionTypes, RouterTypes } from '../../models/role';
+import { ActionTypes, RouterTypes } from '../../models/permission';
 import { pathParameter, queryParameter } from '../schemas/common';
 import { commonArraySchemaContent, commonSchemaContent } from './common';
 
 export default {
-    '/role/create/:team': {
+    '/permission/create/:team': {
         post: {
-            tags: ['Role'],
-            description: 'Create a new role',
+            tags: ['Permission'],
+            description: 'Create a new permission',
             security: [{ bearerAuth: [] }],
             parameters: [
                 pathParameter('team', 'Team ID', 'string', true)
             ],
             requestBody: {
-                content: commonSchemaContent('Role')
+                content: commonSchemaContent('Permission')
             },
             responses: {
                 201: {
-                    description: 'Role created',
-                    content: commonSchemaContent('Role')
+                    description: 'Permission created',
+                    content: commonSchemaContent('Permission')
                 }
             }
         }
     },
-    '/role/routers': {
+    '/permission/routers': {
         get: {
-            tags: ['Role'],
+            tags: ['Permission'],
             description: 'Get all routers available',
             security: [{ bearerAuth: [] }],
             responses: {
@@ -50,9 +50,9 @@ export default {
             }
         }
     },
-    '/role/spec/router/:router': {
+    '/permission/spec/router/:router': {
         get: {
-            tags: ['Role'],
+            tags: ['Permission'],
             description: 'Get key available for a router',
             security: [{ bearerAuth: [] }],
             parameters: [
@@ -77,9 +77,9 @@ export default {
             }
         }
     },
-    '/role/actions': {
+    '/permission/actions': {
         get: {
-            tags: ['Role'],
+            tags: ['Permission'],
             description: 'Get all actions available',
             security: [{ bearerAuth: [] }],
             responses: {
@@ -105,76 +105,76 @@ export default {
             }
         }
     },
-    '/role': {
+    '/permission': {
         get: {
-            tags: ['Role'],
-            description: 'Get all roles',
+            tags: ['Permission'],
+            description: 'Get all permissions',
             security: [{ bearerAuth: [] }],
             parameters: [
                 queryParameter('team', 'Team ID', 'string', true)
             ],
             responses: {
                 200: {
-                    description: 'Roles',
-                    content: commonArraySchemaContent('Role')
+                    description: 'Permissions',
+                    content: commonArraySchemaContent('Permission')
                 }
             }
         }
     },
-    '/role/:id': {
+    '/permission/:id': {
         get: {
-            tags: ['Role'],
-            description: 'Get a role',
+            tags: ['Permission'],
+            description: 'Get a permission',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Role ID', 'string', true)
+                pathParameter('id', 'Permission ID', 'string', true)
             ],
             responses: {
                 200: {
-                    description: 'Role',
-                    content: commonSchemaContent('Role')
+                    description: 'Permission',
+                    content: commonSchemaContent('Permission')
                 }
             }
         },
         patch: {
-            tags: ['Role'],
-            description: 'Update a role',
+            tags: ['Permission'],
+            description: 'Update a permission',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Role ID', 'string', true)
+                pathParameter('id', 'Permission ID', 'string', true)
             ],
             requestBody: {
-                content: commonSchemaContent('RoleUpdateRequest')
+                content: commonSchemaContent('PermissionUpdateRequest')
             },
             responses: {
                 200: {
-                    description: 'Role updated',
-                    content: commonSchemaContent('Role')
+                    description: 'Permission updated',
+                    content: commonSchemaContent('Permission')
                 }
             }
         },
         delete: {
-            tags: ['Role'],
-            description: 'Delete a role',
+            tags: ['Permission'],
+            description: 'Delete a permission',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Role ID', 'string', true)
+                pathParameter('id', 'Permission ID', 'string', true)
             ],
             responses: {
                 200: {
-                    description: 'Role deleted',
-                    content: commonSchemaContent('Role')
+                    description: 'Permission deleted',
+                    content: commonSchemaContent('Permission')
                 }
             }
         }
     },
-    '/role/value/add/:id': {
+    '/permission/value/add/:id': {
         patch: {
-            tags: ['Role'],
-            description: 'Add a value to a role',
+            tags: ['Permission'],
+            description: 'Add a value to a permission',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Role ID', 'string', true)
+                pathParameter('id', 'Permission ID', 'string', true)
             ],
             requestBody: {
                 content: {
@@ -192,19 +192,19 @@ export default {
             },
             responses: {
                 200: {
-                    description: 'Role updated',
-                    content: commonSchemaContent('Role')
+                    description: 'Permission updated',
+                    content: commonSchemaContent('Permission')
                 }
             }
         }
     },
-    '/role/value/remove/:id': {
+    '/permission/value/remove/:id': {
         patch: {
-            tags: ['Role'],
-            description: 'Remove a value from a role',
+            tags: ['Permission'],
+            description: 'Remove a value from a permission',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Role ID', 'string', true)
+                pathParameter('id', 'Permission ID', 'string', true)
             ],
             requestBody: {
                 content: {
@@ -222,27 +222,27 @@ export default {
             },
             responses: {
                 200: {
-                    description: 'Role updated',
-                    content: commonSchemaContent('Role')
+                    description: 'Permission updated',
+                    content: commonSchemaContent('Permission')
                 }
             }
         }
     },
-    '/role/updateValues/:id': {
+    '/permission/updateValues/:id': {
         patch: {
-            tags: ['Role'],
-            description: 'Update values of a role',
+            tags: ['Permission'],
+            description: 'Update values of a permission',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Role ID', 'string', true)
+                pathParameter('id', 'Permission ID', 'string', true)
             ],
             requestBody: {
-                content: commonSchemaContent('Role')
+                content: commonSchemaContent('Permission')
             },
             responses: {
                 200: {
-                    description: 'Role updated',
-                    content: commonSchemaContent('Role')
+                    description: 'Permission updated',
+                    content: commonSchemaContent('Permission')
                 }
             }
         }

@@ -1,6 +1,6 @@
-import { ActionTypes, KeyTypes, RouterTypes } from '../../models/role';
+import { ActionTypes, KeyTypes, RouterTypes } from '../../models/permission';
 
-const role = {
+const permission = {
     type: 'object',
     properties: {
         action: {
@@ -28,8 +28,8 @@ const role = {
 };
 
 export default {
-    Role: role,
-    RoleUpdateRequest: {
+    Permission: permission,
+    PermissionUpdateRequest: {
         type: 'object',
         properties: {
             action: {

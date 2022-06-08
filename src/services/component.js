@@ -1,6 +1,6 @@
 import { checkComponent } from '../external/switcher-api-facade';
 import Component from '../models/component';
-import { ActionTypes, RouterTypes } from '../models/role';
+import { ActionTypes, RouterTypes } from '../models/permission';
 import { formatInput, verifyOwnership } from '../helpers';
 import { response } from './common';
 

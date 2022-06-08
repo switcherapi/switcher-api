@@ -5,7 +5,7 @@ import { auth } from '../middleware/auth';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { sortBy, verifyOwnership } from '../helpers';
 import { responseException } from '../exceptions';
-import { ActionTypes, RouterTypes } from '../models/role';
+import { ActionTypes, RouterTypes } from '../models/permission';
 import * as Services from '../services/group-config';
 import { getDomainById } from '../services/domain';
 import { SwitcherKeys } from '../external/switcher-api-facade';

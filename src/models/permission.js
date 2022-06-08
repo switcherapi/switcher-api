@@ -55,7 +55,7 @@ export function getKeysByRouter(router) {
     };
 }
 
-const roleSchema = new mongoose.Schema({
+const permissionSchema = new mongoose.Schema({
     action: {
         type: String,
         enum: Object.values(ActionTypes),
@@ -83,9 +83,9 @@ const roleSchema = new mongoose.Schema({
 export function checkActionType(actions) {
     for (const action of actions) {
         if (!Object.values(ActionTypes).includes(action)) {
-            throw new Error(`Role validation failed: action: '${action}' is not a valid enum value.`);
+            throw new Error(`Permission validation failed: action: '${action}' is not a valid enum value.`);
         }
     }
 }
 
-export const Role = mongoose.model('Role', roleSchema);
+export const Permission = mongoose.model('Permission', permissionSchema);

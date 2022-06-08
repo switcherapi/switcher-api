@@ -1,6 +1,6 @@
 import { response } from './common';
 import { ConfigStrategy } from '../models/config-strategy';
-import { ActionTypes, RouterTypes } from '../models/role';
+import { ActionTypes, RouterTypes } from '../models/permission';
 import { verifyOwnership } from '../helpers';
 import { updateDomainVersion } from './domain';
 import { getConfigById } from './config';

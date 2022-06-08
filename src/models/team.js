@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { Role, RouterTypes } from './role';
+import { Permission, RouterTypes } from './permission';
 import Admin from './admin';
 
 const teamSchema = new mongoose.Schema({
@@ -20,9 +20,9 @@ const teamSchema = new mongoose.Schema({
         required: true,
         ref: 'Domain'
     },
-    roles: [{
+    permissions: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Role'
+        ref: 'Permission'
     }],
     members: [{
         type: mongoose.Schema.Types.ObjectId,
@@ -49,13 +49,13 @@ teamSchema.virtual('members_list', {
     foreignField: '_id'
 });
 
-export async function addDefaultRole(action, team) {
-    const roleAllRouter = new Role({
+export async function addDefaultPermission(action, team) {
+    const permissionAllRouter = new Permission({
         action,
         router: RouterTypes.ALL
     });
-    await roleAllRouter.save();
-    team.roles.push(roleAllRouter._id);
+    await permissionAllRouter.save();
+    team.permissions.push(permissionAllRouter._id);
 }
 
 const existTeam = async (team) => {
@@ -80,7 +80,7 @@ teamSchema.pre('validate', async function (next) {
 
 teamSchema.pre('remove', async function (next) {
     const team = this;
-    await Role.deleteMany({ _id: { $in: team.roles } });
+    await Permission.deleteMany({ _id: { $in: team.permissions } });
 
     const membersToRemve = await Admin.find({ teams: team._id });
     membersToRemve.forEach(member => {

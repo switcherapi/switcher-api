@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import Admin from '../../src/models/admin';
 import Domain from '../../src/models/domain';
 import { Team } from '../../src/models/team';
-import { Role, RouterTypes, ActionTypes, KeyTypes } from '../../src/models/role';
+import { Permission, RouterTypes, ActionTypes, KeyTypes } from '../../src/models/permission';
 import { EnvType } from '../../src/models/environment';
 import GroupConfig from '../../src/models/group-config';
 import { Config } from '../../src/models/config';
@@ -58,17 +58,17 @@ export const configDocument = {
     domain: domainId
 };
 
-export const role1Id = new mongoose.Types.ObjectId();
-export const role1 = {
-    _id: role1Id,
+export const permission1Id = new mongoose.Types.ObjectId();
+export const permission1 = {
+    _id: permission1Id,
     action: ActionTypes.DELETE,
     active: true,
     router: RouterTypes.CONFIG
 };
 
-export const role2Id = new mongoose.Types.ObjectId();
-export const role2 = {
-    _id: role2Id,
+export const permission2Id = new mongoose.Types.ObjectId();
+export const permission2 = {
+    _id: permission2Id,
     action: ActionTypes.READ,
     active: true,
     router: RouterTypes.GROUP,
@@ -76,9 +76,9 @@ export const role2 = {
     values: [groupConfig2Document.name]
 };
 
-export const role3Id = new mongoose.Types.ObjectId();
-export const role3 = {
-    _id: role3Id,
+export const permission3Id = new mongoose.Types.ObjectId();
+export const permission3 = {
+    _id: permission3Id,
     action: ActionTypes.READ,
     active: true,
     router: RouterTypes.CONFIG,
@@ -86,9 +86,9 @@ export const role3 = {
     values: ['RANDOM_VALUE']
 };
 
-export const role4Id = new mongoose.Types.ObjectId();
-export const role4 = {
-    _id: role4Id,
+export const permission4Id = new mongoose.Types.ObjectId();
+export const permission4 = {
+    _id: permission4Id,
     action: ActionTypes.READ,
     active: true,
     router: RouterTypes.ALL
@@ -100,7 +100,7 @@ export const team1 = {
     domain: domainId,
     name: 'Team 1',
     active: true,
-    roles: [role1Id, role2Id, role3Id]
+    permissions: [permission1Id, permission2Id, permission3Id]
 };
 
 export const team2Id = new mongoose.Types.ObjectId();
@@ -109,7 +109,7 @@ export const team2 = {
     domain: domainId,
     name: 'Team 2',
     active: true,
-    roles: [role4Id]
+    permissions: [permission4Id]
 };
 
 export const adminAccountId = new mongoose.Types.ObjectId();
@@ -149,7 +149,7 @@ export const setupDatabase = async () => {
     await Admin.deleteMany();
     await Team.deleteMany();
     await TeamInvite.deleteMany();
-    await Role.deleteMany();
+    await Permission.deleteMany();
 
     await new Admin(adminMasterAccount).save();
     await new Admin(adminAccount).save();
@@ -160,10 +160,10 @@ export const setupDatabase = async () => {
     await new GroupConfig(groupConfigDocument).save();
     await new GroupConfig(groupConfig2Document).save();
     await new Config(configDocument).save();
-    await new Role(role1).save();
-    await new Role(role2).save();
-    await new Role(role3).save();
-    await new Role(role4).save();
+    await new Permission(permission1).save();
+    await new Permission(permission2).save();
+    await new Permission(permission3).save();
+    await new Permission(permission4).save();
     await new Team(team1).save();
     await new Team(team2).save();
 };

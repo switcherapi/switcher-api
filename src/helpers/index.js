@@ -1,10 +1,10 @@
 import { BadRequestError, PermissionError } from '../exceptions';
 import { EnvType } from '../models/environment';
-import { ActionTypes, RouterTypes } from '../models/role';
+import { ActionTypes, RouterTypes } from '../models/permission';
 import { getDomainById } from '../services/domain';
 import { getEnvironments } from '../services/environment';
 import { getTeams } from '../services/team';
-import { getRole, getRoles } from '../services/role';
+import { getPermission, getPermissions } from '../services/permission';
 
 export async function checkEnvironmentStatusRemoval(domainId, environmentName, strategy = false) {
     const environment = await getEnvironments({ domain: domainId }, ['_id', 'name']);
@@ -71,9 +71,9 @@ export async function verifyOwnership(admin, element, domainId, action, routerTy
     if (teams.length && admin.teams.length) {
         for (const team of teams) {
             if (cascade) {
-                element = await verifyRolesCascade(team, element, action, routerType);
+                element = await verifyPermissionsCascade(team, element, action, routerType);
             } else {
-                element = await verifyRoles(team, element, action, routerType);
+                element = await verifyPermissions(team, element, action, routerType);
             }
         }
     } else {
@@ -83,22 +83,22 @@ export async function verifyOwnership(admin, element, domainId, action, routerTy
     return element;
 }
   
-async function verifyRoles(team, element, action, routerType) {
-    const role = await getRole({
-        _id: { $in: team.roles }, 
+async function verifyPermissions(team, element, action, routerType) {
+    const permission = await getPermission({
+        _id: { $in: team.permissions }, 
         action: { $in: [action, ActionTypes.ALL] },
         active: true,
         router: { $in: [routerType, RouterTypes.ALL] }
     });
 
-    if (role) {
-        return verifyIdentifiers(role, element);
+    if (permission) {
+        return verifyIdentifiers(permission, element);
     } else {
-        throw new PermissionError(`Role not found for this operation: '${action}' - '${routerType}'`);
+        throw new PermissionError(`Permission not found for this operation: '${action}' - '${routerType}'`);
     }
 }
 
-async function verifyRolesCascade(team, element, action, routerType) {
+async function verifyPermissionsCascade(team, element, action, routerType) {
     let orStatement = [];
     if (routerType === RouterTypes.DOMAIN) {
         orStatement = [
@@ -123,37 +123,37 @@ async function verifyRolesCascade(team, element, action, routerType) {
         ];
     }
 
-    const foundRole = await getRoles({
-        _id: { $in: team.roles }, 
+    const foundPermission = await getPermissions({
+        _id: { $in: team.permissions }, 
         action: { $in: [action, ActionTypes.ALL] },
         active: true,
         $or: orStatement
     });
 
-    const matchedRole = foundRole.filter(value => value.router === routerType);
-    if (matchedRole.length) {
-        return verifyIdentifiers(matchedRole[0], element);
-    } else if (foundRole[0]) {
+    const matchedPermission = foundPermission.filter(value => value.router === routerType);
+    if (matchedPermission.length) {
+        return verifyIdentifiers(matchedPermission[0], element);
+    } else if (foundPermission[0]) {
         return element;
     }
 }
 
-function verifyIdentifiers(role, element) {
-    if (role.identifiedBy) {
+function verifyIdentifiers(permission, element) {
+    if (permission.identifiedBy) {
         if (Array.isArray(element)) {
-            if (role.values.length) {
-                element = element.filter(child => role.values.includes(child[`${role.identifiedBy}`]));
+            if (permission.values.length) {
+                element = element.filter(child => permission.values.includes(child[`${permission.identifiedBy}`]));
                 if (element.length) {
                     return element;
                 }
             }
         } else {
-            if (role.values.includes(element[`${role.identifiedBy}`])) {
+            if (permission.values.includes(element[`${permission.identifiedBy}`])) {
                 return element;
             }
         }
     } else {
         return element;
     }
-    throw new PermissionError('It was not possible to match the requiring element to the current role');
+    throw new PermissionError('It was not possible to match the requiring element to the current permission');
 }
