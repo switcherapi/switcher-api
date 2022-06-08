@@ -1781,7 +1781,7 @@
 					"response": []
 				},
 				{
-					"name": "Team - Add Role",
+					"name": "Team - Add Permission",
 					"event": [
 						{
 							"listen": "test",
@@ -1807,7 +1807,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"role\": \"5e35cb6bd5027a30749ecd28\"\n}",
+							"raw": "{\n\t\"permission\": \"5e35cb6bd5027a30749ecd28\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1815,13 +1815,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/team/role/add/5e35d60f0cceed52b012ef28",
+							"raw": "{{url}}/team/permission/add/5e35d60f0cceed52b012ef28",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"team",
-								"role",
+								"permission",
 								"add",
 								"5e35d60f0cceed52b012ef28"
 							],
@@ -1837,7 +1837,7 @@
 					"response": []
 				},
 				{
-					"name": "Team - Remove Role",
+					"name": "Team - Remove Permission",
 					"event": [
 						{
 							"listen": "test",
@@ -1861,7 +1861,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"role\": \"5e0bf2a097f71351a0007ab7\"\n}",
+							"raw": "{\n\t\"permission\": \"5e0bf2a097f71351a0007ab7\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1869,13 +1869,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/team/role/remove/5e0bf0bab2ced93fb0b9111a",
+							"raw": "{{url}}/team/permission/remove/5e0bf0bab2ced93fb0b9111a",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"team",
-								"role",
+								"permission",
 								"remove",
 								"5e0bf0bab2ced93fb0b9111a"
 							],
@@ -1893,10 +1893,10 @@
 			]
 		},
 		{
-			"name": "Role",
+			"name": "Permission",
 			"item": [
 				{
-					"name": "Role - Create",
+					"name": "Permission - Create",
 					"event": [
 						{
 							"listen": "test",
@@ -1928,12 +1928,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/role/create/5e35d60f0cceed52b012ef28",
+							"raw": "{{url}}/permission/create/5e35d60f0cceed52b012ef28",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"role",
+								"permission",
 								"create",
 								"5e35d60f0cceed52b012ef28"
 							]
@@ -1942,7 +1942,7 @@
 					"response": []
 				},
 				{
-					"name": "Role - Update",
+					"name": "Permission - Update",
 					"event": [
 						{
 							"listen": "test",
@@ -1976,12 +1976,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/role/5e0bf4a3a5753d65c0794af4",
+							"raw": "{{url}}/permission/5e0bf4a3a5753d65c0794af4",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"role",
+								"permission",
 								"5e0bf4a3a5753d65c0794af4"
 							]
 						}
@@ -1989,7 +1989,7 @@
 					"response": []
 				},
 				{
-					"name": "Role - Read",
+					"name": "Permission - Read",
 					"event": [
 						{
 							"listen": "test",
@@ -2024,12 +2024,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/role/?team=5e10eda73a649463a8ef3751",
+							"raw": "{{url}}/permission/?team=5e10eda73a649463a8ef3751",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"role",
+								"permission",
 								""
 							],
 							"query": [
@@ -2043,7 +2043,7 @@
 					"response": []
 				},
 				{
-					"name": "Role - Read Single",
+					"name": "Permission - Read Single",
 					"event": [
 						{
 							"listen": "test",
@@ -2078,12 +2078,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/role/5e0bf449a5753d65c0794af3",
+							"raw": "{{url}}/permission/5e0bf449a5753d65c0794af3",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"role",
+								"permission",
 								"5e0bf449a5753d65c0794af3"
 							]
 						}
@@ -2091,7 +2091,7 @@
 					"response": []
 				},
 				{
-					"name": "Role - Read Routers",
+					"name": "Permission - Read Routers",
 					"event": [
 						{
 							"listen": "test",
@@ -2126,12 +2126,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/role/routers",
+							"raw": "{{url}}/permission/routers",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"role",
+								"permission",
 								"routers"
 							]
 						}
@@ -2139,7 +2139,7 @@
 					"response": []
 				},
 				{
-					"name": "Role - Read Actions",
+					"name": "Permission - Read Actions",
 					"event": [
 						{
 							"listen": "test",
@@ -2174,12 +2174,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/role/actions",
+							"raw": "{{url}}/permission/actions",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"role",
+								"permission",
 								"actions"
 							]
 						}
@@ -2187,7 +2187,7 @@
 					"response": []
 				},
 				{
-					"name": "Role - Read Keys By Router",
+					"name": "Permission - Read Keys By Router",
 					"event": [
 						{
 							"listen": "test",
@@ -2222,12 +2222,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/role/spec/router/STRATEGY",
+							"raw": "{{url}}/permission/spec/router/STRATEGY",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"role",
+								"permission",
 								"spec",
 								"router",
 								"STRATEGY"
@@ -2237,7 +2237,7 @@
 					"response": []
 				},
 				{
-					"name": "Role - Delete",
+					"name": "Permission - Delete",
 					"event": [
 						{
 							"listen": "test",
@@ -2269,12 +2269,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/role/5e0bf4b5a5753d65c0794af6",
+							"raw": "{{url}}/permission/5e0bf4b5a5753d65c0794af6",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"role",
+								"permission",
 								"5e0bf4b5a5753d65c0794af6"
 							]
 						}
@@ -2282,7 +2282,7 @@
 					"response": []
 				},
 				{
-					"name": "Role - Add Value",
+					"name": "Permission - Add Value",
 					"event": [
 						{
 							"listen": "test",
@@ -2316,12 +2316,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/role/value/add/5e0bf449a5753d65c0794af3",
+							"raw": "{{url}}/permission/value/add/5e0bf449a5753d65c0794af3",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"role",
+								"permission",
 								"value",
 								"add",
 								"5e0bf449a5753d65c0794af3"
@@ -2338,7 +2338,7 @@
 					"response": []
 				},
 				{
-					"name": "Role - Remove Value",
+					"name": "Permission - Remove Value",
 					"event": [
 						{
 							"listen": "test",
@@ -2372,12 +2372,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/role/value/remove/5e0bf449a5753d65c0794af3",
+							"raw": "{{url}}/permission/value/remove/5e0bf449a5753d65c0794af3",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"role",
+								"permission",
 								"value",
 								"remove",
 								"5e0bf449a5753d65c0794af3"

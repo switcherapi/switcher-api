@@ -4,7 +4,7 @@ import { getConfig } from '../services/config';
 import { check } from 'express-validator';
 import { auth } from '../middleware/auth';
 import { verifyOwnership } from '../helpers';
-import { ActionTypes, RouterTypes } from '../models/role';
+import { ActionTypes, RouterTypes } from '../models/permission';
 import { responseException } from '../exceptions';
 import { 
     aggreagateReasons, 

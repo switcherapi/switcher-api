@@ -6,7 +6,7 @@ import pathConfigStrategy from './paths/path-config-strategy';
 import pathEnvironment from './paths/path-environment';
 import pathComponent from './paths/path-component';
 import pathTeam from './paths/path-team';
-import pathRole from './paths/path-role';
+import pathPermission from './paths/path-permission';
 import pathMetric from './paths/path-metric';
 import pathSlack from './paths/path-slack';
 import pathClient from './paths/path-client';
@@ -20,7 +20,7 @@ import configStrategySchema from './schemas/config-strategy';
 import environmentSchema from './schemas/environment';
 import componentSchema from './schemas/component';
 import teamSchema from './schemas/team';
-import roleSchema from './schemas/role';
+import permissionSchema from './schemas/permission';
 import metricSchema from './schemas/metric';
 import slackSchema from './schemas/slack';
 import info from './swagger-info';
@@ -73,7 +73,7 @@ export default {
             ...environmentSchema,
             ...componentSchema,
             ...teamSchema,
-            ...roleSchema,
+            ...permissionSchema,
             ...metricSchema,
             ...slackSchema
         }
@@ -87,7 +87,7 @@ export default {
         ...pathEnvironment,
         ...pathComponent,
         ...pathTeam,
-        ...pathRole,
+        ...pathPermission,
         ...pathMetric,
         ...pathClient,
         ...pathSlack

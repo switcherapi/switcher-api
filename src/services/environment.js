@@ -2,7 +2,7 @@ import { BadRequestError } from '../exceptions';
 import { checkEnvironment } from '../external/switcher-api-facade';
 import { ConfigStrategy } from '../models/config-strategy';
 import { Environment, EnvType } from '../models/environment';
-import { ActionTypes, RouterTypes } from '../models/role';
+import { ActionTypes, RouterTypes } from '../models/permission';
 import { formatInput, verifyOwnership } from '../helpers';
 import { response } from './common';
 import { getConfigs, removeConfigStatus } from './config';

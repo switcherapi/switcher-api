@@ -6,7 +6,7 @@ import { validate, verifyInputUpdateParameters } from '../middleware/validators'
 import { strategyRequirements, StrategiesType } from '../models/config-strategy';
 import { auth } from '../middleware/auth';
 import { verifyOwnership, sortBy } from '../helpers';
-import { ActionTypes, RouterTypes } from '../models/role';
+import { ActionTypes, RouterTypes } from '../models/permission';
 import { getConfigById } from '../services/config';
 import * as Services from '../services/config-strategy';
 import { responseException } from '../exceptions';

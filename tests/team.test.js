@@ -11,7 +11,7 @@ import {
     domainDocument,
     team1Id,
     adminAccountId,
-    role1Id,
+    permission1Id,
     team1,
     adminMasterAccountId,
     adminMasterAccount,
@@ -66,7 +66,7 @@ describe('Insertion tests', () => {
         // DB validation - document created
         const team = await Team.findById(response.body._id).lean();
         expect(team).not.toBeNull();
-        expect(team.roles.length).toEqual(2);
+        expect(team.permissions.length).toEqual(2);
     });
 
     test('TEAM_SUITE - Should NOT create a new Team - Invalid action permission', async () => {
@@ -78,7 +78,7 @@ describe('Insertion tests', () => {
                 domain: domainId
             }).expect(400);
 
-        expect(response.body.error).toEqual('Role validation failed: action: \'INVALID_ACTION\' is not a valid enum value.');
+        expect(response.body.error).toEqual('Permission validation failed: action: \'INVALID_ACTION\' is not a valid enum value.');
     });
 
     test('TEAM_SUITE - Should NOT create a new Team - Domain not found', async () => {
@@ -568,51 +568,51 @@ describe('Updating team members tests', () => {
     });
 });
 
-describe('Updating team roles tests', () => {
+describe('Updating team permissions tests', () => {
     beforeAll(setupDatabase);
 
-    test('TEAM_SUITE - Should NOT remove a role - Team not found', async () => {
+    test('TEAM_SUITE - Should NOT remove a permission - Team not found', async () => {
         await request(app)
-            .patch('/team/role/remove/' + new mongoose.Types.ObjectId())
+            .patch('/team/permission/remove/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                role: role1Id
+                permission: permission1Id
             }).expect(404);
     });
 
-    test('TEAM_SUITE - Should NOT remove a role - Invalid Team Id', async () => {
+    test('TEAM_SUITE - Should NOT remove a permission - Invalid Team Id', async () => {
         await request(app)
-            .patch('/team/role/remove/INVALID_ID')
+            .patch('/team/permission/remove/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                role: role1Id
+                permission: permission1Id
             }).expect(422);
     });
 
-    test('TEAM_SUITE - Should NOT remove a role - Invalid parameter', async () => {
+    test('TEAM_SUITE - Should NOT remove a permission - Invalid parameter', async () => {
         await request(app)
-            .patch('/team/role/remove/' + team1Id)
+            .patch('/team/permission/remove/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                member: role1Id
+                member: permission1Id
             }).expect(400);
     });
 
-    test('TEAM_SUITE - Should NOT remove a role - Role not found', async () => {
+    test('TEAM_SUITE - Should NOT remove a permission - Permission not found', async () => {
         await request(app)
-            .patch('/team/role/remove/' + team1Id)
+            .patch('/team/permission/remove/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                role: new mongoose.Types.ObjectId()
+                permission: new mongoose.Types.ObjectId()
             }).expect(404);
     });
 
-    test('TEAM_SUITE - Should remove a role', async () => {
+    test('TEAM_SUITE - Should remove a permission', async () => {
         await request(app)
-            .patch('/team/role/remove/' + team1Id)
+            .patch('/team/permission/remove/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                role: role1Id
+                permission: permission1Id
             }).expect(200);
     });
 

@@ -18,9 +18,9 @@ const team = {
             description: 'The domain of the team',
             format: 'uuid'
         },
-        roles: {
+        permissions: {
             type: 'array',
-            description: 'The roles of the team',
+            description: 'The permissions of the team',
             items: {
                 type: 'string',
                 format: 'uuid'

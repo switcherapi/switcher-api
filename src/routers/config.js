@@ -3,7 +3,7 @@ import { check } from 'express-validator';
 import { relayOptions } from '../models/config';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
-import { ActionTypes, RouterTypes } from '../models/role';
+import { ActionTypes, RouterTypes } from '../models/permission';
 import { responseException } from '../exceptions';
 import {
     validate,

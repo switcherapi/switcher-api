@@ -9,7 +9,7 @@ import Component from '../../src/models/component';
 import History from '../../src/models/history';
 import TeamInvite from '../../src/models/team-invite';
 import { Team } from '../../src/models/team';
-import { Role, ActionTypes, RouterTypes } from '../../src/models/role';
+import { Permission, ActionTypes, RouterTypes } from '../../src/models/permission';
 import { Metric } from '../../src/models/metric';
 import { EnvType, Environment } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
@@ -46,9 +46,9 @@ export const domainDocument = {
     owner: adminMasterAccountId
 };
 
-export const role1Id = new mongoose.Types.ObjectId();
-export const role1 = {
-    _id: role1Id,
+export const permission1Id = new mongoose.Types.ObjectId();
+export const permission1 = {
+    _id: permission1Id,
     action: ActionTypes.READ,
     active: true,
     router: RouterTypes.GROUP
@@ -117,33 +117,33 @@ export const configStrategyDocument = {
     domain: domainId
 };
 
-export const roleAll1Id = new mongoose.Types.ObjectId();
-export const roleAll1 = {
-    _id: roleAll1Id,
+export const permissionAll1Id = new mongoose.Types.ObjectId();
+export const permissionAll1 = {
+    _id: permissionAll1Id,
     action: ActionTypes.CREATE,
     active: true,
     router: RouterTypes.ALL
 };
 
-export const roleAll2Id = new mongoose.Types.ObjectId();
-export const roleAll2 = {
-    _id: roleAll2Id,
+export const permissionAll2Id = new mongoose.Types.ObjectId();
+export const permissionAll2 = {
+    _id: permissionAll2Id,
     action: ActionTypes.READ,
     active: true,
     router: RouterTypes.ALL
 };
 
-export const roleAll3Id = new mongoose.Types.ObjectId();
-export const roleAll3 = {
-    _id: roleAll3Id,
+export const permissionAll3Id = new mongoose.Types.ObjectId();
+export const permissionAll3 = {
+    _id: permissionAll3Id,
     action: ActionTypes.UPDATE,
     active: true,
     router: RouterTypes.ALL
 };
 
-export const roleAll4Id = new mongoose.Types.ObjectId();
-export const roleAll4 = {
-    _id: roleAll4Id,
+export const permissionAll4Id = new mongoose.Types.ObjectId();
+export const permissionAll4 = {
+    _id: permissionAll4Id,
     action: ActionTypes.DELETE,
     active: true,
     router: RouterTypes.ALL
@@ -155,7 +155,7 @@ export const team = {
     domain: domainId,
     name: 'Team',
     active: true,
-    roles: [roleAll1Id, roleAll2Id, roleAll3Id, roleAll4Id]
+    permissions: [permissionAll1Id, permissionAll2Id, permissionAll3Id, permissionAll4Id]
 };
 
 export const team1Id = new mongoose.Types.ObjectId();
@@ -164,7 +164,7 @@ export const team1 = {
     domain: domainId,
     name: 'Team 1',
     active: true,
-    roles: [role1Id]
+    permissions: [permission1Id]
 };
 
 export const teamInviteNoTeam = {
@@ -199,7 +199,7 @@ export const setupDatabase = async () => {
 
     await Team.deleteMany();
     await TeamInvite.deleteMany();
-    await Role.deleteMany();
+    await Permission.deleteMany();
 
     adminMasterAccount.token = Admin.extractTokenPart(adminMasterAccountToken);
     await new Admin(adminMasterAccount).save();
@@ -217,11 +217,11 @@ export const setupDatabase = async () => {
     await new Slack(slack).save();
     await new Team(team1).save();
     await new Team(team).save();
-    await new Role(role1).save();
-    await new Role(roleAll1).save();
-    await new Role(roleAll2).save();
-    await new Role(roleAll3).save();
-    await new Role(roleAll4).save();
+    await new Permission(permission1).save();
+    await new Permission(permissionAll1).save();
+    await new Permission(permissionAll2).save();
+    await new Permission(permissionAll3).save();
+    await new Permission(permissionAll4).save();
 
     const hashApiKey = await bcrypt.hash(component1._id + component1.name, 8);
     const hash = await bcrypt.hash(hashApiKey, 8);

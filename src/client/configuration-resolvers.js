@@ -1,5 +1,5 @@
 import { verifyOwnership } from '../helpers';
-import { ActionTypes, RouterTypes } from '../models/role';
+import { ActionTypes, RouterTypes } from '../models/permission';
 import { getGroupConfigById, getGroupConfigs } from '../services/group-config';
 import { getConfigs } from '../services/config';
 import { getStrategies } from '../services/config-strategy';

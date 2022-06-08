@@ -10,7 +10,7 @@ import History from '../../src/models/history';
 import { Metric } from '../../src/models/metric';
 import { Environment, EnvType } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
-import { ActionTypes, RouterTypes, Role } from '../../src/models/role';
+import { ActionTypes, RouterTypes, Permission } from '../../src/models/permission';
 import { Team } from '../../src/models/team';
 import Slack from '../../src/models/slack';
 
@@ -163,9 +163,9 @@ export const component1 = {
 };
 configDocument.components.push(component1Id);
 
-export const roleConfigsId = new mongoose.Types.ObjectId();
-export const roleConfigs = {
-    _id: roleConfigsId,
+export const permissionConfigsId = new mongoose.Types.ObjectId();
+export const permissionConfigs = {
+    _id: permissionConfigsId,
     action: ActionTypes.READ,
     active: true,
     router: RouterTypes.CONFIG
@@ -177,7 +177,7 @@ export const team = {
     domain: domainId,
     name: 'Team Dev',
     active: true,
-    roles: [roleConfigsId]
+    permissions: [permissionConfigsId]
 };
 
 export const slack = {
@@ -201,7 +201,7 @@ export const setupDatabase = async () => {
 
     await Slack.deleteMany();
     await Team.deleteMany();
-    await Role.deleteMany();
+    await Permission.deleteMany();
 
     adminMasterAccount.token = Admin.extractTokenPart(adminMasterAccountToken);
     await new Admin(adminMasterAccount).save();
@@ -216,7 +216,7 @@ export const setupDatabase = async () => {
 
     await new Slack(slack).save();
     await new Team(team).save();
-    await new Role(roleConfigs).save();
+    await new Permission(permissionConfigs).save();
 
     await new GroupConfig(groupConfigDocument).save();
     await new Config(configDocument).save();

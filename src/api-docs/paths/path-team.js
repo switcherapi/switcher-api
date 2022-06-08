@@ -281,10 +281,10 @@ export default {
             }
         }
     },
-    '/team/role/remove/:id': {
+    '/team/permission/remove/:id': {
         patch: {
             tags: ['Team'],
-            description: 'Remove role from team',
+            description: 'Remove permission from team',
             security: [{ bearerAuth: [] }],
             parameters: [
                 pathParameter('id', 'Team ID', true)
@@ -295,9 +295,9 @@ export default {
                         schema: {
                             type: 'object',
                             properties: {
-                                role: {
+                                permission: {
                                     type: 'string',
-                                    description: 'Role ID'
+                                    description: 'Permission ID'
                                 }
                             }
                         }

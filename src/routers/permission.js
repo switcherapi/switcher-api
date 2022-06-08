@@ -1,44 +1,44 @@
 import express from 'express';
 import { auth } from '../middleware/auth';
-import { RouterTypes, ActionTypes, getKeysByRouter } from '../models/role';
+import { RouterTypes, ActionTypes, getKeysByRouter } from '../models/permission';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { verifyOwnership } from '../helpers';
 import { responseException } from '../exceptions';
 import { body, check, query } from 'express-validator';
-import * as Services from '../services/role';
+import * as Services from '../services/permission';
 import { getTeamById } from '../services/team';
 
 const router = new express.Router();
 
-async function updateRole(req, res) {
+async function updatePermission(req, res) {
     try {
-        const role = await Services.updateRole(req.body, req.params.id, req.admin);
-        res.send(role);
+        const permission = await Services.updatePermission(req.body, req.params.id, req.admin);
+        res.send(permission);
     } catch (e) {
         responseException(res, e, 400);
     }
 }
 
-router.post('/role/create/:team', auth, [
+router.post('/permission/create/:team', auth, [
     check('team').isMongoId(),
     body('action').not().isEmpty(),
     body('router').not().isEmpty()
 ], validate, async (req, res) => {
     try {
-        const role = await Services.createRole(req.body, req.params.team, req.admin);
-        res.status(201).send(role);
+        const permission = await Services.createPermission(req.body, req.params.team, req.admin);
+        res.status(201).send(permission);
     } catch (e) {
         responseException(res, e, 400);
     }
 });
 
-router.get('/role/routers', auth, (_req, res) => {
+router.get('/permission/routers', auth, (_req, res) => {
     res.send({
         routersAvailable: Object.values(RouterTypes)
     });
 });
 
-router.get('/role/spec/router/:router', auth, (req, res) => {
+router.get('/permission/spec/router/:router', auth, (req, res) => {
     try {
         const result = getKeysByRouter(req.params.router);
         res.send(result);
@@ -47,83 +47,83 @@ router.get('/role/spec/router/:router', auth, (req, res) => {
     }
 });
 
-router.get('/role/actions', auth, (_req, res) => {
+router.get('/permission/actions', auth, (_req, res) => {
     res.send({
         actionsAvailable: Object.values(ActionTypes)
     });
 });
 
-// GET /role?team=ID
-router.get('/role', auth, [
+// GET /permission?team=ID
+router.get('/permission', auth, [
     query('team').isMongoId()
 ], validate, async (req, res) => {
     try {
         const team = await getTeamById(req.query.team);
         await verifyOwnership(req.admin, team, team.domain, ActionTypes.READ, RouterTypes.ADMIN);
 
-        const roles = await Services.getRoles({ _id: { $in: team.roles } });
-        res.send(roles);
+        const permissions = await Services.getPermissions({ _id: { $in: team.permissions } });
+        res.send(permissions);
     } catch (e) {
         responseException(res, e, 400);
     }
 });
 
-router.get('/role/:id', auth, [
+router.get('/permission/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const role = await Services.getRoleById(req.params.id, true);
-        res.send(role);
+        const permission = await Services.getPermissionById(req.params.id, true);
+        res.send(permission);
     } catch (e) {
         responseException(res, e, 400);
     }
 });
 
-router.patch('/role/:id', auth, verifyInputUpdateParameters([
+router.patch('/permission/:id', auth, verifyInputUpdateParameters([
     'action', 'active', 'router', 'identifiedBy'
 ]), [
     check('id').isMongoId()
 ], validate, async (req, res) => {
-    await updateRole(req, res);
+    await updatePermission(req, res);
 });
 
-router.delete('/role/:id', auth, [
+router.delete('/permission/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const role = await Services.deleteRole(req.params.id, req.admin);
-        res.send(role);
+        const permission = await Services.deletePermission(req.params.id, req.admin);
+        res.send(permission);
     } catch (e) {
         responseException(res, e, 400);
     }
 });
 
-router.patch('/role/value/add/:id', auth, verifyInputUpdateParameters(['value']), [
+router.patch('/permission/value/add/:id', auth, verifyInputUpdateParameters(['value']), [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const role = await Services.addValue(req.body, req.params.id, req.admin);
-        res.send(role);
+        const permission = await Services.addValue(req.body, req.params.id, req.admin);
+        res.send(permission);
     } catch (e) {
         responseException(res, e, 400);
     }
 });
 
-router.patch('/role/value/remove/:id', auth, [
+router.patch('/permission/value/remove/:id', auth, [
     check('id').isMongoId()
 ], validate, verifyInputUpdateParameters(['value']), async (req, res) => {
     try {
-        const role = await Services.removeValue(req.body, req.params.id, req.admin);
-        res.send(role);
+        const permission = await Services.removeValue(req.body, req.params.id, req.admin);
+        res.send(permission);
     } catch (e) {
         responseException(res, e, 400);
     }
 });
 
-router.patch('/role/updateValues/:id', auth, [
+router.patch('/permission/updateValues/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
-    await updateRole(req, res);
+    await updatePermission(req, res);
 });
 
 export default router;

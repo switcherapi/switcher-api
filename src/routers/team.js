@@ -1,7 +1,7 @@
 import express from 'express';
 import { auth } from '../middleware/auth';
 import { check, query } from 'express-validator';
-import { ActionTypes, RouterTypes } from '../models/role';
+import { ActionTypes, RouterTypes } from '../models/permission';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { verifyOwnership } from '../helpers';
 import { responseException } from '../exceptions';
@@ -168,11 +168,11 @@ router.patch('/team/member/remove/:id', auth, [
     }
 });
 
-router.patch('/team/role/remove/:id', auth, [
+router.patch('/team/permission/remove/:id', auth, [
     check('id').isMongoId()
-], validate, verifyInputUpdateParameters(['role']), async (req, res) => {
+], validate, verifyInputUpdateParameters(['permission']), async (req, res) => {
     try {
-        const team = await Services.removeTeamRole(req.body.role, req.params.id, req.admin);
+        const team = await Services.removeTeamPermission(req.body.permission, req.params.id, req.admin);
         res.send(team);
     } catch (e) {
         responseException(res, e, 400);

@@ -4,7 +4,7 @@ import { auth } from '../middleware/auth';
 import { check } from 'express-validator';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { verifyOwnership, sortBy } from '../helpers';
-import { ActionTypes, RouterTypes } from '../models/role';
+import { ActionTypes, RouterTypes } from '../models/permission';
 import { checkDomain, SwitcherKeys } from '../external/switcher-api-facade';
 import * as Services from '../services/domain';
 import { responseException } from '../exceptions';
