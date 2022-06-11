@@ -223,9 +223,9 @@ function checkStrategy(context, strategies, environment) {
     }
 }
 
-function checkStrategyInput(input, strategy) {
-    if (input.length) {
-        if (!processOperation(strategy.strategy, strategy.operation, input[0].input, strategy.values)) {
+function checkStrategyInput(entry, strategy) {
+    if (entry.length) {
+        if (!processOperation(strategy.strategy, strategy.operation, entry[0].input, strategy.values)) {
             throw new Error(`Strategy '${strategy.strategy}' does not agree`);
         }
     } else {

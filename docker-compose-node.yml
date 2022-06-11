@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
 
   express:
-    image: node:12-alpine
+    image: node:gallium-alpine
     volumes:
       - type: bind
         source: ./
