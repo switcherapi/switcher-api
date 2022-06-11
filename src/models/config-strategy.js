@@ -4,6 +4,7 @@ import { recordHistory } from './common/index';
 import moment from 'moment';
 import IPCIDR from 'ip-cidr';
 import { NotFoundError } from '../exceptions';
+import { payloadReader } from '../helpers';
 
 export const StrategiesType = Object.freeze({
     NETWORK: 'NETWORK_VALIDATION',
@@ -11,7 +12,8 @@ export const StrategiesType = Object.freeze({
     NUMERIC: 'NUMERIC_VALIDATION',
     TIME: 'TIME_VALIDATION',
     DATE: 'DATE_VALIDATION',
-    REGEX: 'REGEX_VALIDATION'
+    REGEX: 'REGEX_VALIDATION',
+    PAYLOAD: 'PAYLOAD_VALIDATION'
 });
 
 export const OperationsType = Object.freeze({
@@ -21,7 +23,9 @@ export const OperationsType = Object.freeze({
     NOT_EXIST: 'NOT_EXIST',
     GREATER: 'GREATER',
     LOWER: 'LOWER',
-    BETWEEN: 'BETWEEN'
+    BETWEEN: 'BETWEEN',
+    HAS_ONE: 'HAS_ONE',
+    HAS_ALL: 'HAS_ALL'
 });
 
 const StrategyRequirementDefinition = [
@@ -58,6 +62,10 @@ const StrategyRequirementDefinition = [
         strategy: StrategiesType.REGEX,
         operations: [OperationsType.EXIST, OperationsType.NOT_EXIST, OperationsType.EQUAL, OperationsType.NOT_EQUAL],
         format: 'Hint: NOT/EQUAL forces \\b (delimiter) flag'
+    },
+    {
+        strategy: StrategiesType.PAYLOAD,
+        operations: [OperationsType.HAS_ONE, OperationsType.HAS_ALL]
     }
 ];
 
@@ -75,12 +83,12 @@ const OperationValuesValidation = [
     {
         operation: OperationsType.EXIST,
         min: 1,
-        max: process.env.MAX_EXIST_STRATEGYOPERATION
+        max: process.env.MAX_STRATEGY_OPERATION
     },
     {
         operation: OperationsType.NOT_EXIST,
         min: 1,
-        max: process.env.MAX_EXIST_STRATEGYOPERATION
+        max: process.env.MAX_STRATEGY_OPERATION
     },
     {
         operation: OperationsType.GREATER,
@@ -96,6 +104,16 @@ const OperationValuesValidation = [
         operation: OperationsType.BETWEEN,
         min: 2,
         max: 2
+    },
+    {
+        operation: OperationsType.HAS_ONE,
+        min: 1,
+        max: process.env.MAX_STRATEGY_OPERATION
+    },
+    {
+        operation: OperationsType.HAS_ALL,
+        min: 1,
+        max: process.env.MAX_STRATEGY_OPERATION
     }
 ];
 
@@ -143,6 +161,8 @@ export function processOperation(strategy, operation, input, values) {
             return processDate(operation, input, values);
         case StrategiesType.REGEX:
             return processREGEX(operation, input, values);
+        case StrategiesType.PAYLOAD:
+            return processPAYLOAD(operation, input, values);
     }
 }
 
@@ -257,6 +277,16 @@ function processREGEX(operation, input, values) {
             return input.match(`\\b${values[0]}\\b`) != null;
         case OperationsType.NOT_EQUAL:
             return input.match(`\\b${values[0]}\\b`) == null;
+    }
+}
+
+function processPAYLOAD(operation, input, values) {
+    const keys = payloadReader(JSON.parse(input));
+    switch(operation) {
+        case OperationsType.HAS_ONE:
+            return keys.filter(key => values.includes(key)).length > 0;
+        case OperationsType.HAS_ALL:
+            return values.every(element => keys.includes(element));
     }
 }
 

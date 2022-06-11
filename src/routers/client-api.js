@@ -4,7 +4,7 @@ import { checkConfig, checkConfigComponent, validate } from '../middleware/valid
 import { appAuth, appGenerateCredentials } from '../middleware/auth';
 import { resolveCriteria, checkDomain } from '../client/resolvers';
 import { getConfigs } from '../services/config';
-import { check, query } from 'express-validator';
+import { body, check, query } from 'express-validator';
 
 const router = new express.Router();
 
@@ -13,7 +13,8 @@ const router = new express.Router();
 // GET /check?key=KEY&showStrategy=true
 // GET /check?key=KEY&bypassMetric=true
 router.post('/criteria', appAuth, [
-    query('key').isLength({ min: 1 })
+    query('key').isLength({ min: 1 }),
+    body('entry.*.input').isString()
 ], validate, checkConfig, checkConfigComponent, async (req, res) => {
     try {
         const environment = req.environment;

@@ -98,7 +98,7 @@ app.get('/check', (_req, res) => {
             history: process.env.HISTORY_ACTIVATED,
             metrics: process.env.METRICS_ACTIVATED,
             max_metrics_pages: process.env.METRICS_MAX_PAGE,
-            max_stretegy_op: process.env.MAX_EXIST_STRATEGYOPERATION,
+            max_stretegy_op: process.env.MAX_STRATEGY_OPERATION,
         } 
     });
 });
