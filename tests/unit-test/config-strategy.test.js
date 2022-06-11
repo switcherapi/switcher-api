@@ -538,7 +538,15 @@ describe('Processing strategy: PAYLOAD', () => {
         }
     });
 
-    test('UNIT_PAYLOAD_SUITE - Should read keys from payload', () => {
+    const fixture_values3 = JSON.stringify({
+        description: 'Allowed IP address',
+        strategy: 'NETWORK_VALIDATION',
+        values: ['10.0.0.3/24'],
+        operation: 'EXIST',
+        env: 'default'
+    });
+
+    test('UNIT_PAYLOAD_SUITE - Should read keys from payload #1', () => {
         const keys = payloadReader(JSON.parse(fixture_values2));
         expect(keys).toEqual([                
             'product',
@@ -549,6 +557,17 @@ describe('Processing strategy: PAYLOAD', () => {
             'order.deliver.tracking',      
             'order.deliver.tracking.date', 
             'order.deliver.tracking.status'
+        ]);
+    });
+
+    test('UNIT_PAYLOAD_SUITE - Should read keys from payload #2', () => {
+        const keys = payloadReader(JSON.parse(fixture_values3));
+        expect(keys).toEqual([                
+            'description',
+            'strategy',
+            'values',
+            'operation',
+            'env'
         ]);
     });
 

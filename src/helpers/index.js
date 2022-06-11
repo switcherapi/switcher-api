@@ -21,11 +21,11 @@ export function payloadReader(payload) {
     let payloadRead = payload + '' === payload || payload || 0;
     if (Array.isArray(payloadRead))
         payloadRead = payloadRead[0];
-    
+
     return Object.keys(payloadRead)
         .flatMap(field => [field, ...payloadReader(payload[field])
         .map(nestedField => `${field}.${nestedField}`)])
-        .filter(field => !field.match(/((?=(\.\d))\2)+$/));
+        .filter(field => isNaN(Number(field)));
 }
 
 export function formatInput(input, 
