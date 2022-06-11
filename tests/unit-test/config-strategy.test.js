@@ -1,3 +1,4 @@
+import { payloadReader } from '../../src/helpers';
 import { 
     processOperation,
     validateStrategyValue,
@@ -535,6 +536,32 @@ describe('Processing strategy: PAYLOAD', () => {
                 ]
             }
         }
+    });
+
+    test('UNIT_PAYLOAD_SUITE - Should read keys from payload', () => {
+        const keys = payloadReader(JSON.parse(fixture_values2));
+        expect(keys).toEqual([                
+            'product',
+            'order',
+            'order.qty',
+            'order.deliver',
+            'order.deliver.expect',        
+            'order.deliver.tracking',      
+            'order.deliver.tracking.date', 
+            'order.deliver.tracking.status'
+        ]);
+    });
+
+    test('UNIT_PAYLOAD_SUITE - Should read keys from payload with array values', () => {
+        const keys = payloadReader({
+            order: {
+                items: ['item_1', 'item_2']
+            }
+        });
+        expect(keys).toEqual([                
+            'order',
+            'order.items'
+        ]);
     });
 
     test('UNIT_PAYLOAD_SUITE - Should return TRUE when payload has field', () => {

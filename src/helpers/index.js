@@ -24,7 +24,8 @@ export function payloadReader(payload) {
     
     return Object.keys(payloadRead)
         .flatMap(field => [field, ...payloadReader(payload[field])
-        .map(nestedField => `${field}.${nestedField}`)]);
+        .map(nestedField => `${field}.${nestedField}`)])
+        .filter(field => !/\d+$/.test(field));
 }
 
 export function formatInput(input, 
