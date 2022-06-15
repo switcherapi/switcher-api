@@ -212,24 +212,25 @@ function checkFlags(config, group, domain, environment) {
     }
 }
 
-function checkStrategy(context, strategies, environment) {
+function checkStrategy(entry, strategies, environment) {
     if (strategies) {
         for (const strategy of strategies) {
-            if (!strategy.activated[environment]) continue;
-            checkStrategyInput(context.entry ? 
-                context.entry.filter(e => e.strategy == strategy.strategy) : [], 
-                strategy);
+            if (!strategy.activated[environment]) 
+                continue;
+            
+            const strategyEntry = entry.filter(e => e.strategy === strategy.strategy);
+            checkStrategyInput(strategyEntry, strategy);
         }
     }
 }
 
-function checkStrategyInput(entry, strategy) {
+function checkStrategyInput(entry, { strategy, operation, values }) {
     if (entry.length) {
-        if (!processOperation(strategy.strategy, strategy.operation, entry[0].input, strategy.values)) {
-            throw new Error(`Strategy '${strategy.strategy}' does not agree`);
+        if (!processOperation(strategy, operation, entry[0].input, values)) {
+            throw new Error(`Strategy '${strategy}' does not agree`);
         }
     } else {
-        throw new Error(`Strategy '${strategy.strategy}' did not receive any input`);
+        throw new Error(`Strategy '${strategy}' did not receive any input`);
     }
 }
 
@@ -258,7 +259,7 @@ export async function resolveCriteria(config, context, strategyFilter) {
 
     try {
         checkFlags(config, group, domain, environment);
-        checkStrategy(context, strategies, environment);
+        checkStrategy(context.entry, strategies, environment);
         await resolveRelay(config, environment, context.entry, response);
     } catch (e) {
         response.result = false;
