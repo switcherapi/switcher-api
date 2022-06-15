@@ -635,4 +635,10 @@ describe('Processing strategy: PAYLOAD', () => {
             ])
         ).toBe(false);
     });
+
+    test('UNIT_PAYLOAD_SUITE - Should return FALSE when payload is not a JSON string', () => {
+        expect(processOperation(
+            StrategiesType.PAYLOAD, OperationsType.HAS_ALL, 'NOT_JSON', [])
+        ).toBe(false);
+    });
 });

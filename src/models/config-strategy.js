@@ -4,7 +4,7 @@ import { recordHistory } from './common/index';
 import moment from 'moment';
 import IPCIDR from 'ip-cidr';
 import { NotFoundError } from '../exceptions';
-import { payloadReader } from '../helpers';
+import { parseJSON, payloadReader } from '../helpers';
 
 export const StrategiesType = Object.freeze({
     NETWORK: 'NETWORK_VALIDATION',
@@ -156,9 +156,9 @@ export function processOperation(strategy, operation, input, values) {
         case StrategiesType.NUMERIC:
             return processNUMERIC(operation, input, values);
         case StrategiesType.TIME:
-            return processTime(operation, input, values);
+            return processTIME(operation, input, values);
         case StrategiesType.DATE:
-            return processDate(operation, input, values);
+            return processDATE(operation, input, values);
         case StrategiesType.REGEX:
             return processREGEX(operation, input, values);
         case StrategiesType.PAYLOAD:
@@ -237,7 +237,7 @@ function processNUMERIC(operation, input, values) {
     }
 }
 
-function processTime(operation, input, values) {
+function processTIME(operation, input, values) {
     const today = moment().format('YYYY-MM-DD');
 
     switch(operation) {
@@ -250,7 +250,7 @@ function processTime(operation, input, values) {
     }
 }
 
-function processDate(operation, input, values) {
+function processDATE(operation, input, values) {
     switch(operation) {
         case OperationsType.LOWER:
             return moment(input).isSameOrBefore(values[0]);
@@ -281,7 +281,11 @@ function processREGEX(operation, input, values) {
 }
 
 function processPAYLOAD(operation, input, values) {
-    const keys = payloadReader(JSON.parse(input));
+    const inputJson = parseJSON(input);
+    if (!inputJson)
+        return false;
+
+    const keys = payloadReader(inputJson);
     switch(operation) {
         case OperationsType.HAS_ONE:
             return keys.filter(key => values.includes(key)).length > 0;

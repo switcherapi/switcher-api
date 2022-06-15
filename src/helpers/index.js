@@ -28,6 +28,14 @@ export function payloadReader(payload) {
         .filter(field => isNaN(Number(field)));
 }
 
+export function parseJSON(str) {
+    try {
+        return JSON.parse(str);
+    } catch (e) {
+        return undefined;
+    }
+}
+
 export function formatInput(input, 
     options = { 
         toUpper: false, 
