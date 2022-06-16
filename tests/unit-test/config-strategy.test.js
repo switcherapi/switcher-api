@@ -531,7 +531,8 @@ describe('Processing strategy: PAYLOAD', () => {
                     },
                     {
                         date: '2019-12-10',
-                        status: 'delivered'
+                        status: 'delivered',
+                        comments: 'comments'
                     }
                 ]
             }
@@ -556,7 +557,8 @@ describe('Processing strategy: PAYLOAD', () => {
             'order.deliver.expect',        
             'order.deliver.tracking',      
             'order.deliver.tracking.date', 
-            'order.deliver.tracking.status'
+            'order.deliver.tracking.status',
+            'order.deliver.tracking.comments'
         ]);
     });
 
