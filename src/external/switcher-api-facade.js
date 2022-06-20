@@ -48,7 +48,7 @@ export async function checkDomain(req) {
     const total = await getTotalDomainsByOwner(req.admin._id);
     switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
         checkValue(`domain#${req.admin._id}`),
-        checkNumeric(total)
+        checkNumeric(String(total))
     ]), 'Domain limit has been reached.');
 }
 
@@ -59,7 +59,7 @@ export async function checkGroup(domain) {
     const total = await getTotalGroupsByDomainId(domain._id);
     switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
         checkValue(`group#${domain.owner}`),
-        checkNumeric(total)
+        checkNumeric(String(total))
     ]), 'Group limit has been reached.');
 }
 
@@ -71,7 +71,7 @@ export async function checkSwitcher(group) {
     const { owner } = await getDomainById(group.domain);
     switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
         checkValue(`switcher#${owner}`),
-        checkNumeric(total)
+        checkNumeric(String(total))
     ]), 'Switcher limit has been reached.');
 }
 
@@ -83,7 +83,7 @@ export async function checkComponent(domain) {
     const { owner } = await getDomainById(domain);
     switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
         checkValue(`component#${owner}`),
-        checkNumeric(total)
+        checkNumeric(String(total))
     ]), 'Component limit has been reached.');
 }
 
@@ -95,7 +95,7 @@ export async function checkEnvironment(domain) {
     const { owner } = await getDomainById(domain);
     switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
         checkValue(`environment#${owner}`),
-        checkNumeric(total)
+        checkNumeric(String(total))
     ]), 'Environment limit has been reached.');
 }
 
@@ -107,7 +107,7 @@ export async function checkTeam(domain) {
     const { owner } = await getDomainById(domain);
     switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
         checkValue(`team#${owner}`),
-        checkNumeric(total)
+        checkNumeric(String(total))
     ]), 'Team limit has been reached.');
 }
 

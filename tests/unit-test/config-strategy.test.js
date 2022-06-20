@@ -157,9 +157,15 @@ describe('Processing strategy: NUMERIC', () => {
         '1.5'
     ];
 
-    test('UNIT_STRATEGY_SUITE - Should return TRUE when input EXIST in values', () => {
+    test('UNIT_STRATEGY_SUITE - Should return TRUE when input EXIST in values - String type', () => {
         const result = processOperation(
             StrategiesType.NUMERIC, OperationsType.EXIST, '3', fixture_values2);
+        expect(result).toBe(true);
+    });
+
+    test('UNIT_STRATEGY_SUITE - Should return TRUE when input EXIST in values - Number type', () => {
+        const result = processOperation(
+            StrategiesType.NUMERIC, OperationsType.EXIST, 3, fixture_values2);
         expect(result).toBe(true);
     });
 
