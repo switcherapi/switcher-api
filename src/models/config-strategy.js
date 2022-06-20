@@ -221,19 +221,19 @@ function processVALUE(operation, input, values) {
 function processNUMERIC(operation, input, values) {
     switch(operation) {
         case OperationsType.EXIST:
-            return processVALUE(operation, input, values);
+            return processVALUE(operation, String(input), values);
         case OperationsType.NOT_EXIST:
-            return processVALUE(operation, input, values);
+            return processVALUE(operation, String(input), values);
         case OperationsType.EQUAL:
-            return processVALUE(operation, input, values);
+            return processVALUE(operation, String(input), values);
         case OperationsType.NOT_EQUAL:
-            return processVALUE(operation, input, values);
+            return processVALUE(operation, String(input), values);
         case OperationsType.LOWER:
-            return input < values[0];
+            return String(input) < values[0];
         case OperationsType.GREATER:
-            return input > values[0];
+            return String(input) > values[0];
         case OperationsType.BETWEEN:
-            return input >= values[0] && input <= values[1];
+            return String(input) >= values[0] && String(input) <= values[1];
     }
 }
 
