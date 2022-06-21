@@ -218,15 +218,15 @@ function checkStrategy(entry, strategies, environment) {
             if (!strategy.activated[environment]) 
                 continue;
             
-            const strategyEntry = entry.filter(e => e.strategy === strategy.strategy);
-            checkStrategyInput(strategyEntry, strategy);
+            checkStrategyInput(entry, strategy);
         }
     }
 }
 
 function checkStrategyInput(entry, { strategy, operation, values }) {
-    if (entry.length) {
-        if (!processOperation(strategy, operation, entry[0].input, values)) {
+    if (entry && entry.length) {
+        const strategyEntry = entry.filter(e => e.strategy === strategy);
+        if (strategyEntry.length == 0 || !processOperation(strategy, operation, strategyEntry[0].input, values)) {
             throw new Error(`Strategy '${strategy}' does not agree`);
         }
     } else {

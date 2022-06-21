@@ -200,7 +200,7 @@ describe('Testing criteria [GraphQL] ', () => {
                 [StrategiesType.VALUE, 'USER_2']]))
             );
 
-        const expected = graphqlUtils.criteriaResult('false', `Strategy '${StrategiesType.NETWORK}' did not receive any input`);
+        const expected = graphqlUtils.criteriaResult('false', `Strategy '${StrategiesType.NETWORK}' does not agree`);
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
     });
@@ -513,6 +513,37 @@ describe('Testing criteria [REST] ', () => {
         expect(req.body.strategies.length).toEqual(4);
         expect(req.body.reason).toEqual('Success');
         expect(req.body.result).toBe(true);
+    });
+
+    test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Missing input', async () => {
+        const req = await request(app)
+            .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                entry: [
+                    {
+                        strategy: StrategiesType.VALUE,
+                        input: 'USER_1'
+                    }]})
+            .expect(200);
+
+        expect(req.statusCode).toBe(200);
+        expect(req.body.strategies.length).toEqual(4);
+        expect(req.body.reason).toEqual(`Strategy '${StrategiesType.NETWORK}' does not agree`);
+        expect(req.body.result).toBe(false);
+    });
+
+    test('CLIENT_SUITE - Should NOT return success on a entry-based CRITERIA response - Missing entry', async () => {
+        const req = await request(app)
+            .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({})
+            .expect(200);
+
+        expect(req.statusCode).toBe(200);
+        expect(req.body.strategies.length).toEqual(4);
+        expect(req.body.reason).toEqual(`Strategy '${StrategiesType.VALUE}' did not receive any input`);
+        expect(req.body.result).toBe(false);
     });
 
     test('CLIENT_SUITE - Should NOT return success on a entry-based CRITERIA response - Component not registered', async () => {
