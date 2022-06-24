@@ -22,7 +22,8 @@ export const StrategiesToRelayDataType = Object.freeze({
     NUMERIC_VALIDATION: 'numeric',
     TIME_VALIDATION: 'time',
     DATE_VALIDATION: 'date',
-    REGEX_VALIDATION: 'regex'
+    REGEX_VALIDATION: 'regex',
+    PAYLOAD_VALIDATION: 'payload'
 });
 
 const configSchema = new mongoose.Schema({
