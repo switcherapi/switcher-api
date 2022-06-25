@@ -1,0 +1,82 @@
+name: Release CI
+
+on:
+  release:
+    types: [ created ]
+
+jobs:
+  build-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version:  16.x
+
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.7.0
+        with:
+          mongodb-version: 4.4
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+        env:
+          MONGODB_URI: mongodb://127.0.0.1:27017/switcher-api-test
+          HISTORY_ACTIVATED: true
+          JWT_ADMIN_TOKEN_RENEW_INTERVAL: 5m
+          JWT_CLIENT_TOKEN_EXP_TIME: 5m
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SWITCHER_SLACK_JWT_SECRET: ${{ secrets.SWITCHER_SLACK_JWT_SECRET }}
+          GOOGLE_RECAPTCHA_SECRET: ${{ secrets.GOOGLE_RECAPTCHA_SECRET }}
+          GOOGLE_SKIP_AUTH: false
+          MAX_STRATEGY_OPERATION: 100
+          METRICS_ACTIVATED: true
+          METRICS_MAX_PAGE: 50
+          SWITCHER_API_ENABLE: false
+          SWITCHER_API_LOGGER: false
+  
+  docker:
+    name: Publish Docker Image
+    needs: [ build-test ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: trackerforce/switcher-api
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
