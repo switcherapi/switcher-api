@@ -1,4 +1,4 @@
-import { Switcher, checkNumeric, checkValue } from 'switcher-client';
+import { Switcher, checkValue, checkPayload } from 'switcher-client';
 import { EnvType } from '../models/environment';
 import { BadRequestError, FeatureUnavailableError } from '../exceptions';
 import { getDomainById, getTotalDomainsByOwner } from '../services/domain';
@@ -47,8 +47,11 @@ export async function checkDomain(req) {
 
     const total = await getTotalDomainsByOwner(req.admin._id);
     switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkValue(`domain#${req.admin._id}`),
-        checkNumeric(String(total))
+        checkPayload(JSON.stringify({
+            feature: 'domain',
+            owner: req.admin._id,
+            total
+        }))
     ]), 'Domain limit has been reached.');
 }
 
@@ -58,8 +61,11 @@ export async function checkGroup(domain) {
 
     const total = await getTotalGroupsByDomainId(domain._id);
     switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkValue(`group#${domain.owner}`),
-        checkNumeric(String(total))
+        checkPayload(JSON.stringify({
+            feature: 'group',
+            owner: domain.owner,
+            total
+        }))
     ]), 'Group limit has been reached.');
 }
 
@@ -70,8 +76,11 @@ export async function checkSwitcher(group) {
     const total = await getTotalConfigsByDomainId(group.domain);
     const { owner } = await getDomainById(group.domain);
     switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkValue(`switcher#${owner}`),
-        checkNumeric(String(total))
+        checkPayload(JSON.stringify({
+            feature: 'switcher',
+            owner,
+            total
+        }))
     ]), 'Switcher limit has been reached.');
 }
 
@@ -82,8 +91,11 @@ export async function checkComponent(domain) {
     const total = await getTotalComponentsByDomainId(domain);
     const { owner } = await getDomainById(domain);
     switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkValue(`component#${owner}`),
-        checkNumeric(String(total))
+        checkPayload(JSON.stringify({
+            feature: 'component',
+            owner,
+            total
+        }))
     ]), 'Component limit has been reached.');
 }
 
@@ -94,8 +106,11 @@ export async function checkEnvironment(domain) {
     const total = await getTotalEnvByDomainId(domain);
     const { owner } = await getDomainById(domain);
     switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkValue(`environment#${owner}`),
-        checkNumeric(String(total))
+        checkPayload(JSON.stringify({
+            feature: 'environment',
+            owner,
+            total
+        }))
     ]), 'Environment limit has been reached.');
 }
 
@@ -106,8 +121,11 @@ export async function checkTeam(domain) {
     const total = await getTotalTeamsByDomainId(domain);
     const { owner } = await getDomainById(domain);
     switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkValue(`team#${owner}`),
-        checkNumeric(String(total))
+        checkPayload(JSON.stringify({
+            feature: 'team',
+            owner,
+            total
+        }))
     ]), 'Team limit has been reached.');
 }
 
@@ -117,7 +135,10 @@ export async function checkMetrics(config) {
 
     const { owner } = await getDomainById(config.domain);
     const flag = await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkValue(`metrics#${owner}`)
+        checkPayload(JSON.stringify({
+            feature: 'metrics',
+            owner
+        }))
     ]);
 
     if (!flag) {
@@ -138,7 +159,10 @@ export async function checkHistory(domain) {
 
     const { owner } = await getDomainById(domain);
     return checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkValue(`history#${owner}`)
+        checkPayload(JSON.stringify({
+            feature: 'history',
+            owner
+        }))
     ]);
 }
 
