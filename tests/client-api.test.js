@@ -816,11 +816,32 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected108));
     });
 
+    test('CLIENT_SUITE - Should return domain Flat-structure - By Switcher Id', async () => {
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(graphqlUtils.configurationQuery([['domain', domainId], ['config_id', configId]]));
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected108));
+    });
+
     test('CLIENT_SUITE - Should return domain Flat-structure - By Group', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(graphqlUtils.configurationQuery([['domain', domainId], ['group', 'Group Test']]));
+
+        const result = JSON.parse(req.text);
+        expect(req.statusCode).toBe(200);
+        expect(result.data.configuration.group[0].name).toEqual('Group Test');
+    });
+
+    test('CLIENT_SUITE - Should return domain Flat-structure - By Group Id', async () => {
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(graphqlUtils.configurationQuery([['domain', domainId], ['group_id', groupConfigId]]));
 
         const result = JSON.parse(req.text);
         expect(req.statusCode).toBe(200);

@@ -19,6 +19,7 @@ export async function getGroupConfigById(id, lean = false) {
 
 export async function getGroupConfigs(where, lean = false) {
     const query = GroupConfig.find();
+    if (where.id) query.where('_id', where.id);
     if (where.domain) query.where('domain', where.domain);
     if (where.name) query.where('name', where.name);
     if (lean) query.lean();

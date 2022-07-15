@@ -8,29 +8,31 @@ import { getSlack } from '../services/slack';
 import { getDomainById } from '../services/domain';
 import { getComponents } from '../services/component';
 
-async function resolveConfigByConfig(key, domainId) {
-    const config = await getConfigs({ key, domain: domainId }, true);
+async function resolveConfigByConfig(domainId, key, configId) {
+    const config = await getConfigs({ 
+        id: configId, 
+        key, domain: domainId 
+    }, true);
+
     if (config.length > 0) {
         return { config };
-    } else {
-        return undefined;
     }
+
+    return undefined;
 }
 
-async function resolveGroup(domainId, groupConfig = undefined) {
-    let query = {
-        domain: domainId
-    };
+async function resolveGroup(domainId, groupConfig, groupId) {
+    const group = await getGroupConfigs({ 
+        id: groupId, 
+        name: groupConfig, 
+        domain: domainId 
+    }, true);
 
-    if (groupConfig) 
-        query.name = groupConfig;
-
-    const group = await getGroupConfigs(query, true);
     if (group.length > 0) {
         return { group };
-    } else {
-        return undefined;
     }
+
+    return undefined;
 }
 
 async function resolveSlackInstallation(args) {
@@ -53,12 +55,12 @@ export async function resolveConfiguration(args, context) {
     if (context.domain || args.domain) {
         context.environment = args.environment;
         context.domain = context.domain || args.domain;
-        if (args.key) {
-            return resolveConfigByConfig(args.key, context.domain);
+        if (args.key || args.config_id) {
+            return resolveConfigByConfig(context.domain, args.key, args.config_id);
         }
 
-        if (args.group) {
-            return resolveGroup(context.domain, args.group);
+        if (args.group || args.group_id) {
+            return resolveGroup(context.domain, args.group, args.group_id);
         }
 
         return resolveGroup(context.domain);

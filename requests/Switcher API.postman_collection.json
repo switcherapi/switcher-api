@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "cdfeeb52-cd3e-45ec-8478-155390a22621",
+		"_postman_id": "0cc46f7a-eeac-44a1-909e-4240909b7614",
 		"name": "Switcher API",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "9436108"
 	},
 	"item": [
 		{
@@ -4457,7 +4458,7 @@
 							"query": [
 								{
 									"key": "",
-									"value": null,
+									"value": "",
 									"disabled": true
 								}
 							]
@@ -4504,7 +4505,7 @@
 							"query": [
 								{
 									"key": "",
-									"value": null,
+									"value": "",
 									"disabled": true
 								}
 							]
@@ -4551,7 +4552,7 @@
 							"query": [
 								{
 									"key": "",
-									"value": null,
+									"value": "",
 									"disabled": true
 								}
 							]
@@ -4606,7 +4607,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"domain\": \"My Domain\",\n\t\"component\": \"CustomerAPI\",\n\t\"environment\": \"default\"\n}",
+							"raw": "{\n\t\"domain\": \"Test Domain\",\n\t\"component\": \"App\",\n\t\"environment\": \"default\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4667,7 +4668,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"entry\": [\n\t\t{\n\t\t\t\"strategy\": \"VALUE_VALIDATION\",\n\t\t\t\"input\": \"Roger\"\n\t\t}]\n}",
+							"raw": "{\n\t\"entry\": [\n\t\t{\n\t\t\t\"strategy\": \"PAYLOAD_VALIDATION\",\n\t\t\t\"input\": \"{ \\\"status\\\": \\\"ready\\\" }\"\n\t\t}]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4675,7 +4676,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/criteria?showReason=true&showStrategy=true&bypassMetric=true&key=FEATURE01",
+							"raw": "{{url}}/criteria?showReason=true&showStrategy=true&key=TEST_SWITCH",
 							"host": [
 								"{{url}}"
 							],
@@ -4693,11 +4694,12 @@
 								},
 								{
 									"key": "bypassMetric",
-									"value": "true"
+									"value": "true",
+									"disabled": true
 								},
 								{
 									"key": "key",
-									"value": "FEATURE01"
+									"value": "TEST_SWITCH"
 								}
 							]
 						}
@@ -5063,7 +5065,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "{\r\n    configuration(domain: \"5e0ece606f4f994eac9007ae\") {\r\n    # configuration(domain: \"5e0ece606f4f994eac9007ae\", group: \"Project 2\") {\r\n    # configuration(domain: \"5e0ece606f4f994eac9007ae\", group: \"Release 1\") {\r\n    # configuration(domain: \"5e0ece606f4f994eac9007ae\", key: \"FEATURE01\", environment: \"default\") {\r\n    # configuration(domain: \"5e4f9d8966e06b59c8254500\", key: \"FEATURE01\", environment: \"default\") {\r\n        domain {\r\n            name\r\n            activated\r\n        }\r\n        group {\r\n            name\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n        }\r\n        config {\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
+								"query": "{\r\n    configuration(domain: \"5e4f9d8966e06b59c8254500\", key: \"TEST_SWITCH\") {\r\n    # configuration(domain: \"5e4f9d8966e06b59c8254500\", configId: \"6270b2fe68bceea783c450b4\") {\r\n    # configuration(domain: \"5e4f9d8966e06b59c8254500\", groupId: \"6270b2f568bceea783c45081\") {\r\n    # configuration(domain: \"5e4f9d8966e06b59c8254500\", group: \"Test group\") {\r\n    # configuration(domain: \"5e0ece606f4f994eac9007ae\", key: \"FEATURE01\", environment: \"default\") {\r\n        domain {\r\n            name\r\n            activated\r\n        }\r\n        group {\r\n            _id\r\n            name\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n        }\r\n        config {\r\n            _id\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
 								"variables": ""
 							}
 						},
@@ -5128,7 +5130,7 @@
 					"response": []
 				},
 				{
-					"name": "Client - Configuration (Salck-GraphQL) - Configs",
+					"name": "Client - Configuration (Slack-GraphQL) - Configs",
 					"request": {
 						"method": "POST",
 						"header": [],
