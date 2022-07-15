@@ -65,7 +65,13 @@ const queryType = new GraphQLObjectType({
                 group: {
                     type: GraphQLString
                 },
+                group_id: {
+                    type: GraphQLString
+                },
                 key: {
+                    type: GraphQLString
+                },
+                config_id: {
                     type: GraphQLString
                 },
                 environment: {

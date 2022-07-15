@@ -176,6 +176,22 @@ export const domainType = new GraphQLObjectType({
         description: {
             type: GraphQLString
         },
+        owner: {
+            type: GraphQLString
+        },
+        transfer: {
+            type: GraphQLBoolean
+        },
+        integrations: { 
+            type: new GraphQLObjectType({
+                name: 'Integrations',
+                fields: {
+                    slack: { 
+                        type: GraphQLString
+                    }
+                }
+            })
+        },
         activated: {
             type: GraphQLBoolean,
             resolve: (source, _args, { environment }) => {
