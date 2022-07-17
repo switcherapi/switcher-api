@@ -304,3 +304,7 @@ export const expected110 = `
 
 export const expected111 = `
     {"data":{"configuration":{"environments":["default","QA"]}}}`;
+
+export const expected112 = `
+    {"data":{"configuration":{"domain":{"name":"Domain","description":"Test Domain","activated":true,"statusByEnv":[{"env":"default","value":true}]},
+    "group":null,"config":null,"strategies":null}}}`;

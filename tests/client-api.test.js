@@ -120,14 +120,14 @@ describe('Testing criteria [GraphQL] ', () => {
         expect(req.body).toMatchObject(JSON.parse(graphqlUtils.expected100));
     });
 
-    test('CLIENT_SUITE - Should NOT return on Flat view resolved by an unknown Group name', async () => {
+    test('CLIENT_SUITE - Should return on Flat view resolved without an unknown Group name', async () => {
         const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
             .send(graphqlUtils.configurationQuery([['group', 'UNKNOWN GROUP NAME']]));
 
         expect(req.statusCode).toBe(200);
-        expect(JSON.parse(req.text).data.configuration).toEqual(null);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected112));
     });
 
     test('CLIENT_SUITE - Should return success on Flat view resolved by Config Key', async () => {
@@ -168,14 +168,14 @@ describe('Testing criteria [GraphQL] ', () => {
             }).expect(401);
     });
 
-    test('CLIENT_SUITE - Should NOT return on Flat view resolved by an unknown Config Key', async () => {
+    test('CLIENT_SUITE - Should return on Flat view without unknown Config Key', async () => {
         const req = await request(app)
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
             .send(graphqlUtils.configurationQuery([['key', 'UNKNOWN_CONFIG_KEY']]));
 
         expect(req.statusCode).toBe(200);
-        expect(JSON.parse(req.text).data.configuration).toEqual(null);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected112));
     });
 
     test('CLIENT_SUITE - Should NOT return success on a simple CRITERIA response - Bad login input', async () => {
