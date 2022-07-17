@@ -18,10 +18,10 @@ async function resolveConfigByConfig(domainId, key, configId) {
         return { config };
     }
 
-    return undefined;
+    return [];
 }
 
-async function resolveGroup(domainId, groupConfig, groupId) {
+async function resolveGroupByGroup(domainId, groupConfig, groupId) {
     const group = await getGroupConfigs({ 
         id: groupId, 
         name: groupConfig, 
@@ -32,7 +32,7 @@ async function resolveGroup(domainId, groupConfig, groupId) {
         return { group };
     }
 
-    return undefined;
+    return [];
 }
 
 async function resolveSlackInstallation(args) {
@@ -59,11 +59,7 @@ export async function resolveConfiguration(args, context) {
             return resolveConfigByConfig(context.domain, args.key, args.config_id);
         }
 
-        if (args.group || args.group_id) {
-            return resolveGroup(context.domain, args.group, args.group_id);
-        }
-
-        return resolveGroup(context.domain);
+        return resolveGroupByGroup(context.domain, args.group, args.group_id);
     }
 }
 
