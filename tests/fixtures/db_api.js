@@ -71,6 +71,22 @@ export const environment1 = {
     owner: adminMasterAccountId
 };
 
+export const environment2Id = new mongoose.Types.ObjectId();
+export const environment2 = {
+    _id: environment2Id,
+    name: 'dev',
+    domain: domainId,
+    owner: adminMasterAccountId
+};
+
+export const environment3Id = new mongoose.Types.ObjectId();
+export const environment3 = {
+    _id: environment3Id,
+    name: 'staging',
+    domain: domainId,
+    owner: adminMasterAccountId
+};
+
 export const groupConfigId = new mongoose.Types.ObjectId();
 export const groupConfigDocument = {
     _id: groupConfigId,
@@ -178,6 +194,10 @@ export const slack = {
     team_id: 'TEAM_ID',
     user_id: 'USER_ID',
     domain: domainId,
+    settings: {
+        ignored_environments: ['dev'],
+        frozen_environments: ['staging']
+    },
     installation_payload : {
         incoming_webhook_channel : 'Approval Team',
         incoming_webhook_channel_id : 'CHANNEL_ID'
@@ -208,6 +228,8 @@ export const setupDatabase = async () => {
     await new Admin(adminAccount).save();
 
     await new Environment(environment1).save();
+    await new Environment(environment2).save();
+    await new Environment(environment3).save();
     await new Domain(domainDocument).save();
     await new GroupConfig(groupConfigDocument).save();
     await new Config(config1Document).save();

@@ -103,10 +103,10 @@ router.post('/slack/v1/ticket/validate', slackAuth, [
 ], validate, async (req, res) => {
     try {
         const ticket_content = createTicketContent(req);
-        await Services.validateTicket(
+        const validation = await Services.validateTicket(
             ticket_content, req.body.enterprise_id, req.body.team_id);
-            
-        res.status(200).send({ message: 'Ticket verified' });
+        
+        res.status(200).send({ message: 'Ticket validated', result: validation.result });
     } catch (e) {
         responseException(res, e, 400);
     }
