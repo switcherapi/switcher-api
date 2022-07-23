@@ -1,6 +1,6 @@
 import Slack from '../models/slack';
 import { checkValue, Switcher } from 'switcher-client';
-import { TicketStatusType, SLACK_SUB } from '../models/slack_ticket';
+import { TicketStatusType, SLACK_SUB, TicketValidationType } from '../models/slack_ticket';
 import { NotFoundError, PermissionError } from '../exceptions';
 import { checkSlackIntegration, checkFeature, SwitcherKeys } from '../external/switcher-api-facade';
 import { getConfig } from './config';
@@ -141,7 +141,19 @@ export async function resetTicketHistory(enterprise_id, team_id, admin) {
 
 export async function validateTicket(ticket_content, enterprise_id, team_id) {
     const slack = await getSlackOrError({ enterprise_id, team_id });
-    return canCreateTicket(slack, ticket_content);
+
+    const ticket = await canCreateTicket(slack, ticket_content);
+    const { ignored_environments, frozen_environments } = slack.settings;
+
+    if (frozen_environments?.includes(ticket_content.environment))
+        return { result: TicketValidationType.FROZEN_ENVIRONMENT };
+
+    if (ignored_environments?.includes(ticket_content.environment)) {
+        await approveChange(slack.domain, ticket_content);
+        return { result: TicketValidationType.IGNORED_ENVIRONMENT };
+    }
+
+    return { result: TicketValidationType.VALIDATED, ticket};
 }
 
 export async function createTicket(ticket_content, enterprise_id, team_id) {
@@ -176,12 +188,8 @@ export async function processTicket(enterprise_id, team_id, ticket_id, approved)
         throw new NotFoundError('Ticket not found');
 
     if (approved) {
-        ticket[0].ticket_approvals += 1;
-        
-        if (slack.settings.approvals >= ticket[0].ticket_approvals) {
-            ticket[0].ticket_status = TicketStatusType.APPROVED;
-            await closeTicket(slack.domain, ticket[0]);
-        }
+        ticket[0].ticket_status = TicketStatusType.APPROVED;
+        await closeTicket(slack.domain, ticket[0]);
     } else {
         ticket[0].ticket_status = TicketStatusType.DENIED;
         await closeTicket(null, ticket[0]);

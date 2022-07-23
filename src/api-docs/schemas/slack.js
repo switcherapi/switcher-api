@@ -28,10 +28,6 @@ const ticket = {
             enum: Object.values(TicketStatusType),
             default: TicketStatusType.OPENED
         },
-        ticket_approvals: {
-            type: 'number',
-            description: 'The number of approvals'
-        },
         date_closed: {
             type: 'string',
             description: 'The date closed'
@@ -175,9 +171,19 @@ const slack = {
         settings: {
             type: 'object',
             properties: {
-                approvals: {
-                    type: 'number',
-                    description: 'The number of approvals required to approve a ticket'
+                ignored_environments: {
+                    type: 'array',
+                    description: 'Environments that should be ignored for the approval request',
+                    items: {
+                        type: 'string'
+                    }
+                },
+                frozen_environments: {
+                    type: 'array',
+                    description: 'Environments that should not change',
+                    items: {
+                        type: 'string'
+                    }
                 }
             }
         },

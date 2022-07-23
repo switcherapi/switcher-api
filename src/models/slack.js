@@ -28,11 +28,12 @@ const slackSchema = new mongoose.Schema({
         type: Object
     },
     settings: {
-        approvals: {
-            type: Number,
-            required: true,
-            default: 1
-        }
+        ignored_environments: [{
+            type: String    
+        }],
+        frozen_environments: [{
+            type: String    
+        }]
     },
     tickets: [slackTicketSchema]
 }, {

@@ -7,6 +7,12 @@ export const TicketStatusType = Object.freeze({
     DENIED: 'DENIED'
 });
 
+export const TicketValidationType = Object.freeze({
+    VALIDATED: 'VALIDATED',
+    IGNORED_ENVIRONMENT: 'IGNORED_ENVIRONMENT',
+    FROZEN_ENVIRONMENT: 'FROZEN_ENVIRONMENT'
+});
+
 export const slackTicketSchema = new mongoose.Schema({
     environment: {
         type: String,
@@ -31,10 +37,6 @@ export const slackTicketSchema = new mongoose.Schema({
         enum: Object.values(TicketStatusType),
         default: TicketStatusType.OPENED,
         required: true
-    },
-    ticket_approvals: {
-        type: Number,
-        default: 0
     },
     date_closed: {
         type: Date
