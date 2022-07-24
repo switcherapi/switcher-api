@@ -226,4 +226,15 @@ router.delete('/slack/v1/installation/unlink', auth, [
     }
 });
 
+router.patch('/slack/v1/settings/:param/:domain', auth, [
+    check('domain').isMongoId()
+], validate, async (req, res) => {
+    try {
+        const slack = await Services.updateSettings(req.params.domain, req.params.param, req.body);
+        res.send(slack.settings);
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+});
+
 export default router;

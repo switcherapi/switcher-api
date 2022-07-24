@@ -276,5 +276,22 @@ export default {
                 }
             }
         }
+    },
+    '/slack/v1/settings/:param/:domain': {
+        patch: {
+            tags: ['Switcher Slack App'],
+            description: 'Update Slack Installation settings given a parameter',
+            security: [{ bearerAuth: [] }],
+            parameters: [
+                pathParameter('param', 'Parameter to be updated', 'string', true),
+                pathParameter('domain', 'The domain ID', 'string', true)
+            ],
+            responses: {
+                200: {
+                    description: 'The installation settings was updated',
+                    content: commonSchemaContent('SlackInstallationSettings')
+                }
+            }
+        }
     }
 };

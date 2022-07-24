@@ -462,6 +462,82 @@ describe('Slack Installation', () => {
 
 });
 
+describe('Slack Settings', () => {
+    beforeAll(setupDatabase);
+
+    test('SLACK_SUIT - Should update ignored environments', async () => {
+        //given
+        let slackDb = await Services.getSlack({ id: slack._id });
+        expect(slackDb.settings.ignored_environments).toEqual(
+            expect.arrayContaining(['dev']),
+        );
+
+        //test
+        let response = await request(app)
+            .patch(`/slack/v1/settings/${TicketValidationType.IGNORED_ENVIRONMENT}/${domainId}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                environments: ['dev', 'dev1']
+            }).expect(200);
+
+        slackDb = await Services.getSlack({ id: slack._id });
+        expect(response.body).toMatchObject(slackDb.settings);
+        expect(slackDb.settings.ignored_environments).toEqual(
+            expect.arrayContaining(['dev', 'dev1']),
+        );
+    });
+
+    test('SLACK_SUIT - Should update frozen environments', async () => {
+        //given
+        let slackDb = await Services.getSlack({ id: slack._id });
+        expect(slackDb.settings.frozen_environments).toEqual(
+            expect.arrayContaining(['staging']),
+        );
+
+        //test
+        let response = await request(app)
+            .patch(`/slack/v1/settings/${TicketValidationType.FROZEN_ENVIRONMENT}/${domainId}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                environments: ['staging', 'staging1']
+            }).expect(200);
+
+        slackDb = await Services.getSlack({ id: slack._id });
+        expect(response.body).toMatchObject(slackDb.settings);
+        expect(slackDb.settings.frozen_environments).toEqual(
+            expect.arrayContaining(['staging', 'staging1']),
+        );
+    });
+
+    test('SLACK_SUIT - Should NOT update settings - Invalid Domain Id', async () => {
+        await request(app)
+            .patch(`/slack/v1/settings/${TicketValidationType.IGNORED_ENVIRONMENT}/INVALID`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                environments: ['dev', 'dev1']
+            }).expect(422);
+    });
+
+    test('SLACK_SUIT - Should NOT update settings - Slack Installation not found', async () => {
+        await request(app)
+            .patch(`/slack/v1/settings/${TicketValidationType.IGNORED_ENVIRONMENT}/${new mongoose.Types.ObjectId()}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                environments: ['dev', 'dev1']
+            }).expect(404);
+    });
+
+    test('SLACK_SUIT - Should NOT update settings - Invalid Parameter', async () => {
+        await request(app)
+            .patch(`/slack/v1/settings/INVALID/${domainId}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                environments: ['dev', 'dev1']
+            }).expect(400);
+    });
+
+});
+
 describe('Slack Route - Create Ticket', () => {
     beforeAll(setupDatabase);
 

@@ -1,7 +1,7 @@
 import Slack from '../models/slack';
 import { checkValue, Switcher } from 'switcher-client';
 import { TicketStatusType, SLACK_SUB, TicketValidationType } from '../models/slack_ticket';
-import { NotFoundError, PermissionError } from '../exceptions';
+import { BadRequestError, NotFoundError, PermissionError } from '../exceptions';
 import { checkSlackIntegration, checkFeature, SwitcherKeys } from '../external/switcher-api-facade';
 import { getConfig } from './config';
 import { getDomainById } from './domain';
@@ -126,6 +126,21 @@ export async function unlinkSlack(domainid, admin) {
 
     const slack = await getSlackOrError({ id: domain.integrations.slack });
     return deleteSlackInstallation(slack);
+}
+
+export async function updateSettings(domainId, param, request) {
+    const domain = await getDomainById(domainId);
+    const slack = await getSlackOrError({ id: domain.integrations.slack });
+
+    if (param === TicketValidationType.IGNORED_ENVIRONMENT) {
+        slack.settings.ignored_environments = request.environments;
+    } else if (param === TicketValidationType.FROZEN_ENVIRONMENT) {
+        slack.settings.frozen_environments = request.environments;
+    } else {
+        throw new BadRequestError('Invalid parameter');
+    }
+
+    return slack.save();
 }
 
 export async function resetTicketHistory(enterprise_id, team_id, admin) {

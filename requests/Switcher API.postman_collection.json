@@ -576,13 +576,19 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/admin/5e0ece2b6f4f994eac9007ad",
+							"raw": "{{url}}/admin/:admin",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"admin",
-								"5e0ece2b6f4f994eac9007ad"
+								":admin"
+							],
+							"variable": [
+								{
+									"key": "admin",
+									"value": "5e0ece2b6f4f994eac9007ad"
+								}
 							]
 						}
 					},
@@ -666,7 +672,7 @@
 						"method": "PATCH",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/admin/me/team/leave/5ed5b45fbcd74972fc55b72e",
+							"raw": "{{url}}/admin/me/team/leave/:domain",
 							"host": [
 								"{{url}}"
 							],
@@ -675,7 +681,13 @@
 								"me",
 								"team",
 								"leave",
-								"5ed5b45fbcd74972fc55b72e"
+								":domain"
+							],
+							"variable": [
+								{
+									"key": "domain",
+									"value": "5ed5b45fbcd74972fc55b72e"
+								}
 							]
 						}
 					},
@@ -742,14 +754,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/environment/recover/5df2a4491bf6792758ba6b82",
+							"raw": "{{url}}/environment/recover/:env",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"environment",
 								"recover",
-								"5df2a4491bf6792758ba6b82"
+								":env"
+							],
+							"variable": [
+								{
+									"key": "env",
+									"value": "5df2a4491bf6792758ba6b82"
+								}
 							]
 						}
 					},
@@ -838,13 +856,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/environment/5deac6bc2d61a41fa0a84789",
+							"raw": "{{url}}/environment/:env",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"environment",
-								"5deac6bc2d61a41fa0a84789"
+								":env"
+							],
+							"variable": [
+								{
+									"key": "env",
+									"value": "5deac6bc2d61a41fa0a84789"
+								}
 							]
 						}
 					},
@@ -856,13 +880,19 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/environment/5deac77f2d61a41fa0a8478f",
+							"raw": "{{url}}/environment/:env",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"environment",
-								"5deac77f2d61a41fa0a8478f"
+								":env"
+							],
+							"variable": [
+								{
+									"key": "env",
+									"value": "5deac77f2d61a41fa0a8478f"
+								}
 							]
 						}
 					},
@@ -929,13 +959,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/component/5decaa99e9c69f47380ee5e4",
+							"raw": "{{url}}/component/:component",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"component",
-								"5decaa99e9c69f47380ee5e4"
+								":component"
+							],
+							"variable": [
+								{
+									"key": "component",
+									"value": "5decaa99e9c69f47380ee5e4"
+								}
 							]
 						}
 					},
@@ -984,14 +1020,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/component/generateApiKey/5edb2330985c4725fcf2146f",
+							"raw": "{{url}}/component/generateApiKey/:component",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"component",
 								"generateApiKey",
-								"5edb2330985c4725fcf2146f"
+								":component"
+							],
+							"variable": [
+								{
+									"key": "component",
+									"value": "5edb2330985c4725fcf2146f"
+								}
 							]
 						}
 					},
@@ -1142,13 +1184,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/component/5deca4d3ed149e3f804aecb9",
+							"raw": "{{url}}/component/:component",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"component",
-								"5deca4d3ed149e3f804aecb9"
+								":component"
+							],
+							"variable": [
+								{
+									"key": "component",
+									"value": "5deca4d3ed149e3f804aecb9"
+								}
 							]
 						}
 					},
@@ -1160,13 +1208,19 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/component/5deca63a9323870448544f2d",
+							"raw": "{{url}}/component/:component",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"component",
-								"5deca63a9323870448544f2d"
+								":component"
+							],
+							"variable": [
+								{
+									"key": "component",
+									"value": "5deca63a9323870448544f2d"
+								}
 							]
 						}
 					},
@@ -1323,18 +1377,24 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/team/5e10eda73a649463a8ef3751?resolveMembers=true",
+							"raw": "{{url}}/team/:team?resolveMembers=true",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"team",
-								"5e10eda73a649463a8ef3751"
+								":team"
 							],
 							"query": [
 								{
 									"key": "resolveMembers",
 									"value": "true"
+								}
+							],
+							"variable": [
+								{
+									"key": "team",
+									"value": "5e10eda73a649463a8ef3751"
 								}
 							]
 						}
@@ -1374,13 +1434,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/team/5e0bc0e1ac22583584aeb849",
+							"raw": "{{url}}/team/:team",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"team",
-								"5e0bc0e1ac22583584aeb849"
+								":team"
+							],
+							"variable": [
+								{
+									"key": "team",
+									"value": "5e0bc0e1ac22583584aeb849"
+								}
 							]
 						}
 					},
@@ -1419,13 +1485,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/team/5e0d10c21078a209b4215b7f",
+							"raw": "{{url}}/team/:team",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"team",
-								"5e0d10c21078a209b4215b7f"
+								":team"
+							],
+							"variable": [
+								{
+									"key": "team",
+									"value": "5e0d10c21078a209b4215b7f"
+								}
 							]
 						}
 					},
@@ -1464,7 +1536,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/team/member/invite/5e10eda73a649463a8ef3751",
+							"raw": "{{url}}/team/member/invite/:team",
 							"host": [
 								"{{url}}"
 							],
@@ -1472,7 +1544,13 @@
 								"team",
 								"member",
 								"invite",
-								"5e10eda73a649463a8ef3751"
+								":team"
+							],
+							"variable": [
+								{
+									"key": "team",
+									"value": "5e10eda73a649463a8ef3751"
+								}
 							]
 						}
 					},
@@ -1511,7 +1589,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/team/member/invite/accept/5ed404eabe178984d812f61e",
+							"raw": "{{url}}/team/member/invite/accept/:team",
 							"host": [
 								"{{url}}"
 							],
@@ -1520,7 +1598,13 @@
 								"member",
 								"invite",
 								"accept",
-								"5ed404eabe178984d812f61e"
+								":team"
+							],
+							"variable": [
+								{
+									"key": "team",
+									"value": "5ed404eabe178984d812f61e"
+								}
 							]
 						}
 					},
@@ -1559,7 +1643,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/team/member/invite/remove/5e10eda73a649463a8ef3751/5f30448867be1453684853fc",
+							"raw": "{{url}}/team/member/invite/remove/:id/:request_id",
 							"host": [
 								"{{url}}"
 							],
@@ -1568,8 +1652,18 @@
 								"member",
 								"invite",
 								"remove",
-								"5e10eda73a649463a8ef3751",
-								"5f30448867be1453684853fc"
+								":id",
+								":request_id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5e10eda73a649463a8ef3751"
+								},
+								{
+									"key": "request_id",
+									"value": "5f30448867be1453684853fc"
+								}
 							]
 						}
 					},
@@ -1611,7 +1705,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/team/member/invite/5ed80055ada7c13b4cfd6a63",
+							"raw": "{{url}}/team/member/invite/:team",
 							"host": [
 								"{{url}}"
 							],
@@ -1619,7 +1713,13 @@
 								"team",
 								"member",
 								"invite",
-								"5ed80055ada7c13b4cfd6a63"
+								":team"
+							],
+							"variable": [
+								{
+									"key": "team",
+									"value": "5ed80055ada7c13b4cfd6a63"
+								}
 							]
 						}
 					},
@@ -1661,7 +1761,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/team/member/invite/pending/5e10eda73a649463a8ef3751",
+							"raw": "{{url}}/team/member/invite/pending/:team",
 							"host": [
 								"{{url}}"
 							],
@@ -1670,7 +1770,13 @@
 								"member",
 								"invite",
 								"pending",
-								"5e10eda73a649463a8ef3751"
+								":team"
+							],
+							"variable": [
+								{
+									"key": "team",
+									"value": "5e10eda73a649463a8ef3751"
+								}
 							]
 						}
 					},
@@ -1929,14 +2035,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/permission/create/5e35d60f0cceed52b012ef28",
+							"raw": "{{url}}/permission/create/:team",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"permission",
 								"create",
-								"5e35d60f0cceed52b012ef28"
+								":team"
+							],
+							"variable": [
+								{
+									"key": "team",
+									"value": "5e35d60f0cceed52b012ef28"
+								}
 							]
 						}
 					},
@@ -1977,13 +2089,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/permission/5e0bf4a3a5753d65c0794af4",
+							"raw": "{{url}}/permission/:id",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"permission",
-								"5e0bf4a3a5753d65c0794af4"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5e0bf4a3a5753d65c0794af4"
+								}
 							]
 						}
 					},
@@ -2079,13 +2197,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/permission/5e0bf449a5753d65c0794af3",
+							"raw": "{{url}}/permission/:id",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"permission",
-								"5e0bf449a5753d65c0794af3"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5e0bf449a5753d65c0794af3"
+								}
 							]
 						}
 					},
@@ -2270,13 +2394,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/permission/5e0bf4b5a5753d65c0794af6",
+							"raw": "{{url}}/permission/:id",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"permission",
-								"5e0bf4b5a5753d65c0794af6"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5e0bf4b5a5753d65c0794af6"
+								}
 							]
 						}
 					},
@@ -2317,7 +2447,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/permission/value/add/5e0bf449a5753d65c0794af3",
+							"raw": "{{url}}/permission/value/add/:id",
 							"host": [
 								"{{url}}"
 							],
@@ -2325,13 +2455,19 @@
 								"permission",
 								"value",
 								"add",
-								"5e0bf449a5753d65c0794af3"
+								":id"
 							],
 							"query": [
 								{
 									"key": "id",
 									"value": "5e0bbe0d9ad3100658ae2228",
 									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5e0bf449a5753d65c0794af3"
 								}
 							]
 						}
@@ -2373,7 +2509,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/permission/value/remove/5e0bf449a5753d65c0794af3",
+							"raw": "{{url}}/permission/value/remove/:id",
 							"host": [
 								"{{url}}"
 							],
@@ -2381,7 +2517,13 @@
 								"permission",
 								"value",
 								"remove",
-								"5e0bf449a5753d65c0794af3"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5e0bf449a5753d65c0794af3"
+								}
 							]
 						}
 					},
@@ -2461,13 +2603,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/domain/5e0ece606f4f994eac9007ae",
+							"raw": "{{url}}/domain/:domain",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"domain",
-								"5e0ece606f4f994eac9007ae"
+								":domain"
+							],
+							"variable": [
+								{
+									"key": "domain",
+									"value": "5e0ece606f4f994eac9007ae"
+								}
 							]
 						}
 					},
@@ -2565,14 +2713,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/domain/updateStatus/5de9babb40778d3b5c82a07b",
+							"raw": "{{url}}/domain/updateStatus/:domain",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"domain",
 								"updateStatus",
-								"5de9babb40778d3b5c82a07b"
+								":domain"
+							],
+							"variable": [
+								{
+									"key": "domain",
+									"value": "5de9babb40778d3b5c82a07b"
+								}
 							]
 						}
 					},
@@ -2600,14 +2754,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/domain/removeStatus/5de9babb40778d3b5c82a07b",
+							"raw": "{{url}}/domain/removeStatus/:domain",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"domain",
 								"removeStatus",
-								"5de9babb40778d3b5c82a07b"
+								":domain"
+							],
+							"variable": [
+								{
+									"key": "domain",
+									"value": "5de9babb40778d3b5c82a07b"
+								}
 							]
 						}
 					},
@@ -2652,13 +2812,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/domain/5e0bbe269ad3100658ae2229",
+							"raw": "{{url}}/domain/:domain",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"domain",
-								"5e0bbe269ad3100658ae2229"
+								":domain"
 							],
 							"query": [
 								{
@@ -2671,6 +2831,12 @@
 									"value": "2",
 									"disabled": true
 								}
+							],
+							"variable": [
+								{
+									"key": "domain",
+									"value": "5e0bbe269ad3100658ae2229"
+								}
 							]
 						}
 					},
@@ -2682,14 +2848,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/domain/history/5e0ece606f4f994eac9007ae?sortBy=oldValue:updatedAt:desc&limit=5",
+							"raw": "{{url}}/domain/history/:domain?sortBy=oldValue:updatedAt:desc&limit=5",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"domain",
 								"history",
-								"5e0ece606f4f994eac9007ae"
+								":domain"
 							],
 							"query": [
 								{
@@ -2710,6 +2876,12 @@
 									"value": "100",
 									"disabled": true
 								}
+							],
+							"variable": [
+								{
+									"key": "domain",
+									"value": "5e0ece606f4f994eac9007ae"
+								}
 							]
 						}
 					},
@@ -2721,14 +2893,20 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/domain/history/5e0ece606f4f994eac9007ae",
+							"raw": "{{url}}/domain/history/:domain",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"domain",
 								"history",
-								"5e0ece606f4f994eac9007ae"
+								":domain"
+							],
+							"variable": [
+								{
+									"key": "domain",
+									"value": "5e0ece606f4f994eac9007ae"
+								}
 							]
 						}
 					},
@@ -2740,13 +2918,19 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/domain/5dd36ab857445636ccdeb520",
+							"raw": "{{url}}/domain/:domain",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"domain",
-								"5dd36ab857445636ccdeb520"
+								":domain"
+							],
+							"variable": [
+								{
+									"key": "domain",
+									"value": "5dd36ab857445636ccdeb520"
+								}
 							]
 						}
 					},
@@ -2813,13 +2997,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/groupconfig/5dd231391f11a7307c164531",
+							"raw": "{{url}}/groupconfig/:groupconfig",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"groupconfig",
-								"5dd231391f11a7307c164531"
+								":groupconfig"
+							],
+							"variable": [
+								{
+									"key": "groupconfig",
+									"value": "5dd231391f11a7307c164531"
+								}
 							]
 						}
 					},
@@ -2847,14 +3037,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/groupconfig/updateStatus/5df166359194d613400a52e9",
+							"raw": "{{url}}/groupconfig/updateStatus/:groupconfig",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"groupconfig",
 								"updateStatus",
-								"5df166359194d613400a52e9"
+								":groupconfig"
+							],
+							"variable": [
+								{
+									"key": "groupconfig",
+									"value": "5df166359194d613400a52e9"
+								}
 							]
 						}
 					},
@@ -2882,14 +3078,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/groupconfig/removeStatus/5de9c927248192258cd1c3f0",
+							"raw": "{{url}}/groupconfig/removeStatus/:groupconfig",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"groupconfig",
 								"removeStatus",
-								"5de9c927248192258cd1c3f0"
+								":groupconfig"
+							],
+							"variable": [
+								{
+									"key": "groupconfig",
+									"value": "5de9c927248192258cd1c3f0"
+								}
 							]
 						}
 					},
@@ -2944,13 +3146,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/groupconfig/5de9fc74279fa52e0c9cf499",
+							"raw": "{{url}}/groupconfig/:groupconfig",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"groupconfig",
-								"5de9fc74279fa52e0c9cf499"
+								":groupconfig"
 							],
 							"query": [
 								{
@@ -2963,6 +3165,12 @@
 									"value": "2",
 									"disabled": true
 								}
+							],
+							"variable": [
+								{
+									"key": "groupconfig",
+									"value": "5de9fc74279fa52e0c9cf499"
+								}
 							]
 						}
 					},
@@ -2974,14 +3182,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/groupconfig/history/5df1664d9194d613400a52eb",
+							"raw": "{{url}}/groupconfig/history/:groupconfig",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"groupconfig",
 								"history",
-								"5df1664d9194d613400a52eb"
+								":groupconfig"
 							],
 							"query": [
 								{
@@ -3004,6 +3212,12 @@
 									"value": "1",
 									"disabled": true
 								}
+							],
+							"variable": [
+								{
+									"key": "groupconfig",
+									"value": "5df1664d9194d613400a52eb"
+								}
 							]
 						}
 					},
@@ -3015,14 +3229,20 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/groupconfig/history/5df1664d9194d613400a52eb",
+							"raw": "{{url}}/groupconfig/history/:groupconfig",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"groupconfig",
 								"history",
-								"5df1664d9194d613400a52eb"
+								":groupconfig"
+							],
+							"variable": [
+								{
+									"key": "groupconfig",
+									"value": "5df1664d9194d613400a52eb"
+								}
 							]
 						}
 					},
@@ -3034,13 +3254,19 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/groupconfig/5dd230a81f11a7307c16452b",
+							"raw": "{{url}}/groupconfig/:groupconfig",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"groupconfig",
-								"5dd230a81f11a7307c16452b"
+								":groupconfig"
+							],
+							"variable": [
+								{
+									"key": "groupconfig",
+									"value": "5dd230a81f11a7307c16452b"
+								}
 							]
 						}
 					},
@@ -3057,14 +3283,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/config/history/5df1664d9194d613400a52eb",
+							"raw": "{{url}}/config/history/:config",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"config",
 								"history",
-								"5df1664d9194d613400a52eb"
+								":config"
 							],
 							"query": [
 								{
@@ -3087,6 +3313,12 @@
 									"value": "1",
 									"disabled": true
 								}
+							],
+							"variable": [
+								{
+									"key": "config",
+									"value": "5df1664d9194d613400a52eb"
+								}
 							]
 						}
 					},
@@ -3098,14 +3330,20 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/config/history/5df1664d9194d613400a52eb",
+							"raw": "{{url}}/config/history/:config",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"config",
 								"history",
-								"5df1664d9194d613400a52eb"
+								":config"
+							],
+							"variable": [
+								{
+									"key": "config",
+									"value": "5df1664d9194d613400a52eb"
+								}
 							]
 						}
 					},
@@ -3167,13 +3405,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/config/5dd232241f11a7307c164535",
+							"raw": "{{url}}/config/:config",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"config",
-								"5dd232241f11a7307c164535"
+								":config"
+							],
+							"variable": [
+								{
+									"key": "config",
+									"value": "5dd232241f11a7307c164535"
+								}
 							]
 						}
 					},
@@ -3201,14 +3445,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/config/updateRelay/5f45ca87b196cd151c6ec8bf",
+							"raw": "{{url}}/config/updateRelay/:config",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"config",
 								"updateRelay",
-								"5f45ca87b196cd151c6ec8bf"
+								":config"
+							],
+							"variable": [
+								{
+									"key": "config",
+									"value": "5f45ca87b196cd151c6ec8bf"
+								}
 							]
 						}
 					},
@@ -3236,14 +3486,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/config/updateRelay/5f4588335a311b4848e51f2e",
+							"raw": "{{url}}/config/updateRelay/:config",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"config",
 								"updateRelay",
-								"5f4588335a311b4848e51f2e"
+								":config"
+							],
+							"variable": [
+								{
+									"key": "config",
+									"value": "5f4588335a311b4848e51f2e"
+								}
 							]
 						}
 					},
@@ -3271,14 +3527,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/config/updateStatus/5df1664d9194d613400a52eb",
+							"raw": "{{url}}/config/updateStatus/:config",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"config",
 								"updateStatus",
-								"5df1664d9194d613400a52eb"
+								":config"
+							],
+							"variable": [
+								{
+									"key": "config",
+									"value": "5df1664d9194d613400a52eb"
+								}
 							]
 						}
 					},
@@ -3306,14 +3568,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/config/removeStatus/5de9c927248192258cd1c3f0",
+							"raw": "{{url}}/config/removeStatus/:config",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"config",
 								"removeStatus",
-								"5de9c927248192258cd1c3f0"
+								":config"
+							],
+							"variable": [
+								{
+									"key": "config",
+									"value": "5de9c927248192258cd1c3f0"
+								}
 							]
 						}
 					},
@@ -3341,14 +3609,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/config/addComponent/5e0eceb66f4f994eac9007b2",
+							"raw": "{{url}}/config/addComponent/:config",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"config",
 								"addComponent",
-								"5e0eceb66f4f994eac9007b2"
+								":config"
+							],
+							"variable": [
+								{
+									"key": "config",
+									"value": "5e0eceb66f4f994eac9007b2"
+								}
 							]
 						}
 					},
@@ -3376,14 +3650,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/config/updateComponents/5e0eceb66f4f994eac9007b2",
+							"raw": "{{url}}/config/updateComponents/:config",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"config",
 								"updateComponents",
-								"5e0eceb66f4f994eac9007b2"
+								":config"
+							],
+							"variable": [
+								{
+									"key": "config",
+									"value": "5e0eceb66f4f994eac9007b2"
+								}
 							]
 						}
 					},
@@ -3411,14 +3691,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/config/removeComponent/5deac6e42d61a41fa0a8478b",
+							"raw": "{{url}}/config/removeComponent/:config",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"config",
 								"removeComponent",
-								"5deac6e42d61a41fa0a8478b"
+								":config"
+							],
+							"variable": [
+								{
+									"key": "config",
+									"value": "5deac6e42d61a41fa0a8478b"
+								}
 							]
 						}
 					},
@@ -3446,14 +3732,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/config/removeRelay/5f458a38388f1a389892780a",
+							"raw": "{{url}}/config/removeRelay/:config",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"config",
 								"removeRelay",
-								"5f458a38388f1a389892780a"
+								":config"
+							],
+							"variable": [
+								{
+									"key": "config",
+									"value": "5f458a38388f1a389892780a"
+								}
 							]
 						}
 					},
@@ -3539,18 +3831,24 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/config/5e0eceb66f4f994eac9007b2?resolveComponents=true",
+							"raw": "{{url}}/config/:config?resolveComponents=true",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"config",
-								"5e0eceb66f4f994eac9007b2"
+								":config"
 							],
 							"query": [
 								{
 									"key": "resolveComponents",
 									"value": "true"
+								}
+							],
+							"variable": [
+								{
+									"key": "config",
+									"value": "5e0eceb66f4f994eac9007b2"
 								}
 							]
 						}
@@ -3563,13 +3861,19 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/config/5dd230b31f11a7307c16452c",
+							"raw": "{{url}}/config/:config",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"config",
-								"5dd230b31f11a7307c16452c"
+								":config"
+							],
+							"variable": [
+								{
+									"key": "config",
+									"value": "5dd230b31f11a7307c16452c"
+								}
 							]
 						}
 					},
@@ -3670,13 +3974,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/configstrategy/5df1668d9194d613400a52ee",
+							"raw": "{{url}}/configstrategy/:id",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"configstrategy",
-								"5df1668d9194d613400a52ee"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5df1668d9194d613400a52ee"
+								}
 							]
 						}
 					},
@@ -3704,14 +4014,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/configstrategy/addval/5df1668d9194d613400a52ee",
+							"raw": "{{url}}/configstrategy/addval/:id",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"configstrategy",
 								"addval",
-								"5df1668d9194d613400a52ee"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5df1668d9194d613400a52ee"
+								}
 							]
 						}
 					},
@@ -3739,14 +4055,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/configstrategy/updateval/5df1668d9194d613400a52ee",
+							"raw": "{{url}}/configstrategy/updateval/:id",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"configstrategy",
 								"updateval",
-								"5df1668d9194d613400a52ee"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5df1668d9194d613400a52ee"
+								}
 							]
 						}
 					},
@@ -3774,14 +4096,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/configstrategy/removeval/5df1668d9194d613400a52ee",
+							"raw": "{{url}}/configstrategy/removeval/:id",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"configstrategy",
 								"removeval",
-								"5df1668d9194d613400a52ee"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5df1668d9194d613400a52ee"
+								}
 							]
 						}
 					},
@@ -3809,14 +4137,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/configstrategy/updateStatus/5e2b7f09b91d810cd037424b",
+							"raw": "{{url}}/configstrategy/updateStatus/:id",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"configstrategy",
 								"updateStatus",
-								"5e2b7f09b91d810cd037424b"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5e2b7f09b91d810cd037424b"
+								}
 							]
 						}
 					},
@@ -3870,19 +4204,25 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/configstrategy/5deac6fc2d61a41fa0a8478d",
+							"raw": "{{url}}/configstrategy/:id",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"configstrategy",
-								"5deac6fc2d61a41fa0a8478d"
+								":id"
 							],
 							"query": [
 								{
 									"key": "skip",
 									"value": "2",
 									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5deac6fc2d61a41fa0a8478d"
 								}
 							]
 						}
@@ -3895,14 +4235,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/configstrategy/values/5de1e309d3162634b832e8a7",
+							"raw": "{{url}}/configstrategy/values/:id",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"configstrategy",
 								"values",
-								"5de1e309d3162634b832e8a7"
+								":id"
 							],
 							"query": [
 								{
@@ -3919,6 +4259,12 @@
 									"key": "skip",
 									"value": "1",
 									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5de1e309d3162634b832e8a7"
 								}
 							]
 						}
@@ -3970,14 +4316,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/configstrategy/history/5df1668d9194d613400a52ee",
+							"raw": "{{url}}/configstrategy/history/:id",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"configstrategy",
 								"history",
-								"5df1668d9194d613400a52ee"
+								":id"
 							],
 							"query": [
 								{
@@ -4000,6 +4346,12 @@
 									"value": "1",
 									"disabled": true
 								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5df1668d9194d613400a52ee"
+								}
 							]
 						}
 					},
@@ -4011,14 +4363,20 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/configstrategy/history/5df1668d9194d613400a52ee",
+							"raw": "{{url}}/configstrategy/history/:id",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"configstrategy",
 								"history",
-								"5df1668d9194d613400a52ee"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5df1668d9194d613400a52ee"
+								}
 							]
 						}
 					},
@@ -4030,13 +4388,19 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/configstrategy/5de1e309d3162634b832e8a7",
+							"raw": "{{url}}/configstrategy/:id",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"configstrategy",
-								"5de1e309d3162634b832e8a7"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "5de1e309d3162634b832e8a7"
+								}
 							]
 						}
 					},
@@ -4290,7 +4654,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/slack/v1/installation/5e0ece606f4f994eac9007ae",
+							"raw": "{{url}}/slack/v1/installation/:domain",
 							"host": [
 								"{{url}}"
 							],
@@ -4298,7 +4662,13 @@
 								"slack",
 								"v1",
 								"installation",
-								"5e0ece606f4f994eac9007ae"
+								":domain"
+							],
+							"variable": [
+								{
+									"key": "domain",
+									"value": "5e0ece606f4f994eac9007ae"
+								}
 							]
 						}
 					},
@@ -4559,6 +4929,46 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Slack -  Installation Settings",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"environments\": [\"dev1\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/slack/v1/settings/:param/:domain",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"slack",
+								"v1",
+								"settings",
+								":param",
+								":domain"
+							],
+							"variable": [
+								{
+									"key": "param",
+									"value": "IGNORED_ENVIRONMENT"
+								},
+								{
+									"key": "domain",
+									"value": "5e0ece606f4f994eac9007ae"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -4805,14 +5215,20 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/criteria/snapshot_check/1588557288037",
+							"raw": "{{url}}/criteria/snapshot_check/:version",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"criteria",
 								"snapshot_check",
-								"1588557288037"
+								":version"
+							],
+							"variable": [
+								{
+									"key": "version",
+									"value": "1588557288037"
+								}
 							]
 						}
 					},
