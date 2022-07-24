@@ -285,5 +285,11 @@ export default {
             },
             settings: slack.properties.settings
         }
+    },
+    SlackInstallationSettings: {
+        type: 'object',
+        properties: {
+            settings: slack.properties.settings
+        }
     }
 };
