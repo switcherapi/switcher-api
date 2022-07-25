@@ -7,6 +7,7 @@ import { getConfig } from './config';
 import { getDomainById } from './domain';
 import { getEnvironment } from './environment';
 import { getGroupConfig } from './group-config';
+import { containsValue } from '../helpers';
 
 /**
  * Validates if ticket already exists, if so, return it.
@@ -160,10 +161,10 @@ export async function validateTicket(ticket_content, enterprise_id, team_id) {
     const ticket = await canCreateTicket(slack, ticket_content);
     const { ignored_environments, frozen_environments } = slack.settings;
 
-    if (frozen_environments?.includes(ticket_content.environment))
+    if (containsValue(frozen_environments, ticket_content.environment))
         return { result: TicketValidationType.FROZEN_ENVIRONMENT };
 
-    if (ignored_environments?.includes(ticket_content.environment)) {
+    if (containsValue(ignored_environments, ticket_content.environment)) {
         await approveChange(slack.domain, ticket_content);
         return { result: TicketValidationType.IGNORED_ENVIRONMENT };
     }
