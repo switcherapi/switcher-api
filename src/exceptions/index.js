@@ -1,4 +1,5 @@
 import { Switcher } from 'switcher-client';
+import Logger from '../helpers/logger';
 
 export class NotFoundError extends Error {
     constructor(message) {
@@ -37,19 +38,14 @@ export class FeatureUnavailableError extends Error {
 
 export function responseException(res, err, code, feature = undefined) {
     if (process.env.SWITCHER_API_LOGGER == 'true') {
-        console.error(`Error (${err.constructor.name}): ${err.message} - Code: ${err.code}`);
+        Logger.httpError(err.constructor.name, err.code, err.message, err)
         if (feature) {
-            console.error('\n### Switcher API Logger ###\n' + 
-                JSON.stringify(Switcher.getLogger(feature), undefined, 2));
+            Logger.info(`Feature [${feature}]`, { log: Switcher.getLogger(feature) });
         }
     }
 
     if (err.code) {
-        try {
-            return res.status(err.code).send({ error: err.message });
-        } catch (e) {
-            console.error(err);
-        }
+        return res.status(err.code).send({ error: err.message });
     }
     res.status(code).send({ error: err.message });
 }

@@ -314,7 +314,7 @@ describe('Updating permission values tests', () => {
         await request(app)
             .patch('/permission/value/add/' + permission1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 
     test('PERMISSION_SUITE - Should NOT add a value - Value already joined', async () => {
@@ -375,7 +375,7 @@ describe('Updating permission values tests', () => {
         await request(app)
             .patch('/permission/value/remove/' + permission1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 
     test('PERMISSION_SUITE - Should NOT remove a value - Invalid parameter', async () => {

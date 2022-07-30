@@ -135,7 +135,7 @@ describe('Testing fetch configuration info', () => {
         await request(app)
             .get('/config?group=INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
     });
 
     test('CONFIG_SUITE - Should get Config information by Id', async () => {

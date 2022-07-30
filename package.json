@@ -1,6 +1,6 @@
 {
   "name": "switcher-api",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Feature Flag/Toggle API",
   "main": "start.js",
   "author": {
@@ -41,6 +41,8 @@
     "moment": "^2.29.4",
     "mongodb": "^4.7.0",
     "mongoose": "^6.4.0",
+    "pino": "^8.3.1",
+    "pino-pretty": "^8.1.0",
     "swagger-ui-express": "^4.4.0",
     "switcher-client": "^3.1.1",
     "validator": "^13.7.0"
