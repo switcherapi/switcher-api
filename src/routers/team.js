@@ -11,8 +11,9 @@ import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
-router.post('/team/create', auth, [
-    check('name').isLength({ min: 2, max: 50 })
+router.post('/team/create', auth, verifyInputUpdateParameters(['name', 'domain']), [
+    check('name').isLength({ min: 2, max: 50 }),
+    check('domain').isMongoId()
 ], validate, async (req, res) => {
     try {
         const team = await Services.createTeam(req.body, req.admin, req.query.defaultActions);

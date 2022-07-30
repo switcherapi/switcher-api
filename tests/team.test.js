@@ -98,7 +98,7 @@ describe('Insertion tests', () => {
             .send({
                 name: 'My Team',
                 domain: 'INVALID_ID'
-            }).expect(404);
+            }).expect(422);
     });
 
     test('TEAM_SUITE - Should NOT create a new Team - Name is missing', async () => {

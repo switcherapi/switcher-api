@@ -2,13 +2,15 @@ import express from 'express';
 import { check, query } from 'express-validator';
 import { auth } from '../middleware/auth';
 import { responseException } from '../exceptions';
-import { validate } from '../middleware/validators';
+import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import * as Services from '../services/environment';
 import { SwitcherKeys } from '../external/switcher-api-facade';
 
 const router = new express.Router();
 
-router.post('/environment/create', auth, async (req, res) => {
+router.post('/environment/create', auth, verifyInputUpdateParameters([
+    'name', 'domain'
+]), async (req, res) => {
     try {
         const environment = await Services.createEnvironment(req.body, req.admin);
         res.status(201).send(environment);

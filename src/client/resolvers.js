@@ -8,6 +8,7 @@ import { ActionTypes, RouterTypes } from '../models/permission';
 import { verifyOwnership } from '../helpers';
 import { resolveNotification, resolveValidation } from './relay/index';
 import Component from '../models/component';
+import Logger from '../helpers/logger';
 
 export const resolveConfigByKey = async (domain, key) => Config.findOne({ domain, key }, null, { lean: true });
 
@@ -187,7 +188,7 @@ async function resolveRelay(config, environment, entry, response) {
         if (config.relay.type === RelayTypes.VALIDATION) {
             response.result = false;
             response.reason = 'Relay service could not be reached';
-            response.message = e.message;
+            Logger.error(response.reason, e);
         }
     }
 }

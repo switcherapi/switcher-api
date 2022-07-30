@@ -98,8 +98,9 @@ router.delete('/permission/:id', auth, [
     }
 });
 
-router.patch('/permission/value/add/:id', auth, verifyInputUpdateParameters(['value']), [
-    check('id').isMongoId()
+router.patch('/permission/value/add/:id', auth, verifyInputUpdateParameters(['id', 'value']), [
+    check('id').isMongoId(),
+    check('value').isString()
 ], validate, async (req, res) => {
     try {
         const permission = await Services.addValue(req.body, req.params.id, req.admin);
@@ -109,9 +110,10 @@ router.patch('/permission/value/add/:id', auth, verifyInputUpdateParameters(['va
     }
 });
 
-router.patch('/permission/value/remove/:id', auth, [
-    check('id').isMongoId()
-], validate, verifyInputUpdateParameters(['value']), async (req, res) => {
+router.patch('/permission/value/remove/:id', auth, verifyInputUpdateParameters(['id', 'value']), [
+    check('id').isMongoId(),
+    check('value').isString()
+], validate, async (req, res) => {
     try {
         const permission = await Services.removeValue(req.body, req.params.id, req.admin);
         res.send(permission);

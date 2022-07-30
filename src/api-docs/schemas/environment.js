@@ -30,5 +30,17 @@ const environment = {
 
 export default {
     Environment: environment,
-    EnvironmentCreateRequest: environment
+    EnvironmentCreateRequest: {
+        type: 'object',
+        properties: {
+            name: {
+                type: 'string'
+            },
+            domain: {
+                type: 'string',
+                description: 'The domain ID parent of the environment',
+                format: 'uuid'
+            }
+        }
+    }
 };

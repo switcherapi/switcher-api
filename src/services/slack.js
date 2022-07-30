@@ -8,6 +8,7 @@ import { getDomainById } from './domain';
 import { getEnvironment } from './environment';
 import { getGroupConfig } from './group-config';
 import { containsValue } from '../helpers';
+import Logger from '../helpers/logger';
 
 /**
  * Validates if ticket already exists, if so, return it.
@@ -78,9 +79,9 @@ export async function checkAvailability(admin, feature) {
         SwitcherKeys.SLACK_UPDATE
     ]);
 
-    if (process.env.SWITCHER_API_LOGGER == 'true')
-        console.log('\n### Switcher API Logger ###\n' + 
-            JSON.stringify(Switcher.getLogger(feature), undefined, 2));
+    if (process.env.SWITCHER_API_LOGGER == 'true') {
+        Logger.info(`checkAvailability [${feature}]`, { log: Switcher.getLogger(feature) });
+    }
 
     return result;
 }

@@ -296,7 +296,6 @@ describe('Testing Switcher Relay', () => {
         axiosStub.restore();
         expect(req.statusCode).toBe(200);
         expect(req.body.reason).toEqual('Relay service could not be reached');
-        expect(req.body.message).toEqual('Failed to reach http://localhost:3001 via GET');
         expect(req.body.result).toBe(false);
     });
 
@@ -320,7 +319,6 @@ describe('Testing Switcher Relay', () => {
         axiosStub.restore();
         expect(req.statusCode).toBe(200);
         expect(req.body.reason).toEqual('Relay service could not be reached');
-        expect(req.body.message).toEqual('Failed to reach http://localhost:3001 via POST');
         expect(req.body.result).toBe(false);
     });
 

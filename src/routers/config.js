@@ -1,5 +1,5 @@
 import express from 'express';
-import { check } from 'express-validator';
+import { check, query } from 'express-validator';
 import { relayOptions } from '../models/config';
 import History from '../models/history';
 import { auth } from '../middleware/auth';
@@ -31,7 +31,9 @@ router.post('/config/create',
 // GET /config?group=ID&limit=10&skip=20
 // GET /config?group=ID&sortBy=createdAt:desc
 // GET /config?group=ID
-router.get('/config', auth, async (req, res) => {
+router.get('/config', auth, [
+    query('group').isMongoId()
+], validate, async (req, res) => {
     try {
         const groupConfig = await getGroupConfigById(req.query.group);
         await groupConfig.populate({
