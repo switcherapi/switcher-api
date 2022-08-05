@@ -2,9 +2,9 @@ import mongoose from 'mongoose';
 import History from './history';
 import { recordHistory } from './common/index';
 import moment from 'moment';
-import IPCIDR from 'ip-cidr';
 import { NotFoundError } from '../exceptions';
 import { parseJSON, payloadReader } from '../helpers';
+import IPCIDR from '../helpers/ipcidr';
 
 export const StrategiesType = Object.freeze({
     NETWORK: 'NETWORK_VALIDATION',
@@ -181,7 +181,7 @@ function processNETWORK_Exist(input, values, cidrRegex) {
     for (const value of values) {
         if (value.match(cidrRegex)) {
             const cidr = new IPCIDR(value);
-            if (cidr.contains(input)) {
+            if (cidr.isIp4InCidr(input)) {
                 return true;
             }
         } else {
@@ -192,10 +192,10 @@ function processNETWORK_Exist(input, values, cidrRegex) {
 }
 
 function processNETWORK_NotExist(input, values, cidrRegex) {
-    const result = values.filter(element => {
+    const result = values.filter((element) => {
         if (element.match(cidrRegex)) {
             const cidr = new IPCIDR(element);
-            if (cidr.contains(input)) {
+            if (cidr.isIp4InCidr(input)) {
                 return true;
             }
         } else {
