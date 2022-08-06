@@ -29,7 +29,7 @@ router.get('/metric/data/', auth, [
             return res.send();
         }
 
-        res.send({ page, data });
+        res.send({ data });
     } catch (e) {
         responseException(res, e, 500);
     }
