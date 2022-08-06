@@ -14,6 +14,7 @@ afterAll(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     await mongoose.disconnect();
 });
+
 describe('Fetch overall statistics', () => {
     beforeAll(setupDatabase);
 

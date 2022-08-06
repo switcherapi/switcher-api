@@ -62,7 +62,7 @@ router.get('/criteria/snapshot_check/:version', appAuth, async (req, res) => {
 });
 
 router.post('/criteria/switchers_check', appAuth, [
-    check('switchers', 'Switcher Key is required').isLength({ min: 1 })
+    check('switchers', 'Switcher Key is required').isArray().isLength({ min: 1 })
 ], validate, async (req, res) => {
     try {
         const configsFound = await getConfigs({ domain: req.domain, components: req.componentId });

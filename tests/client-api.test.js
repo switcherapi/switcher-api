@@ -780,6 +780,22 @@ describe('Testing criteria [REST] ', () => {
         expect(req.statusCode).toBe(200);
         expect(req.body.not_found).toEqual(['I_DO_NOT_EXIST']);
     });
+
+    test('CLIENT_SUITE - Should NOT return list of switchers - Invalid body attribute', async () => {
+        await request(app)
+            .post('/criteria/switchers_check')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                switchers: 'TEST_CONFIG_KEY'
+            })
+            .expect(422);
+
+        await request(app)
+            .post('/criteria/switchers_check')
+            .set('Authorization', `Bearer ${token}`)
+            .send()
+            .expect(422);
+    });
 });
 
 describe('Testing domain [Adm-GraphQL] ', () => {
