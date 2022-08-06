@@ -359,7 +359,14 @@ describe('Testing reading strategies #1', () => {
         await request(app)
             .get('/configstrategy?config=INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(500);
+            .send().expect(422);
+    });
+
+    test('STRATEGY_SUITE - Should NOT get Config Strategy information - Invalid Environment query', async () => {
+        await request(app)
+            .get(`/configstrategy?config=${configId1}&env=${'a'.repeat(50)}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(422);
     });
 });
 

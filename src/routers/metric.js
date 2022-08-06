@@ -1,7 +1,7 @@
 import express from 'express';
 import { Metric } from '../models/metric';
 import { getConfig } from '../services/config';
-import { check } from 'express-validator';
+import { check, query } from 'express-validator';
 import { auth } from '../middleware/auth';
 import { verifyOwnership } from '../helpers';
 import { ActionTypes, RouterTypes } from '../models/permission';
@@ -58,15 +58,23 @@ router.get('/metric/data/', auth, [
 });
 
 router.get('/metric/statistics/', auth, [
-    check('domainid').isMongoId(),
-    check('statistics', 'add one or more options {swicthers,components,reasons,all} separed by comma').isLength({ min: 3 })
+    query('domainid').isMongoId(),
+    query('statistics', 'add one or more options {swicthers,components,reasons,all} separed by comma').isLength({ min: 3 }),
+    query('dateGroupPattern', 'e.g. YYYY-MM-DD HH:mm').optional().isLength({ max: 16 }),
+    query('key').optional().isLength({ max: 30 }),
+    query('environment').optional().isLength({ max: 30 }),
+    query('result').optional().isBoolean(),
+    query('component').optional().isLength({ max: 50 }),
+    query('group').optional().isLength({ max: 30 }),
+    query('dateBefore').optional().isDate(),
+    query('dateAfter').optional().isDate()
 ], validate, async (req, res) => {
     try {
         const switcher = buildMetricsFilter(req);
         const components = buildMetricsFilter(req);
         const reasons = buildMetricsFilter(req);
 
-        const dateGroupPattern =  req.query.dateGroupPattern ? 
+        const dateGroupPattern = req.query.dateGroupPattern ? 
             req.query.dateGroupPattern : 'YYYY-MM';
 
         if (req.query.key) { 
