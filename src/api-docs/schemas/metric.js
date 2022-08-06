@@ -72,9 +72,6 @@ export default {
     MetricsData: {
         type: 'object',
         properties: {
-            page: {
-                type: 'integer'
-            },
             data: {
                 type: 'array',
                 items: data

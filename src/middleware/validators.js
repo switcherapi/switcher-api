@@ -5,11 +5,11 @@ import { getComponents } from '../services/component';
 import { getEnvironments } from '../services/environment';
 
 export async function checkConfig(req, res, next) {
-    const config = await getConfig({ domain: req.domain, key: req.query.key.toString() }, true);
+    const config = await getConfig({ domain: req.domain, key: String(req.query.key) }, true);
 
     if (!config) {
         return res.status(404).send({ 
-            error: `Unable to load a key ${req.query.key.toString()}` });
+            error: `Unable to load a key ${String(req.query.key)}` });
     }
     
     req.config = config;

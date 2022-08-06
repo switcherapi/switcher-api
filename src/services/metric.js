@@ -1,9 +1,73 @@
 import moment from 'moment';
 import { ObjectId } from 'mongodb';
+import { NotFoundError } from '../exceptions';
+import { verifyOwnership } from '../helpers';
 import { EnvType } from '../models/environment';
 import { Metric } from '../models/metric';
+import { ActionTypes, RouterTypes } from '../models/permission';
+import { getConfig } from './config';
 
-export async function aggreagateReasons(aggregate, result) {
+export async function getData(req, page) {
+    const { args } = buildMetricsFilter(req);
+
+    if (req.query.key) { 
+        const config = await getConfig({ domain: req.query.domainid, key: req.query.key });
+        if (!config) return undefined;
+        args.config = config._id;
+    }
+
+    const skip = parseInt((process.env.METRICS_MAX_PAGE * parseInt(page)) - process.env.METRICS_MAX_PAGE);
+    return Metric.find({ ...args }, 
+        'config component entry result reason message group environment date -_id', {
+            skip,
+            limit: parseInt(process.env.METRICS_MAX_PAGE)
+        }).sort(req.query.sortBy ? String(req.query.sortBy).replace(';', ' ') : 'date')
+        .populate({ path: 'config', select: 'key -_id' }).exec();
+}
+
+export async function getStatistics(req) {
+    const switcher = buildMetricsFilter(req);
+    const components = buildMetricsFilter(req);
+    const reasons = buildMetricsFilter(req);
+
+    const dateGroupPattern = req.query.dateGroupPattern ? 
+        req.query.dateGroupPattern : 'YYYY-MM';
+
+    if (req.query.key) { 
+        const config = await getConfig({ domain: req.query.domainid, key: req.query.key });
+        if (!config) return undefined;
+
+        const switcherId = { config: config._id };
+        switcher.aggregate.match(switcherId);
+        components.aggregate.match(switcherId);
+        reasons.aggregate.match(switcherId);
+    }
+
+    let result = {};
+    const options = String(req.query.statistics);
+    await Promise.all([
+        options.match(/(switchers)|(all)/) ?
+            aggregateSwitchers(switcher.aggregate, dateGroupPattern, result) : Promise.resolve(),
+        options.match(/(components)|(all)/) ?
+            aggregateComponents(components.aggregate, dateGroupPattern, result) : Promise.resolve(),
+        options.match(/(reasons)|(all)/) ?
+            aggreagateReasons(reasons.aggregate, result) : Promise.resolve()
+    ]);
+
+    return result;
+}
+
+export async function deleteMetrics(req) {
+    let config = await getConfig({ domain: req.query.domainid, key: req.query.key });
+    if (!config) {
+        throw new NotFoundError('Switcher not found');
+    }
+
+    config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
+    await Metric.deleteMany({ domain: config.domain, config: config._id });
+}
+
+async function aggreagateReasons(aggregate, result) {
     aggregate.group({
         _id: { reason: '$reason' },
         count: { $sum: 1 }
@@ -21,7 +85,7 @@ export async function aggreagateReasons(aggregate, result) {
     result.reasons = reasonsAggregated;
 }
 
-export async function aggregateComponents(aggregate, dateGroupPattern, result) {
+async function aggregateComponents(aggregate, dateGroupPattern, result) {
     aggregate.group({
         _id: { component: '$component', result: '$result', date: '$date' },
         count: { $sum: 1 }
@@ -63,7 +127,7 @@ export async function aggregateComponents(aggregate, dateGroupPattern, result) {
     result.components = buildStatistics(componentsAggregated, 'component');
 }
 
-export async function aggregateSwitchers(aggregate, dateGroupPattern, result) {
+async function aggregateSwitchers(aggregate, dateGroupPattern, result) {
     aggregate.group({
         _id: { config: '$config', result: '$result', date: '$date' },
         count: { $sum: 1 }
@@ -111,16 +175,16 @@ export async function aggregateSwitchers(aggregate, dateGroupPattern, result) {
     result.switchers = buildStatistics(switchersAggregated, 'switcher');
 }
 
-export function buildMetricsFilter(req) {
+function buildMetricsFilter(req) {
     let aggregate = Metric.aggregate();
     let args = {};
 
     args.domain = req.query.domainid;
-    aggregate.match({ domain: new ObjectId(req.query.domainid.toString()) });
+    aggregate.match({ domain: new ObjectId(String(req.query.domainid)) });
 
     if (req.query.environment) {
         args.environment = req.query.environment;
-        aggregate.match({ environment: req.query.environment.toString() });
+        aggregate.match({ environment: String(req.query.environment) });
     } else { 
         args.environment = EnvType.DEFAULT;
         aggregate.match({ environment: EnvType.DEFAULT });
@@ -128,25 +192,25 @@ export function buildMetricsFilter(req) {
 
     if (req.query.result) { 
         args.result = req.query.result;
-        aggregate.match({ result: req.query.result.toString() === 'true' });
+        aggregate.match({ result: String(req.query.result) === 'true' });
     }
 
     if (req.query.component) { 
         args.component = req.query.component;
-        aggregate.match({ component: req.query.component.toString() });
+        aggregate.match({ component: String(req.query.component) });
     }
     
     if (req.query.group) { 
         args.group = req.query.group;
-        aggregate.match({ group: req.query.group.toString() });
+        aggregate.match({ group: String(req.query.group) });
     }
 
     if (req.query.dateBefore && !req.query.dateAfter) { 
         args.date = { $lte: new Date(req.query.dateBefore) };
-        aggregate.match({ date: { $lte: new Date(req.query.dateBefore.toString()) } });
+        aggregate.match({ date: { $lte: new Date(String(req.query.dateBefore)) } });
     } else if (req.query.dateAfter && !req.query.dateBefore) { 
         args.date = { $gte: new Date(req.query.dateAfter) };
-        aggregate.match({ date: { $gte: new Date(req.query.dateAfter.toString()) } });
+        aggregate.match({ date: { $gte: new Date(String(req.query.dateAfter)) } });
     } else if (req.query.dateAfter && req.query.dateBefore) {
         buildRangeDateFilter(req, args, aggregate);
     }
