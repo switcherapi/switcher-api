@@ -1,5 +1,5 @@
 import express from 'express';
-import { check } from 'express-validator';
+import { check, query } from 'express-validator';
 import History from '../models/history';
 import { EnvType } from '../models/environment';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
@@ -27,7 +27,10 @@ router.post('/configstrategy/create', auth, [
 // GET /configstrategy?limit=10&skip=20
 // GET /configstrategy?sortBy=createdAt:desc
 // GET /configstrategy?config=ID&env=QA
-router.get('/configstrategy', auth, async (req, res) => {
+router.get('/configstrategy', auth, [
+    query('config').isMongoId(),
+    query('env').optional().isLength({ max: 30 })
+], validate, async (req, res) => {
     try {
         const config = await getConfigById(req.query.config);
 

@@ -93,6 +93,80 @@ describe('Fetch overall statistics', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
     });
+
+    test('METRIC_SUITE - Should NOT return statistics - Invalid queries', async () => {
+        await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&environment=${'a'.repeat(31)}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(422);
+
+        await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&component=${'a'.repeat(51)}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(422);
+
+        await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&key=${'a'.repeat(31)}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(422);
+
+        await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&group=${'a'.repeat(31)}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(422);
+
+        await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&result=not_true`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(422);
+
+        await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&dateBefore=2020`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(422);
+
+        await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&dateAfter=2020`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(422);
+    });
+
+    test('METRIC_SUITE - Should return statistics - Valid queries', async () => {
+        await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&environment=${'a'.repeat(30)}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&component=${'a'.repeat(50)}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&key=${'a'.repeat(30)}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&group=${'a'.repeat(30)}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&result=true`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&dateBefore=2020-10-10`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&dateAfter=2020-10-10`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+    });
 });
 
 describe('Fetch metrics', () => {
