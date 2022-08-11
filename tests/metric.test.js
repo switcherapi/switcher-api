@@ -65,6 +65,30 @@ describe('Fetch overall statistics', () => {
         expect(response.body.switchers[0].switcher).toEqual('KEY_1');
     });
 
+    test('METRIC_SUITE - Should return statistics filtered by Switcher KEY and Date Range - One entry', async () => {
+        const response = await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&key=KEY_1&statistics=all&dateBefore=2019-12-14 17:01&dateAfter=2019-12-14 16:59`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        // Response validation
+        expect(response.body).not.toBeNull();
+        expect(response.body.reasons.length).toEqual(1);
+        expect(response.body.switchers[0].switcher).toEqual('KEY_1');
+    });
+
+    test('METRIC_SUITE - Should return statistics filtered by Switcher KEY and Date Range - Two entries', async () => {
+        const response = await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&key=KEY_1&statistics=all&dateBefore=2019-12-14 18:02&dateAfter=2019-12-14 16:59`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        // Response validation
+        expect(response.body).not.toBeNull();
+        expect(response.body.reasons.length).toEqual(2);
+        expect(response.body.switchers[0].switcher).toEqual('KEY_1');
+    });
+
     test('METRIC_SUITE - Should return statistics filtered by Result', async () => {
         const response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&result=true`)
@@ -122,12 +146,12 @@ describe('Fetch overall statistics', () => {
             .send().expect(422);
 
         await request(app)
-            .get(`/metric/statistics?domainid=${domainId}&statistics=all&dateBefore=2020`)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&dateBefore=202000`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
 
         await request(app)
-            .get(`/metric/statistics?domainid=${domainId}&statistics=all&dateAfter=2020`)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=all&dateAfter=2020000`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
     });
