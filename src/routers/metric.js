@@ -44,8 +44,8 @@ router.get('/metric/statistics/', auth, [
     query('result').optional().isBoolean(),
     query('component').optional().isLength({ max: 50 }),
     query('group').optional().isLength({ max: 30 }),
-    query('dateBefore').optional().isDate(),
-    query('dateAfter').optional().isDate()
+    query('dateBefore').optional().isISO8601(),
+    query('dateAfter').optional().isISO8601()
 ], validate, async (req, res) => {
     try {
         const result = await getStatistics(req);
