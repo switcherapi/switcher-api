@@ -4,6 +4,8 @@ import { EnvType } from '../models/environment';
 import { strategyInputType, criteriaType } from './criteria-type';
 import { resolveConfigByKey, resolveDomain } from './resolvers';
 import { resolveConfiguration } from './configuration-resolvers';
+import { permissionType } from './permission-type';
+import { resolvePermission } from './permission-resolvers';
 
 const queryType = new GraphQLObjectType({
     name: 'Query',
@@ -85,6 +87,26 @@ const queryType = new GraphQLObjectType({
                 return resolveConfiguration(args, context);
             }
         },
+        permission: {
+            type: new GraphQLList(permissionType),
+            args: {
+                domain: {
+                    type: GraphQLString
+                },
+                parent: {
+                    type: GraphQLString
+                },
+                actions: {
+                    type: new GraphQLList(GraphQLString)
+                },
+                router: {
+                    type: GraphQLString
+                }
+            },
+            resolve: async (_source, args, context) => {
+                return resolvePermission(args, context.admin);
+            }
+        }
     }
 });
 

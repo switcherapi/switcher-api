@@ -28,6 +28,7 @@ import {
     adminAccountId,
     slack
 } from './fixtures/db_client';
+import { RouterTypes } from '../src/models/permission';
 
 const changeStrategy = async (strategyId, newOperation, status, environment) => {
     const strategy = await ConfigStrategy.findById(strategyId);
@@ -927,5 +928,72 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         const expected = '{"data":{"configuration":{"domain":null,"group":null,"config":null,"strategies":null}}}';
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
+    });
+
+    test('CLIENT_SUITE - Should return list of Groups permissions', async () => {
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(graphqlUtils.permissionsQuery(domainId, undefined, `"UPDATE","DELETE"`, RouterTypes.GROUP));
+
+        const exptected = '[{"action":"UPDATE","result":"ok"},{"action":"DELETE","result":"ok"}]';
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).not.toBe(null);
+        expect(JSON.parse(req.text).data.permission[0].name).toBe("Group Test");
+        expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
+    });
+
+    test('CLIENT_SUITE - Should return list of Groups permissions - Unauthorized access', async () => {
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send(graphqlUtils.permissionsQuery(domainId, undefined, `"UPDATE","DELETE"`, RouterTypes.GROUP));
+
+        const exptected = '[{"action":"UPDATE","result":"nok"},{"action":"DELETE","result":"nok"}]';
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).not.toBe(null);
+        expect(JSON.parse(req.text).data.permission[0].name).toBe("Group Test");
+        expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
+    });
+
+    test('CLIENT_SUITE - Should return list of Configs permissions', async () => {
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(graphqlUtils.permissionsQuery(domainId, groupConfigId, `"UPDATE","DELETE"`, RouterTypes.CONFIG));
+
+        const exptected = '[{"action":"UPDATE","result":"ok"},{"action":"DELETE","result":"ok"}]';
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).not.toBe(null);
+        expect(JSON.parse(req.text).data.permission[0].name).toBe("TEST_CONFIG_KEY");
+        expect(JSON.parse(req.text).data.permission[1].name).toBe("TEST_CONFIG_KEY_PRD_QA");
+        expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
+        expect(JSON.parse(req.text).data.permission[1].permissions).toMatchObject(JSON.parse(exptected));
+    });
+
+    test('CLIENT_SUITE - Should return list of Configs permissions - Unauthorized access', async () => {
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send(graphqlUtils.permissionsQuery(domainId, groupConfigId, `"UPDATE","DELETE"`, RouterTypes.CONFIG));
+
+        const exptected = '[{"action":"UPDATE","result":"nok"},{"action":"DELETE","result":"nok"}]';
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).not.toBe(null);
+        expect(JSON.parse(req.text).data.permission[0].name).toBe("TEST_CONFIG_KEY");
+        expect(JSON.parse(req.text).data.permission[1].name).toBe("TEST_CONFIG_KEY_PRD_QA");
+        expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
+        expect(JSON.parse(req.text).data.permission[1].permissions).toMatchObject(JSON.parse(exptected));
+    });
+
+    test('CLIENT_SUITE - Should NOT return list of permissions - Invalid router', async () => {
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send(graphqlUtils.permissionsQuery(domainId, undefined, `"UPDATE","DELETE"`, RouterTypes.DOMAIN));
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).not.toBe(null);
+        expect(JSON.parse(req.text).data.permission).toStrictEqual([]);
     });
 });

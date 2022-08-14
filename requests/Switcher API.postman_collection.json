@@ -5602,6 +5602,30 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Client - Permission (Adm-GraphQL)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "{\r\n    # permission(domain: \"5e0ece606f4f994eac9007ae\", actions: [\"UPDATE\", \"DELETE\"], router: \"GROUP\") {\r\n    permission(\r\n        domain: \"5e0ece606f4f994eac9007ae\", \r\n        parent: \"5e0ece916f4f994eac9007b0\", \r\n        actions: [\"UPDATE\", \"DELETE\"],\r\n        router: \"SWITCHER\") {\r\n        id\r\n        name\r\n        permissions {\r\n            action\r\n            result\r\n        }\r\n    }\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{url}}/adm-graphql",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"adm-graphql"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
