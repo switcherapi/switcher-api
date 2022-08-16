@@ -38,12 +38,12 @@
     "helmet": "^5.1.1",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.4",
-    "mongodb": "^4.7.0",
-    "mongoose": "^6.4.0",
-    "pino": "^8.4.0",
-    "pino-pretty": "^8.1.0",
+    "mongodb": "^4.8.1",
+    "mongoose": "^6.5.2",
+    "pino": "^8.4.1",
+    "pino-pretty": "^9.0.0",
     "swagger-ui-express": "^4.5.0",
-    "switcher-client": "^3.1.1",
+    "switcher-client": "^3.1.2",
     "validator": "^13.7.0"
   },
   "devDependencies": {
