@@ -108,14 +108,9 @@ export async function updateConfig(id, args, admin) {
         }
     }
 
-    // modifies metrics map toggle by environment
+    // validates existing environment
     if (args.disable_metrics) {
-        const updateMetrics = Object.keys(args.disable_metrics);
         await checkEnvironmentStatusChange_v2(args, config.domain, args.disable_metrics);
-        Object.keys(args.disable_metrics[updateMetrics])
-            .forEach((map) => 
-                config.disable_metrics[updateMetrics]
-                    .set(map, args.disable_metrics[updateMetrics][map]));
     }
 
     // check permissions
