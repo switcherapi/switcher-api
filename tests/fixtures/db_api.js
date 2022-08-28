@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import Admin from '../../src/models/admin';
 import Domain from '../../src/models/domain';
@@ -245,8 +245,8 @@ export const setupDatabase = async () => {
     await new Permission(permissionAll3).save();
     await new Permission(permissionAll4).save();
 
-    const hashApiKey = await bcrypt.hash(component1._id + component1.name, 8);
-    const hash = await bcrypt.hash(hashApiKey, 8);
+    const hashApiKey = await bcryptjs.hash(component1._id + component1.name, 8);
+    const hash = await bcryptjs.hash(hashApiKey, 8);
     component1.apihash = hash;
     await new Component(component1).save();
 };

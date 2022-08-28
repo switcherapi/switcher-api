@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Config } from './config';
 import Domain from './domain';
@@ -53,8 +53,8 @@ componentSchema.options.toJSON = {
 
 componentSchema.methods.generateApiKey = async function () {
     const component = this;
-    const apiKey = await bcrypt.hash(component._id + component.name, 8);
-    const hash = await bcrypt.hash(apiKey, 8);
+    const apiKey = await bcryptjs.hash(component._id + component.name, 8);
+    const hash = await bcryptjs.hash(apiKey, 8);
     component.apihash = hash;
     await component.save();
     
@@ -84,7 +84,7 @@ componentSchema.statics.findByCredentials = async (domainName, componentName, ap
     }
 
     let decoded = Buffer.from(apiKey, 'base64').toString('ascii');
-    const isMatch = await bcrypt.compare(decoded, component.apihash);
+    const isMatch = await bcryptjs.compare(decoded, component.apihash);
 
     if (!isMatch) {
         throw new Error('Unable to find this Component');

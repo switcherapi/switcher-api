@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 import app from '../src/app';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
@@ -557,8 +557,8 @@ describe('Testing criteria [REST] ', () => {
             owner: adminMasterAccountId
         };
 
-        const hashApiKey = await bcrypt.hash(component._id + component.name, 8);
-        const hash = await bcrypt.hash(hashApiKey, 8);
+        const hashApiKey = await bcryptjs.hash(component._id + component.name, 8);
+        const hash = await bcryptjs.hash(hashApiKey, 8);
         component.apihash = hash;
         await new Component(component).save();
         const generatedApiKey = Buffer.from(hashApiKey).toString('base64');

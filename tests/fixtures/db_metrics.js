@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 import { Metric } from '../../src/models/metric';
 import Admin from '../../src/models/admin';
 import { EnvType } from '../../src/models/environment';
@@ -169,8 +169,8 @@ export const setupDatabase = async () => {
     await new Metric(entry3).save();
     await new Metric(entry4).save();
 
-    const apiKey = await bcrypt.hash(component1._id + component1.name, 8);
-    const hash = await bcrypt.hash(apiKey, 8);
+    const apiKey = await bcryptjs.hash(component1._id + component1.name, 8);
+    const hash = await bcryptjs.hash(apiKey, 8);
     component1.apihash = hash;
     await new Component(component1).save();
 };
