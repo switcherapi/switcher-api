@@ -1,5 +1,5 @@
 # ---------- Base ----------
-FROM --platform=linux/amd64 node:gallium-alpine AS base
+FROM node:gallium-alpine AS base
 
 WORKDIR /app
 
