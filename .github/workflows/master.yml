@@ -95,5 +95,5 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          platforms: linux/amd64,linux/arm/v8
+          platforms: linux/amd64,linux/arm64
           tags: trackerforce/switcher-api:latest
