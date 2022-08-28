@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 import Component from '../../src/models/component';
 import Domain from '../../src/models/domain';
 import { EnvType } from '../../src/models/environment';
@@ -26,8 +26,8 @@ export async function createDummyComponent(componentName, domainId, accountId) {
         owner: accountId
     };
 
-    const apiKey = await bcrypt.hash(componentDocument._id + componentDocument.name, 8);
-    const hash = await bcrypt.hash(apiKey, 8);
+    const apiKey = await bcryptjs.hash(componentDocument._id + componentDocument.name, 8);
+    const hash = await bcryptjs.hash(apiKey, 8);
     componentDocument.apihash = hash;
     
     await new Component(componentDocument).save();

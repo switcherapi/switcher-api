@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import Domain from './domain';
@@ -142,7 +142,7 @@ adminSchema.statics.findByCredentials = async (email, password) => {
         throw new Error('Unable to login');
     }
 
-    const isMatch = await bcrypt.compare(password, admin.password);
+    const isMatch = await bcryptjs.compare(password, admin.password);
 
     if (!isMatch) {
         throw new Error('Unable to login');
@@ -196,7 +196,7 @@ adminSchema.pre('save', async function (next) {
     const admin = this;
 
     if (admin.isModified('password')) {
-        admin.password = await bcrypt.hash(admin.password, 8);
+        admin.password = await bcryptjs.hash(admin.password, 8);
         notifyAcCreation(admin._id);
     }
     

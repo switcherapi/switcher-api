@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 import app from '../src/app';
 import Component from '../src/models/component';
 import { 
@@ -97,7 +97,7 @@ describe('Insertion tests', () => {
         // DB validation - current Domain token should not be as the same as the generated
         const apiKey = Buffer.from(response.body.apiKey, 'base64').toString('ascii');
         const component = await Component.findById(component1Id).lean();
-        const isMatch = await bcrypt.compare(apiKey, component.apihash);
+        const isMatch = await bcryptjs.compare(apiKey, component.apihash);
         expect(isMatch).toEqual(true);
     });
 

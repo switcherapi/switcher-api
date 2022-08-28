@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 import Admin from '../../src/models/admin';
 import Domain from '../../src/models/domain';
 import GroupConfig from '../../src/models/group-config';
@@ -226,8 +226,8 @@ export const setupDatabase = async () => {
     await new ConfigStrategy(configStrategyTIME_BETWEENDocument).save();
     await new ConfigStrategy(configStrategyTIME_GREATDocument).save();
 
-    const hashApiKey = await bcrypt.hash(component1._id + component1.name, 8);
-    const hash = await bcrypt.hash(hashApiKey, 8);
+    const hashApiKey = await bcryptjs.hash(component1._id + component1.name, 8);
+    const hash = await bcryptjs.hash(hashApiKey, 8);
     component1.apihash = hash;
     await new Component(component1).save();
     apiKey = Buffer.from(hashApiKey).toString('base64');
