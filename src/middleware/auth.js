@@ -86,7 +86,7 @@ export async function slackAuth(req, res, next) {
 export function resourcesAuth() {
     return basicAuth({
         users: {
-            admin: process.env.RESOURCE_SECRECT || 'admin',
+            admin: process.env.RESOURCE_SECRET || 'admin',
         },
         challenge: true,
     });
