@@ -126,7 +126,7 @@ jobs:
           kubectl: 1.24.0
           kustomize: 4.5.4
           command: |
-            cd switcher-api-dev/base
+            cd switcher-api/base
             echo RELEASE_TIME=`date` > environment-properties.env
             kustomize edit set image trackerforce/switcher-api:latest=trackerforce/switcher-api@${{ needs.docker.outputs.digest }}
             git config --global user.email "${{ github.actor }}@users.noreply.github.com"
