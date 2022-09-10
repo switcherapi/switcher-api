@@ -91,6 +91,7 @@ app.get('/check', (_req, res) => {
         status: 'UP',
         attributes: {
             version: swaggerDocument.info.version,
+            release_time: process.env.RELEASE_TIME,
             env: process.env.ENV,
             db_state: mongoose.connection.readyState,
             switcherapi: process.env.SWITCHER_API_ENABLE,
