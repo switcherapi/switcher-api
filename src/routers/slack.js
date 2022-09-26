@@ -30,7 +30,7 @@ const deleteInstallation = async (req, res) => {
             req.query.enterprise_id, req.query.team_id);
 
         if (!slack) throw new NotFoundError();
-        res.send(slack);
+        res.send({ message: 'Installation deleted' });
     } catch (e) {
         responseException(res, e, 400);
     }
