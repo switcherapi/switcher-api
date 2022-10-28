@@ -58,20 +58,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  deploy-staging:
-    name: Deploy to Staging
-    needs: [ build-test ]
-    runs-on: ubuntu-latest
-    if: success() && github.ref == 'refs/heads/master'
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY_1}}
-          heroku_app_name: "switcher-api-staging"
-          heroku_email: ${{secrets.HEROKU_EMAIL_1}}
-
   docker:
     name: Publish Docker Image
     needs: [ build-test ]

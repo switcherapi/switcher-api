@@ -34,8 +34,8 @@ export default {
             description: 'Local'
         },
         {
-            url: 'https://switcher-api.herokuapp.com',
-            description: 'Production'
+            url: 'https://switcherapi.com/api',
+            description: 'Cloud API'
         }
     ],
     consumes: ['application/json'],
