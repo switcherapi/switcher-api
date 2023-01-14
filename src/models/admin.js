@@ -136,7 +136,7 @@ adminSchema.methods.generateAuthCode = async function () {
 };
 
 adminSchema.statics.findByCredentials = async (email, password) => {
-    const admin = await Admin.findOne({ email, active: true });
+    const admin = await Admin.findOne({ email, active: true }).exec();
 
     if (!admin) {
         throw new Error('Unable to login');
@@ -214,14 +214,14 @@ adminSchema.pre('remove', async function (next) {
     const ObjectId = (require('mongoose').Types.ObjectId);
 
     const admin = this;
-    const domains = await Domain.find({ owner: new ObjectId(admin._id) });
+    const domains = await Domain.find({ owner: new ObjectId(admin._id) }).exec();
 
     if (domains) {
         for (const domain of domains)
             await domain.remove();
     }
 
-    const teams = await Team.find({ members: admin._id });
+    const teams = await Team.find({ members: admin._id }).exec();
     for (const team of teams) {
         let indexMmeber = team.members.indexOf(admin._id);
         team.members.splice(indexMmeber, 1);

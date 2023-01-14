@@ -56,7 +56,7 @@ groupConfigSchema.options.toJSON = {
 
 async function recordGroupHistory(group, modifiedField) {
     if (group.__v !== undefined && modifiedField.length) {
-        const oldGroup = await GroupConfig.findById(group._id);
+        const oldGroup = await GroupConfig.findById(group._id).exec();
         await recordHistory(modifiedField, oldGroup, group, group.domain);
     }
 }
@@ -69,7 +69,7 @@ groupConfigSchema.virtual('config', {
 
 groupConfigSchema.pre('remove', async function (next) {
     const group = this;
-    const configs = await Config.find({ group: group._id });
+    const configs = await Config.find({ group: group._id }).exec();
 
     if (configs) {
         for (const config of configs) {
@@ -77,7 +77,7 @@ groupConfigSchema.pre('remove', async function (next) {
         }
     }
 
-    await History.deleteMany({ domainId: group.domain, elementId: group._id });
+    await History.deleteMany({ domainId: group.domain, elementId: group._id }).exec();
     next();
 });
 

@@ -62,7 +62,8 @@ router.get('/domain/history/:id', auth, [
             .select('oldValue newValue updatedBy date -_id')
             .sort(sortBy(req.query))
             .limit(parseInt(req.query.limit || 10))
-            .skip(parseInt(req.query.skip || 0));
+            .skip(parseInt(req.query.skip || 0))
+            .exec();
 
         await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN);
 

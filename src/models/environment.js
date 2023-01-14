@@ -43,7 +43,7 @@ environmentSchema.options.toJSON = {
 
 environmentSchema.pre('validate', async function (next) {
     const { name, domain } = this;
-    const existEnv = await Environment.findOne({ name, domain });
+    const existEnv = await Environment.findOne({ name, domain }).exec();
     
     if (existEnv) {
         const err = new Error(`Unable to complete the operation. Environment '${name}' already exist for this Domain`);

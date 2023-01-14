@@ -13,7 +13,7 @@ async function verifyGroupInput(groupId, admin) {
 }
 
 export async function getGroupConfigById(id, lean = false) {
-    let group = await GroupConfig.findById(id, null, { lean });
+    let group = await GroupConfig.findById(id, null, { lean }).exec();
     return response(group, 'Group Config not found');
 }
 

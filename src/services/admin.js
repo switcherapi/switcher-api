@@ -10,7 +10,7 @@ import { response } from './common';
 import { getTeams } from './team';
 
 export async function getAdminById(id) {
-    let admin = await Admin.findById(id);
+    let admin = await Admin.findById(id).exec();
     return response(admin, 'Admin not found');
 }
 
@@ -139,7 +139,7 @@ export async function leaveDomain(domainid, admin) {
 }
 
 export async function deleteAccount(admin) {
-    const domains = await Domain.find({ owner: admin._id }).countDocuments();
+    const domains = await Domain.find({ owner: admin._id }).countDocuments().exec();
     if (domains > 0) {
         throw new BadRequestError(
             `This account has ${domains} Domain(s) that must be either deleted or transfered to another account.`);

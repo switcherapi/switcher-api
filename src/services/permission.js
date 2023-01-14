@@ -17,7 +17,10 @@ async function verifyPermissionValueInput(permissionId, value) {
 }
 
 export async function getPermissionById(id, lean = false) {
-    let permission = lean ? await Permission.findById(id).lean() : await Permission.findById(id);
+    let permission = lean ? 
+        await Permission.findById(id).lean().exec() : 
+        await Permission.findById(id).exec();
+        
     return response(permission, 'Permission not found');
 }
 

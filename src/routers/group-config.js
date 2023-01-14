@@ -72,7 +72,8 @@ router.get('/groupconfig/history/:id', auth, [
             .select('oldValue newValue updatedBy date -_id')
             .sort(sortBy(req.query))
             .limit(parseInt(req.query.limit || 10))
-            .skip(parseInt(req.query.skip || 0));
+            .skip(parseInt(req.query.skip || 0))
+            .exec();
 
         await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP);
 
@@ -89,7 +90,7 @@ router.delete('/groupconfig/history/:id', auth, [
         const groupconfig = await Services.getGroupConfigById(req.params.id);
         await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
 
-        await History.deleteMany({ domainId: groupconfig.domain, elementId: groupconfig._id });
+        await History.deleteMany({ domainId: groupconfig.domain, elementId: groupconfig._id }).exec();
         res.send(groupconfig);
     } catch (e) {
         responseException(res, e, 500);

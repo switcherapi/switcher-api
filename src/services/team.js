@@ -28,7 +28,7 @@ export async function verifyRequestedTeam(teamId, admin, action) {
 }
 
 export async function getTeamById(id) {
-    let team = await Team.findById(id);
+    let team = await Team.findById(id).exec();
     return response(team, 'Team not found');
 }
 
@@ -57,7 +57,7 @@ export async function getTeamsSort(where, projection, skip, limit, sort) {
 }
 
 export async function getTeamInviteById(id) {
-    let teamInvite = await TeamInvite.findById(id);
+    let teamInvite = await TeamInvite.findById(id).exec();
     return response(teamInvite, 'Invite request not found');
 }
 
@@ -66,7 +66,7 @@ export async function getTeamInvites(where) {
 }
 
 export async function getTeamInvite(where, validate = true) {
-    let teamInvite = await TeamInvite.findOne(where);
+    let teamInvite = await TeamInvite.findOne(where).exec();
 
     if (validate)
         return response(teamInvite, 'Invite request not found');
@@ -155,7 +155,7 @@ export async function removeInvite(request_id, id, admin) {
 export async function addTeamMember(member, id, admin) {
     const team = await verifyRequestedTeam(id, admin, ActionTypes.UPDATE);
 
-    const adminMember = await Admin.findById(member.trim());
+    const adminMember = await Admin.findById(member.trim()).exec();
     await addMemberToTeam(adminMember, team);
     return adminMember;
 }
@@ -163,7 +163,7 @@ export async function addTeamMember(member, id, admin) {
 export async function removeTeamMember(member, id, admin) {
     const team = await verifyRequestedTeam(id, admin, ActionTypes.UPDATE);
 
-    const adminMember = await Admin.findById(member.trim());
+    const adminMember = await Admin.findById(member.trim()).exec();
 
     if (!adminMember) {
         throw new NotFoundError('Member not found');
@@ -184,14 +184,14 @@ export async function removeTeamMember(member, id, admin) {
 
 export async function removeTeamPermission(permission, id, admin) {
     const team = await verifyRequestedTeam(id, admin, ActionTypes.UPDATE);
-    const permissionToRemove = await Permission.findById(permission.trim());
+    const permissionToRemove = await Permission.findById(permission.trim()).exec();
     
     if (!permissionToRemove) {
         throw new NotFoundError('Permission not found');
     }
 
     const indexPermissions = team.permissions.indexOf(permissionToRemove._id);
-    await Permission.deleteOne({ _id: permission.trim() });
+    await Permission.deleteOne({ _id: permission.trim() }).exec();
     team.permissions.splice(indexPermissions, 1);
     
     return team.save();
