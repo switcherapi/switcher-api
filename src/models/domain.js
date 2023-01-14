@@ -98,7 +98,7 @@ domainSchema.options.toJSON = {
 
 domainSchema.pre('remove', async function (next) {
     const domain = this;
-    const groups = await GroupConfig.find({ domain: domain._id });
+    const groups = await GroupConfig.find({ domain: domain._id }).exec();
     
     if (groups) {
         for (const group of groups) {
@@ -106,7 +106,7 @@ domainSchema.pre('remove', async function (next) {
         }
     }
 
-    const teams = await Team.find({ domain: domain._id });
+    const teams = await Team.find({ domain: domain._id }).exec();
     if (teams) {
         for (const team of teams) {
             await team.remove();
@@ -125,7 +125,7 @@ domainSchema.pre('remove', async function (next) {
 
 async function recordDomainHistory(domain, modifiedField) {
     if (domain.__v !== undefined && modifiedField.length) {
-        const oldDomain = await Domain.findById(domain._id);
+        const oldDomain = await Domain.findById(domain._id).exec();
         await recordHistory(modifiedField, oldDomain, domain, domain._id, ['lastUpdate']);
     }
 }

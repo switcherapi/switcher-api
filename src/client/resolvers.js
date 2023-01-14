@@ -33,7 +33,7 @@ export async function resolveConfigStrategy(source, _id, strategy, operation, ac
     if (strategy) { args.strategy = strategy; }
     if (operation) { args.operation = operation; }
     
-    let strategies = await ConfigStrategy.find({ config: source._id, ...args }).lean();
+    let strategies = await ConfigStrategy.find({ config: source._id, ...args }).lean().exec();
     const environment = context.environment ? context.environment : EnvType.DEFAULT;
 
     strategies = strategies.filter(s => s.activated[environment] !== undefined);
@@ -43,7 +43,7 @@ export async function resolveConfigStrategy(source, _id, strategy, operation, ac
 
     try {
         if (context.admin) {
-            let parentConfig = await Config.findById(source._id);
+            let parentConfig = await Config.findById(source._id).exec();
             strategies = await verifyOwnership(context.admin, strategies, parentConfig.domain, ActionTypes.READ, RouterTypes.STRATEGY);
         }
     } catch (e) {
@@ -60,7 +60,7 @@ export async function resolveConfig(source, _id, key, activated, context) {
     if (key) { args.key = key; }
     if (context._component) { args.components = context._component; }
 
-    let configs = await Config.find({ group: source._id, ...args }).lean();
+    let configs = await Config.find({ group: source._id, ...args }).lean().exec();
 
     if (activated !== undefined) {
         configs = configs.filter(config => config.activated[context.environment] === activated);
@@ -68,7 +68,7 @@ export async function resolveConfig(source, _id, key, activated, context) {
 
     try {
         if (context.admin) {
-            let parentGroup = await GroupConfig.findById(source._id);
+            let parentGroup = await GroupConfig.findById(source._id).exec();
             configs = await verifyOwnership(context.admin, configs, parentGroup.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
         }
     } catch (e) {
@@ -84,7 +84,7 @@ export async function resolveGroupConfig(source, _id, name, activated, context) 
     if (_id) { args._id = _id; }
     if (name) { args.name = name; }
 
-    let groups = await GroupConfig.find({ domain: source._id, ...args }).lean();
+    let groups = await GroupConfig.find({ domain: source._id, ...args }).lean().exec();
 
     if (activated !== undefined) {
         groups = groups.filter(group => group.activated[context.environment] === activated);
@@ -114,7 +114,7 @@ export async function resolveDomain(_id, name, activated, context) {
         }
     }
     
-    let domain = await Domain.findOne({ ...args }).lean();
+    let domain = await Domain.findOne({ ...args }).lean().exec();
     if (activated !== undefined) {
         if (domain.activated[context.environment] !== activated) {
             return null;
@@ -142,14 +142,14 @@ export async function checkDomain(domainId) {
  */
 async function resolveComponentsFirst(source, context, groups) {
     if (context._component) {
-        const component = await Component.findOne({ domain: source._id, name: context._component });
+        const component = await Component.findOne({ domain: source._id, name: context._component }).exec();
         const validGroups = [];
 
         context._component = component?._id;
         for (const group of groups) {
             let configsLength = await Config.find({
                  domain: source._id, group: group._id, components: context._component 
-            }).countDocuments();
+            }).countDocuments().exec();
 
             if (configsLength) {
                 validGroups.push(group);
@@ -161,7 +161,7 @@ async function resolveComponentsFirst(source, context, groups) {
 }
 
 async function checkGroup(configId) {
-    const config = await Config.findOne({ _id: configId }, null, { lean: true });
+    const config = await Config.findOne({ _id: configId }, null, { lean: true }).exec();
     return GroupConfig.findOne({ _id: config.group }, null, { lean: true });
 }
 

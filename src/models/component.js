@@ -76,8 +76,8 @@ componentSchema.methods.generateAuthToken = async function (environment) {
 };
 
 componentSchema.statics.findByCredentials = async (domainName, componentName, apiKey) => {
-    const domain = await Domain.findOne({ name: domainName });
-    const component = await Component.findOne({ name: componentName, domain: domain._id || '' });
+    const domain = await Domain.findOne({ name: domainName }).exec();
+    const component = await Component.findOne({ name: componentName, domain: domain._id || '' }).exec();
 
     if (!component) {
         throw new Error('Unable to find this Component');
@@ -98,7 +98,7 @@ componentSchema.statics.findByCredentials = async (domainName, componentName, ap
 
 const existComponent = async ({ domain, name, __v }) => {
     if (__v === undefined) {
-        const foundComponent = await Component.find({ domain, name });
+        const foundComponent = await Component.find({ domain, name }).exec();
         return foundComponent.length > 0;
     }
     return false;
@@ -119,7 +119,7 @@ componentSchema.pre('validate', async function (next) {
 componentSchema.pre('remove', async function (next) {
     const component = this;
     
-    const configsToRemoveFrom = await Config.find({ components: { $in: [component._id] } });
+    const configsToRemoveFrom = await Config.find({ components: { $in: [component._id] } }).exec();
     configsToRemoveFrom.forEach(config => {
         const indexValue = config.components.indexOf(component._id);
         config.components.splice(indexValue, 1);

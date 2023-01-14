@@ -142,7 +142,7 @@ configSchema.options.toJSON = {
 
 async function recordConfigHistory(config, modifiedField) {
     if (config.__v !== undefined && modifiedField.length) {
-        const oldConfig = await Config.findById(config._id);
+        const oldConfig = await Config.findById(config._id).exec();
         await oldConfig.populate({ path: 'component_list' });
         await recordHistory(modifiedField, oldConfig.toJSON(), config, config.domain);
     }
@@ -157,14 +157,14 @@ configSchema.virtual('configStrategy', {
 configSchema.pre('remove', async function (next) {
     const config = this;
     
-    const strategies = await ConfigStrategy.find({ config: config._id });
+    const strategies = await ConfigStrategy.find({ config: config._id }).exec();
     if (strategies) {
         for (const strategy of strategies) {
             await strategy.remove();
         }
     }
     
-    await History.deleteMany({ domainId: config.domain, elementId: config._id });
+    await History.deleteMany({ domainId: config.domain, elementId: config._id }).exec();
     next();
 });
 

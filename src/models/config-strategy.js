@@ -297,7 +297,7 @@ function processPAYLOAD(operation, input, values) {
 
 async function recordStrategyHistory(strategyConfig, modifiedField) {
     if (strategyConfig.__v !== undefined && modifiedField.length) {
-        const oldStrategy = await ConfigStrategy.findById(strategyConfig._id);
+        const oldStrategy = await ConfigStrategy.findById(strategyConfig._id).exec();
         await recordHistory(modifiedField, oldStrategy, strategyConfig, strategyConfig.domain);
     }
 }
@@ -309,7 +309,7 @@ async function existStrategy(strategyConfig) {
                 config: strategyConfig.config, 
                 strategy: strategyConfig.strategy,
                 activated: strategyConfig.activated 
-            });
+            }).exec();
 
         return foundStrategy.length > 0;
     }
@@ -383,7 +383,7 @@ configStrategySchema.options.toJSON = {
 configStrategySchema.pre('remove', async function (next) {
     const strategyConfig = this;
     await History.deleteMany({ domainId: strategyConfig.domain, 
-        elementId: strategyConfig._id });
+        elementId: strategyConfig._id }).exec();
         
     next();
 });

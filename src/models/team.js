@@ -60,7 +60,7 @@ export async function addDefaultPermission(action, team) {
 
 const existTeam = async (team) => {
     if (team.__v === undefined) {
-        const foundTeam = await Team.find({ name: team.name, domain: team.domain });
+        const foundTeam = await Team.find({ name: team.name, domain: team.domain }).exec();
         return foundTeam.length > 0;
     }
     return false;
@@ -80,9 +80,9 @@ teamSchema.pre('validate', async function (next) {
 
 teamSchema.pre('remove', async function (next) {
     const team = this;
-    await Permission.deleteMany({ _id: { $in: team.permissions } });
+    await Permission.deleteMany({ _id: { $in: team.permissions } }).exec();
 
-    const membersToRemve = await Admin.find({ teams: team._id });
+    const membersToRemve = await Admin.find({ teams: team._id }).exec();
     membersToRemve.forEach(member => {
         const indexValue = member.teams.indexOf(team._id);
         member.teams.splice(indexValue, 1);
