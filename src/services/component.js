@@ -5,7 +5,7 @@ import { formatInput, verifyOwnership } from '../helpers';
 import { response } from './common';
 
 export async function getComponentById(id) {
-    let component = await Component.findById(id);
+    let component = await Component.findById(id).exec();
     return response(component, 'Component not found');
 }
 

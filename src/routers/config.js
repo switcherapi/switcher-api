@@ -84,7 +84,8 @@ router.get('/config/history/:id', auth, [
             .select('oldValue newValue updatedBy date -_id')
             .sort(sortBy(req.query))
             .limit(parseInt(req.query.limit || 10))
-            .skip(parseInt(req.query.skip || 0));
+            .skip(parseInt(req.query.skip || 0))
+            .exec();
 
         await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG);
 
@@ -101,7 +102,7 @@ router.delete('/config/history/:id', auth, [
         const config = await Services.getConfigById(req.params.id);
         await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
 
-        await History.deleteMany({ domainId: config.domain, elementId: config._id });
+        await History.deleteMany({ domainId: config.domain, elementId: config._id }).exec();
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);

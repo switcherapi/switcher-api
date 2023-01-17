@@ -64,7 +64,7 @@ export async function deleteMetrics(req) {
     }
 
     config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
-    await Metric.deleteMany({ domain: config.domain, config: config._id });
+    await Metric.deleteMany({ domain: config.domain, config: config._id }).exec();
 }
 
 async function aggreagateReasons(aggregate, result) {

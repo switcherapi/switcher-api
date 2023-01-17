@@ -26,7 +26,7 @@ function validateValues(values) {
 }
 
 export async function getStrategyById(id) {
-    let strategy = await ConfigStrategy.findById(id);
+    let strategy = await ConfigStrategy.findById(id).exec();
     return response(strategy, 'Strategy not found');
 }
 
