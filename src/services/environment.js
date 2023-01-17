@@ -13,7 +13,7 @@ async function removeEnvironmentFromElements(environment) {
     await ConfigStrategy.deleteMany({ domain: environment.domain, $or: [ 
         { activated: { [`${environment.name}`]: true } }, 
         { activated: { [`${environment.name}`]: false } } 
-    ] });
+    ] }).exec();
 
     const configs = await getConfigs({ domain: environment.domain });
     if (configs.length) {
@@ -34,7 +34,7 @@ async function removeEnvironmentFromElements(environment) {
 }
 
 export async function getEnvironmentById(id) {
-    let environment = await Environment.findById(id);
+    let environment = await Environment.findById(id).exec();
     return response(environment, 'Environment not found');
 }
 

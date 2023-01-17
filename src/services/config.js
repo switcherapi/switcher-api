@@ -16,7 +16,7 @@ async function verifyAddComponentInput(configId, admin) {
 }
 
 export async function getConfigById(id) {
-    let config = await Config.findById(id);
+    let config = await Config.findById(id).exec();
     return response(config, 'Config not found');
 }
 

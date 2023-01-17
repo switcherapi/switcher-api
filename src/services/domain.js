@@ -21,7 +21,7 @@ export async function removeDomainStatus(domain, environmentName) {
 }
 
 export async function getDomainById(id, lean = false) {
-    let domain = await Domain.findById(id, null, { lean });
+    let domain = await Domain.findById(id, null, { lean }).exec();
     return response(domain, 'Domain not found');
 }
 
@@ -59,7 +59,7 @@ export async function createDomain(args, admin) {
 export async function deleteDomainHistory(id, admin) {
     const domain = await getDomainById(id);
     await verifyOwnership(admin, domain, domain._id, ActionTypes.DELETE, RouterTypes.ADMIN);
-    await History.deleteMany({ elementId: domain._id });
+    await History.deleteMany({ elementId: domain._id }).exec();
     return domain;
 }
 
