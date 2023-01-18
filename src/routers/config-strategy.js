@@ -1,6 +1,5 @@
 import express from 'express';
 import { check, query } from 'express-validator';
-import History from '../models/history';
 import { EnvType } from '../models/environment';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { strategyRequirements, StrategiesType } from '../models/config-strategy';
@@ -8,6 +7,7 @@ import { auth } from '../middleware/auth';
 import { verifyOwnership, sortBy } from '../helpers';
 import { ActionTypes, RouterTypes } from '../models/permission';
 import { getConfigById } from '../services/config';
+import { getHistory, deleteHistory } from '../services/history';
 import * as Services from '../services/config-strategy';
 import { responseException } from '../exceptions';
 
@@ -75,12 +75,9 @@ router.get('/configstrategy/history/:id', auth, [
 ], validate, async (req, res) => {
     try {
         const configStrategy = await Services.getStrategyById(req.params.id);
-        const history = await History.find({ domainId: configStrategy.domain, elementId: configStrategy._id })
-            .select('oldValue newValue updatedBy date -_id')
-            .sort(sortBy(req.query))
-            .limit(parseInt(req.query.limit || 10))
-            .skip(parseInt(req.query.skip || 0))
-            .exec();
+        
+        const query = 'oldValue newValue updatedBy date -_id';
+        const history = await getHistory(query, configStrategy.domain, configStrategy._id, req.query);
 
         await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY);
 
@@ -97,7 +94,7 @@ router.delete('/configstrategy/history/:id', auth, [
         const configStrategy = await Services.getStrategyById(req.params.id);
         await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
 
-        await History.deleteMany({ domainId: configStrategy.domain, elementId: configStrategy._id }).exec();
+        await deleteHistory(configStrategy.domain, configStrategy._id);
         res.send(configStrategy);
     } catch (e) {
         responseException(res, e, 500);

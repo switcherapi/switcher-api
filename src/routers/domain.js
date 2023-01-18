@@ -1,5 +1,4 @@
 import express from 'express';
-import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { check } from 'express-validator';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
@@ -7,6 +6,7 @@ import { verifyOwnership, sortBy } from '../helpers';
 import { ActionTypes, RouterTypes } from '../models/permission';
 import { checkDomain, SwitcherKeys } from '../external/switcher-api-facade';
 import * as Services from '../services/domain';
+import { getHistory } from '../services/history';
 import { responseException } from '../exceptions';
 
 const router = new express.Router();
@@ -58,12 +58,9 @@ router.get('/domain/history/:id', auth, [
 ], validate, async (req, res) => {
     try {
         const domain = await Services.getDomainById(req.params.id);
-        const history = await History.find({ elementId: domain._id })
-            .select('oldValue newValue updatedBy date -_id')
-            .sort(sortBy(req.query))
-            .limit(parseInt(req.query.limit || 10))
-            .skip(parseInt(req.query.skip || 0))
-            .exec();
+
+        const query = 'oldValue newValue updatedBy date -_id';
+        const history = await getHistory(query, domain._id, undefined, req.query);
 
         await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN);
 

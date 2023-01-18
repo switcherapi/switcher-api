@@ -1,7 +1,6 @@
 import express from 'express';
 import { check, query } from 'express-validator';
 import { relayOptions } from '../models/config';
-import History from '../models/history';
 import { auth } from '../middleware/auth';
 import { ActionTypes, RouterTypes } from '../models/permission';
 import { responseException } from '../exceptions';
@@ -10,6 +9,7 @@ import {
     verifyInputUpdateParameters } from '../middleware/validators';
 import { sortBy, verifyOwnership } from '../helpers';
 import * as Services from '../services/config';
+import { getHistory, deleteHistory } from '../services/history';
 import { getGroupConfigById } from '../services/group-config';
 import { SwitcherKeys } from '../external/switcher-api-facade';
 
@@ -80,12 +80,9 @@ router.get('/config/history/:id', auth, [
 ], validate, async (req, res) => {
     try {
         const config = await Services.getConfigById(req.params.id);
-        const history = await History.find({ domainId: config.domain, elementId: config._id })
-            .select('oldValue newValue updatedBy date -_id')
-            .sort(sortBy(req.query))
-            .limit(parseInt(req.query.limit || 10))
-            .skip(parseInt(req.query.skip || 0))
-            .exec();
+
+        const query = 'oldValue newValue updatedBy date -_id';
+        const history = await getHistory(query, config.domain, config._id, req.query);
 
         await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG);
 
@@ -102,7 +99,7 @@ router.delete('/config/history/:id', auth, [
         const config = await Services.getConfigById(req.params.id);
         await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
 
-        await History.deleteMany({ domainId: config.domain, elementId: config._id }).exec();
+        await deleteHistory(config.domain, config._id);
         res.send(config);
     } catch (e) {
         responseException(res, e, 500);
