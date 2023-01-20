@@ -1,14 +1,18 @@
 import History from '../models/history';
-import { sortBy } from '../helpers';
+import { sortBy, validatePagingArgs } from '../helpers';
+import { BadRequestError } from '../exceptions';
 
-export async function getHistory(query, domainId, elementId, specs = {}) {
+export async function getHistory(query, domainId, elementId, pagingArgs = {}) {
     const findQuery = elementId ? { domainId, elementId } : { domainId };
+
+    if (!validatePagingArgs(pagingArgs))
+        throw new BadRequestError('Invalid paging args');
 
     return History.find(findQuery)
             .select(query)
-            .sort(sortBy(specs))
-            .limit(parseInt(specs.limit || 10))
-            .skip(parseInt(specs.skip || 0))
+            .sort(sortBy(pagingArgs))
+            .limit(parseInt(pagingArgs.limit || 10))
+            .skip(parseInt(pagingArgs.skip || 0))
             .exec();
 }
 

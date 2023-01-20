@@ -88,6 +88,29 @@ export function sortBy(args) {
     return sort;
 }
 
+export function validatePagingArgs(args) {
+    if (args.limit && !Number.isInteger(args.limit))
+        return false;
+     
+    if (args.skip && !Number.isInteger(args.skip))
+        return false;
+
+    if (args.sortBy) {
+        const parts = args.sortBy.split(':');
+
+        if (parts.length != 2)
+            return false;
+            
+        if (!parts[0].match(/^[A-Za-z]+$/))
+            return false;
+
+        if (parts[1] != 'asc' && parts[1] != 'desc')
+            return false;
+    }
+
+    return true;
+}
+
 export async function verifyOwnership(admin, element, domainId, action, routerType, cascade = false) {
     const domain = await getDomainById(domainId);
     if (admin._id.equals(domain.owner)) {
