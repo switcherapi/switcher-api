@@ -50,6 +50,26 @@ describe('Testing history services', () => {
         expect(history[0].elementId).toMatchObject(element1Id);
     });
 
+    test('HISTORY_SERVICE - Should NOT get history - invalid paging args - limit', async () => {
+        const call = async () => {
+            await getHistory('elementId', domainId, element1Id, {
+                limit: '0'
+            });
+        }; 
+
+        await expect(call()).rejects.toThrowError('Invalid paging args');
+    });
+
+    test('HISTORY_SERVICE - Should NOT get history - invalid paging args - skip', async () => {
+        const call = async () => {
+            await getHistory('elementId', domainId, element1Id, {
+                skip: '0'
+            });
+        }; 
+
+        await expect(call()).rejects.toThrowError('Invalid paging args');
+    });
+
     test('HISTORY_SERVICE - Should get history - skip first entry', async () => {
         // given
         const timestamp = Date.now();
@@ -76,6 +96,42 @@ describe('Testing history services', () => {
         });
 
         expect(history[0].oldValue.toJSON()).toMatchObject({ value: 1 });
+    });
+
+    test('HISTORY_SERVICE - Should NOT get history entries sorted - invalid sortBy query spec', async () => {
+        const call = async () => {
+            await getHistory('elementId', domainId, element1Id, {
+                sortBy: 'oldValue:ASC'
+            });
+        }; 
+
+        await expect(call()).rejects.toThrowError('Invalid paging args');
+    });
+
+    test('HISTORY_SERVICE - Should NOT get history entries sorted - invalid sortBy query spec #2', async () => {
+        const call = async () => {
+            await getHistory('elementId', domainId, element1Id, {
+                sortBy: 'oldValue'
+            });
+        }; 
+
+        await expect(call()).rejects.toThrowError('Invalid paging args');
+    });
+
+    test('HISTORY_SERVICE - Should NOT get history entries sorted - invalid sortBy query argument', async () => {
+        // given
+        const timestamp = Date.now();
+        await addHistory(domainId, element1Id, { value: 1 }, { value: 2 }, timestamp);
+        await addHistory(domainId, element1Id, { value: 3 }, { value: 4 }, timestamp);
+        
+        // test
+        const call = async () => {
+            await getHistory('elementId', domainId, element1Id, {
+                sortBy: 'oldValue&:asc'
+            });
+        }; 
+
+        await expect(call()).rejects.toThrowError('Invalid paging args');
     });
 
     test('HISTORY_SERVICE - Should get history entries sorted by desc', async () => {
