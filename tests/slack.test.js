@@ -481,7 +481,7 @@ describe('Slack Settings', () => {
             }).expect(200);
 
         slackDb = await Services.getSlack({ id: slack._id });
-        expect(response.body).toMatchObject(slackDb.settings);
+        expect(response.body).toEqual(slackDb.settings);
         expect(slackDb.settings.ignored_environments).toEqual(
             expect.arrayContaining(['dev', 'dev1']),
         );
@@ -503,7 +503,7 @@ describe('Slack Settings', () => {
             }).expect(200);
 
         slackDb = await Services.getSlack({ id: slack._id });
-        expect(response.body).toMatchObject(slackDb.settings);
+        expect(response.body).toEqual(slackDb.settings);
         expect(slackDb.settings.frozen_environments).toEqual(
             expect.arrayContaining(['staging', 'staging1']),
         );

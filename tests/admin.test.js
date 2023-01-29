@@ -50,7 +50,7 @@ describe('Testing Admin insertion', () => {
             }).expect(201);
 
         // DB validation - document created
-        const admin = await Admin.findById(response.body.admin._id).lean();
+        const admin = await Admin.findById(response.body.admin._id).lean().exec();
         expect(admin).not.toBeNull();
 
         //used at: ADMIN_SUITE - Should confirm access to a new Admin
@@ -96,7 +96,7 @@ describe('Testing Admin insertion', () => {
 
     test('ADMIN_SUITE - Should NOT login before access confirmation sent via Email', async () => {
         // given
-        let admin = await Admin.findById(signedupUser).lean();
+        let admin = await Admin.findById(signedupUser).lean().exec();
         expect(admin).not.toBeNull();
         expect(admin.active).toEqual(false);
 
@@ -111,7 +111,7 @@ describe('Testing Admin insertion', () => {
 
     test('ADMIN_SUITE - Should confirm access to a new Admin', async () => {
         // given
-        let admin = await Admin.findById(signedupUser).lean();
+        let admin = await Admin.findById(signedupUser).lean().exec();
         expect(admin).not.toBeNull();
         expect(admin.active).toEqual(false);
 
@@ -121,13 +121,13 @@ describe('Testing Admin insertion', () => {
             .send().expect(201);
 
         // DB validation - document updated
-        admin = await Admin.findById(signedupUser).lean();
+        admin = await Admin.findById(signedupUser).lean().exec();
         expect(admin.active).toEqual(true);
     });
 
     test('ADMIN_SUITE - Should login after access confirmation', async () => {
         // given
-        let admin = await Admin.findById(signedupUser).lean();
+        let admin = await Admin.findById(signedupUser).lean().exec();
         expect(admin).not.toBeNull();
         expect(admin.active).toEqual(true);
 
@@ -155,7 +155,7 @@ describe('Testing Admin insertion', () => {
         axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
 
         // test
-        let admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true }).lean();
+        let admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true }).lean().exec();
         expect(admin).not.toBeNull();
         expect(admin.code).toBeNull();
 
@@ -166,7 +166,7 @@ describe('Testing Admin insertion', () => {
             }).expect(200);
 
         // DB validation - document obtained
-        admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true }).lean();
+        admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true }).lean().exec();
         expect(admin).not.toBeNull();
         expect(admin.code).not.toBeNull();
 
@@ -183,7 +183,7 @@ describe('Testing Admin insertion', () => {
         axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
 
         // test
-        let admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true }).lean();
+        let admin = await Admin.findOne({ email: 'new_admin@mail.com', active: true }).lean().exec();
         expect(admin).not.toBeNull();
         expect(admin.code).not.toBeNull();
 
@@ -302,7 +302,7 @@ describe('Testing Admin insertion', () => {
             .send().expect(201);
 
         // DB validation - document created
-        const admin = await Admin.findById(response.body.admin._id).lean();
+        const admin = await Admin.findById(response.body.admin._id).lean().exec();
         expect(admin).not.toBeNull();
         expect(admin._gitid).toEqual('123456789');
 
@@ -326,7 +326,7 @@ describe('Testing Admin insertion', () => {
             } 
         };
 
-        var bodyFormData = new URLSearchParams();
+        const bodyFormData = new URLSearchParams();
         bodyFormData.set('grant_type', 'authorization_code');
         bodyFormData.set('code', 'BITBUCKET_CODE');
 
@@ -340,7 +340,7 @@ describe('Testing Admin insertion', () => {
             .send().expect(201);
 
         // DB validation - document created
-        const admin = await Admin.findById(response.body.admin._id).lean();
+        const admin = await Admin.findById(response.body.admin._id).lean().exec();
         expect(admin).not.toBeNull();
         expect(admin._bitbucketid).toEqual('123456789');
 
@@ -410,7 +410,7 @@ describe('Testing Admin insertion', () => {
         // given
         const mockedTokenData = { data: { access_token: 'MOCKED_TOKEN' } };
 
-        var bodyFormData = new URLSearchParams();
+        const bodyFormData = new URLSearchParams();
         bodyFormData.set('grant_type', 'authorization_code');
         bodyFormData.set('code', 'BITBUCKET_CODE');
 
@@ -507,7 +507,7 @@ describe('Testing Admin insertion', () => {
         expect(refreshToken).not.toBeNull();
 
         //DB validation
-        let admin = await Admin.findById(adminAccount._id).lean();
+        let admin = await Admin.findById(adminAccount._id).lean().exec();
         expect(admin.token).toEqual(Admin.extractTokenPart(token));
 
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -648,7 +648,7 @@ describe('Testing Admin login and fetch', () => {
                 password: adminAccount.password
             }).expect(200);
 
-        const admin = await Admin.findById(adminAccountId).lean();
+        const admin = await Admin.findById(adminAccountId).lean().exec();
         const token = response.body.jwt.token;
         expect(Admin.extractTokenPart(token)).toBe(admin.token);
     });
@@ -736,7 +736,22 @@ describe('Testing Admin login and fetch', () => {
             .get('/admin/INVALID_ID')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send()
-            .expect(400);
+            .expect(422);
+    });
+
+    test('ADMIN_SUITE - Should NOT get admin profile given unexisting Admin ID', async () => {
+        const responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminMasterAccount.email,
+                password: adminMasterAccount.password
+            }).expect(200);
+
+        await request(app)
+            .get(`/admin/${new mongoose.Types.ObjectId()}`)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send()
+            .expect(404);
     });
 
     test('ADMIN_SUITE - Should not get profile for unauthenticated admin', async () => {
@@ -761,7 +776,7 @@ describe('Testing Admin login and fetch', () => {
                 name: 'Updated Name'
             })
             .expect(200);
-        let admin = await Admin.findById(adminMasterAccountId).lean();
+        let admin = await Admin.findById(adminMasterAccountId).lean().exec();
         expect(admin.name).toEqual('Updated Name');
 
         // Validating regular Admin credential
@@ -780,7 +795,7 @@ describe('Testing Admin login and fetch', () => {
             })
             .expect(200);
 
-        admin = await Admin.findById(adminAccountId).lean();
+        admin = await Admin.findById(adminAccountId).lean().exec();
         expect(admin.name).toEqual('Updated Name');
     });
 
@@ -815,7 +830,7 @@ describe('Testing Admin login and fetch', () => {
             .send()
             .expect(200);
 
-        const admin = await Admin.findById(adminMasterAccountId).lean();
+        const admin = await Admin.findById(adminMasterAccountId).lean().exec();
         expect(admin.token).toBeNull();
     });
 });
@@ -859,7 +874,7 @@ describe('Testing Admin logout', () => {
             .send()
             .expect(200);
 
-        const admin = await Admin.findById(adminMasterAccountId).lean();
+        const admin = await Admin.findById(adminMasterAccountId).lean().exec();
         expect(admin).toBeNull();
     });
 });
@@ -970,7 +985,7 @@ describe('Testing Admin collaboration endpoint', () => {
             }).expect(200);
             
         //verify
-        let teams = await Team.find({ members: adminMasterAccountId }).lean();
+        let teams = await Team.find({ members: adminMasterAccountId }).lean().exec();
         teams.forEach(team => {
             expect(team.members[0]).toEqual(adminMasterAccountId);
         });
@@ -981,7 +996,7 @@ describe('Testing Admin collaboration endpoint', () => {
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send().expect(200);
 
-        teams = await Team.find({ members: adminMasterAccountId }).lean();
+        teams = await Team.find({ members: adminMasterAccountId }).lean().exec();
         teams.forEach(team => {
             expect(team.members[0]).toBeNull();
         });
@@ -1037,7 +1052,7 @@ describe('Testing Admin collaboration endpoint', () => {
             }).expect(200);
             
         //verify
-        let teams = await Team.find({ members: adminMasterAccountId }).lean();
+        let teams = await Team.find({ members: adminMasterAccountId }).lean().exec();
         teams.forEach(team => {
             expect(team.members[0]).toEqual(adminMasterAccountId);
         });
@@ -1054,7 +1069,7 @@ describe('Testing Admin collaboration endpoint', () => {
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send().expect(200);
 
-        teams = await Team.find({ members: adminMasterAccountId });
+        teams = await Team.find({ members: adminMasterAccountId }).exec();
         teams.forEach(team => {
             expect(team.members[0]).toBeNull();
         });

@@ -128,7 +128,9 @@ router.get('/admin/collaboration', auth, async (req, res) => {
     res.send(Array.from(new Set(domains)));
 });
 
-router.get('/admin/:id', auth, async (req, res) => {
+router.get('/admin/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
     try {
         const admin = await Services.getAdminById(req.params.id);
         res.send(admin);
