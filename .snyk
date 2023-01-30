@@ -4,4 +4,4 @@ ignore: {}
 patch: {}
 exclude:
   global:
-    - tests\
+    - tests/**
