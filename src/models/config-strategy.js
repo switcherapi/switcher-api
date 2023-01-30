@@ -270,9 +270,9 @@ async function processREGEX(operation, input, values) {
         case OperationsType.NOT_EXIST:
             return !(await processREGEX(OperationsType.EXIST, input, values));
         case OperationsType.EQUAL:
-            return input.match(`\\b${values[0]}\\b`) != null;
+            return await tryMatch([`\\b${values[0]}\\b`], input);
         case OperationsType.NOT_EQUAL:
-            return input.match(`\\b${values[0]}\\b`) == null;
+            return !(await tryMatch([`\\b${values[0]}\\b`], input));
     }
 }
 
