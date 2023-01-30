@@ -5,6 +5,7 @@ import moment from 'moment';
 import { NotFoundError } from '../exceptions';
 import { parseJSON, payloadReader } from '../helpers';
 import IPCIDR from '../helpers/ipcidr';
+import tryMatch from '../helpers/timed-match/try-match';
 
 export const StrategiesType = Object.freeze({
     NETWORK: 'NETWORK_VALIDATION',
@@ -147,7 +148,7 @@ export function strategyRequirements(strategy) {
     };
 }
 
-export function processOperation(strategy, operation, input, values) {
+export async function processOperation(strategy, operation, input, values) {
     switch(strategy) {
         case StrategiesType.NETWORK:
             return processNETWORK(operation, input, values);
@@ -262,18 +263,12 @@ function processDATE(operation, input, values) {
     }
 }
 
-function processREGEX(operation, input, values) {
+async function processREGEX(operation, input, values) {
     switch(operation) {
-        case OperationsType.EXIST: {
-            for (const value of values) {
-                if (input.match(value)) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        case OperationsType.EXIST:
+            return await tryMatch(values, input);
         case OperationsType.NOT_EXIST:
-            return !processREGEX(OperationsType.EXIST, input, values);
+            return !(await processREGEX(OperationsType.EXIST, input, values));
         case OperationsType.EQUAL:
             return input.match(`\\b${values[0]}\\b`) != null;
         case OperationsType.NOT_EQUAL:

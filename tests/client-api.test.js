@@ -31,7 +31,7 @@ import {
 import { RouterTypes } from '../src/models/permission';
 
 const changeStrategy = async (strategyId, newOperation, status, environment) => {
-    const strategy = await ConfigStrategy.findById(strategyId);
+    const strategy = await ConfigStrategy.findById(strategyId).exec();
     strategy.operation = newOperation ? newOperation : strategy.operation;
     strategy.activated.set(environment, status !== undefined ? status : strategy.activated.get(environment));
     strategy.updatedBy = adminMasterAccountId;
@@ -39,14 +39,14 @@ const changeStrategy = async (strategyId, newOperation, status, environment) => 
 };
 
 const changeConfigStatus = async (configid, status, environment) => {
-    const config = await Config.findById(configid);
+    const config = await Config.findById(configid).exec();
     config.activated.set(environment, status !== undefined ? status : config.activated.get(environment));
     config.updatedBy = adminMasterAccountId;
     await config.save();
 };
 
 const changeConfigDisableMetricFlag = async (configid, status, environment) => {
-    const config = await Config.findById(configid);
+    const config = await Config.findById(configid).exec();
     if (!config.disable_metrics)
         config.disable_metrics = new Map;
 
@@ -56,14 +56,14 @@ const changeConfigDisableMetricFlag = async (configid, status, environment) => {
 };
 
 const changeGroupConfigStatus = async (groupconfigid, status, environment) => {
-    const groupConfig = await GroupConfig.findById(groupconfigid);
+    const groupConfig = await GroupConfig.findById(groupconfigid).exec();
     groupConfig.activated.set(environment, status !== undefined ? status : groupConfig.activated.get(environment));
     groupConfig.updatedBy = adminMasterAccountId;
     await groupConfig.save();
 };
 
 const changeDomainStatus = async (domainid, status, environment) => {
-    const domain = await Domain.findById(domainid);
+    const domain = await Domain.findById(domainid).exec();
     domain.activated.set(environment, status !== undefined ? status : domain.activated.get(environment));
     domain.updatedBy = adminMasterAccountId;
     await domain.save();
@@ -363,7 +363,7 @@ describe('Testing criteria [GraphQL] ', () => {
             .expect(200);
 
         //get total of metric data
-        const numMetricData = await Metric.find({ config: configId }).countDocuments();
+        const numMetricData = await Metric.find({ config: configId }).countDocuments().exec();
 
         //disable metrics
         await changeConfigDisableMetricFlag(configId, true, EnvType.DEFAULT);
@@ -379,7 +379,7 @@ describe('Testing criteria [GraphQL] ', () => {
             .expect(200);
 
         //test
-        const afterNumMetricData = await Metric.find({ config: configId }).countDocuments();
+        const afterNumMetricData = await Metric.find({ config: configId }).countDocuments().exec();
         expect(numMetricData === afterNumMetricData).toBe(true);
     });
 });
@@ -902,7 +902,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
 
     test('CLIENT_SUITE - Should NOT return domain structure for an excluded team member', async () => {
         //given
-        const admin = await Admin.findById(adminAccountId);
+        const admin = await Admin.findById(adminAccountId).exec();
         admin.teams = [];
         await admin.save();
         
