@@ -42,7 +42,7 @@ describe('Testing strategy creation #1', () => {
             }).expect(201);
 
         // DB validation - document created
-        const configStrategy = await ConfigStrategy.findById(response.body._id).lean();
+        const configStrategy = await ConfigStrategy.findById(response.body._id).lean().exec();
         expect(configStrategy).not.toBeNull();
 
         // Response validation
@@ -339,7 +339,7 @@ describe('Testing reading strategies #1', () => {
             }).expect(201);
 
         // DB validation - document created
-        const configStrategy = await ConfigStrategy.findById(response.body._id).lean();
+        const configStrategy = await ConfigStrategy.findById(response.body._id).lean().exec();
         expect(configStrategy).not.toBeNull();
 
         response = await request(app)
@@ -418,19 +418,19 @@ describe('Testing reading strategies #2', () => {
 
     test('STRATEGY_SUITE - Should delete Config Strategy', async () => {
         // DB validation Before deleting
-        let domain = await Domain.findById(domainId).lean();
+        let domain = await Domain.findById(domainId).lean().exec();
         expect(domain).not.toBeNull();
 
-        let group = await GroupConfig.findById(groupConfigId).lean();
+        let group = await GroupConfig.findById(groupConfigId).lean().exec();
         expect(group).not.toBeNull();
 
-        let config1 = await Config.findById(configId1).lean();
+        let config1 = await Config.findById(configId1).lean().exec();
         expect(config1).not.toBeNull();
 
-        let config2 = await Config.findById(configId2).lean();
+        let config2 = await Config.findById(configId2).lean().exec();
         expect(config2).not.toBeNull();
 
-        let configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
+        let configStrategy = await ConfigStrategy.findById(configStrategyId).lean().exec();
         expect(configStrategy).not.toBeNull();
 
         await request(app)
@@ -438,23 +438,23 @@ describe('Testing reading strategies #2', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
-        const admin = await Admin.findById(adminMasterAccountId).lean();
+        const admin = await Admin.findById(adminMasterAccountId).lean().exec();
         expect(admin).not.toBeNull();
 
         // DB validation After - Verify deleted dependencies
-        domain = await Domain.findById(domainId).lean();
+        domain = await Domain.findById(domainId).lean().exec();
         expect(domain).not.toBeNull();
 
-        group = await GroupConfig.findById(groupConfigId).lean();
+        group = await GroupConfig.findById(groupConfigId).lean().exec();
         expect(group).not.toBeNull();
 
-        config1 = await Config.findById(configId1).lean();
+        config1 = await Config.findById(configId1).lean().exec();
         expect(config1).not.toBeNull();
 
-        config2 = await Config.findById(configId2).lean();
+        config2 = await Config.findById(configId2).lean().exec();
         expect(config2).not.toBeNull();
 
-        configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
+        configStrategy = await ConfigStrategy.findById(configStrategyId).lean().exec();
         expect(configStrategy).toBeNull();
     });
 
@@ -476,7 +476,7 @@ describe('Testing update strategies #1', () => {
 
     test('STRATEGY_SUITE - Should update Config Strategy info', async () => {
 
-        let configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
+        let configStrategy = await ConfigStrategy.findById(configStrategyId).lean().exec();
         expect(configStrategy).not.toBeNull();
 
         await request(app)
@@ -487,7 +487,7 @@ describe('Testing update strategies #1', () => {
             }).expect(200);
         
         // DB validation - verify flag updated
-        configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
+        configStrategy = await ConfigStrategy.findById(configStrategyId).lean().exec();
         expect(configStrategy).not.toBeNull();
         expect(configStrategy.description).toEqual('New description');
     });
@@ -556,7 +556,7 @@ describe('Testing update strategies #1', () => {
         expect(response.body).not.toEqual([]);
 
         // DB validation
-        let history = await History.find({ elementId: strategyId }).lean();
+        let history = await History.find({ elementId: strategyId }).lean().exec();
         expect(history[0].oldValue['description']).toEqual('Description of my new Config Strategy');
         expect(history[0].newValue['description']).toEqual('New description');
 
@@ -568,7 +568,7 @@ describe('Testing update strategies #1', () => {
             }).expect(200);
         
         // DB validation
-        history = await History.find({ elementId: strategyId }).lean();
+        history = await History.find({ elementId: strategyId }).lean().exec();
         expect(history.length).toEqual(2);
     });
 
@@ -624,7 +624,7 @@ describe('Testing update strategies #1', () => {
                 description: 'New description'
             }).expect(200);
 
-        let history = await History.find({ elementId: strategyId }).lean();
+        let history = await History.find({ elementId: strategyId }).lean().exec();
         expect(history.length > 0).toEqual(true);
 
         await request(app)
@@ -632,7 +632,7 @@ describe('Testing update strategies #1', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
-        history = await History.find({ elementId: strategyId }).lean();
+        history = await History.find({ elementId: strategyId }).lean().exec();
         expect(history.length > 0).toEqual(false);
     });
 
@@ -675,7 +675,7 @@ describe('Testing update strategies #1', () => {
         expect(response.body.values[response.body.values.length - 1]).toEqual('USER_4');
 
         // DB validation
-        const configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId }).lean();
+        const configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId }).lean().exec();
         const foundExistingOne = configStrategy.values.find((element) => element === 'USER_4');
         expect('USER_4').toEqual(foundExistingOne);
     });
@@ -762,7 +762,7 @@ describe('Testing update strategies #1', () => {
         expect(response.body.values[response.body.values.length - 1]).toEqual('USER_THREE');
 
         // DB validation
-        const configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId }).lean();
+        const configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId }).lean().exec();
         const foundExistingOne = configStrategy.values.find((element) => element === 'USER_THREE');
         expect('USER_THREE').toEqual(foundExistingOne);
 
@@ -822,7 +822,7 @@ describe('Testing update strategies #2', () => {
     });
 
     test('STRATEGY_SUITE - Should remove a value from Strategy values', async () => {
-        let configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId }).lean();
+        let configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId }).lean().exec();
         const numberOfValues = configStrategy.values.length;
 
         let response = await request(app)
@@ -835,7 +835,7 @@ describe('Testing update strategies #2', () => {
         expect(response.body.values.length + 1).toEqual(numberOfValues);
 
         // DB validation
-        configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId }).lean();
+        configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId }).lean().exec();
         const notFoundOldOne = configStrategy.values.find((element) => element === 'USER_3');
         expect(notFoundOldOne).toEqual(undefined);
     });
@@ -935,7 +935,7 @@ describe('Testing fetch strategies', () => {
         expect(response.body.activated[EnvType.DEFAULT]).toEqual(false);
 
         // DB validation - verify status updated
-        const strategy = await ConfigStrategy.findById(configStrategyId).lean();
+        const strategy = await ConfigStrategy.findById(configStrategyId).lean().exec();
         expect(strategy.activated[EnvType.DEFAULT]).toEqual(false);
     });
 
@@ -976,7 +976,7 @@ describe('Scenario: creating QA environment and modifying its status', () => {
         expect(response.body.activated['QA']).toEqual(true);
 
         // DB validation - verify status updated
-        let strategy = await ConfigStrategy.findById(newStrategy.body._id).lean();
+        let strategy = await ConfigStrategy.findById(newStrategy.body._id).lean().exec();
         expect(strategy.activated['QA']).toEqual(true);
 
         // Inactivating QA. Default environment should stay activated
@@ -987,7 +987,7 @@ describe('Scenario: creating QA environment and modifying its status', () => {
                 QA: false
             }).expect(200);
 
-        strategy = await ConfigStrategy.findById(newStrategy.body._id).lean();
+        strategy = await ConfigStrategy.findById(newStrategy.body._id).lean().exec();
         expect(strategy.activated['QA']).toEqual(false);
     });
 
