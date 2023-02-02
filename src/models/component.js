@@ -56,7 +56,7 @@ componentSchema.methods.generateApiKey = async function () {
     const component = this;
 
     const buffer = randomBytes(32);
-    const apiKey = Buffer.from(buffer).toString('base64')
+    const apiKey = Buffer.from(buffer).toString('base64');
     const hash = await bcryptjs.hash(apiKey, 8);
     component.apihash = hash;
     await component.save();
