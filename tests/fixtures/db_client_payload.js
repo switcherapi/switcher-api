@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import bcryptjs from 'bcryptjs';
+import { randomBytes } from 'crypto';
 import Admin from '../../src/models/admin';
 import Domain from '../../src/models/domain';
 import GroupConfig from '../../src/models/group-config';
@@ -97,13 +98,13 @@ export const component1 = {
 configPayloadDocument.components.push(component1Id);
 
 export const setupDatabase = async () => {
-    await ConfigStrategy.deleteMany();
-    await Config.deleteMany();
-    await GroupConfig.deleteMany();
-    await Domain.deleteMany();
-    await Admin.deleteMany();
-    await Environment.deleteMany();
-    await Component.deleteMany();
+    await ConfigStrategy.deleteMany().exec();
+    await Config.deleteMany().exec();
+    await GroupConfig.deleteMany().exec();
+    await Domain.deleteMany().exec();
+    await Admin.deleteMany().exec();
+    await Environment.deleteMany().exec();
+    await Component.deleteMany().exec();
 
     adminMasterAccount.token = Admin.extractTokenPart(adminMasterAccountToken);
     await new Admin(adminMasterAccount).save();
@@ -115,9 +116,10 @@ export const setupDatabase = async () => {
     await new Config(configPayloadDocument).save();
     await new ConfigStrategy(configStrategyPAYLOAD_HAS_ONEDocument).save();
 
-    const hashApiKey = await bcryptjs.hash(component1._id + component1.name, 8);
-    const hash = await bcryptjs.hash(hashApiKey, 8);
+    const buffer = randomBytes(32);
+    const newApiKey = Buffer.from(buffer).toString('base64');
+    const hash = await bcryptjs.hash(newApiKey, 8);
     component1.apihash = hash;
     await new Component(component1).save();
-    apiKey = Buffer.from(hashApiKey).toString('base64');
+    apiKey = Buffer.from(newApiKey).toString('base64');
 };

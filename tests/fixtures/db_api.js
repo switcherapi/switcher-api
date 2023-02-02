@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcryptjs from 'bcryptjs';
+import { randomBytes } from 'crypto';
 import jwt from 'jsonwebtoken';
 import Admin from '../../src/models/admin';
 import Domain from '../../src/models/domain';
@@ -205,21 +206,21 @@ export const slack = {
 };
 
 export const setupDatabase = async () => {
-    await ConfigStrategy.deleteMany();
-    await Config.deleteMany();
-    await GroupConfig.deleteMany();
-    await Domain.deleteMany();
-    await Admin.deleteMany();
-    await Environment.deleteMany();
-    await Component.deleteMany();
-    await Slack.deleteMany();
+    await ConfigStrategy.deleteMany().exec();
+    await Config.deleteMany().exec();
+    await GroupConfig.deleteMany().exec();
+    await Domain.deleteMany().exec();
+    await Admin.deleteMany().exec();
+    await Environment.deleteMany().exec();
+    await Component.deleteMany().exec();
+    await Slack.deleteMany().exec();
 
-    await History.deleteMany();
-    await Metric.deleteMany();
+    await History.deleteMany().exec();
+    await Metric.deleteMany().exec();
 
-    await Team.deleteMany();
-    await TeamInvite.deleteMany();
-    await Permission.deleteMany();
+    await Team.deleteMany().exec();
+    await TeamInvite.deleteMany().exec();
+    await Permission.deleteMany().exec();
 
     adminMasterAccount.token = Admin.extractTokenPart(adminMasterAccountToken);
     await new Admin(adminMasterAccount).save();
@@ -245,8 +246,9 @@ export const setupDatabase = async () => {
     await new Permission(permissionAll3).save();
     await new Permission(permissionAll4).save();
 
-    const hashApiKey = await bcryptjs.hash(component1._id + component1.name, 8);
-    const hash = await bcryptjs.hash(hashApiKey, 8);
+    const buffer = randomBytes(32);
+    const apiKey = Buffer.from(buffer).toString('base64');
+    const hash = await bcryptjs.hash(apiKey, 8);
     component1.apihash = hash;
     await new Component(component1).save();
 };
