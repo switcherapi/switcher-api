@@ -143,13 +143,13 @@ export const adminAccount3 = {
 };
 
 export const setupDatabase = async () => {
-    await Config.deleteMany();
-    await GroupConfig.deleteMany();
-    await Domain.deleteMany();
-    await Admin.deleteMany();
-    await Team.deleteMany();
-    await TeamInvite.deleteMany();
-    await Permission.deleteMany();
+    await Config.deleteMany().exec();
+    await GroupConfig.deleteMany().exec();
+    await Domain.deleteMany().exec();
+    await Admin.deleteMany().exec();
+    await Team.deleteMany().exec();
+    await TeamInvite.deleteMany().exec();
+    await Permission.deleteMany().exec();
 
     await new Admin(adminMasterAccount).save();
     await new Admin(adminAccount).save();

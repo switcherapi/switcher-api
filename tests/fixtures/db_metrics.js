@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import bcryptjs from 'bcryptjs';
+import { randomBytes } from 'crypto';
 import { Metric } from '../../src/models/metric';
 import Admin from '../../src/models/admin';
 import { EnvType } from '../../src/models/environment';
@@ -146,12 +147,12 @@ export const entry5 = {
 };
 
 export const setupDatabase = async () => {
-    await Metric.deleteMany();
-    await Admin.deleteMany();
-    await Domain.deleteMany();
-    await GroupConfig.deleteMany();
-    await Config.deleteMany();
-    await Component.deleteMany();
+    await Metric.deleteMany().exec();
+    await Admin.deleteMany().exec();
+    await Domain.deleteMany().exec();
+    await GroupConfig.deleteMany().exec();
+    await Config.deleteMany().exec();
+    await Component.deleteMany().exec();
 
     adminMasterAccount.token = Admin.extractTokenPart(adminMasterAccountToken);
     await new Admin(adminMasterAccount).save();
@@ -169,8 +170,9 @@ export const setupDatabase = async () => {
     await new Metric(entry3).save();
     await new Metric(entry4).save();
 
-    const apiKey = await bcryptjs.hash(component1._id + component1.name, 8);
-    const hash = await bcryptjs.hash(apiKey, 8);
+    const buffer = randomBytes(32);
+    const newApiKey = Buffer.from(buffer).toString('base64');
+    const hash = await bcryptjs.hash(newApiKey, 8);
     component1.apihash = hash;
     await new Component(component1).save();
 };

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
 import bcryptjs from 'bcryptjs';
+import { randomBytes } from 'crypto';
 import jwt from 'jsonwebtoken';
 import { Config } from './config';
 import Domain from './domain';
@@ -53,7 +54,9 @@ componentSchema.options.toJSON = {
 
 componentSchema.methods.generateApiKey = async function () {
     const component = this;
-    const apiKey = await bcryptjs.hash(component._id + component.name, 8);
+
+    const buffer = randomBytes(32);
+    const apiKey = Buffer.from(buffer).toString('base64');
     const hash = await bcryptjs.hash(apiKey, 8);
     component.apihash = hash;
     await component.save();
