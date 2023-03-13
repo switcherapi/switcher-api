@@ -100,6 +100,8 @@ app.get('/check', (_req, res) => {
             metrics: process.env.METRICS_ACTIVATED,
             max_metrics_pages: process.env.METRICS_MAX_PAGE,
             max_stretegy_op: process.env.MAX_STRATEGY_OPERATION,
+            regex_max_timeout: process.env.REGEX_MAX_TIMEOUT,
+            regex_max_blacklist: process.env.REGEX_MAX_BLACLIST
         } 
     });
 });

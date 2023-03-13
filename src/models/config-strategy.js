@@ -5,7 +5,7 @@ import moment from 'moment';
 import { NotFoundError } from '../exceptions';
 import { parseJSON, payloadReader } from '../helpers';
 import IPCIDR from '../helpers/ipcidr';
-import tryMatch from '../helpers/timed-match/try-match';
+import TimedMatch from '../helpers/timed-match/';
 
 export const StrategiesType = Object.freeze({
     NETWORK: 'NETWORK_VALIDATION',
@@ -266,13 +266,13 @@ function processDATE(operation, input, values) {
 async function processREGEX(operation, input, values) {
     switch(operation) {
         case OperationsType.EXIST:
-            return await tryMatch(values, input);
+            return await TimedMatch.tryMatch(values, input);
         case OperationsType.NOT_EXIST:
             return !(await processREGEX(OperationsType.EXIST, input, values));
         case OperationsType.EQUAL:
-            return await tryMatch([`\\b${values[0]}\\b`], input);
+            return await TimedMatch.tryMatch([`\\b${values[0]}\\b`], input);
         case OperationsType.NOT_EQUAL:
-            return !(await tryMatch([`\\b${values[0]}\\b`], input));
+            return !(await TimedMatch.tryMatch([`\\b${values[0]}\\b`], input));
     }
 }
 
