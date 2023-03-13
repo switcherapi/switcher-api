@@ -9,6 +9,6 @@ export default {
     },
     license: {
         name: 'MIT',
-        url: 'https://github.com/petruki/switcher-api/blob/master/LICENSE'
+        url: 'https://github.com/switcherapi/switcher-api/blob/master/LICENSE'
     }
 };
