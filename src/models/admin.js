@@ -3,7 +3,6 @@ import moment from 'moment';
 import bcryptjs from 'bcryptjs';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import Domain from './domain';
 import { Team } from './team';
 import { notifyAcCreation, notifyAcDeletion } from '../external/switcher-api-facade';
 
@@ -180,11 +179,12 @@ adminSchema.statics.createThirdPartyAccount = async (
             _avatar: userInfo.avatar,
             password: hash
         });
-        await admin.save();
-    } else {
-        admin._avatar = userInfo.avatar;
-    }
 
+        await admin.save();
+    }
+    
+    admin.name = userInfo.name;
+    admin._avatar = userInfo.avatar;
     return admin;
 };
 
