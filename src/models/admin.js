@@ -210,7 +210,7 @@ adminSchema.post('save', function(error, _doc, next) {
     next(error);
 });
 
-adminSchema.pre('remove', async function (next) {
+adminSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
     const ObjectId = (require('mongoose').Types.ObjectId);
 
     const admin = this;
@@ -218,7 +218,7 @@ adminSchema.pre('remove', async function (next) {
 
     if (domains) {
         for (const domain of domains)
-            await domain.remove();
+            await domain.deleteOne();
     }
 
     const teams = await Team.find({ members: admin._id }).exec();

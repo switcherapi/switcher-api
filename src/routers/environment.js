@@ -58,7 +58,7 @@ router.delete('/environment/:id', auth, [
 ], validate, async (req, res) => {
     try {
         const environment = await Services.deleteEnvironment(req.params.id, req.admin);
-        await environment.remove();
+        await environment.deleteOne();
         res.send(environment);
     } catch (e) {
         responseException(res, e, 400);

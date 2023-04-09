@@ -375,7 +375,7 @@ configStrategySchema.options.toJSON = {
     }
 };
 
-configStrategySchema.pre('remove', async function (next) {
+configStrategySchema.pre('deleteOne', { document: true, query: false }, async function (next) {
     const strategyConfig = this;
     await History.deleteMany({ domainId: strategyConfig.domain, 
         elementId: strategyConfig._id }).exec();

@@ -119,7 +119,7 @@ componentSchema.pre('validate', async function (next) {
     next();
 });
 
-componentSchema.pre('remove', async function (next) {
+componentSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
     const component = this;
     
     const configsToRemoveFrom = await Config.find({ components: { $in: [component._id] } }).exec();

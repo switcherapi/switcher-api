@@ -65,8 +65,8 @@ export async function createStrategy(args, admin) {
 export async function deleteStrategy(id, admin) {
     let configStrategy = await getStrategyById(id);
     configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.DELETE, RouterTypes.STRATEGY);
-
-    await configStrategy.remove();
+    
+    await configStrategy.deleteOne();
     updateDomainVersion(configStrategy.domain);
 
     return configStrategy;

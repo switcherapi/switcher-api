@@ -48,7 +48,7 @@ async function deleteSlackInstallation(slack) {
         await domain.save();
     }
 
-    return slack.remove();
+    return slack.deleteOne();
 }
 
 export async function getSlackOrError(where) {

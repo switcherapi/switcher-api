@@ -72,7 +72,7 @@ export async function deleteGroup(id, admin) {
     let groupconfig = await getGroupConfigById(id);
     groupconfig = await verifyOwnership(admin, groupconfig, groupconfig.domain, ActionTypes.DELETE, RouterTypes.GROUP);
 
-    await groupconfig.remove();
+    await groupconfig.deleteOne();
     updateDomainVersion(groupconfig.domain);
 
     return groupconfig;
