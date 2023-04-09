@@ -211,17 +211,7 @@ adminSchema.post('save', function(error, _doc, next) {
 });
 
 adminSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    const ObjectId = (require('mongoose').Types.ObjectId);
-
     const admin = this;
-    const domains = await Domain.find({ owner: new ObjectId(admin._id) }).exec();
-
-    if (domains) {
-        for (const domain of domains) {
-            await Promise.resolve(domain.deleteOne());
-        }
-    }
-
     const teams = await Team.find({ members: admin._id }).exec();
     for (const team of teams) {
         let indexMmeber = team.members.indexOf(admin._id);
