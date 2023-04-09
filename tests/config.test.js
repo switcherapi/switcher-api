@@ -546,6 +546,7 @@ describe('Testing Environment status change', () => {
 
 describe('Testing component association', () => {
     beforeAll(async () => {
+        await setupDatabase();
         await request(app)
             .post('/component/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)

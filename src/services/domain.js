@@ -66,7 +66,7 @@ export async function deleteDomainHistory(id, admin) {
 export async function deleteDomain(id, admin) {
     let domain = await getDomainById(id);
     domain = await verifyOwnership(admin, domain, domain._id, ActionTypes.DELETE, RouterTypes.DOMAIN);
-    return domain.remove();
+    return domain.deleteOne();
 }
 
 export async function transferDomain(args, admin) {

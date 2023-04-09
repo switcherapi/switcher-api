@@ -78,7 +78,7 @@ teamSchema.pre('validate', async function (next) {
     next();
 });
 
-teamSchema.pre('remove', async function (next) {
+teamSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
     const team = this;
     await Permission.deleteMany({ _id: { $in: team.permissions } }).exec();
 

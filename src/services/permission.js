@@ -72,7 +72,7 @@ export async function deletePermission(id, admin) {
         team.save();
     });
     
-    return permission.remove();
+    return permission.deleteOne();
 }
 
 export async function addValue(args, id, admin) {

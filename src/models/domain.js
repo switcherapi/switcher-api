@@ -96,20 +96,20 @@ domainSchema.options.toJSON = {
     }
 };
 
-domainSchema.pre('remove', async function (next) {
+domainSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
     const domain = this;
     const groups = await GroupConfig.find({ domain: domain._id }).exec();
     
     if (groups) {
         for (const group of groups) {
-            await group.remove();
+            await Promise.resolve(group.deleteOne());
         }
     }
 
     const teams = await Team.find({ domain: domain._id }).exec();
     if (teams) {
         for (const team of teams) {
-            await team.remove();
+            await Promise.resolve(team.deleteOne());
         }
     }
 

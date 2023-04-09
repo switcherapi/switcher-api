@@ -84,7 +84,7 @@ export async function deleteEnvironment(id, admin) {
     environment = await verifyOwnership(admin, environment, environment.domain, ActionTypes.DELETE, RouterTypes.ENVIRONMENT);
 
     await removeEnvironmentFromElements(environment);
-    return environment.remove();
+    return environment.deleteOne();
 }
 
 export async function recoverEnvironment(id, admin) {

@@ -86,7 +86,7 @@ export async function deleteConfig(id, admin) {
     let config = await getConfigById(id);
     config = await verifyOwnership(admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG);
 
-    await config.remove();
+    await config.deleteOne();
     updateDomainVersion(config.domain);
 
     return config;
@@ -224,7 +224,7 @@ export async function removeComponent(id, args, admin) {
 
 export async function updateComponent(id, args, admin) {
     const config = await verifyAddComponentInput(id, admin);
-    const componentIds = args.components.map(component => mongoose.Types.ObjectId(component));
+    const componentIds = args.components.map(component => new mongoose.Types.ObjectId(component));
     const components = await getComponents({ _id: { $in: componentIds } });
 
     if (components.length != args.components.length) {

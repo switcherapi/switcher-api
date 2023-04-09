@@ -145,5 +145,5 @@ export async function deleteAccount(admin) {
             `This account has ${domains} Domain(s) that must be either deleted or transfered to another account.`);
     }
 
-    return admin.remove();
+    return admin.deleteOne();
 }

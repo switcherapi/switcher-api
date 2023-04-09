@@ -154,13 +154,13 @@ configSchema.virtual('configStrategy', {
     foreignField: 'config'
 });
 
-configSchema.pre('remove', async function (next) {
+configSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
     const config = this;
     
     const strategies = await ConfigStrategy.find({ config: config._id }).exec();
     if (strategies) {
         for (const strategy of strategies) {
-            await strategy.remove();
+            await Promise.resolve(strategy.deleteOne());
         }
     }
     

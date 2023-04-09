@@ -47,7 +47,7 @@ export async function deleteComponent(id, admin) {
     let component = await getComponentById(id);
     component = await verifyOwnership(
         admin, component, component.domain, ActionTypes.DELETE, RouterTypes.COMPONENT);
-    return component.remove();
+    return component.deleteOne();
 }
 
 export async function generateApiKey(id, admin) {

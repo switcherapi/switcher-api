@@ -106,7 +106,7 @@ export async function updateTeam(args, id, admin) {
 
 export async function deleteTeam(id, admin) {
     const team = await verifyRequestedTeam(id, admin, ActionTypes.DELETE);
-    return team.remove();
+    return team.deleteOne();
 }
 
 export async function inviteMember(id, email, admin) {
@@ -136,9 +136,9 @@ export async function acceptInvite(request_id, admin) {
 
     if (team.length) {
         await addMemberToTeam(admin, team[0]);
-        teamInvite.remove();
+        teamInvite.deleteOne();
     } else {
-        await teamInvite.remove();
+        await teamInvite.deleteOne();
         throw new BadRequestError('Team does not exist anymore');
     }
 
@@ -149,7 +149,7 @@ export async function removeInvite(request_id, id, admin) {
     await verifyRequestedTeam(id, admin, ActionTypes.UPDATE);
 
     const teamInvite = await getTeamInviteById(request_id);
-    return teamInvite.remove();
+    return teamInvite.deleteOne();
 }
 
 export async function addTeamMember(member, id, admin) {

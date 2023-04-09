@@ -3,7 +3,6 @@ import moment from 'moment';
 import bcryptjs from 'bcryptjs';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import Domain from './domain';
 import { Team } from './team';
 import { notifyAcCreation, notifyAcDeletion } from '../external/switcher-api-facade';
 
@@ -180,11 +179,12 @@ adminSchema.statics.createThirdPartyAccount = async (
             _avatar: userInfo.avatar,
             password: hash
         });
-        await admin.save();
-    } else {
-        admin._avatar = userInfo.avatar;
-    }
 
+        await admin.save();
+    }
+    
+    admin.name = userInfo.name;
+    admin._avatar = userInfo.avatar;
     return admin;
 };
 
@@ -210,17 +210,8 @@ adminSchema.post('save', function(error, _doc, next) {
     next(error);
 });
 
-adminSchema.pre('remove', async function (next) {
-    const ObjectId = (require('mongoose').Types.ObjectId);
-
+adminSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
     const admin = this;
-    const domains = await Domain.find({ owner: new ObjectId(admin._id) }).exec();
-
-    if (domains) {
-        for (const domain of domains)
-            await domain.remove();
-    }
-
     const teams = await Team.find({ members: admin._id }).exec();
     for (const team of teams) {
         let indexMmeber = team.members.indexOf(admin._id);

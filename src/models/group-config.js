@@ -67,13 +67,13 @@ groupConfigSchema.virtual('config', {
     foreignField: 'group'
 });
 
-groupConfigSchema.pre('remove', async function (next) {
+groupConfigSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
     const group = this;
     const configs = await Config.find({ group: group._id }).exec();
 
     if (configs) {
         for (const config of configs) {
-            await config.remove();
+            await Promise.resolve(config.deleteOne());
         }
     }
 
