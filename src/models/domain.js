@@ -102,14 +102,14 @@ domainSchema.pre('deleteOne', { document: true, query: false }, async function (
     
     if (groups) {
         for (const group of groups) {
-            await group.deleteOne();
+            await Promise.resolve(group.deleteOne());
         }
     }
 
     const teams = await Team.find({ domain: domain._id }).exec();
     if (teams) {
         for (const team of teams) {
-            await team.deleteOne();
+            await Promise.resolve(team.deleteOne());
         }
     }
 

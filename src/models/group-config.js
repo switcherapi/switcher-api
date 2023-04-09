@@ -73,7 +73,7 @@ groupConfigSchema.pre('deleteOne', { document: true, query: false }, async funct
 
     if (configs) {
         for (const config of configs) {
-            await config.deleteOne();
+            await Promise.resolve(config.deleteOne());
         }
     }
 

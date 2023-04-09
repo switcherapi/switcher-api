@@ -217,8 +217,9 @@ adminSchema.pre('deleteOne', { document: true, query: false }, async function (n
     const domains = await Domain.find({ owner: new ObjectId(admin._id) }).exec();
 
     if (domains) {
-        for (const domain of domains)
-            await domain.deleteOne();
+        for (const domain of domains) {
+            await Promise.resolve(domain.deleteOne());
+        }
     }
 
     const teams = await Team.find({ members: admin._id }).exec();

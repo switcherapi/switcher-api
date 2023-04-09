@@ -160,7 +160,7 @@ configSchema.pre('deleteOne', { document: true, query: false }, async function (
     const strategies = await ConfigStrategy.find({ config: config._id }).exec();
     if (strategies) {
         for (const strategy of strategies) {
-            await strategy.deleteOne();
+            await Promise.resolve(strategy.deleteOne());
         }
     }
     
