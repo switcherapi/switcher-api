@@ -1,5 +1,5 @@
 # ---------- Base ----------
-FROM node:gallium-alpine AS base
+FROM node:hydrogen-alpine AS base
 
 WORKDIR /app
 
