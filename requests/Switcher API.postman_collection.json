@@ -5017,7 +5017,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"domain\": \"Test Domain\",\n\t\"component\": \"App\",\n\t\"environment\": \"default\"\n}",
+							"raw": "{\n\t\"domain\": \"Playground\",\n\t\"component\": \"switcher-playground\",\n\t\"environment\": \"default\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5086,7 +5086,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/criteria?showReason=true&showStrategy=true&key=TEST_SWITCH",
+							"raw": "{{url}}/criteria?showReason=true&showStrategy=true&key=MY_SWITCHER",
 							"host": [
 								"{{url}}"
 							],
@@ -5109,7 +5109,7 @@
 								},
 								{
 									"key": "key",
-									"value": "TEST_SWITCH"
+									"value": "MY_SWITCHER"
 								}
 							]
 						}
@@ -5148,7 +5148,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/criteria?key=FF2FOR2030",
+							"raw": "{{url}}/criteria?key=MY_SWITCHER",
 							"host": [
 								"{{url}}"
 							],
@@ -5173,7 +5173,7 @@
 								},
 								{
 									"key": "key",
-									"value": "FF2FOR2030"
+									"value": "MY_SWITCHER"
 								}
 							]
 						}
@@ -5307,7 +5307,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "{\r\n  criteria(\r\n      key: \"FF2FOR2020\",\r\n    #   bypassMetric: false,\r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              }\r\n            ]\r\n        ) {\r\n    key\r\n    activated\r\n    response {\r\n        result\r\n        reason\r\n        domain {\r\n            name\r\n            activated\r\n            description\r\n            group {\r\n                name\r\n                activated\r\n                description\r\n                config {\r\n                    key\r\n                    activated\r\n                    description\r\n                    strategies {\r\n                        strategy\r\n                        activated\r\n                        operation\r\n                        values\r\n                    }\r\n                }\r\n            }\r\n        }\r\n        group {\r\n            name\r\n            activated\r\n            description\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n  }\r\n}",
+								"query": "{\r\n  criteria(\r\n      key: \"MY_SWITCHER\",\r\n    #   bypassMetric: false,\r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              }\r\n            ]\r\n        ) {\r\n    key\r\n    activated\r\n    response {\r\n        result\r\n        reason\r\n        domain {\r\n            name\r\n            activated\r\n            description\r\n            group {\r\n                name\r\n                activated\r\n                description\r\n                config {\r\n                    key\r\n                    activated\r\n                    description\r\n                    strategies {\r\n                        strategy\r\n                        activated\r\n                        operation\r\n                        values\r\n                    }\r\n                }\r\n            }\r\n        }\r\n        group {\r\n            name\r\n            activated\r\n            description\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n  }\r\n}",
 								"variables": ""
 							}
 						},
@@ -5341,7 +5341,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "{\r\n  criteria(\r\n      key: \"FF2FOR2030\", \r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              },\r\n              {\r\n                  strategy: \"NETWORK_VALIDATION\", \r\n                  input: \"192.168.0.2\"\r\n              }\r\n            ]\r\n        ) {\r\n    response {\r\n        result\r\n        reason\r\n    }\r\n  }\r\n}",
+								"query": "{\r\n  criteria(\r\n      key: \"MY_SWITCHER\", \r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              },\r\n              {\r\n                  strategy: \"NETWORK_VALIDATION\", \r\n                  input: \"192.168.0.2\"\r\n              }\r\n            ]\r\n        ) {\r\n    response {\r\n        result\r\n        reason\r\n    }\r\n  }\r\n}",
 								"variables": ""
 							}
 						},
@@ -5611,7 +5611,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "{\r\n    # permission(domain: \"5e0ece606f4f994eac9007ae\", actions: [\"UPDATE\", \"DELETE\"], router: \"GROUP\") {\r\n    permission(\r\n        domain: \"5e0ece606f4f994eac9007ae\", \r\n        parent: \"5e0ece916f4f994eac9007b0\", \r\n        actions: [\"UPDATE\", \"DELETE\"],\r\n        router: \"SWITCHER\") {\r\n        id\r\n        name\r\n        permissions {\r\n            action\r\n            result\r\n        }\r\n    }\r\n}",
+								"query": "{\r\n    # permission(domain: \"5e0ece606f4f994eac9007ae\", actions: [\"UPDATE\", \"DELETE\"], router: \"GROUP\") {\r\n    permission(\r\n        domain: \"601de9281e38730048dd0988\", \r\n        parent: \"601dea391e38730048dd098a\", \r\n        actions: [\"READ\", \"UPDATE\", \"DELETE\"],\r\n        router: \"SWITCHER\") {\r\n        id\r\n        name\r\n        permissions {\r\n            action\r\n            result\r\n        }\r\n    }\r\n}",
 								"variables": ""
 							}
 						},
