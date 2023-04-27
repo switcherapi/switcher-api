@@ -56,8 +56,7 @@ export function formatInput(input,
     if (options.autoUnderscore) {
         regexStr = /^[a-zA-Z0-9_\- ]*$/;
     } else {
-        // eslint-disable-next-line no-useless-escape
-        regexStr = options.allowSpace ? /^[a-zA-Z0-9_\- ]*$/ : /^[a-zA-Z0-9_\-]*$/;
+        regexStr = options.allowSpace ? /^[a-zA-Z0-9_\- ]*$/ : /^[a-zA-Z0-9_-]*$/;
     }
 
     if (!input.match(regexStr)) {
