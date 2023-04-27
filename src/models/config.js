@@ -97,6 +97,13 @@ const configSchema = new mongoose.Schema({
         auth_token: {
             type: Map,
             of: String
+        },
+        verification_code: {
+            type: String
+        },
+        verified: {
+            type: Boolean,
+            default: false
         }
     }
 }, {
