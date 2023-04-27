@@ -52,7 +52,7 @@ router.get('/groupconfig/:id', auth, [
 ], validate, async (req, res) => {
     try {
         let groupconfig = await Services.getGroupConfigById(req.params.id);
-        groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP);
+        groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP, true);
 
         res.send(groupconfig);
     } catch (e) {
