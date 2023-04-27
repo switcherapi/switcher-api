@@ -17,7 +17,11 @@ import {
     adminMasterAccount,
     teamInviteNoTeam,
     adminAccountToken,
-    adminAccount
+    memberAccountId,
+    teamId,
+    memberAccount2,
+    memberAccount2Token,
+    memberAccount2Id
  } from './fixtures/db_api';
 
 afterAll(async () => { 
@@ -38,7 +42,7 @@ describe('Insertion tests', () => {
             }).expect(201);
 
         // DB validation - document created
-        const team = await Team.findById(response.body._id).lean();
+        const team = await Team.findById(response.body._id).exec();
         expect(team).not.toBeNull();
 
         // Response validation
@@ -64,7 +68,7 @@ describe('Insertion tests', () => {
             }).expect(201);
 
         // DB validation - document created
-        const team = await Team.findById(response.body._id).lean();
+        const team = await Team.findById(response.body._id).exec();
         expect(team).not.toBeNull();
         expect(team.permissions.length).toEqual(2);
     });
@@ -187,7 +191,7 @@ describe('Updating tests', () => {
             }).expect(200);
 
         // DB validation - document updated
-        const team = await Team.findById(team1Id).lean();
+        const team = await Team.findById(team1Id).exec();
         expect(team.active).toBe(false);
     });
 
@@ -241,7 +245,7 @@ describe('Deletion tests', () => {
             }).expect(200);
 
         // DB validation
-        let admin = await Admin.findById(adminAccountId);
+        let admin = await Admin.findById(adminAccountId).exec();
         expect(admin.teams.includes(teamId)).toEqual(true);
 
         await request(app)
@@ -250,10 +254,10 @@ describe('Deletion tests', () => {
             .send().expect(200);
 
         // DB validation - document deleted
-        const team = await Team.findById(teamId).lean();
+        const team = await Team.findById(teamId).exec();
         expect(team).toBeNull();
 
-        admin = await Admin.findById(adminAccountId);
+        admin = await Admin.findById(adminAccountId).exec();
         expect(admin.teams.includes(teamId)).toEqual(false);
     });
 
@@ -284,7 +288,7 @@ describe('Updating team members tests', () => {
             }).expect(200);
 
         // DB validation
-        const admin = await Admin.findById(adminAccountId).lean();
+        const admin = await Admin.findById(adminAccountId).exec();
         expect(admin.teams[0]).toEqual(team1._id);
     });
 
@@ -297,7 +301,7 @@ describe('Updating team members tests', () => {
             }).expect(201);
 
         // DB validation
-        let teamInvite = await TeamInvite.findById(response.body._id).lean();
+        let teamInvite = await TeamInvite.findById(response.body._id).exec();
         expect(teamInvite).not.toBeNull();
 
         response = await request(app)
@@ -518,53 +522,75 @@ describe('Updating team members tests', () => {
     });
 
     test('TEAM_SUITE - Should remove a team member', async () => {
+        // Given
+        // Member added to [Team]
         await request(app)
-            .patch('/team/member/remove/' + team1Id)
+            .patch('/team/member/add/' + teamId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                member: adminAccountId
+                member: memberAccountId
+            }).expect(200);
+
+        // Member added to [Team 1]
+        await request(app)
+            .patch('/team/member/add/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                member: memberAccountId
+            }).expect(200);
+
+        // That
+        let admin = await Admin.findById(memberAccountId).exec();
+        expect(admin.teams.length).toEqual(2);
+
+        // Test - remove from [Team]
+        await request(app)
+            .patch('/team/member/remove/' + teamId)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                member: memberAccountId
             }).expect(200);
 
         // DB validation
-        const admin = await Admin.findById(adminAccountId).lean();
-        expect(admin.teams.length).toBe(0);
+        admin = await Admin.findById(memberAccountId).exec();
+        expect(admin.teams[0]._id).toEqual(team1Id);
+        expect(admin.teams.length).toEqual(1);
     });
 
     test('TEAM_SUITE - Should remove a team member when account is deleted', async() => {
-        // given
-        // member invited
+        // Given
+        // Member invited
         let response = await request(app)
             .post('/team/member/invite/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                email: adminAccount.email
+                email: memberAccount2.email
             }).expect(201);
 
-        let teamInvite = await TeamInvite.findById(response.body._id).lean();
+        let teamInvite = await TeamInvite.findById(response.body._id).exec();
 
-        // given
-        // invite accepted
+        // Invite accepted
         await request(app)
             .post('/team/member/invite/accept/' + teamInvite._id)
-            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .set('Authorization', `Bearer ${memberAccount2Token}`)
             .send().expect(200);
 
-        // test
+        // That
         // Team has a new member
-        let team = await Team.findById(team1Id);
-        expect(team.members.length).toBe(1);
+        let team = await Team.findById(team1Id).exec();
+        expect(team.members).toEqual(expect.arrayContaining([memberAccount2Id]));
 
-        // given
-        // account being deleted
+        // Test
+        // Account being deleted
         await request(app)
             .delete('/admin/me')
-            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .set('Authorization', `Bearer ${memberAccount2Token}`)
             .send()
             .expect(200);
 
-        // test
-        team = await Team.findById(team1Id);
-        expect(team.members.length).toBe(0);
+        // That
+        team = await Team.findById(team1Id).exec();
+        expect(team.members).not.toEqual(expect.arrayContaining([memberAccount2Id]));
     });
 });
 

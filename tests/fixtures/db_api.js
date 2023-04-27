@@ -38,6 +38,26 @@ export const adminAccount = {
     active: true
 };
 
+export const memberAccountId = new mongoose.Types.ObjectId();
+export const memberAccountToken = jwt.sign({ _id: memberAccountId }, process.env.JWT_SECRET);
+export const memberAccount = {
+    _id: memberAccountId,
+    name: 'Member',
+    email: 'member@mail.com',
+    password: 'asdasdasdasd',
+    active: true
+};
+
+export const memberAccount2Id = new mongoose.Types.ObjectId();
+export const memberAccount2Token = jwt.sign({ _id: memberAccount2Id }, process.env.JWT_SECRET);
+export const memberAccount2 = {
+    _id: memberAccount2Id,
+    name: 'Member 2',
+    email: 'member2@mail.com',
+    password: 'asdasdasdasd',
+    active: true
+};
+
 export const domainId = new mongoose.Types.ObjectId();
 export const domainDocument = {
     _id: domainId,
@@ -227,6 +247,12 @@ export const setupDatabase = async () => {
 
     adminAccount.token = Admin.extractTokenPart(adminAccountToken);
     await new Admin(adminAccount).save();
+
+    memberAccount.token = Admin.extractTokenPart(memberAccountToken);
+    await new Admin(memberAccount).save();
+
+    memberAccount2.token = Admin.extractTokenPart(memberAccount2Token);
+    await new Admin(memberAccount2).save();
 
     await new Environment(environment1).save();
     await new Environment(environment2).save();
