@@ -174,7 +174,7 @@ export async function removeTeamMember(member, id, admin) {
         throw new NotFoundError(`Member '${adminMember.name}' does not belong to '${team.name}'`);
     }
 
-    adminMember.teams.splice(indexTeam);
+    adminMember.teams.splice(indexTeam, 1);
     indexTeam = team.members.indexOf(team._id);
     team.members.splice(indexTeam, 1);
 
