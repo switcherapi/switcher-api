@@ -23,19 +23,19 @@ import {
 import { PermissionError } from '../../src/exceptions';
 
 const changePermissionStatus = async (permissionId, status) => {
-    const permission = await Permission.findById(permissionId);
+    const permission = await Permission.findById(permissionId).exec();
     permission.active = status;
     await permission.save();
 };
 
 const changePermissionAction = async (permissionId, action) => {
-    const permission = await Permission.findById(permissionId);
+    const permission = await Permission.findById(permissionId).exec();
     permission.action = action;
     await permission.save();
 };
 
 const changeTeamStatus = async (teamId, status) => {
-    const team = await Team.findById(teamId);
+    const team = await Team.findById(teamId).exec();
     team.active = status;
     await team.save();
 };
@@ -64,6 +64,11 @@ describe('Success tests', () => {
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Member has permission to select group', async () => {
+        // Given
+        // Enabled Read - Group 
+        await changePermissionStatus(permission2Id, true);
+
+        // Test
         try {
             const element = await verifyOwnership(
                 adminAccount, 
@@ -78,9 +83,38 @@ describe('Success tests', () => {
         }
     });
 
-    test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Member has permission to select just one of those', async () => {
+    test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Member has permission to select group - Cascade', async () => {
+        // Given
+        // Disabled Read - Group 
+        await changePermissionStatus(permission2Id, false);
+
+        // Enabled Read - Config 
+        await changePermissionStatus(permission3Id, true);
+
+        // Test
         try {
-            let groups = await GroupConfig.find({ domain: domainId });
+            const element = await verifyOwnership(
+                adminAccount, 
+                groupConfig2Document, 
+                domainDocument, 
+                ActionTypes.READ, 
+                RouterTypes.GROUP,
+                true);
+
+            expect(element._id).toEqual(groupConfig2Document._id);
+        } catch (e) {
+            expect(e).toBeNull();
+        }
+    });
+
+    test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Member has permission to select just one of those', async () => {
+        // Given
+        // Enabled Read - Group 
+        await changePermissionStatus(permission2Id, true);
+
+        // Test
+        try {
+            let groups = await GroupConfig.find({ domain: domainId }).exec();
             expect(groups.length).toEqual(2);
 
             const element = await verifyOwnership(
@@ -161,7 +195,7 @@ describe('Success tests', () => {
 
             expect(element._id).toEqual(configDocument._id);
 
-            let groups = await GroupConfig.find({ domain: domainId });
+            let groups = await GroupConfig.find({ domain: domainId }).exec();
             expect(groups.length).toEqual(2);
 
             element = await verifyOwnership(
