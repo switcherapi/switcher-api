@@ -39,7 +39,7 @@ describe('Testing configuration insertion', () => {
             }).expect(201);
 
         // DB validation - document created
-        const config = await Config.findById(response.body._id).lean();
+        const config = await Config.findById(response.body._id).lean().exec();
         expect(config).not.toBeNull();
 
         // Response validation
@@ -100,7 +100,7 @@ describe('Testing fetch configuration info', () => {
 
     test('CONFIG_SUITE - Should get Configs by sorting ascending and descending', async () => {
         // given a config that was sent to the past
-        const configKey1 = await Config.findOne({ key: 'TEST_CONFIG_KEY_1' });
+        const configKey1 = await Config.findOne({ key: 'TEST_CONFIG_KEY_1' }).exec();
         let pastDate = new Date(configKey1.createdAt);
         pastDate.setDate(pastDate.getDate() - 2);
         configKey1.createdAt = pastDate;
@@ -195,19 +195,19 @@ describe('Testing configuration deletion', () => {
 
     test('CONFIG_SUITE - Should delete Config', async () => {
         // DB validation Before deleting
-        let domain = await Domain.findById(domainId).lean();
+        let domain = await Domain.findById(domainId).lean().exec();
         expect(domain).not.toBeNull();
 
-        let group = await GroupConfig.findById(groupConfigId).lean();
+        let group = await GroupConfig.findById(groupConfigId).lean().exec();
         expect(group).not.toBeNull();
 
-        let config1 = await Config.findById(configId1).lean();
+        let config1 = await Config.findById(configId1).lean().exec();
         expect(config1).not.toBeNull();
 
-        let config2 = await Config.findById(configId2).lean();
+        let config2 = await Config.findById(configId2).lean().exec();
         expect(config2).not.toBeNull();
 
-        let configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
+        let configStrategy = await ConfigStrategy.findById(configStrategyId).lean().exec();
         expect(configStrategy).not.toBeNull();
 
         await request(app)
@@ -215,23 +215,23 @@ describe('Testing configuration deletion', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
-        const admin = await Admin.findById(adminMasterAccountId).lean();
+        const admin = await Admin.findById(adminMasterAccountId).lean().exec();
         expect(admin).not.toBeNull();
 
         // DB validation After - Verify deleted dependencies
-        domain = await Domain.findById(domainId).lean();
+        domain = await Domain.findById(domainId).lean().exec();
         expect(domain).not.toBeNull();
 
-        group = await GroupConfig.findById(groupConfigId).lean();
+        group = await GroupConfig.findById(groupConfigId).lean().exec();
         expect(group).not.toBeNull();
 
-        config1 = await Config.findById(configId1).lean();
+        config1 = await Config.findById(configId1).lean().exec();
         expect(config1).toBeNull();
 
-        config2 = await Config.findById(configId2).lean();
+        config2 = await Config.findById(configId2).lean().exec();
         expect(config2).not.toBeNull();
 
-        configStrategy = await ConfigStrategy.findById(configStrategyId).lean();
+        configStrategy = await ConfigStrategy.findById(configStrategyId).lean().exec();
         expect(configStrategy).toBeNull();
     });
 });
@@ -241,7 +241,7 @@ describe('Testing update info', () => {
 
     test('CONFIG_SUITE - Should update Config info', async () => {
 
-        let config = await Config.findById(configId1).lean();
+        let config = await Config.findById(configId1).lean().exec();
         expect(config).not.toBeNull();
 
         await request(app)
@@ -253,7 +253,7 @@ describe('Testing update info', () => {
             }).expect(200);
         
         // DB validation - verify flag updated
-        config = await Config.findById(configId1).lean();
+        config = await Config.findById(configId1).lean().exec();
         expect(config).not.toBeNull();
         expect(config.key).toEqual('NEWKEY');
         expect(config.description).toEqual('New description');
@@ -304,7 +304,7 @@ describe('Testing update info', () => {
         expect(response.body.activated[EnvType.DEFAULT]).toEqual(false);
 
         // DB validation - verify status updated
-        const config = await Config.findById(configId1).lean();
+        const config = await Config.findById(configId1).lean().exec();
         expect(config.activated[EnvType.DEFAULT]).toEqual(false);
     });
 });
@@ -335,7 +335,7 @@ describe('Testing Environment status change', () => {
         expect(response.body.activated['QA']).toEqual(true);
 
         // DB validation - verify status updated
-        let config = await Config.findById(configId1).lean();
+        let config = await Config.findById(configId1).lean().exec();
         expect(config.activated[EnvType.DEFAULT]).toEqual(true);
         expect(config.activated['QA']).toEqual(true);
 
@@ -347,7 +347,7 @@ describe('Testing Environment status change', () => {
                 QA: false
             }).expect(200);
 
-        config = await Config.findById(configId1).lean();
+        config = await Config.findById(configId1).lean().exec();
         expect(config.activated[EnvType.DEFAULT]).toEqual(true);
         expect(config.activated['QA']).toEqual(false);
     });
@@ -396,7 +396,7 @@ describe('Testing Environment status change', () => {
                 QA1: true
             }).expect(200);
 
-        let config = await Config.findById(configId1).lean();
+        let config = await Config.findById(configId1).lean().exec();
         expect(config.activated['QA1']).toEqual(true);
 
         await request(app)
@@ -407,7 +407,7 @@ describe('Testing Environment status change', () => {
             }).expect(200);
 
         // DB validation - verify status updated
-        config = await Config.findById(configId1).lean();
+        config = await Config.findById(configId1).lean().exec();
         expect(config.activated['QA1']).toEqual(undefined);
     });
 
@@ -444,7 +444,7 @@ describe('Testing Environment status change', () => {
         expect(response.body).not.toEqual([]);
 
         // DB validation
-        let history = await History.find({ elementId: configId }).lean();
+        let history = await History.find({ elementId: configId }).lean().exec();
         expect(history[0].oldValue['description']).toEqual('Description of my new Config');
         expect(history[0].newValue['description']).toEqual('New description');
 
@@ -456,7 +456,7 @@ describe('Testing Environment status change', () => {
             }).expect(200);
         
         // DB validation
-        history = await History.find({ elementId: configId }).lean();
+        history = await History.find({ elementId: configId }).lean().exec();
         expect(history.length).toEqual(2);
     });
 
@@ -485,7 +485,7 @@ describe('Testing Environment status change', () => {
     });
 
     test('CONFIG_SUITE - Should delete history from a Config element', async () => {
-        let history = await History.find({ elementId: configId1 }).lean();
+        let history = await History.find({ elementId: configId1 }).lean().exec();
         expect(history.length > 0).toEqual(true);
 
         await request(app)
@@ -493,7 +493,7 @@ describe('Testing Environment status change', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
-        history = await History.find({ elementId: configId1 }).lean();
+        history = await History.find({ elementId: configId1 }).lean().exec();
         expect(history.length > 0).toEqual(false);
     });
 
@@ -538,7 +538,7 @@ describe('Testing Environment status change', () => {
                 env: 'QA3'
             }).expect(404);
 
-        const config = await Config.findById(configId1).lean();
+        const config = await Config.findById(configId1).lean().exec();
         expect(config.activated[EnvType.DEFAULT]).toEqual(true);
         expect(config.activated['QA3']).toEqual(true);
     });
@@ -575,7 +575,7 @@ describe('Testing component association', () => {
             }).expect(200);
 
         // DB validation - document updated
-        const config = await Config.findById(configId1);
+        const config = await Config.findById(configId1).exec()
         expect(config.components.includes(responseComponent.body.component._id)).toBe(true);
     });
 
@@ -609,7 +609,7 @@ describe('Testing component association', () => {
             }).expect(200);
 
         // DB validation - document updated
-        const config = await Config.findById(configId1).lean();
+        const config = await Config.findById(configId1).lean().exec();
         expect(config.components.length >= 2).toBe(true);
     });
 
@@ -749,19 +749,19 @@ describe('Testing component association', () => {
             }).expect(200);
 
         // DB validation - document updated
-        const config = await Config.findById(configId1).lean();
+        const config = await Config.findById(configId1).lean().exec();
         expect(config.components.includes(responseComponent.body.component._id)).toEqual(false);
     });
 
     test('CONFIG_SUITE - Should remove records from history after deleting element', async () => {
-        let history = await History.find({ elementId: configId1 }).lean();
+        let history = await History.find({ elementId: configId1 }).lean().exec();
         expect(history.length > 0).toEqual(true);
         await request(app)
             .delete('/config/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
-        history = await History.find({ elementId: configId1 });
+        history = await History.find({ elementId: configId1 }).exec();
         expect(history.length).toEqual(0);
     });
 });
@@ -792,7 +792,8 @@ describe('Testing relay association', () => {
             .send(bodyRelayProd).expect(200);
 
         // DB validation - document updated
-        const config = await Config.findById(configId1).lean();
+        const config = await Config.findById(configId1).lean().exec();
+        expect(config.relay.verified).toEqual(false);
         expect(config.relay.activated['default']).toEqual(true);
         expect(config.relay.endpoint['default']).toBe('http://localhost:3001');
         expect(config.relay.auth_token['default']).toEqual('123');
@@ -886,7 +887,7 @@ describe('Testing relay association', () => {
             }).expect(200);
 
         // DB validation - document updated
-        const config = await Config.findById(configId1).lean();
+        const config = await Config.findById(configId1).lean().exec();
         expect(config.relay.type).toEqual('VALIDATION');
         expect(config.relay.activated['default']).toEqual(true);
         expect(config.relay.endpoint['default']).toBe('http://localhost:3001');
@@ -906,7 +907,7 @@ describe('Testing relay association', () => {
             }).expect(200);
 
         // DB validation - document updated
-        const config = await Config.findById(configId1).lean();
+        const config = await Config.findById(configId1).lean().exec();
         expect(config.relay.type).toEqual('VALIDATION');
         expect(config.relay.activated['default']).toEqual(true);
         expect(config.relay.endpoint['default']).toBe('http://localhost:3001');
@@ -934,7 +935,7 @@ describe('Testing relay association', () => {
             }).expect(200);
 
         // DB validation - document updated
-        let config = await Config.findById(configId1).lean();
+        let config = await Config.findById(configId1).lean().exec();
         expect(config.relay.activated['development']).toEqual(true);
         expect(config.relay.endpoint['development']).toBe('http://localhost:7000');
         expect(config.relay.auth_token['development']).toEqual('abcd');
@@ -945,7 +946,7 @@ describe('Testing relay association', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
         
-        config = await Config.findById(configId1).lean();
+        config = await Config.findById(configId1).lean().exec();
         expect(config.relay.activated['development']).toBe(undefined);
         expect(config.relay.endpoint['development']).toBe(undefined);
         expect(config.relay.auth_token['development']).toBe(undefined);
@@ -964,7 +965,7 @@ describe('Testing relay association', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
         
-        const config = await Config.findById(configId1).lean();
+        const config = await Config.findById(configId1).lean().exec();
         expect(config.relay).toEqual({});
     });
 
@@ -992,7 +993,7 @@ describe('Testing disable metrics', () => {
             }).expect(200);
 
         // DB validation - document updated
-        const config = await Config.findById(configId1).lean();
+        const config = await Config.findById(configId1).lean().exec();
         expect(config.disable_metrics['default']).toEqual(true);
     });
 
@@ -1021,7 +1022,7 @@ describe('Testing disable metrics', () => {
             }).expect(200);
 
         // DB validation - document updated
-        let config = await Config.findById(configId1).lean();
+        let config = await Config.findById(configId1).lean().exec();
         expect(config.disable_metrics['development']).toEqual(true);
 
         //test
@@ -1033,7 +1034,7 @@ describe('Testing disable metrics', () => {
             }).expect(200);
 
         // DB validation - document updated
-        config = await Config.findById(configId1).lean();
+        config = await Config.findById(configId1).lean().exec();
         expect(config.disable_metrics['development']).toEqual(undefined);
     });
 
