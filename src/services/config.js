@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { randomBytes } from 'crypto';
 import { response } from './common';
 import { Config } from '../models/config';
 import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers';
@@ -258,4 +259,18 @@ export async function removeRelay(id, env, admin) {
     }
 
     return config;
+}
+
+export async function getRelayVerificationCode(id, admin) {
+    let config = await getConfigById(id);
+    config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
+
+    const buffer = randomBytes(32);
+    const code = Buffer.from(buffer).toString('base64');
+
+    config.updatedBy = admin.email;
+    config.relay.verification_code = code;
+    config.relay.verified = false;
+
+    return config.save();
 }

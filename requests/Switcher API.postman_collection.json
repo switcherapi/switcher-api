@@ -3752,6 +3752,48 @@
 					"response": []
 				},
 				{
+					"name": "Config - Relay - Generate Verification Code",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/config/relay/verificationCode/:config",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"config",
+								"relay",
+								"verificationCode",
+								":config"
+							],
+							"variable": [
+								{
+									"key": "config",
+									"value": "5e0eceb66f4f994eac9007b2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Config - Read Relay Specs",
 					"request": {
 						"method": "GET",

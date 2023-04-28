@@ -274,6 +274,34 @@ export default {
             }
         }
     },
+    '/config/relay/verificationCode/{id}': {
+        patch: {
+            tags: ['Config'],
+            description: 'Config Relay generates verification code',
+            security: [{ bearerAuth: [] }],
+            parameters: [
+                pathParameter('id', 'Config ID', true)
+            ],
+            responses: {
+                '200': {
+                    description: 'Config Relay verification code generated',
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    code: {
+                                        type: 'string',
+                                        description: 'Verification code'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
     '/config/spec/relay': {
         get: {
             tags: ['Config'],
