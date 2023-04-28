@@ -978,6 +978,22 @@ describe('Testing relay association', () => {
         expect(response.body).toMatchObject({ methods: [ 'POST', 'GET' ], types: [ 'VALIDATION', 'NOTIFICATION' ] });
     });
 
+    test('CONFIG_SUITE - Should generate verification code', async () => {
+        const response = await request(app)
+            .patch(`/config/relay/verificationCode/${configId1}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        expect(response.body.code).not.toBe(undefined);
+    });
+
+    test('CONFIG_SUITE - Should NOT generate verification code', async () => {
+        await request(app)
+            .patch(`/config/relay/verificationCode/${new mongoose.Types.ObjectId()}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(bodyRelayProd).expect(404);
+    });
+
 });
 
 describe('Testing disable metrics', () => {

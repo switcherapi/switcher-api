@@ -259,3 +259,14 @@ export async function removeRelay(id, env, admin) {
 
     return config;
 }
+
+export async function getRelayVerificationCode(id, admin) {
+    let config = await getConfigById(id);
+    config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
+
+    config.updatedBy = admin.email;
+    config.relay.verification_code = Math.random().toString(36).slice(-10);
+    config.relay.verified = false;
+
+    return config.save();
+}
