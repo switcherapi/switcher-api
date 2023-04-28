@@ -45,7 +45,7 @@ export const relay = {
         },
         verification_code: {
             type: 'string',
-            description: '10 character string used to verify Relay endpoint ownership'
+            description: 'Generated string used to verify Relay endpoint ownership'
         },
         verified: {
             type: 'boolean',
