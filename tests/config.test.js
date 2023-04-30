@@ -987,11 +987,74 @@ describe('Testing relay association', () => {
         expect(response.body.code).not.toBe(undefined);
     });
 
-    test('CONFIG_SUITE - Should NOT generate verification code', async () => {
+    test('CONFIG_SUITE - Should NOT generate verification code - Config not found', async () => {
         await request(app)
             .patch(`/config/relay/verificationCode/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(bodyRelayProd).expect(404);
+    });
+
+    test('CONFIG_SUITE - Should verify code', async () => {
+        // Given
+        // Request verification code
+        let response = await request(app)
+            .patch(`/config/relay/verificationCode/${configId1}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        // Test
+        response = await request(app)
+            .patch(`/config/relay/verify/${configId1}?code=${response.body.code}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        expect(response.body.status).toBe('verified');
+    });
+
+    test('CONFIG_SUITE - Should NOT verify code - Config not found', async () => {
+        // Given
+        // Request verification code
+        const response = await request(app)
+            .patch(`/config/relay/verificationCode/${configId1}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        // Test
+        await request(app)
+            .patch(`/config/relay/verify/${new mongoose.Types.ObjectId()}?code=${response.body.code}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404);
+    });
+
+    test('CONFIG_SUITE - Should NOT verify code - Invalid code', async () => {
+        await request(app)
+            .patch(`/config/relay/verify/${configId1}?code=`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(422);
+    });
+
+    test('CONFIG_SUITE - Should NOT verify code - Relay already verified', async () => {
+        // Given
+        // Request verification code
+        let response = await request(app)
+            .patch(`/config/relay/verificationCode/${configId1}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        // That
+        // Is already verified
+        await request(app)
+            .patch(`/config/relay/verify/${configId1}?code=${response.body.code}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        // Test
+        response = await request(app)
+            .patch(`/config/relay/verify/${configId1}?code=${response.body.code}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        expect(response.body.status).toBe('failed');
     });
 
 });

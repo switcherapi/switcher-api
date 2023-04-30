@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { randomBytes } from 'crypto';
+import { randomUUID } from 'crypto';
 import { response } from './common';
 import { Config } from '../models/config';
 import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers';
@@ -265,12 +265,22 @@ export async function getRelayVerificationCode(id, admin) {
     let config = await getConfigById(id);
     config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
 
-    const buffer = randomBytes(32);
-    const code = Buffer.from(buffer).toString('base64');
-
     config.updatedBy = admin.email;
-    config.relay.verification_code = code;
+    config.relay.verification_code = randomUUID();
     config.relay.verified = false;
 
     return config.save();
+}
+
+export async function verifyRelay(id, code, admin) {
+    let config = await getConfigById(id);
+    config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
+
+    if (!config.relay.verified && Object.is(config.relay.verification_code, code)) {
+        config.relay.verified = true;
+        await config.save();
+        return 'verified';
+    }
+
+    return 'failed';
 }
