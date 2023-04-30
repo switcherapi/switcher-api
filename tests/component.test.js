@@ -44,7 +44,7 @@ describe('Insertion tests', () => {
             }).expect(201);
 
         // DB validation - document created
-        const component = await Component.findById(response.body.component._id).lean();
+        const component = await Component.findById(response.body.component._id).exec();
         expect(component).not.toBeNull();
 
         // Response validation
@@ -95,8 +95,8 @@ describe('Insertion tests', () => {
 
         expect(response.body.apiKey).not.toBeNull();
         // DB validation - current Domain token should not be as the same as the generated
-        const apiKey = Buffer.from(response.body.apiKey, 'base64').toString('ascii');
-        const component = await Component.findById(component1Id).lean();
+        const apiKey = response.body.apiKey;
+        const component = await Component.findById(component1Id).exec();
         const isMatch = await bcryptjs.compare(apiKey, component.apihash);
         expect(isMatch).toEqual(true);
     });
@@ -194,7 +194,7 @@ describe('Updating tests', () => {
             }).expect(201);
         
         // DB validation - document created
-        let component = await Component.findById(response.body.component._id).lean();
+        let component = await Component.findById(response.body.component._id).exec();
         expect(component.description).toBe('This is my Web App using this wonderful API');
 
         response = await request(app)
@@ -205,7 +205,7 @@ describe('Updating tests', () => {
             }).expect(200);
 
         // DB validation - document updated
-        component = await Component.findById(response.body._id).lean();
+        component = await Component.findById(response.body._id).exec();
         expect(component.description).toBe('Wow, this is my updated description');
     });
 
@@ -257,7 +257,7 @@ describe('Deletion tests', () => {
                 component: response.body.component._id
             }).expect(200);
 
-        const configsToRemoveFrom = await Config.find({ components: { $in: [response.body.component._id] } }).lean();
+        const configsToRemoveFrom = await Config.find({ components: { $in: [response.body.component._id] } }).exec();
         expect(configsToRemoveFrom[0]._id).toEqual(configId1);
 
         response = await request(app)
@@ -266,7 +266,7 @@ describe('Deletion tests', () => {
             .send().expect(200);
 
         // DB validation - document deleted
-        const component = await Component.findById(response.body._id).lean();
+        const component = await Component.findById(response.body._id).exec();
         expect(component).toBeNull();
     });
 

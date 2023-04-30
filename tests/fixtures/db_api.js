@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import bcryptjs from 'bcryptjs';
-import { randomBytes } from 'crypto';
+import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
 import Admin from '../../src/models/admin';
 import Domain from '../../src/models/domain';
@@ -272,8 +272,7 @@ export const setupDatabase = async () => {
     await new Permission(permissionAll3).save();
     await new Permission(permissionAll4).save();
 
-    const buffer = randomBytes(32);
-    const apiKey = Buffer.from(buffer).toString('base64');
+    const apiKey = randomUUID();
     const hash = await bcryptjs.hash(apiKey, 8);
     component1.apihash = hash;
     await new Component(component1).save();

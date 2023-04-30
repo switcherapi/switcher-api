@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
-import bcryptjs from 'bcryptjs';
 import app from '../src/app';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
@@ -548,21 +547,16 @@ describe('Testing criteria [REST] ', () => {
     });
 
     test('CLIENT_SUITE - Should NOT return success on a entry-based CRITERIA response - Component not registered', async () => {
-        //given
-        const component = {
+        // Given
+        const component = new Component({
             _id: new mongoose.Types.ObjectId(),
             name: 'Temp Component',
             description: 'Temporary component',
             domain: domainId,
             owner: adminMasterAccountId
-        };
-
-        const hashApiKey = await bcryptjs.hash(component._id + component.name, 8);
-        const hash = await bcryptjs.hash(hashApiKey, 8);
-        component.apihash = hash;
-        await new Component(component).save();
-        const generatedApiKey = Buffer.from(hashApiKey).toString('base64');
-
+        });
+        
+        const generatedApiKey = await component.generateApiKey();
         const response = await request(app)
             .post('/criteria/auth')
             .set('switcher-api-key', `${generatedApiKey}`)
@@ -574,7 +568,7 @@ describe('Testing criteria [REST] ', () => {
 
         const tempToken = response.body.token;
 
-        //test
+        // Test
         const req = await request(app)
             .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
             .set('Authorization', `Bearer ${tempToken}`)
