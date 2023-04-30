@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
 import bcryptjs from 'bcryptjs';
-import { randomBytes } from 'crypto';
+import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
 import { Config } from './config';
 import Domain from './domain';
@@ -55,13 +55,12 @@ componentSchema.options.toJSON = {
 componentSchema.methods.generateApiKey = async function () {
     const component = this;
 
-    const buffer = randomBytes(32);
-    const apiKey = Buffer.from(buffer).toString('base64');
+    const apiKey = randomUUID();
     const hash = await bcryptjs.hash(apiKey, 8);
     component.apihash = hash;
     await component.save();
     
-    return Buffer.from(apiKey).toString('base64');
+    return apiKey;
 };
 
 componentSchema.methods.generateAuthToken = async function (environment) {
@@ -86,8 +85,16 @@ componentSchema.statics.findByCredentials = async (domainName, componentName, ap
         throw new Error('Unable to find this Component');
     }
 
-    let decoded = Buffer.from(apiKey, 'base64').toString('ascii');
-    const isMatch = await bcryptjs.compare(decoded, component.apihash);
+    let isMatch = false;
+
+    // Validate API Key type
+    if (apiKey.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)) {
+        isMatch = await bcryptjs.compare(apiKey, component.apihash);
+    } else {
+        // Must be deprecated by date
+        let decoded = Buffer.from(apiKey, 'base64').toString('ascii');
+        isMatch = await bcryptjs.compare(decoded, component.apihash);
+    }
 
     if (!isMatch) {
         throw new Error('Unable to find this Component');
