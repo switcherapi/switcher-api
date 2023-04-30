@@ -321,7 +321,7 @@ export default {
                                 properties: {
                                     status: {
                                         type: 'string',
-                                        description: `Return verification status ['verified'/'failed']`
+                                        description: 'Return verification status [verified/failed]'
                                     }
                                 }
                             }
