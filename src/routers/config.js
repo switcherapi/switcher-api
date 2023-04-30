@@ -219,6 +219,18 @@ router.patch('/config/relay/verificationCode/:id', auth, [
     }
 });
 
+router.patch('/config/relay/verify/:id', auth, [
+    check('id').isMongoId(),
+    query('code').isAscii()
+], validate, async (req, res) => {
+    try {
+        const result = await Services.verifyRelay(req.params.id, req.query.code, req.admin);
+        res.send({ status: result });
+    } catch (e) {
+        responseException(res, e, 500);
+    }
+});
+
 router.get('/config/spec/relay', auth, (_req, res) => {
     res.send(relayOptions());
 });

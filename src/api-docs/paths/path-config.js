@@ -302,6 +302,35 @@ export default {
             }
         }
     },
+    '/config/relay/verify/{id}': {
+        patch: {
+            tags: ['Config'],
+            description: 'Verify Config Relay ownership based on given verification code',
+            security: [{ bearerAuth: [] }],
+            parameters: [
+                pathParameter('id', 'Config ID', true),
+                queryParameter('code', 'Verification code', true, 'string')
+            ],
+            responses: {
+                '200': {
+                    description: 'Config Relay verification code generated',
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    status: {
+                                        type: 'string',
+                                        description: `Return verification status ['verified'/'failed']`
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
     '/config/spec/relay': {
         get: {
             tags: ['Config'],
