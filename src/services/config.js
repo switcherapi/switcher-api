@@ -298,4 +298,4 @@ export function validateRelay(relay) {
     
     if (foundNotHttps.length)
         throw new BadRequestError('HTTPS required');
-};
+}
