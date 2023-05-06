@@ -290,7 +290,7 @@ export async function verifyRelay(id, code, admin) {
 export function validateRelay(relay) {
     const bypass = process.env.RELAY_BYPASS_HTTPS === 'true' || false;
 
-    if (bypass)
+    if (bypass || !relay.endpoint)
         return;
 
     const foundNotHttps = Object.values(relay.endpoint)
