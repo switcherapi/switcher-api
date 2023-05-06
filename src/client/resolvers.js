@@ -172,9 +172,9 @@ async function checkConfigStrategies(configId, strategyFilter) {
 
 async function resolveRelay(config, environment, entry, response) {
     try {
-        validateRelay(config.relay);
-
-        if (config.relay && config.relay.activated[environment]) {
+        if (config.relay?.activated[environment]) {
+            validateRelay(config.relay);
+            
             if (config.relay.type === RelayTypes.NOTIFICATION) {
                 resolveNotification(config.relay.endpoint[environment], config.relay.method, entry,
                     config.relay.auth_prefix, config.relay.auth_token[environment]);
@@ -197,7 +197,7 @@ async function resolveRelay(config, environment, entry, response) {
 }
 
 function isMetricDisabled(config, environment) {
-    if (config.disable_metrics && config.disable_metrics[environment]) {
+    if (config.disable_metrics) {
         return config.disable_metrics[environment];
     }
     return false;
@@ -228,7 +228,7 @@ async function checkStrategy(entry, strategies, environment) {
 }
 
 async function checkStrategyInput(entry, { strategy, operation, values }) {
-    if (entry && entry.length) {
+    if (entry?.length) {
         const strategyEntry = entry.filter(e => e.strategy === strategy);
         if (strategyEntry.length == 0 || !(await processOperation(strategy, operation, strategyEntry[0].input, values))) {
             throw new Error(`Strategy '${strategy}' does not agree`);

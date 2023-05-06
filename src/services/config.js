@@ -247,7 +247,7 @@ export async function removeRelay(id, env, admin) {
     config = await verifyOwnership(admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG);
     config.updatedBy = admin.email;
 
-    if (config.relay.activated && config.relay.activated.get(env) != undefined) {
+    if (config.relay.activated?.get(env) != undefined) {
         if (config.relay.activated.size > 1) {
             config.relay.activated.delete(env);
             config.relay.endpoint.delete(env);
