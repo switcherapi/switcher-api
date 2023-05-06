@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator';
-import { BadRequestError } from '../exceptions';
+import { BadRequestError, responseException } from '../exceptions';
 import { getConfig } from '../services/config';
 import { getComponents } from '../services/component';
 import { getEnvironments } from '../services/environment';
@@ -48,7 +48,7 @@ export function verifyInputUpdateParameters(allowedUpdates) {
         const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
         if (!isValidOperation) {
-            return res.status(400).send({ error: 'Invalid update parameters' });
+            return responseException(res, new Error('Invalid update parameters'), 400);
         }
 
         req.updates = updates;

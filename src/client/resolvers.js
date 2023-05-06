@@ -9,6 +9,7 @@ import { verifyOwnership } from '../helpers';
 import { resolveNotification, resolveValidation } from './relay/index';
 import Component from '../models/component';
 import Logger from '../helpers/logger';
+import { validateRelay } from '../services/config';
 
 export const resolveConfigByKey = async (domain, key) => Config.findOne({ domain, key }, null, { lean: true });
 
@@ -171,6 +172,8 @@ async function checkConfigStrategies(configId, strategyFilter) {
 
 async function resolveRelay(config, environment, entry, response) {
     try {
+        validateRelay(config.relay);
+
         if (config.relay && config.relay.activated[environment]) {
             if (config.relay.type === RelayTypes.NOTIFICATION) {
                 resolveNotification(config.relay.endpoint[environment], config.relay.method, entry,

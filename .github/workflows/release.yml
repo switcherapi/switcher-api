@@ -41,6 +41,7 @@ jobs:
           GOOGLE_RECAPTCHA_SECRET: ${{ secrets.GOOGLE_RECAPTCHA_SECRET }}
           GOOGLE_SKIP_AUTH: false
           MAX_STRATEGY_OPERATION: 100
+          RELAY_BYPASS_HTTPS: true
           METRICS_ACTIVATED: true
           METRICS_MAX_PAGE: 50
           SWITCHER_API_ENABLE: false

@@ -766,6 +766,64 @@ describe('Testing component association', () => {
     });
 });
 
+describe('Testing relay verification', () => {
+    beforeAll(async () => {
+        await setupDatabase();
+        process.env.RELAY_BYPASS_HTTPS = false;
+    });
+
+    afterAll(() => {
+        process.env.RELAY_BYPASS_HTTPS = true;
+    });
+
+    const bodyRelay = {
+        type: 'VALIDATION',
+        activated: {
+            default: true
+        },
+        endpoint: {
+            default: {}
+        },
+        method: 'POST'
+    };
+
+    test('CONFIG_SUITE - Should NOT configure new Relay - Not HTTPS', async () => {
+        // Given HTTP
+        bodyRelay.endpoint.default = 'http://localhost:3001';
+
+        // Test
+        const response = await request(app)
+            .patch(`/config/updateRelay/${configId1}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(bodyRelay).expect(400);
+
+        expect(response.body.error).toEqual('HTTPS required');
+    });
+
+    test('CONFIG_SUITE - Should configure new Relay', async () => {
+        // Given HTTPS
+        bodyRelay.endpoint.default = 'https://localhost:3001';
+
+        // Test
+        await request(app)
+            .patch(`/config/updateRelay/${configId1}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(bodyRelay).expect(200);
+    });
+
+    test('CONFIG_SUITE - Should configure new Relay - All capital HTTPS', async () => {
+        // Given HTTPS
+        bodyRelay.endpoint.default = 'HTTPS://localhost:3001';
+
+        // Test
+        await request(app)
+            .patch(`/config/updateRelay/${configId1}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(bodyRelay).expect(200);
+    });
+
+});
+
 describe('Testing relay association', () => {
     beforeAll(setupDatabase);
 
@@ -794,6 +852,7 @@ describe('Testing relay association', () => {
         // DB validation - document updated
         const config = await Config.findById(configId1).lean().exec();
         expect(config.relay.verified).toEqual(false);
+        expect(config.relay.verification_code).toEqual(undefined);
         expect(config.relay.activated['default']).toEqual(true);
         expect(config.relay.endpoint['default']).toBe('http://localhost:3001');
         expect(config.relay.auth_token['default']).toEqual('123');
@@ -860,7 +919,7 @@ describe('Testing relay association', () => {
     });
 
     test('CONFIG_SUITE - Should configure new Relay on new envrironment', async () => {
-        //given
+        // Given
         // Creating development Environment...
         await request(app)
             .post('/environment/create')
@@ -870,7 +929,7 @@ describe('Testing relay association', () => {
                 domain: domainId
             }).expect(201);
 
-        //test
+        // Test
         await request(app)
             .patch(`/config/updateRelay/${configId1}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -898,7 +957,7 @@ describe('Testing relay association', () => {
     });
 
     test('CONFIG_SUITE - Should remove configured Relay when reseting environment', async () => {
-        //test
+        // Test
         await request(app)
             .patch('/config/removeStatus/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -918,7 +977,7 @@ describe('Testing relay association', () => {
     });
 
     test('CONFIG_SUITE - Should remove Relay from an environment', async () => {
-        //given - adding development relay to be removed later on
+        // Given - adding development relay to be removed later on
         await request(app)
             .patch(`/config/updateRelay/${configId1}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -940,7 +999,7 @@ describe('Testing relay association', () => {
         expect(config.relay.endpoint['development']).toBe('http://localhost:7000');
         expect(config.relay.auth_token['development']).toEqual('abcd');
 
-        //test
+        // Test
         await request(app)
             .patch(`/config/removeRelay/${configId1}/development`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -1060,6 +1119,7 @@ describe('Testing relay association', () => {
 });
 
 describe('Testing disable metrics', () => {
+    beforeAll(setupDatabase);
 
     test('CONFIG_SUITE - Should disable metrics for production environment', async () => {
         await request(app)
@@ -1090,7 +1150,17 @@ describe('Testing disable metrics', () => {
     });
 
     test('CONFIG_SUITE - Should reset disabled metric flag when reseting environment', async () => {
-        //given
+        // Given
+        // Creating development Environment...
+        await request(app)
+            .post('/environment/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'development',
+                domain: domainId
+            }).expect(201);
+
+        // Update to true
         await request(app)
             .patch(`/config/${configId1}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -1104,7 +1174,7 @@ describe('Testing disable metrics', () => {
         let config = await Config.findById(configId1).lean().exec();
         expect(config.disable_metrics['development']).toEqual(true);
 
-        //test
+        // Test
         await request(app)
             .patch('/config/removeStatus/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
