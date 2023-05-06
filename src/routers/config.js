@@ -132,7 +132,9 @@ router.patch('/config/:id', auth, [
 
 router.patch('/config/updateRelay/:id', auth, [
     check('id').isMongoId()
-], validate, async (req, res) => {
+], validate, verifyInputUpdateParameters([
+    'type', 'description', 'activated', 'endpoint', 'method', 'auth_prefix', 'auth_token'
+]), async (req, res) => {
     try {
         let config = await Services.updateConfigRelay(req.params.id, req.body, req.admin);
         res.send(config);

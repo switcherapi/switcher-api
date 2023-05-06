@@ -130,6 +130,8 @@ export async function updateConfig(id, args, admin) {
 
 export async function updateConfigRelay(id, args, admin) {
     let config = await getConfigById(id);
+    validateRelay(args);
+
     config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
     config.updatedBy = admin.email;
 
@@ -245,7 +247,7 @@ export async function removeRelay(id, env, admin) {
     config = await verifyOwnership(admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG);
     config.updatedBy = admin.email;
 
-    if (config.relay.activated && config.relay.activated.get(env) != undefined) {
+    if (config.relay.activated?.get(env) != undefined) {
         if (config.relay.activated.size > 1) {
             config.relay.activated.delete(env);
             config.relay.endpoint.delete(env);
@@ -283,4 +285,17 @@ export async function verifyRelay(id, code, admin) {
     }
 
     return 'failed';
+}
+
+export function validateRelay(relay) {
+    const bypass = process.env.RELAY_BYPASS_HTTPS === 'true' || false;
+
+    if (bypass)
+        return;
+
+    const foundNotHttps = Object.values(relay.endpoint)
+        .filter(endpoint => !endpoint.toLowerCase().startsWith('https'));
+    
+    if (foundNotHttps.length)
+        throw new BadRequestError('HTTPS required');
 }
