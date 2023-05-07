@@ -155,6 +155,15 @@ async function recordConfigHistory(config, modifiedField) {
     }
 }
 
+function hasRelayEndpointUpdates(config, modifiedField) {
+    const hasUpdate = modifiedField.filter(field => field.indexOf('relay.endpoint') >= 0);
+    
+    if (hasUpdate.length) {
+        config.relay.verified = false;
+        config.relay.verification_code = undefined;
+    }
+}
+
 configSchema.virtual('configStrategy', {
     ref: 'ConfigStrategy',
     localField: '_id',
@@ -180,6 +189,8 @@ configSchema.pre('save', async function (next) {
     await config.populate({ path: 'component_list' });
     await recordConfigHistory(config.toJSON(), this.modifiedPaths());
     await checkMetrics(config);
+    hasRelayEndpointUpdates(config, this.modifiedPaths());
+
     next();
 });
 
