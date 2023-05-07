@@ -56,8 +56,7 @@ export async function createConfig(args, admin) {
 
     // validates existing config
     let config = await getConfig({ 
-        key: args.key, 
-        group: group._id, 
+        key: args.key,
         domain: group.domain 
     });
     
