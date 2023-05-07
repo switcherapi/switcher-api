@@ -129,7 +129,7 @@ export async function updateConfig(id, args, admin) {
 
 export async function updateConfigRelay(id, args, admin) {
     let config = await getConfigById(id);
-    validateRelay(args);
+    isRelayValid(args);
 
     config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
     config.updatedBy = admin.email;
@@ -286,7 +286,7 @@ export async function verifyRelay(id, code, admin) {
     return 'failed';
 }
 
-export function validateRelay(relay) {
+export function isRelayValid(relay) {
     const bypass = process.env.RELAY_BYPASS_HTTPS === 'true' || false;
 
     if (bypass || !relay.endpoint)
@@ -297,4 +297,14 @@ export function validateRelay(relay) {
     
     if (foundNotHttps.length)
         throw new BadRequestError('HTTPS required');
+}
+
+export function isRelayVerified(relay) {
+    const bypass = process.env.RELAY_BYPASS_VERIFICATION === 'true' || false;
+
+    if (bypass)
+        return;
+    
+    if (!relay.verified)
+        throw new BadRequestError('Relay not verified');
 }

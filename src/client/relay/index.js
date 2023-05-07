@@ -1,20 +1,27 @@
 import axios from 'axios';
 import { StrategiesToRelayDataType, RelayMethods } from '../../models/config';
 
-export function resolveNotification(url, method, entry, auth_prefix, auth_token) {
-    if (method === RelayMethods.GET) {
-        get(url, createParams(entry), createHeader(auth_prefix, auth_token));
+export function resolveNotification(relay, entry, environment) {
+    const url = relay.endpoint[environment];
+    const header = createHeader(relay.auth_prefix, relay.auth_token, environment);
+
+    if (relay.method === RelayMethods.GET) {
+        get(url, createParams(entry), header);
     } else {
-        post(url, createBody(entry), createHeader(auth_prefix, auth_token));
+        post(url, createBody(entry), header);
     }
 }
 
-export async function resolveValidation(url, method, entry, auth_prefix, auth_token) {
+export async function resolveValidation(relay, entry, environment) {
     let response;
-    if (method === RelayMethods.GET) {
-        response = await get(url, createParams(entry), createHeader(auth_prefix, auth_token));
+    
+    const url = relay.endpoint[environment];
+    const header = createHeader(relay.auth_prefix, relay.auth_token, environment);
+
+    if (relay.method === RelayMethods.GET) {
+        response = await get(url, createParams(entry), header);
     } else {
-        response = await post(url, createBody(entry), createHeader(auth_prefix, auth_token));
+        response = await post(url, createBody(entry), header);
     }
 
     return {
@@ -56,13 +63,16 @@ function createParams(entry) {
     return '';
 }
 
-function createHeader(auth_prefix, auth_token) {
+function createHeader(auth_prefix, auth_token, environment) {
     let headers = {};
 
     headers['Content-Type'] = 'application/json';
-    if (auth_prefix)
-        headers['Authorization'] = `${auth_prefix} ${auth_token}`;
-        
+
+    if (auth_token && environment in auth_token && 
+        auth_prefix && auth_token[environment]) {
+        headers['Authorization'] = `${auth_prefix} ${auth_token[environment]}`;
+    }
+
     return {
         headers
     };

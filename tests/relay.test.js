@@ -3,7 +3,7 @@ import request from 'supertest';
 import sinon from 'sinon';
 import axios from 'axios';
 import app from '../src/app';
-import { RelayMethods, RelayTypes } from '../src/models/config';
+import { Config, RelayMethods, RelayTypes } from '../src/models/config';
 import { 
     setupDatabase,
     adminMasterAccountToken,
@@ -25,6 +25,19 @@ const changeStrategy = async (strategyId, newOperation, status, environment) => 
     strategy.activated.set(environment, status !== undefined ? status : strategy.activated.get(environment));
     strategy.updatedBy = adminMasterAccountId;
     await strategy.save();
+};
+
+const bodyRelay = (endpoint) => {
+    return {
+        type: RelayTypes.VALIDATION,
+        activated: {
+            default: true
+        },
+        endpoint: {
+            default: endpoint
+        },
+        method: RelayMethods.GET
+    };
 };
 
 beforeAll(setupDatabase);
@@ -295,7 +308,7 @@ describe('Testing Switcher Relay', () => {
 
         axiosStub.restore();
         expect(req.statusCode).toBe(200);
-        expect(req.body.reason).toEqual('Relay service could not be reached');
+        expect(req.body.reason).toEqual('Relay service could not be reached: Failed to reach http://localhost:3001 via GET');
         expect(req.body.result).toBe(false);
     });
 
@@ -318,26 +331,13 @@ describe('Testing Switcher Relay', () => {
 
         axiosStub.restore();
         expect(req.statusCode).toBe(200);
-        expect(req.body.reason).toEqual('Relay service could not be reached');
+        expect(req.body.reason).toEqual('Relay service could not be reached: Failed to reach http://localhost:3001 via POST');
         expect(req.body.result).toBe(false);
     });
 
 });
 
 describe('Testing Switcher Relay Validation', () => {
-
-    const bodyRelay = (endpoint) => {
-        return {
-            type: RelayTypes.VALIDATION,
-            activated: {
-                default: true
-            },
-            endpoint: {
-                default: endpoint
-            },
-            method: RelayMethods.GET
-        };
-    };
 
     let token;
 
@@ -389,7 +389,107 @@ describe('Testing Switcher Relay Validation', () => {
                 ]});
             
         expect(req.statusCode).toBe(200);
-        expect(req.body.reason).toEqual('Relay service could not be reached');
+        expect(req.body.reason).toEqual('Relay service could not be reached: HTTPS required');
+    });
+
+});
+
+describe('Testing Switcher Relay Verification', () => {
+
+    let token;
+    let axiosStub;
+
+    beforeAll(async () => {
+        const response = await request(app)
+            .post('/criteria/auth')
+            .set('switcher-api-key', `${apiKey}`)
+            .send({
+                domain: domainDocument.name,
+                component: component1.name,
+                environment: EnvType.DEFAULT
+            }).expect(200);
+
+        token = response.body.token;
+    });
+
+    afterAll(() => {
+        process.env.RELAY_BYPASS_VERIFICATION = true;
+    });
+
+    test('RELAY_SUITE - Should return Relay could not be reached - Not verified', async () => {
+        // Given
+        // Verification required
+        process.env.RELAY_BYPASS_VERIFICATION = false;
+
+        // Setup Switcher
+        await request(app)
+            .patch(`/config/updateRelay/${configId}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(bodyRelay('https://localhost:3001')).expect(200);
+
+        // Test
+        const req = await request(app)
+            .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                entry: [
+                    {
+                        strategy: StrategiesType.VALUE,
+                        input: 'USER_1'
+                    },
+                    {
+                        strategy: StrategiesType.NETWORK,
+                        input: '10.0.0.3'
+                    }
+                ]});
+        
+        expect(req.statusCode).toBe(200);
+        expect(req.body.reason).toEqual('Relay service could not be reached: Relay not verified');
+    });
+
+    test('RELAY_SUITE - Should return success when validating verified relay', async () => {
+        // Mock
+        axiosStub = sinon.stub(axios, 'get');
+
+        // Given
+        const mockRelayService = { data: { result: true, reason: 'Success' } };
+        axiosStub.returns(Promise.resolve(mockRelayService));
+
+        // Verification required
+        process.env.RELAY_BYPASS_VERIFICATION = false;
+
+        // Setup Switcher
+        await request(app)
+            .patch(`/config/updateRelay/${configId}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(bodyRelay('https://localhost:3001')).expect(200);
+        
+        // Config has a verified Relay
+        const config = await Config.findById(configId).exec();
+        config.relay.verified = true;
+        config.relay.verification_code = '123';
+        await config.save();
+        expect(config.relay.verified).toBe(true);
+
+        // Test
+        const req = await request(app)
+            .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                entry: [
+                    {
+                        strategy: StrategiesType.VALUE,
+                        input: 'USER_1'
+                    },
+                    {
+                        strategy: StrategiesType.NETWORK,
+                        input: '10.0.0.3'
+                    }
+                ]});
+            
+        axiosStub.restore();
+        expect(req.statusCode).toBe(200);
+        expect(req.body.reason).toEqual('Success');
     });
 
 });
