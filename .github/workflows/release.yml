@@ -42,6 +42,7 @@ jobs:
           GOOGLE_SKIP_AUTH: false
           MAX_STRATEGY_OPERATION: 100
           RELAY_BYPASS_HTTPS: true
+          RELAY_BYPASS_VERIFICATION: true
           METRICS_ACTIVATED: true
           METRICS_MAX_PAGE: 50
           SWITCHER_API_ENABLE: false

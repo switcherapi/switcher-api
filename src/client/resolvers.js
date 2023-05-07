@@ -9,7 +9,7 @@ import { verifyOwnership } from '../helpers';
 import { resolveNotification, resolveValidation } from './relay/index';
 import Component from '../models/component';
 import Logger from '../helpers/logger';
-import { validateRelay } from '../services/config';
+import { isRelayVerified, isRelayValid } from '../services/config';
 
 export const resolveConfigByKey = async (domain, key) => Config.findOne({ domain, key }, null, { lean: true });
 
@@ -173,15 +173,14 @@ async function checkConfigStrategies(configId, strategyFilter) {
 async function resolveRelay(config, environment, entry, response) {
     try {
         if (config.relay?.activated[environment]) {
-            validateRelay(config.relay);
+            isRelayValid(config.relay);
+            isRelayVerified(config.relay);
             
             if (config.relay.type === RelayTypes.NOTIFICATION) {
-                resolveNotification(config.relay.endpoint[environment], config.relay.method, entry,
-                    config.relay.auth_prefix, config.relay.auth_token[environment]);
+                resolveNotification(config.relay, entry, environment);
             } else {
-                const relayResponse = await resolveValidation(config.relay.endpoint[environment], config.relay.method, entry,
-                    config.relay.auth_prefix, config.relay.auth_token[environment]);
-                
+                const relayResponse = await resolveValidation(config.relay, entry, environment);
+
                 response.result = relayResponse.result;
                 response.reason = relayResponse.result ? 'Success' : 'Relay does not agree';
                 response.message = relayResponse.message;
@@ -190,7 +189,7 @@ async function resolveRelay(config, environment, entry, response) {
     } catch (e) {
         if (config.relay.type === RelayTypes.VALIDATION) {
             response.result = false;
-            response.reason = 'Relay service could not be reached';
+            response.reason = `Relay service could not be reached: ${e.message}`;
             Logger.error(response.reason, e);
         }
     }
