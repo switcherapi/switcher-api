@@ -22,7 +22,7 @@ export const permissionType = new GraphQLObjectType({
             type: GraphQLString
         },
         permissions: {
-            type: GraphQLList(elementPermissionsType)
+            type: new GraphQLList(elementPermissionsType)
         }
     }
 });
