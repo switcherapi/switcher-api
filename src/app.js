@@ -1,6 +1,6 @@
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
-import { graphqlHTTP } from 'express-graphql';
+import { createHandler } from 'graphql-http/lib/use/express';
 import cors from 'cors';
 import helmet from 'helmet';    
 
@@ -34,7 +34,7 @@ app.use(helmet());
 app.disable('x-powered-by');
 
 /**
- * API Routers
+ * API Routes
  */
 app.use(clientApiRouter);
 app.use(adminRouter);
@@ -50,28 +50,18 @@ app.use(permissionRouter);
 app.use(slackRouter);
 
 /**
- * Component: Client API - GraphQL
+ * GraphQL Routes
  */
-app.use('/graphql', appAuth, graphqlHTTP({
-    schema,
-    graphiql: true
-}));
 
-/**
- * Admin: Client API - GraphQL
- */
-app.use('/adm-graphql', auth, graphqlHTTP({
-    schema,
-    graphiql: true
-}));
+const handler = (req, res, next) => 
+    createHandler({ schema, context: req})(req, res, next);
 
-/**
- * Slack: Client API - GraphQL
- */
- app.use('/slack-graphql', slackAuth, graphqlHTTP({
-    schema,
-    graphiql: true
-}));
+// Component: Client API
+app.use('/graphql', appAuth, handler);
+// Admin: Client API
+app.use('/adm-graphql', auth, handler);
+// Slack: Client API
+app.use('/slack-graphql', slackAuth, handler);
 
 /**
  * API Docs and Health Check
