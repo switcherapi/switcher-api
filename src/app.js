@@ -54,7 +54,7 @@ app.use(slackRouter);
  */
 
 const handler = (req, res, next) => 
-    createHandler({ schema, context: req})(req, res, next);
+    createHandler({ schema, context: req })(req, res, next);
 
 // Component: Client API
 app.use('/graphql', appAuth, handler);
