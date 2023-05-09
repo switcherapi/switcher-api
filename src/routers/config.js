@@ -62,7 +62,7 @@ router.get('/config/:id', auth, [
         let config = await Services.getConfigById(req.params.id);
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
 
-        if (req.query.resolveComponents) {
+        if (req.query.resolveComponents === 'true') {
             await config.populate({ path: 'component_list' });
         }
 

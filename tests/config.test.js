@@ -17,7 +17,8 @@ import {
     configId1,
     config1Document,
     configId2,
-    configStrategyId
+    configStrategyId,
+    component1
 } from './fixtures/db_api';
 
 afterAll(async () => { 
@@ -138,9 +139,9 @@ describe('Testing fetch configuration info', () => {
             .send().expect(422);
     });
 
-    test('CONFIG_SUITE - Should get Config information by Id', async () => {
-        let response = await request(app)
-            .get('/config/' + configId1 + '?resolveComponents=true')
+    test('CONFIG_SUITE - Should get Config information by Id - resolveComponents as true', async () => {
+        const response = await request(app)
+            .get(`/config/${configId1}?resolveComponents=true`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
@@ -148,24 +149,20 @@ describe('Testing fetch configuration info', () => {
         expect(response.body.key).toEqual(config1Document.key);
         expect(String(response.body.group)).toEqual(String(config1Document.group));
         expect(response.body.activated[EnvType.DEFAULT]).toEqual(config1Document.activated.get(EnvType.DEFAULT));
-
-        // Adding new Config
-        response = await request(app)
-            .post('/config/create')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                key: 'NEW_CONFIG456',
-                description: 'Description of my new Config',
-                group: groupConfigId
-            }).expect(201);
-
-        await request(app)
-            .get('/config/' + response.body._id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200);
+        expect(response.body.components[0].name).toEqual(component1.name);
     });
 
-    test('CONFIG_SUITE - Should not found Config information by Id', async () => {
+    test('CONFIG_SUITE - Should get Config information by Id - resolveComponents as false', async () => {
+        const response = await request(app)
+            .get(`/config/${configId1}?resolveComponents=false`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        expect(String(response.body._id)).toEqual(String(config1Document._id));
+        expect(response.body.components[0].name).toEqual(undefined);
+    });
+
+    test('CONFIG_SUITE - Should not find Config information by Id', async () => {
         await request(app)
             .get('/config/' + 'NOTEXIST')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
