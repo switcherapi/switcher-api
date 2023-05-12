@@ -164,19 +164,19 @@ export async function removeTeamMember(member, id, admin) {
     const team = await verifyRequestedTeam(id, admin, ActionTypes.UPDATE);
 
     const adminMember = await Admin.findById(member.trim()).exec();
-
     if (!adminMember) {
         throw new NotFoundError('Member not found');
     }
 
-    let indexTeam = adminMember.teams.indexOf(team._id);
+    const indexTeam = adminMember.teams.indexOf(team._id);
     if (indexTeam < 0) {
         throw new NotFoundError(`Member '${adminMember.name}' does not belong to '${team.name}'`);
     }
 
     adminMember.teams.splice(indexTeam, 1);
-    indexTeam = team.members.indexOf(team._id);
-    team.members.splice(indexTeam, 1);
+    
+    const indexMember = team.members.indexOf(adminMember._id);
+    team.members.splice(indexMember, 1);
 
     await team.save();
     return adminMember.save();
