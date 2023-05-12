@@ -48,7 +48,7 @@ describe('Insertion tests', () => {
         // Response validation
         expect(response.body.name).toBe('My Team');
 
-        //Should NOT create team with same name
+        // Should NOT create team with same name
         await request(app)
             .post('/team/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -133,7 +133,7 @@ describe('Reading tests', () => {
 
     test('TEAM_SUITE - Should read all Teams from a Domain', async () => {
         const response = await request(app)
-            .get('/team?domain=' + domainId)
+            .get(`/team?domain=${domainId}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
@@ -150,7 +150,7 @@ describe('Reading tests', () => {
 
     test('TEAM_SUITE - Should read one single Team', async () => {
         const response = await request(app)
-            .get('/team/' + teamId + '?resolveMembers=true')
+            .get(`/team/${teamId}?resolveMembers=true`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
@@ -159,7 +159,7 @@ describe('Reading tests', () => {
 
     test('TEAM_SUITE - Should NOT read Team - Not found', async () => {
         await request(app)
-            .get('/team/' + new mongoose.Types.ObjectId())
+            .get(`/team/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
     });
@@ -184,7 +184,7 @@ describe('Updating tests', () => {
 
     test('TEAM_SUITE - Should update a Team', async () => {
         await request(app)
-            .patch('/team/' + team1Id)
+            .patch(`/team/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 active: false
@@ -197,7 +197,7 @@ describe('Updating tests', () => {
 
     test('TEAM_SUITE - Should NOT update a Team - Invalid field', async () => {
         await request(app)
-            .patch('/team/' + team1Id)
+            .patch(`/team/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 domain: new mongoose.Types.ObjectId()
@@ -206,7 +206,7 @@ describe('Updating tests', () => {
 
     test('TEAM_SUITE - Should NOT update a Team - Not found', async () => {
         await request(app)
-            .patch('/team/' + new mongoose.Types.ObjectId())
+            .patch(`/team/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 active: true
@@ -238,7 +238,7 @@ describe('Deletion tests', () => {
         const teamId = response.body._id;
 
         await request(app)
-            .patch('/team/member/add/' + teamId)
+            .patch(`/team/member/add/${teamId}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: adminAccountId
@@ -249,7 +249,7 @@ describe('Deletion tests', () => {
         expect(admin.teams.includes(teamId)).toEqual(true);
 
         await request(app)
-            .delete('/team/' + teamId)
+            .delete(`/team/${teamId}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
@@ -263,7 +263,7 @@ describe('Deletion tests', () => {
 
     test('TEAM_SUITE - Should NOT delete a Team - Not found', async () => {
         await request(app)
-            .delete('/team/' + new mongoose.Types.ObjectId())
+            .delete(`/team/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
     });
@@ -281,7 +281,7 @@ describe('Updating team members tests', () => {
 
     test('TEAM_SUITE - Should add a team member', async () => {
         await request(app)
-            .patch('/team/member/add/' + team1Id)
+            .patch(`/team/member/add/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: adminAccountId
@@ -294,7 +294,7 @@ describe('Updating team members tests', () => {
 
     test('TEAM_SUITE - Should create invite request', async () => {
         let response = await request(app)
-            .post('/team/member/invite/' + team1Id)
+            .post(`/team/member/invite/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
@@ -305,7 +305,7 @@ describe('Updating team members tests', () => {
         expect(teamInvite).not.toBeNull();
 
         response = await request(app)
-            .get('/team/member/invite/' + teamInvite._id)
+            .get(`/team/member/invite/${teamInvite._id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
@@ -316,7 +316,7 @@ describe('Updating team members tests', () => {
 
         // Should get invite already made
         await request(app)
-            .post('/team/member/invite/' + team1Id)
+            .post(`/team/member/invite/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
@@ -324,13 +324,13 @@ describe('Updating team members tests', () => {
 
         // Should accept invitation
         await request(app)
-            .post('/team/member/invite/accept/' + teamInvite._id)
+            .post(`/team/member/invite/accept/${teamInvite._id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
         // Should NOT accept invitation - Already used
         await request(app)
-            .post('/team/member/invite/accept/' + teamInvite._id)
+            .post(`/team/member/invite/accept/${teamInvite._id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
     });
@@ -353,7 +353,7 @@ describe('Updating team members tests', () => {
             }).expect(422);
 
         await request(app)
-            .get('/team/member/invite/' + new mongoose.Types.ObjectId())
+            .get(`/team/member/invite/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
@@ -362,14 +362,14 @@ describe('Updating team members tests', () => {
 
     test('TEAM_SUITE - Should get all invitation requests from a team', async () => {
         await request(app)
-            .post('/team/member/invite/' + team1Id)
+            .post(`/team/member/invite/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
             }).expect(201);
 
         const response = await request(app)
-            .get('/team/member/invite/pending/' + team1Id)
+            .get(`/team/member/invite/pending/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
             
@@ -386,7 +386,7 @@ describe('Updating team members tests', () => {
 
     test('TEAM_SUITE - Should NOT remove team invitaion - TEAM INVITE REQUEST NOT FOUND', async () => {
         await request(app)
-            .get('/team/member/invite/pending/' + team1Id)
+            .get(`/team/member/invite/pending/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
@@ -398,7 +398,7 @@ describe('Updating team members tests', () => {
 
     test('TEAM_SUITE - Should remove team invitaion', async () => {
         let response = await request(app)
-            .get('/team/member/invite/pending/' + team1Id)
+            .get(`/team/member/invite/pending/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
@@ -410,7 +410,7 @@ describe('Updating team members tests', () => {
             .send().expect(200);
 
         response = await request(app)
-            .get('/team/member/invite/pending/' + team1Id)
+            .get(`/team/member/invite/pending/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
             
@@ -419,7 +419,7 @@ describe('Updating team members tests', () => {
 
     test('TEAM_SUITE - Should NOT accept invite - Team does not exist', async () => {
         const response = await request(app)
-            .post('/team/member/invite/accept/' + teamInviteNoTeam._id)
+            .post(`/team/member/invite/accept/${teamInviteNoTeam._id}`)
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(400);
 
@@ -428,7 +428,7 @@ describe('Updating team members tests', () => {
 
     test('TEAM_SUITE - Should NOT add a team member - Team not found', async () => {
         await request(app)
-            .patch('/team/member/add/' + new mongoose.Types.ObjectId())
+            .patch(`/team/member/add/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: adminAccountId
@@ -437,7 +437,7 @@ describe('Updating team members tests', () => {
 
     test('TEAM_SUITE - Should NOT add a team member - Member not found', async () => {
         await request(app)
-            .patch('/team/member/add/' + team1Id)
+            .patch(`/team/member/add/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: new mongoose.Types.ObjectId()
@@ -446,14 +446,14 @@ describe('Updating team members tests', () => {
 
     test('TEAM_SUITE - Should NOT add a team member - Member not given', async () => {
         await request(app)
-            .patch('/team/member/add/' + team1Id)
+            .patch(`/team/member/add/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(400);
     });
 
     test('TEAM_SUITE - Should NOT add a team member - Member already joined', async () => {
         await request(app)
-            .patch('/team/member/add/' + team1Id)
+            .patch(`/team/member/add/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: adminAccountId
@@ -462,7 +462,7 @@ describe('Updating team members tests', () => {
 
     test('TEAM_SUITE - Should NOT add a team member - Invalid parameter', async () => {
         await request(app)
-            .patch('/team/member/add/' + team1Id)
+            .patch(`/team/member/add/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 admin: adminAccountId
@@ -471,7 +471,7 @@ describe('Updating team members tests', () => {
     
     test('TEAM_SUITE - Should NOT remove a team member - Team not found', async () => {
         await request(app)
-            .patch('/team/member/remove/' + new mongoose.Types.ObjectId())
+            .patch(`/team/member/remove/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: adminAccountId
@@ -480,7 +480,7 @@ describe('Updating team members tests', () => {
 
     test('TEAM_SUITE - Should NOT remove a team member - Member not found', async () => {
         await request(app)
-            .patch('/team/member/remove/' + team1Id)
+            .patch(`/team/member/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: new mongoose.Types.ObjectId()
@@ -490,7 +490,7 @@ describe('Updating team members tests', () => {
     test('TEAM_SUITE - Should NOT remove a team member - Member do not belong to the team', async () => {
         // Remove member
         await request(app)
-            .patch('/team/member/remove/' + team1Id)
+            .patch(`/team/member/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: adminMasterAccountId
@@ -498,7 +498,7 @@ describe('Updating team members tests', () => {
 
         // Trying to remove again
         await request(app)
-            .patch('/team/member/remove/' + team1Id)
+            .patch(`/team/member/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: adminMasterAccountId
@@ -507,14 +507,14 @@ describe('Updating team members tests', () => {
 
     test('TEAM_SUITE - Should NOT remove a team member - Member not given', async () => {
         await request(app)
-            .patch('/team/member/remove/' + team1Id)
+            .patch(`/team/member/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(400);
     });
 
     test('TEAM_SUITE - Should NOT remove a team member - Invalid parameter', async () => {
         await request(app)
-            .patch('/team/member/remove/' + team1Id)
+            .patch(`/team/member/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 admin: adminAccountId
@@ -525,7 +525,7 @@ describe('Updating team members tests', () => {
         // Given
         // Member added to [Team]
         await request(app)
-            .patch('/team/member/add/' + teamId)
+            .patch(`/team/member/add/${teamId}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: memberAccountId
@@ -533,7 +533,7 @@ describe('Updating team members tests', () => {
 
         // Member added to [Team 1]
         await request(app)
-            .patch('/team/member/add/' + team1Id)
+            .patch(`/team/member/add/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: memberAccountId
@@ -545,7 +545,7 @@ describe('Updating team members tests', () => {
 
         // Test - remove from [Team]
         await request(app)
-            .patch('/team/member/remove/' + teamId)
+            .patch(`/team/member/remove/${teamId}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: memberAccountId
@@ -555,13 +555,47 @@ describe('Updating team members tests', () => {
         admin = await Admin.findById(memberAccountId).exec();
         expect(admin.teams[0]._id).toEqual(team1Id);
         expect(admin.teams.length).toEqual(1);
+
+        const team = await Team.findById(teamId).exec();
+        expect(team.members.length).toBe(0);
+    });
+
+    test('TEAM_SUITE - Should remove one team member', async () => {
+        // Given
+        // [Member 1] added to Team
+        await request(app)
+            .patch(`/team/member/add/${teamId}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                member: memberAccountId
+            }).expect(200);
+
+        // [Member 2] added to Team
+        await request(app)
+            .patch(`/team/member/add/${teamId}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                member: memberAccount2Id
+            }).expect(200);
+
+        // Test - remove [Member 1]
+        await request(app)
+            .patch(`/team/member/remove/${teamId}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                member: memberAccountId
+            }).expect(200);
+
+        // DB validation
+        const team = await Team.findById(teamId).exec();
+        expect(String(team.members[0])).toBe(String(memberAccount2Id));
     });
 
     test('TEAM_SUITE - Should remove a team member when account is deleted', async() => {
         // Given
         // Member invited
         let response = await request(app)
-            .post('/team/member/invite/' + team1Id)
+            .post(`/team/member/invite/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: memberAccount2.email
@@ -571,7 +605,7 @@ describe('Updating team members tests', () => {
 
         // Invite accepted
         await request(app)
-            .post('/team/member/invite/accept/' + teamInvite._id)
+            .post(`/team/member/invite/accept/${teamInvite._id}`)
             .set('Authorization', `Bearer ${memberAccount2Token}`)
             .send().expect(200);
 
@@ -599,7 +633,7 @@ describe('Updating team permissions tests', () => {
 
     test('TEAM_SUITE - Should NOT remove a permission - Team not found', async () => {
         await request(app)
-            .patch('/team/permission/remove/' + new mongoose.Types.ObjectId())
+            .patch(`/team/permission/remove/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 permission: permission1Id
@@ -617,7 +651,7 @@ describe('Updating team permissions tests', () => {
 
     test('TEAM_SUITE - Should NOT remove a permission - Invalid parameter', async () => {
         await request(app)
-            .patch('/team/permission/remove/' + team1Id)
+            .patch(`/team/permission/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: permission1Id
@@ -626,7 +660,7 @@ describe('Updating team permissions tests', () => {
 
     test('TEAM_SUITE - Should NOT remove a permission - Permission not found', async () => {
         await request(app)
-            .patch('/team/permission/remove/' + team1Id)
+            .patch(`/team/permission/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 permission: new mongoose.Types.ObjectId()
@@ -635,7 +669,7 @@ describe('Updating team permissions tests', () => {
 
     test('TEAM_SUITE - Should remove a permission', async () => {
         await request(app)
-            .patch('/team/permission/remove/' + team1Id)
+            .patch(`/team/permission/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 permission: permission1Id
