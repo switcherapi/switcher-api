@@ -221,12 +221,12 @@ router.patch('/config/relay/verificationCode/:id', auth, [
     }
 });
 
-router.patch('/config/relay/verify/:id', auth, [
+router.patch('/config/relay/verify/:id/:env', auth, [
     check('id').isMongoId(),
-    query('code').isAscii()
+    check('env').isLength({ min: 1 })
 ], validate, async (req, res) => {
     try {
-        const result = await Services.verifyRelay(req.params.id, req.query.code, req.admin);
+        const result = await Services.verifyRelay(req.params.id, req.params.env, req.admin);
         res.send({ status: result });
     } catch (e) {
         responseException(res, e, 500);

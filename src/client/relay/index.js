@@ -30,6 +30,15 @@ export async function resolveValidation(relay, entry, environment) {
     };
 }
 
+export async function resolveVerification(relay, environment) {
+    const endpoint = relay.endpoint.get(environment)?.replace(/\/$/, '');
+    const url = `${endpoint?.substring(0, endpoint.lastIndexOf('/'))}/verify`;
+    const header = createHeader(relay.auth_prefix, relay.auth_token.get(environment));
+    const response = await get(url, `?code=${relay.verification_code}`, header);
+
+    return response.data?.code;
+}
+
 async function post(url, data, headers) {
     try {
         return await axios.post(url, data, headers);
@@ -68,9 +77,12 @@ function createHeader(auth_prefix, auth_token, environment) {
 
     headers['Content-Type'] = 'application/json';
 
-    if (auth_token && environment in auth_token && 
-        auth_prefix && auth_token[environment]) {
-        headers['Authorization'] = `${auth_prefix} ${auth_token[environment]}`;
+    if (environment) {
+        if (auth_token && environment in auth_token && auth_prefix) {
+            headers['Authorization'] = `${auth_prefix} ${auth_token[environment]}`;
+        }
+    } else if (auth_token && auth_prefix) {
+        headers['Authorization'] = `${auth_prefix} ${auth_token}`;
     }
 
     return {

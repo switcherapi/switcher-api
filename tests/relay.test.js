@@ -466,10 +466,10 @@ describe('Testing Switcher Relay Verification', () => {
         
         // Config has a verified Relay
         const config = await Config.findById(configId).exec();
-        config.relay.verified = true;
+        config.relay.verified.set(EnvType.DEFAULT, true);
         config.relay.verification_code = '123';
         await config.save();
-        expect(config.relay.verified).toBe(true);
+        expect(config.relay.verified.get(EnvType.DEFAULT)).toBe(true);
 
         // Test
         const req = await request(app)
