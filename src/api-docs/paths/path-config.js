@@ -302,18 +302,18 @@ export default {
             }
         }
     },
-    '/config/relay/verify/{id}': {
+    '/config/relay/verify/{id}/{env}': {
         patch: {
             tags: ['Config'],
-            description: 'Verify Config Relay ownership based on given verification code',
+            description: 'Verify Config Relay ownership',
             security: [{ bearerAuth: [] }],
             parameters: [
                 pathParameter('id', 'Config ID', true),
-                queryParameter('code', 'Verification code', true, 'string')
+                pathParameter('env', 'Environment name', true)
             ],
             responses: {
                 '200': {
-                    description: 'Config Relay verification code generated',
+                    description: 'Verify Config Relay using [GET] endpoint/verify',
                     content: {
                         'application/json': {
                             schema: {

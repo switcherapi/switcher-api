@@ -174,7 +174,7 @@ async function resolveRelay(config, environment, entry, response) {
     try {
         if (config.relay?.activated[environment]) {
             isRelayValid(config.relay);
-            isRelayVerified(config.relay);
+            isRelayVerified(config.relay, environment);
             
             if (config.relay.type === RelayTypes.NOTIFICATION) {
                 resolveNotification(config.relay, entry, environment);

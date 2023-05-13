@@ -102,8 +102,9 @@ const configSchema = new mongoose.Schema({
             type: String
         },
         verified: {
-            type: Boolean,
-            default: false
+            type: Map,
+            of: Boolean,
+            default: new Map()
         }
     }
 }, {
@@ -156,11 +157,11 @@ async function recordConfigHistory(config, modifiedField) {
 }
 
 function hasRelayEndpointUpdates(config, modifiedField) {
-    const hasUpdate = modifiedField.filter(field => field.indexOf('relay.endpoint') >= 0);
+    const hasUpdate = modifiedField.filter(field => field.indexOf('relay.endpoint.') >= 0);
     
     if (hasUpdate.length) {
-        config.relay.verified = false;
-        config.relay.verification_code = undefined;
+        const environment = hasUpdate[0].split('.')[2];
+        config.relay.verified.set(environment, false);
     }
 }
 

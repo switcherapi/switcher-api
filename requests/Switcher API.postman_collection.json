@@ -3786,7 +3786,7 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5e0eceb66f4f994eac9007b2"
+									"value": "5f504cc2aaea6121c4a35bfc"
 								}
 							]
 						}
@@ -3815,7 +3815,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/config/relay/verify/:config?code=",
+							"raw": "{{url}}/config/relay/verify/:config/:environment",
 							"host": [
 								"{{url}}"
 							],
@@ -3823,18 +3823,17 @@
 								"config",
 								"relay",
 								"verify",
-								":config"
-							],
-							"query": [
-								{
-									"key": "code",
-									"value": ""
-								}
+								":config",
+								":environment"
 							],
 							"variable": [
 								{
 									"key": "config",
-									"value": "5e0eceb66f4f994eac9007b2"
+									"value": "5f504cc2aaea6121c4a35bfc"
+								},
+								{
+									"key": "environment",
+									"value": "default"
 								}
 							]
 						}

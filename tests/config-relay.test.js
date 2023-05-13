@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
+import sinon from 'sinon';
+import axios from 'axios';
 import app from '../src/app';
 import { Config } from '../src/models/config';
 import { 
@@ -8,6 +10,7 @@ import {
     domainId,
     configId1,
 } from './fixtures/db_api';
+import { EnvType } from '../src/models/environment';
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -83,10 +86,10 @@ describe('Testing relay verification', () => {
         // That
         // Config has a verified Relay
         let config = await Config.findById(configId1).exec();
-        config.relay.verified = true;
+        config.relay.verified.set(EnvType.DEFAULT, true);
         config.relay.verification_code = '123';
         await config.save();
-        expect(config.relay.verified).toBe(true);
+        expect(config.relay.verified.get(EnvType.DEFAULT)).toBe(true);
 
         // Test: change endpoint
         bodyRelay.endpoint.default = 'https://localhost:8080';
@@ -98,8 +101,8 @@ describe('Testing relay verification', () => {
             .send(bodyRelay).expect(200);
 
         config = await Config.findById(configId1).exec();
-        expect(config.relay.verified).toBe(false);
-        expect(config.relay.verification_code).toBe(undefined);
+        expect(config.relay.verified.get(EnvType.DEFAULT)).toBe(false);
+        expect(config.relay.verification_code).toBe('123');
     });
 
     test('CONFIG_RELAY_SUITE - Should NOT reset Relay verified flag when changing anything but endpoint', async () => {
@@ -115,10 +118,10 @@ describe('Testing relay verification', () => {
         // That
         // Config has a verified Relay
         let config = await Config.findById(configId1).exec();
-        config.relay.verified = true;
+        config.relay.verified.set(EnvType.DEFAULT, true);
         config.relay.verification_code = '123';
         await config.save();
-        expect(config.relay.verified).toBe(true);
+        expect(config.relay.verified.get(EnvType.DEFAULT)).toBe(true);
 
         // Test: change endpoint
         bodyRelay.method = 'GET';
@@ -130,7 +133,7 @@ describe('Testing relay verification', () => {
             .send(bodyRelay).expect(200);
 
         config = await Config.findById(configId1).exec();
-        expect(config.relay.verified).toBe(true);
+        expect(config.relay.verified.get(EnvType.DEFAULT)).toBe(true);
         expect(config.relay.verification_code).toBe('123');
     });
 
@@ -163,11 +166,11 @@ describe('Testing relay association', () => {
 
         // DB validation - document updated
         const config = await Config.findById(configId1).lean().exec();
-        expect(config.relay.verified).toEqual(false);
+        expect(config.relay.verified[EnvType.DEFAULT]).toEqual(false);
         expect(config.relay.verification_code).toEqual(undefined);
-        expect(config.relay.activated['default']).toEqual(true);
-        expect(config.relay.endpoint['default']).toBe('http://localhost:3001');
-        expect(config.relay.auth_token['default']).toEqual('123');
+        expect(config.relay.activated[EnvType.DEFAULT]).toEqual(true);
+        expect(config.relay.endpoint[EnvType.DEFAULT]).toBe('http://localhost:3001');
+        expect(config.relay.auth_token[EnvType.DEFAULT]).toEqual('123');
     });
 
     test('CONFIG_RELAY_SUITE - Should NOT configure new Relay - Config not found', async () => {
@@ -331,6 +334,17 @@ describe('Testing relay association', () => {
     });
 
     test('CONFIG_RELAY_SUITE - Should remove all Relays', async () => {
+        // Given - adding relay to be removed later on
+        await request(app)
+            .patch(`/config/updateRelay/${configId1}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                activated: { default: true },
+                endpoint: { default: 'http://localhost:7000' },
+                auth_token: { default: 'abcd' }
+            }).expect(200);
+
+        // Test
         await request(app)
             .patch(`/config/removeRelay/${configId1}/default`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -367,61 +381,74 @@ describe('Testing relay association', () => {
 
     test('CONFIG_RELAY_SUITE - Should verify code', async () => {
         // Given
+        // Adding relay
+        await request(app)
+            .patch(`/config/updateRelay/${configId1}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                activated: { default: true },
+                endpoint: { default: 'http://localhost:7000/relay' },
+                auth_token: { default: 'abcd' },
+                auth_prefix: 'Bearer'
+            }).expect(200);
+
         // Request verification code
         let response = await request(app)
             .patch(`/config/relay/verificationCode/${configId1}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
+        // Relay verification
+        const axiosStub = sinon.stub(axios, 'get');
+        const mockRelayService = { data: { code: response.body.code } };
+        axiosStub.returns(Promise.resolve(mockRelayService));
+
         // Test
         response = await request(app)
-            .patch(`/config/relay/verify/${configId1}?code=${response.body.code}`)
+            .patch(`/config/relay/verify/${configId1}/${EnvType.DEFAULT}?code=${response.body.code}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
+        axiosStub.restore();
         expect(response.body.status).toBe('verified');
     });
 
     test('CONFIG_RELAY_SUITE - Should NOT verify code - Config not found', async () => {
         // Given
         // Request verification code
-        const response = await request(app)
+        await request(app)
             .patch(`/config/relay/verificationCode/${configId1}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
         // Test
         await request(app)
-            .patch(`/config/relay/verify/${new mongoose.Types.ObjectId()}?code=${response.body.code}`)
+            .patch(`/config/relay/verify/${new mongoose.Types.ObjectId()}/${EnvType.DEFAULT}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
     });
 
     test('CONFIG_RELAY_SUITE - Should NOT verify code - Invalid code', async () => {
-        await request(app)
-            .patch(`/config/relay/verify/${configId1}?code=`)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(422);
-    });
-
-    test('CONFIG_RELAY_SUITE - Should NOT verify code - Relay already verified', async () => {
         // Given
-        // Request verification code
-        let response = await request(app)
-            .patch(`/config/relay/verificationCode/${configId1}`)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200);
-
-        // That
-        // Is already verified
+        // Adding relay
         await request(app)
-            .patch(`/config/relay/verify/${configId1}?code=${response.body.code}`)
+            .patch(`/config/updateRelay/${configId1}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200);
+            .send({
+                activated: { default: true },
+                endpoint: { default: 'http://localhost:7000/relay' },
+                auth_token: { default: 'abcd' },
+                auth_prefix: 'Bearer'
+            }).expect(200);
+
+        // Relay verification
+        const axiosStub = sinon.stub(axios, 'get');
+        const mockRelayService = { data: { code: 'INVALID' } };
+        axiosStub.returns(Promise.resolve(mockRelayService));
 
         // Test
-        response = await request(app)
-            .patch(`/config/relay/verify/${configId1}?code=${response.body.code}`)
+        const response = await request(app)
+            .patch(`/config/relay/verify/${configId1}/${EnvType.DEFAULT}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 

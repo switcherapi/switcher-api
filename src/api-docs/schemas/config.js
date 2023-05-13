@@ -48,8 +48,11 @@ export const relay = {
             description: 'Generated string used to verify Relay endpoint ownership'
         },
         verified: {
-            type: 'boolean',
-            description: 'Valid when true (default: false)'
+            type: 'object',
+            additionalProperties: {
+                type: 'boolean'
+            },
+            description: 'Defines when Relay endpoint is verified'
         }
     }
 };

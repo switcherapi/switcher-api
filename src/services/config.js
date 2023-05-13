@@ -10,6 +10,7 @@ import { checkSwitcher } from '../external/switcher-api-facade';
 import { BadRequestError, NotFoundError } from '../exceptions';
 import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';
 import { getComponentById, getComponents } from './component';
+import { resolveVerification } from '../client/relay';
 
 async function verifyAddComponentInput(configId, admin) {
     const config = await getConfigById(configId);
@@ -251,6 +252,7 @@ export async function removeRelay(id, env, admin) {
             config.relay.activated.delete(env);
             config.relay.endpoint.delete(env);
             config.relay.auth_token.delete(env);
+            config.relay.verified.delete(env);
         } else {
             config.relay = {};
         }
@@ -268,17 +270,17 @@ export async function getRelayVerificationCode(id, admin) {
 
     config.updatedBy = admin.email;
     config.relay.verification_code = randomUUID();
-    config.relay.verified = false;
 
     return config.save();
 }
 
-export async function verifyRelay(id, code, admin) {
+export async function verifyRelay(id, env, admin) {
     let config = await getConfigById(id);
     config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
 
-    if (!config.relay.verified && Object.is(config.relay.verification_code, code)) {
-        config.relay.verified = true;
+    const code = await resolveVerification(config.relay, env);
+    if (!config.relay.verified?.get(env) && Object.is(config.relay.verification_code, code)) {
+        config.relay.verified.set(env, true);
         await config.save();
         return 'verified';
     }
@@ -299,12 +301,12 @@ export function isRelayValid(relay) {
         throw new BadRequestError('HTTPS required');
 }
 
-export function isRelayVerified(relay) {
+export function isRelayVerified(relay, environment) {
     const bypass = process.env.RELAY_BYPASS_VERIFICATION === 'true' || false;
 
     if (bypass)
         return;
     
-    if (!relay.verified)
+    if (!relay.verified[environment])
         throw new BadRequestError('Relay not verified');
 }
