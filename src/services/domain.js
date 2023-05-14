@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';
 import Component from '../models/component';
 import { Config } from '../models/config';
@@ -133,4 +134,18 @@ export async function updateDomainVersion(domainId) {
     const domain = await getDomainById(domainId);
     domain.lastUpdate = Date.now();
     domain.save();
+}
+
+export async function getRelayVerificationCode(id, admin) {
+    let domain = await getDomainById(id);
+    domain = await verifyOwnership(admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN);
+    
+    domain.updatedBy = admin.email;
+    
+    if (!domain.integrations.relay.verification_code) {
+        domain.integrations.relay.verification_code = randomUUID();
+        await domain.save();
+    }
+
+    return domain.integrations.relay.verification_code;
 }

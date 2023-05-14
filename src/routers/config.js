@@ -210,17 +210,6 @@ router.patch('/config/removeRelay/:id/:env', auth, [
     }
 });
 
-router.patch('/config/relay/verificationCode/:id', auth, [
-    check('id').isMongoId()
-], validate, async (req, res) => {
-    try {
-        const config = await Services.getRelayVerificationCode(req.params.id, req.admin);
-        res.send({ code: config.relay.verification_code });
-    } catch (e) {
-        responseException(res, e, 500);
-    }
-});
-
 router.patch('/config/relay/verify/:id/:env', auth, [
     check('id').isMongoId(),
     check('env').isLength({ min: 1 })
