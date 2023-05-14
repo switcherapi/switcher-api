@@ -98,9 +98,6 @@ const configSchema = new mongoose.Schema({
             type: Map,
             of: String
         },
-        verification_code: {
-            type: String
-        },
         verified: {
             type: Map,
             of: Boolean,

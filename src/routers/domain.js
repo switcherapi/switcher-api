@@ -148,4 +148,15 @@ router.patch('/domain/removeStatus/:id', auth, [
     }
 });
 
+router.patch('/domain/relay/verificationCode/:id', auth, [
+    check('id').isMongoId()
+], validate, async (req, res) => {
+    try {
+        const code = await Services.getRelayVerificationCode(req.params.id, req.admin);
+        res.send({ code });
+    } catch (e) {
+        responseException(res, e, 500);
+    }
+});
+
 export default router;

@@ -1,10 +1,9 @@
 import mongoose from 'mongoose';
-import { randomUUID } from 'crypto';
 import { response } from './common';
 import { Config } from '../models/config';
 import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers';
 import { ActionTypes, RouterTypes } from '../models/permission';
-import { updateDomainVersion } from './domain';
+import { getDomainById, updateDomainVersion } from './domain';
 import { getGroupConfigById } from './group-config';
 import { checkSwitcher } from '../external/switcher-api-facade';
 import { BadRequestError, NotFoundError } from '../exceptions';
@@ -264,22 +263,13 @@ export async function removeRelay(id, env, admin) {
     return config;
 }
 
-export async function getRelayVerificationCode(id, admin) {
-    let config = await getConfigById(id);
-    config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
-
-    config.updatedBy = admin.email;
-    config.relay.verification_code = randomUUID();
-
-    return config.save();
-}
-
 export async function verifyRelay(id, env, admin) {
     let config = await getConfigById(id);
+    let domain = await getDomainById(config.domain);
     config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
 
     const code = await resolveVerification(config.relay, env);
-    if (!config.relay.verified?.get(env) && Object.is(config.relay.verification_code, code)) {
+    if (!config.relay.verified?.get(env) && Object.is(domain.integrations.relay.verification_code, code)) {
         config.relay.verified.set(env, true);
         await config.save();
         return 'verified';

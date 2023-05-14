@@ -34,7 +34,7 @@ export async function resolveVerification(relay, environment) {
     const endpoint = relay.endpoint.get(environment)?.replace(/\/$/, '');
     const url = `${endpoint?.substring(0, endpoint.lastIndexOf('/'))}/verify`;
     const header = createHeader(relay.auth_prefix, relay.auth_token.get(environment));
-    const response = await get(url, `?code=${relay.verification_code}`, header);
+    const response = await get(url, '', header);
 
     return response.data?.code;
 }

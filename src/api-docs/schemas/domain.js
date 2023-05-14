@@ -11,6 +11,15 @@ export const domain = {
                 slack: {
                     type: 'string',
                     description: 'The slack integration id'
+                },
+                relay: {
+                    type: 'object',
+                    properties: {
+                        verification_code: {
+                            type: 'string',
+                            description: 'Generated string used to verify Relay ownership'
+                        }
+                    }
                 }
             }
         },

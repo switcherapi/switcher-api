@@ -231,5 +231,33 @@ export default {
                 }
             }
         }
-    }
+    },
+    '/domain/relay/verificationCode/{id}': {
+        patch: {
+            tags: ['Domain'],
+            description: 'Generates verification code for Relay integration',
+            security: [{ bearerAuth: [] }],
+            parameters: [
+                pathParameter('id', 'Domain ID', true)
+            ],
+            responses: {
+                '200': {
+                    description: 'Relay verification code generated',
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    code: {
+                                        type: 'string',
+                                        description: 'Verification code'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
 };

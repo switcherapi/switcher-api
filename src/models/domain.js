@@ -37,6 +37,11 @@ const domainSchema = new mongoose.Schema({
         slack: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Slack'
+        },
+        relay: {
+            verification_code: {
+                type: String
+            }
         }
     },
     lastUpdate: {
