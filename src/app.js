@@ -2,7 +2,7 @@ import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import { createHandler } from 'graphql-http/lib/use/express';
 import cors from 'cors';
-import helmet from 'helmet';    
+import helmet from 'helmet';
 
 require('./db/mongoose');
 
@@ -22,6 +22,7 @@ import permissionRouter from './routers/permission';
 import slackRouter from './routers/slack';
 import schema from './client/schema';
 import { appAuth, auth, resourcesAuth, slackAuth } from './middleware/auth';
+import { clientLimiter, defaultLimiter } from './middleware/limiter';
 
 const app = express();
 app.use(express.json());
@@ -57,9 +58,9 @@ const handler = (req, res, next) =>
     createHandler({ schema, context: req })(req, res, next);
 
 // Component: Client API
-app.use('/graphql', appAuth, handler);
+app.use('/graphql', appAuth, clientLimiter, handler);
 // Admin: Client API
-app.use('/adm-graphql', auth, handler);
+app.use('/adm-graphql', auth, defaultLimiter, handler);
 // Slack: Client API
 app.use('/slack-graphql', slackAuth, handler);
 
@@ -76,7 +77,7 @@ app.get('/swagger.json', resourcesAuth(), (_req, res) => {
     res.status(200).send(swaggerDocument);
 });
 
-app.get('/check', (_req, res) => {
+app.get('/check', defaultLimiter, (_req, res) => {
     res.status(200).send({ 
         status: 'UP',
         attributes: {
@@ -92,6 +93,7 @@ app.get('/check', (_req, res) => {
             metrics: process.env.METRICS_ACTIVATED,
             max_metrics_pages: process.env.METRICS_MAX_PAGE,
             max_stretegy_op: process.env.MAX_STRATEGY_OPERATION,
+            max_rpm: process.env.MAX_REQUEST_PER_MINUTE,
             regex_max_timeout: process.env.REGEX_MAX_TIMEOUT,
             regex_max_blacklist: process.env.REGEX_MAX_BLACLIST
         } 

@@ -51,6 +51,7 @@ jobs:
           RELAY_BYPASS_VERIFICATION: true
           METRICS_ACTIVATED: true
           METRICS_MAX_PAGE: 50
+          MAX_REQUEST_PER_MINUTE: 0
           SWITCHER_API_ENABLE: false
           SWITCHER_API_LOGGER: false
 

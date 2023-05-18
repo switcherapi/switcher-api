@@ -7,6 +7,7 @@ import { getTotalConfigsByDomainId } from '../services/config';
 import { getTotalComponentsByDomainId } from '../services/component';
 import { getTotalEnvByDomainId } from '../services/environment';
 import { getTotalTeamsByDomainId } from '../services/team';
+import { DEFAULT_RATE_LIMIT } from '../middleware/limiter';
 
 const apiKey = process.env.SWITCHER_API_KEY;
 const environment = process.env.SWITCHER_API_ENVIRONMENT;
@@ -24,7 +25,8 @@ export const SwitcherKeys = Object.freeze({
     ACCOUNT_IN_NOTIFY: 'ACCOUNT_IN_NOTIFY',
     ACCOUNT_OUT_NOTIFY: 'ACCOUNT_OUT_NOTIFY',
     SLACK_INTEGRATION: 'SLACK_INTEGRATION',
-    SLACK_UPDATE: 'SLACK_UPDATE'
+    SLACK_UPDATE: 'SLACK_UPDATE',
+    RATE_LIMIT: 'RATE_LIMIT'
 });
 
 function switcherFlagResult(flag, message) {
@@ -38,7 +40,7 @@ export async function checkFeature(feature, params, restrictTo = SwitcherKeys) {
     if (!key)
         throw new BadRequestError('Invalid feature');
     
-    return switcher.isItOn(feature, params);
+    return switcher.isItOn(feature, params, true);
 }
 
 export async function checkDomain(req) {
@@ -200,4 +202,22 @@ export function notifyAcDeletion(adminid) {
 
     switcher.isItOn(SwitcherKeys.ACCOUNT_OUT_NOTIFY, [
         checkValue(adminid)]);
+}
+
+export async function getRateLimit(key, component) {
+    if (process.env.SWITCHER_API_ENABLE === 'true' && key !== process.env.SWITCHER_API_KEY) {
+        const domain = await getDomainById(component.domain);
+        const result = await checkFeature(SwitcherKeys.RATE_LIMIT, [
+            checkValue(String(domain.owner))
+        ]);
+
+        if (result) {
+            const log = Switcher.getLogger(SwitcherKeys.RATE_LIMIT)
+                .find(log => log.input[0][1] === String(domain.owner));
+            
+            return JSON.parse(log.response.message).rate_limit;
+        }
+    }
+
+    return parseInt(process.env.MAX_REQUEST_PER_MINUTE || DEFAULT_RATE_LIMIT);
 }
