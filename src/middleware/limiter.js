@@ -17,8 +17,8 @@ export const defaultLimiter = rateLimit({
 
 export const clientLimiter = rateLimit({
 	windowMs: DEFAULT_WINDOWMS,
-	keyGenerator: (request, response) => request.domain,
-	max: (request, response) => request.rate_limit,
+	keyGenerator: (request) => request.domain,
+	max: (request) => request.rate_limit,
 	standardHeaders: true,
     message: ERROR_MESSAGE,
 	store: new MemoryStore(),
