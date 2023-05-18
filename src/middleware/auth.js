@@ -4,6 +4,7 @@ import { getAdmin, getAdminById } from '../services/admin';
 import { getComponentById } from '../services/component';
 import Admin from '../models/admin';
 import Component from '../models/component';
+import { getRateLimit } from '../external/switcher-api-facade';
 
 export async function auth(req, res, next) {
     try {
@@ -67,6 +68,7 @@ export async function appAuth(req, res, next) {
         req.component = component.name;
         req.componentId = component._id;
         req.environment = decoded.environment;
+        req.rate_limit = decoded.rate_limit;
         next();
     } catch (e) {
         res.status(401).send({ error: 'Invalid API token.' });
@@ -101,11 +103,13 @@ export async function appGenerateCredentials(req, res, next) {
             throw new Error();
         }
 
-        const token = await component.generateAuthToken(req.body.environment);
+        const rate_limit = await getRateLimit(key, component);
+        const token = await component.generateAuthToken(req.body.environment, rate_limit);
 
         req.token = token;
         req.domain = domain;
         req.environment = req.body.environment;
+        req.rate_limit = rate_limit;
         next();
     } catch (e) {
         res.status(401).send({ error: 'Invalid token request' });

@@ -76,6 +76,7 @@ export const permission1 = {
 };
 
 export const component1Id = new mongoose.Types.ObjectId();
+export const component1Key = randomUUID();
 export const component1 = {
     _id: component1Id,
     name: 'TestApp',
@@ -271,9 +272,8 @@ export const setupDatabase = async () => {
     await new Permission(permissionAll2).save();
     await new Permission(permissionAll3).save();
     await new Permission(permissionAll4).save();
-
-    const apiKey = randomUUID();
-    const hash = await bcryptjs.hash(apiKey, 8);
+    
+    const hash = await bcryptjs.hash(component1Key, 8);
     component1.apihash = hash;
     await new Component(component1).save();
 };

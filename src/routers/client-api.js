@@ -5,6 +5,7 @@ import { appAuth, appGenerateCredentials } from '../middleware/auth';
 import { resolveCriteria, checkDomain } from '../client/resolvers';
 import { getConfigs } from '../services/config';
 import { body, check, query } from 'express-validator';
+import { clientLimiter } from '../middleware/limiter';
 
 const router = new express.Router();
 
@@ -12,7 +13,7 @@ const router = new express.Router();
 // GET /check?key=KEY&showReason=true
 // GET /check?key=KEY&showStrategy=true
 // GET /check?key=KEY&bypassMetric=true
-router.post('/criteria', appAuth, [
+router.post('/criteria', appAuth, clientLimiter, [
     query('key').isLength({ min: 1 }),
     body('entry.*.input').isString()
 ], validate, checkConfig, checkConfigComponent, async (req, res) => {
@@ -42,7 +43,7 @@ router.post('/criteria', appAuth, [
     }
 });
 
-router.get('/criteria/snapshot_check/:version', appAuth, async (req, res) => {
+router.get('/criteria/snapshot_check/:version', appAuth, clientLimiter, async (req, res) => {
     try {
         const domain = await checkDomain(req.domain);
         const version = req.params.version;
@@ -61,7 +62,7 @@ router.get('/criteria/snapshot_check/:version', appAuth, async (req, res) => {
     }
 });
 
-router.post('/criteria/switchers_check', appAuth, [
+router.post('/criteria/switchers_check', appAuth, clientLimiter, [
     check('switchers', 'Switcher Key is required').isArray().isLength({ min: 1 })
 ], validate, async (req, res) => {
     try {
@@ -73,7 +74,7 @@ router.post('/criteria/switchers_check', appAuth, [
     }
 });
 
-router.post('/criteria/auth', appGenerateCredentials, async (req, res) => {
+router.post('/criteria/auth', appGenerateCredentials, clientLimiter, async (req, res) => {
     try {
         const { exp } = jwt.decode(req.token);
         res.send({ token: req.token, exp });

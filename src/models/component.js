@@ -63,7 +63,7 @@ componentSchema.methods.generateApiKey = async function () {
     return apiKey;
 };
 
-componentSchema.methods.generateAuthToken = async function (environment) {
+componentSchema.methods.generateAuthToken = async function (environment, rate_limit) {
     const component = this;
 
     const options = {
@@ -73,6 +73,7 @@ componentSchema.methods.generateAuthToken = async function (environment) {
     return jwt.sign(({ 
         component: component._id,
         environment,
+        rate_limit,
         vc: component.apihash.substring(50, component.apihash.length - 1) 
     }), process.env.JWT_SECRET, options);
 };
