@@ -9,7 +9,7 @@ export const DEFAULT_RATE_LIMIT = 1000;
 
 export const defaultLimiter = rateLimit({
 	windowMs: DEFAULT_WINDOWMS,
-	max: process.env.MAX_REQUEST_PER_MINUTE || DEFAULT_RATE_LIMIT,
+	max: parseInt(process.env.MAX_REQUEST_PER_MINUTE || DEFAULT_RATE_LIMIT),
 	standardHeaders: true,
     message: ERROR_MESSAGE,
 	store: new MemoryStore(),

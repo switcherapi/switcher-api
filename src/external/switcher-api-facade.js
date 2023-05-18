@@ -219,5 +219,5 @@ export async function getRateLimit(key, component) {
         }
     }
 
-    return process.env.MAX_REQUEST_PER_MINUTE || DEFAULT_RATE_LIMIT;
+    return parseInt(process.env.MAX_REQUEST_PER_MINUTE || DEFAULT_RATE_LIMIT);
 }
