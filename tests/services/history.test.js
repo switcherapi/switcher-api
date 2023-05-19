@@ -60,10 +60,30 @@ describe('Testing history services', () => {
         await expect(call()).rejects.toThrowError('Invalid paging args');
     });
 
+    test('HISTORY_SERVICE - Should NOT get history - invalid paging args - limit not number', async () => {
+        const call = async () => {
+            await getHistory('elementId', domainId, element1Id, {
+                limit: 'a'
+            });
+        }; 
+
+        await expect(call()).rejects.toThrowError('Invalid paging args');
+    });
+
     test('HISTORY_SERVICE - Should NOT get history - invalid paging args - skip', async () => {
         const call = async () => {
             await getHistory('elementId', domainId, element1Id, {
-                skip: '0'
+                skip: '-1'
+            });
+        }; 
+
+        await expect(call()).rejects.toThrowError('Invalid paging args');
+    });
+
+    test('HISTORY_SERVICE - Should NOT get history - invalid paging args - skip not number', async () => {
+        const call = async () => {
+            await getHistory('elementId', domainId, element1Id, {
+                skip: 'a'
             });
         }; 
 
