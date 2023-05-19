@@ -3,12 +3,10 @@ import { sortBy, validatePagingArgs } from '../helpers';
 import { BadRequestError } from '../exceptions';
 
 export async function getHistory(query, domainId, elementId, pagingArgs = {}) {
-    const findQuery = elementId ? { domainId, elementId } : { domainId };
-
     if (!validatePagingArgs(pagingArgs))
         throw new BadRequestError('Invalid paging args');
 
-    return History.find(findQuery)
+    return History.find({ domainId, elementId })
             .select(query)
             .sort(sortBy(pagingArgs))
             .limit(parseInt(pagingArgs.limit || 10))
