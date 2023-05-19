@@ -88,14 +88,12 @@ export function sortBy(args) {
 }
 
 export function validatePagingArgs(args) {
-    if (args.limit && !Number.isInteger(parseInt(args.limit)))
-        return false;
-    else if (parseInt(args.limit) < 1)
+    if (args.limit && !Number.isInteger(parseInt(args.limit)) || 
+        parseInt(args.limit) < 1)
         return false;
      
-    if (args.skip && !Number.isInteger(parseInt(args.skip)))
-        return false;
-    else if (parseInt(args.skip) < 0)
+    if (args.skip && !Number.isInteger(parseInt(args.skip)) ||
+        parseInt(args.skip) < 0)
         return false;
 
     if (args.sortBy) {
