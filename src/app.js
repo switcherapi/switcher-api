@@ -77,10 +77,14 @@ app.get('/swagger.json', resourcesAuth(), (_req, res) => {
     res.status(200).send(swaggerDocument);
 });
 
-app.get('/check', defaultLimiter, (_req, res) => {
-    res.status(200).send({ 
-        status: 'UP',
-        attributes: {
+app.get('/check', defaultLimiter, (req, res) => {
+    const showDetails = req.query.details === '1';
+    const response = {
+        status: 'UP'
+    };
+
+    if (showDetails) {
+        response.attributes = {
             version: swaggerDocument.info.version,
             release_time: process.env.RELEASE_TIME,
             env: process.env.ENV,
@@ -96,8 +100,10 @@ app.get('/check', defaultLimiter, (_req, res) => {
             max_rpm: process.env.MAX_REQUEST_PER_MINUTE,
             regex_max_timeout: process.env.REGEX_MAX_TIMEOUT,
             regex_max_blacklist: process.env.REGEX_MAX_BLACLIST
-        } 
-    });
+        };
+    }
+
+    res.status(200).send(response);
 });
 
 app.get('*', (_req, res) => {

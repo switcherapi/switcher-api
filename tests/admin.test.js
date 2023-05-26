@@ -470,7 +470,7 @@ describe('Testing Admin insertion', () => {
 
     test('ADMIN_SUITE - Should get API UP', async () => {
         const response = await request(app)
-            .get('/check')
+            .get('/check?details=1')
             .send().expect(200);
 
         expect(response.body.status).toEqual('UP');
