@@ -468,13 +468,22 @@ describe('Testing Admin insertion', () => {
         expect(response.body.error).toEqual('Operation not found');
     });
 
-    test('ADMIN_SUITE - Should get API UP', async () => {
+    test('ADMIN_SUITE - Should get API UP with details', async () => {
         const response = await request(app)
             .get('/check?details=1')
             .send().expect(200);
 
         expect(response.body.status).toEqual('UP');
         expect(response.body.attributes.version).toEqual(swaggerDocument.info.version);
+    });
+
+    test('ADMIN_SUITE - Should get API UP with NO details', async () => {
+        const response = await request(app)
+            .get('/check')
+            .send().expect(200);
+
+        expect(response.body.status).toEqual('UP');
+        expect(response.body.attributes).toBe(undefined);
     });
 
     test('ADMIN_SUITE - Should return OpenAPI Swagger API document', async () => {
