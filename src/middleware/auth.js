@@ -5,11 +5,11 @@ import { getComponentById } from '../services/component';
 import Admin from '../models/admin';
 import Component from '../models/component';
 import { getRateLimit } from '../external/switcher-api-facade';
-import Logger from '../helpers/logger';
+import { responseExceptionSilent } from '../exceptions';
 
 export async function auth(req, res, next) {
     try {
-        const token = req.header('Authorization').replace('Bearer ', '');
+        const token = req.header('Authorization')?.replace('Bearer ', '');
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const admin = await getAdminById(decoded._id);
 
@@ -25,8 +25,7 @@ export async function auth(req, res, next) {
         req.admin = admin;
         next();
     } catch (err) {
-        Logger.httpError('auth', 401, err.message, err);
-        res.status(401).send({ error: 'Please authenticate.' });
+        responseExceptionSilent(res, err, 401, 'Please authenticate.');
     }
 }
 
@@ -51,8 +50,7 @@ export async function authRefreshToken(req, res, next) {
         res.jwt = newTokenPair;
         next();
     } catch (err) {
-        Logger.httpError('authRefreshToken', 401, err.message, err);
-        res.status(401).send({ error: 'Unable to refresh token.' });
+        responseExceptionSilent(res, err, 401, 'Unable to refresh token.');
     }
 }
 
@@ -74,8 +72,7 @@ export async function appAuth(req, res, next) {
         req.rate_limit = decoded.rate_limit;
         next();
     } catch (err) {
-        Logger.httpError('appAuth', 401, err.message, err);
-        res.status(401).send({ error: 'Invalid API token.' });
+        responseExceptionSilent(res, err, 401, 'Invalid API token.');
     }
 }
 
@@ -85,8 +82,7 @@ export async function slackAuth(req, res, next) {
         jwt.verify(token, process.env.SWITCHER_SLACK_JWT_SECRET);
         next();
     } catch (err) {
-        Logger.httpError('slackAuth', 401, err.message, err);
-        res.status(401).send({ error: 'Invalid API token.' });
+        responseExceptionSilent(res, err, 401, 'Invalid API token.');
     }
 }
 
@@ -104,10 +100,6 @@ export async function appGenerateCredentials(req, res, next) {
         const key = req.header('switcher-api-key');
         const { component, domain } = await Component.findByCredentials(req.body.domain, req.body.component, key);
 
-        if (!component) {
-            throw new Error('Component not found');
-        }
-
         const rate_limit = await getRateLimit(key, component);
         const token = await component.generateAuthToken(req.body.environment, rate_limit);
 
@@ -117,7 +109,6 @@ export async function appGenerateCredentials(req, res, next) {
         req.rate_limit = rate_limit;
         next();
     } catch (err) {
-        Logger.httpError('appGenerateCredentials', 401, err.message, err);
-        res.status(401).send({ error: 'Invalid token request' });
+        responseExceptionSilent(res, err, 401, 'Invalid token request.');
     }
 }
