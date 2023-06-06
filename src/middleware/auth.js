@@ -5,6 +5,7 @@ import { getComponentById } from '../services/component';
 import Admin from '../models/admin';
 import Component from '../models/component';
 import { getRateLimit } from '../external/switcher-api-facade';
+import Logger from '../helpers/logger';
 
 export async function auth(req, res, next) {
     try {
@@ -12,18 +13,19 @@ export async function auth(req, res, next) {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const admin = await getAdminById(decoded._id);
 
-        if (!admin || !admin.active) {
-            throw new Error();
+        if (!admin?.active) {
+            throw new Error('User not active');
         }
         
         if (admin.token !== Admin.extractTokenPart(token)) {
-            throw new Error();
+            throw new Error(`Invalid token for ${admin.email}`);
         }
 
         req.token = token;
         req.admin = admin;
         next();
-    } catch (e) {
+    } catch (err) {
+        Logger.httpError('auth', 401, err.message, err);
         res.status(401).send({ error: 'Please authenticate.' });
     }
 }
@@ -35,20 +37,21 @@ export async function authRefreshToken(req, res, next) {
         
         const decodedRefreshToken = jwt.verify(refreshToken, process.env.JWT_SECRET);
         if (decodedRefreshToken.subject !== Admin.extractTokenPart(token)) {
-            throw new Error();
+            throw new Error('Refresh code does not match');
         }
 
         const decoded = await jwt.decode(token);
         const admin = await getAdmin({ _id: decoded._id, token: decodedRefreshToken.subject });
         
-        if (!admin || !admin.active) {
-            throw new Error();
+        if (!admin?.active) {
+            throw new Error('User not active');
         }
 
         const newTokenPair = await admin.generateAuthToken();
         res.jwt = newTokenPair;
         next();
-    } catch (e) {
+    } catch (err) {
+        Logger.httpError('authRefreshToken', 401, err.message, err);
         res.status(401).send({ error: 'Unable to refresh token.' });
     }
 }
@@ -60,7 +63,7 @@ export async function appAuth(req, res, next) {
         const component = await getComponentById(decoded.component);
 
         if (component?.apihash.substring(50, component.apihash.length - 1) !== decoded.vc) {
-            throw new Error();
+            throw new Error('Invalid API token');
         }
 
         req.token = token;
@@ -70,7 +73,8 @@ export async function appAuth(req, res, next) {
         req.environment = decoded.environment;
         req.rate_limit = decoded.rate_limit;
         next();
-    } catch (e) {
+    } catch (err) {
+        Logger.httpError('appAuth', 401, err.message, err);
         res.status(401).send({ error: 'Invalid API token.' });
     }
 }
@@ -80,7 +84,8 @@ export async function slackAuth(req, res, next) {
         const token = req.header('Authorization').replace('Bearer ', '');
         jwt.verify(token, process.env.SWITCHER_SLACK_JWT_SECRET);
         next();
-    } catch (e) {
+    } catch (err) {
+        Logger.httpError('slackAuth', 401, err.message, err);
         res.status(401).send({ error: 'Invalid API token.' });
     }
 }
@@ -100,7 +105,7 @@ export async function appGenerateCredentials(req, res, next) {
         const { component, domain } = await Component.findByCredentials(req.body.domain, req.body.component, key);
 
         if (!component) {
-            throw new Error();
+            throw new Error('Component not found');
         }
 
         const rate_limit = await getRateLimit(key, component);
@@ -111,7 +116,8 @@ export async function appGenerateCredentials(req, res, next) {
         req.environment = req.body.environment;
         req.rate_limit = rate_limit;
         next();
-    } catch (e) {
+    } catch (err) {
+        Logger.httpError('appGenerateCredentials', 401, err.message, err);
         res.status(401).send({ error: 'Invalid token request' });
     }
 }

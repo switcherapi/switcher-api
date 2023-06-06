@@ -54,6 +54,19 @@ describe('Fetch overall statistics', () => {
         expect(response.body?.reasons).toEqual(undefined);
     });
 
+    test('METRIC_SUITE - Should return only reason statistics from a given Domain', async () => {
+        const response = await request(app)
+            .get(`/metric/statistics?domainid=${domainId}&statistics=reasons`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        // Response validation
+        expect(response.body).not.toBeNull();
+        expect(response.body?.reasons.length > 0).toEqual(true);
+        expect(response.body?.switchers).toEqual(undefined);
+        expect(response.body?.components).toEqual(undefined);
+    });
+
     test('METRIC_SUITE - Should return statistics filtered by Switcher KEY', async () => {
         const response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&key=KEY_1&statistics=all`)
