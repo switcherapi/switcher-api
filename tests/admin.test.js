@@ -140,6 +140,32 @@ describe('Testing Admin insertion', () => {
             }).expect(200);
     });
 
+    test('ADMIN_SUITE - Should NOT access routes - Admin not active', async () => {
+        // given
+        let admin = await Admin.findById(signedupUser).exec();
+        let response = await request(app)
+            .post('/admin/login')
+            .send({
+                email: admin.email,
+                password: '12312312312'
+            }).expect(200);
+        
+        // admin not active
+        admin.active = false;
+        await admin.save();
+        const token = response.body.jwt.token;
+
+        // test
+        await request(app)
+            .get('/admin/me')
+            .set('Authorization', `Bearer ${token}`)
+            .send().expect(401);
+
+        // teardown - restore admin
+        admin.active = true;
+        await admin.save();
+    });
+
     test('ADMIN_SUITE - Should NOT confirm access to a new Admin - Invalid access code', async () => {
         await request(app)
             .post('/admin/signup/authorization?code=INVALID_CODE')

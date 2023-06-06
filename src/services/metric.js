@@ -46,11 +46,11 @@ export async function getStatistics(req) {
     let result = {};
     const options = String(req.query.statistics);
     await Promise.all([
-        options.match(/(switchers)|(all)/) ?
+        RegExp(/(switchers)|(all)/).exec(options) ?
             aggregateSwitchers(switcher.aggregate, dateGroupPattern, result) : Promise.resolve(),
-        options.match(/(components)|(all)/) ?
+        RegExp(/(components)|(all)/).exec(options) ?
             aggregateComponents(components.aggregate, dateGroupPattern, result) : Promise.resolve(),
-        options.match(/(reasons)|(all)/) ?
+        RegExp(/(reasons)|(all)/).exec(options) ?
             aggreagateReasons(reasons.aggregate, result) : Promise.resolve()
     ]);
 

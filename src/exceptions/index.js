@@ -37,15 +37,21 @@ export class FeatureUnavailableError extends Error {
 }
 
 export function responseException(res, err, code, feature = undefined) {
+    if (process.env.SWITCHER_API_LOGGER == 'true' && feature) {
+        Logger.info(`Feature [${feature}]`, { log: Switcher.getLogger(feature) });
+    }
+
+    responseExceptionSilent(res, err, code, err.message);
+}
+
+export function responseExceptionSilent(res, err, code, message) {
     if (process.env.SWITCHER_API_LOGGER == 'true') {
         Logger.httpError(err.constructor.name, err.code, err.message, err);
-        if (feature) {
-            Logger.info(`Feature [${feature}]`, { log: Switcher.getLogger(feature) });
-        }
     }
 
     if (err.code) {
-        return res.status(err.code).send({ error: err.message });
+        return res.status(err.code).send({ error: message });
     }
-    res.status(code).send({ error: err.message });
+
+    res.status(code).send({ error: message });
 }
