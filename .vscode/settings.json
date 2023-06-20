@@ -1,0 +1,6 @@
+{
+    "sonarlint.connectedMode.project": {
+        "connectionId": "switcherapi",
+        "projectKey": "switcherapi_switcher-api"
+    }
+}
