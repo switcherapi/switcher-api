@@ -26,7 +26,8 @@ export const SwitcherKeys = Object.freeze({
     ACCOUNT_OUT_NOTIFY: 'ACCOUNT_OUT_NOTIFY',
     SLACK_INTEGRATION: 'SLACK_INTEGRATION',
     SLACK_UPDATE: 'SLACK_UPDATE',
-    RATE_LIMIT: 'RATE_LIMIT'
+    RATE_LIMIT: 'RATE_LIMIT',
+    HTTPS_AGENT: 'HTTPS_AGENT'
 });
 
 function switcherFlagResult(flag, message) {
@@ -220,4 +221,11 @@ export async function getRateLimit(key, component) {
     }
 
     return parseInt(process.env.MAX_REQUEST_PER_MINUTE || DEFAULT_RATE_LIMIT);
+}
+
+export async function checkHttpsAgent(value) {
+    if (process.env.SWITCHER_API_ENABLE != 'true')
+        return;
+
+    return await checkFeature(SwitcherKeys.HTTPS_AGENT, [checkValue(value)]);
 }
