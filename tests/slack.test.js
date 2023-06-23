@@ -21,7 +21,7 @@ import {
 import { TicketValidationType } from '../src/models/slack_ticket';
 
 afterAll(async () => {
-    await Slack.deleteMany();
+    await Slack.deleteMany().exec();
     await new Promise(resolve => setTimeout(resolve, 1000));
     await mongoose.disconnect();
 });
@@ -840,7 +840,7 @@ describe('Slack Route - Process Ticket', () => {
 
     test('SLACK_SUITE - Should reset installation tickets', async () => {
         //verify that
-        let slackInstallation = await Slack.findOne({ team_id: slack.team_id });
+        let slackInstallation = await Slack.findOne({ team_id: slack.team_id }).exec();
         expect(slackInstallation.tickets.length).toBeGreaterThan(0);
 
         //test
@@ -851,7 +851,7 @@ describe('Slack Route - Process Ticket', () => {
                 team_id: slack.team_id
             }).expect(200);
 
-        slackInstallation = await Slack.findOne({ team_id: slack.team_id });
+        slackInstallation = await Slack.findOne({ team_id: slack.team_id }).exec();
         expect(slackInstallation.tickets.length).toEqual(0);
     });
 
