@@ -1,12 +1,8 @@
 import axios from 'axios';
 import https from 'https';
 import { StrategiesToRelayDataType, RelayMethods } from '../../models/config';
-import { checkHttpsAgent } from '../../external/switcher-api-facade';
 
-const agent = async (url) => {
-    const rejectUnauthorized = !(await checkHttpsAgent(url));
-    return new https.Agent({ rejectUnauthorized });
-};
+const agent = new https.Agent({ rejectUnauthorized: false });
 
 export function resolveNotification(relay, entry, environment) {
     const url = relay.endpoint[environment];
@@ -48,7 +44,7 @@ export async function resolveVerification(relay, environment) {
 
 async function post(url, data, headers) {
     try {
-        return await axios.post(url, data, { httpsAgent: agent(url) }, headers);
+        return await axios.post(url, data, { httpsAgent: agent }, headers);
     } catch (error) {
         throw new Error(`Failed to reach ${url} via POST`);
     }
@@ -56,7 +52,7 @@ async function post(url, data, headers) {
 
 async function get(url, data, headers) {
     try {
-        return await axios.get(`${url}${data}`, { httpsAgent: agent(url) }, headers);
+        return await axios.get(`${url}${data}`, { httpsAgent: agent }, headers);
     } catch (error) {
         throw new Error(`Failed to reach ${url} via GET`);
     }
