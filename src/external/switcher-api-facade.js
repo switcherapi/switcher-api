@@ -1,4 +1,4 @@
-import { Switcher, checkValue, checkPayload } from 'switcher-client';
+import { Switcher, checkValue, checkPayload, checkRegex } from 'switcher-client';
 import { EnvType } from '../models/environment';
 import { BadRequestError, FeatureUnavailableError } from '../exceptions';
 import { getDomainById, getTotalDomainsByOwner } from '../services/domain';
@@ -227,5 +227,5 @@ export async function checkHttpsAgent(value) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
         return;
 
-    return await checkFeature(SwitcherKeys.HTTPS_AGENT, [checkValue(value)]);
+    return checkFeature(SwitcherKeys.HTTPS_AGENT, [checkRegex(value)]);
 }
