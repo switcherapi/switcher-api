@@ -1,7 +1,14 @@
 import axios from 'axios';
+import https from 'https';
 import { StrategiesToRelayDataType, RelayMethods } from '../../models/config';
+import { checkHttpsAgent } from '../../external/switcher-api-facade';
 
-export function resolveNotification(relay, entry, environment) {
+const agent = async (url) => {
+    const rejectUnauthorized = !(await checkHttpsAgent(url));
+    return new https.Agent({ rejectUnauthorized });
+};
+
+export async function resolveNotification(relay, entry, environment) {
     const url = relay.endpoint[environment];
     const header = createHeader(relay.auth_prefix, relay.auth_token, environment);
 
@@ -41,7 +48,7 @@ export async function resolveVerification(relay, environment) {
 
 async function post(url, data, headers) {
     try {
-        return await axios.post(url, data, headers);
+        return await axios.post(url, data, { httpsAgent: await agent(url), headers });
     } catch (error) {
         throw new Error(`Failed to reach ${url} via POST`);
     }
@@ -49,7 +56,7 @@ async function post(url, data, headers) {
 
 async function get(url, data, headers) {
     try {
-        return await axios.get(`${url}${data}`, headers);
+        return await axios.get(`${url}${data}`, { httpsAgent: await agent(url), headers });
     } catch (error) {
         throw new Error(`Failed to reach ${url} via GET`);
     }
@@ -73,9 +80,9 @@ function createParams(entry) {
 }
 
 function createHeader(auth_prefix, auth_token, environment) {
-    let headers = {};
-
-    headers['Content-Type'] = 'application/json';
+    let headers = {
+        ['Content-Type']: 'application/json'
+    };
 
     if (environment) {
         if (auth_token && environment in auth_token && auth_prefix) {
@@ -85,7 +92,5 @@ function createHeader(auth_prefix, auth_token, environment) {
         headers['Authorization'] = `${auth_prefix} ${auth_token}`;
     }
 
-    return {
-        headers
-    };
+    return headers;
 }
