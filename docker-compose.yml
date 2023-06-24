@@ -3,6 +3,12 @@ version: '3.8'
 volumes:
   mongodb_data:
     driver: local
+  switcherapi-tls:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: "[CHANGE_IT]"
 
 networks:
   backend:
@@ -33,6 +39,9 @@ services:
       - NODE_ENV=development
       - PORT=3000
       - ENV=${ENV}
+      - SSL_KEY=${SSL_KEY}
+      - SSL_CERT=${SSL_CERT}
+
       - MONGODB_URI=${MONGODB_URI}
       - SENDGRID_API_KEY=${SENDGRID_API_KEY}
       - SENDGRID_MAIL_FROM=${SENDGRID_MAIL_FROM}
@@ -67,13 +76,19 @@ services:
       - SWITCHER_SLACK_JWT_SECRET=${SWITCHER_SLACK_JWT_SECRET}
     depends_on:
       - mongodb
+    volumes:
+      - switcherapi-tls:/etc/certs
 
   switchermanagement:
     image: trackerforce/switcher-management
     container_name: switchermanagement
-    command: /bin/sh -c "setup.sh"
+    # Enable SSL with "./setup.sh true"
+    command: ["/bin/sh", "-c", "./setup.sh"]
     ports:
+      - 443:443
       - 80:80
+    volumes: 
+      - switcherapi-tls:/etc/nginx/conf.d
     networks:
       - backend
     environment: 
