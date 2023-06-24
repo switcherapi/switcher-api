@@ -23,6 +23,7 @@ import slackRouter from './routers/slack';
 import schema from './client/schema';
 import { appAuth, auth, resourcesAuth, slackAuth } from './middleware/auth';
 import { clientLimiter, defaultLimiter } from './middleware/limiter';
+import { createServer } from './app-server';
 
 const app = express();
 app.use(express.json());
@@ -110,4 +111,4 @@ app.get('*', (_req, res) => {
     res.status(404).send({ error: 'Operation not found' });
 });
 
-export default app;
+export default createServer(app);
