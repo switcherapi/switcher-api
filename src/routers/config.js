@@ -12,6 +12,7 @@ import * as Services from '../services/config';
 import { getHistory, deleteHistory } from '../services/history';
 import { getGroupConfigById } from '../services/group-config';
 import { SwitcherKeys } from '../external/switcher-api-facade';
+import { getFields } from './common';
 
 const router = new express.Router();
 
@@ -30,9 +31,14 @@ router.post('/config/create',
 
 // GET /config?group=ID&limit=10&skip=20
 // GET /config?group=ID&sortBy=createdAt:desc
+// GET /config?group=ID&fields=key,description
 // GET /config?group=ID
 router.get('/config', auth, [
-    query('group').isMongoId()
+    query('group').isMongoId(),
+    query('fields').isString().optional(),
+    query('limit').isInt().optional(),
+    query('skip').isInt().optional(),
+    query('sortBy').isString().optional()
 ], validate, async (req, res) => {
     try {
         const groupConfig = await getGroupConfigById(req.query.group);
@@ -46,8 +52,12 @@ router.get('/config', auth, [
         });
 
         let configs = groupConfig.config;
-
         configs = await verifyOwnership(req.admin, configs, groupConfig.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
+
+        if (req.query.fields) {
+            configs = getFields(configs, req.query.fields);
+        }
+        
         res.send(configs);
     } catch (e) {
         responseException(res, e, 500);

@@ -1,6 +1,7 @@
 import https from 'https';
 import http from 'http';
 import fs from 'fs';
+import Logger from './helpers/logger';
 
 export const createServer = (app) => {
     if (process.env.SSL_CERT && process.env.SSL_KEY) {
@@ -9,10 +10,10 @@ export const createServer = (app) => {
             cert: fs.readFileSync(process.env.SSL_CERT)
         };
 
-        console.log('SSL enabled');
+        Logger.info('SSL enabled');
         return https.createServer(options, app);
     }
-
-    console.log('SSL disabled');
+    
+    Logger.info('SSL disabled');
     return http.createServer(app);
 };
