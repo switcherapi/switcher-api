@@ -323,7 +323,8 @@ export default {
             security: [{ bearerAuth: [] }],
             parameters: [
                 ...pagination,
-                queryParameter('group', 'Group ID', true)
+                queryParameter('group', 'Group ID', true),
+                queryParameter('fields', 'Fields to return', false, 'string', 'E.g.: key,description,activated.default')
             ],
             responses: {
                 '200': {

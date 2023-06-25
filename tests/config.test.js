@@ -99,6 +99,21 @@ describe('Testing fetch configuration info', () => {
         expect(response.body[0].activated[EnvType.DEFAULT]).toEqual(config1Document.activated.get(EnvType.DEFAULT));
     });
 
+    test('CONFIG_SUITE - Should get Config information - only fields (key, activated.default)', async () => {
+        let response = await request(app)
+            .get(`/config?group=${groupConfigId}&fields=key,activated.default`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        expect(response.body.length).toEqual(2);
+        expect(response.body[0]).toMatchObject({
+            key: config1Document.key,
+            activated: {
+                default: config1Document.activated.get(EnvType.DEFAULT)
+            }
+        });
+    });
+
     test('CONFIG_SUITE - Should get Configs by sorting ascending and descending', async () => {
         // given a config that was sent to the past
         const configKey1 = await Config.findOne({ key: 'TEST_CONFIG_KEY_1' }).exec();

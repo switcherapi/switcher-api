@@ -7,16 +7,22 @@ const logger = pino({
 });
 
 export default class Logger {
-
+    static get logger() {
+        return logger;
+    }
+    
     static info(message, obj) {
-        logger.info(obj, message);
+        if (process.env.SWITCHER_API_LOGGER == 'true')
+            logger.info(obj, message);
     }
 
     static error(message, err) {
-        logger.error(err, message);
+        if (process.env.SWITCHER_API_LOGGER == 'true')
+            logger.error(err, message);
     }
 
     static httpError(name, code, message, err) {
-        logger.error(err, `${name} [${code}]: ${message}`);
+        if (process.env.SWITCHER_API_LOGGER == 'true')
+            logger.error(err, `${name} [${code}]: ${message}`);
     }
 }

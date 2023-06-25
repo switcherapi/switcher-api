@@ -3882,7 +3882,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/config?group=5e0ece916f4f994eac9007b0",
+							"raw": "{{url}}/config?group=groupid",
 							"host": [
 								"{{url}}"
 							],
@@ -3890,6 +3890,15 @@
 								"config"
 							],
 							"query": [
+								{
+									"key": "group",
+									"value": "groupid"
+								},
+								{
+									"key": "fields",
+									"value": "key",
+									"disabled": true
+								},
 								{
 									"key": "sortBy",
 									"value": "createdAt:asc",
@@ -3904,10 +3913,6 @@
 									"key": "skip",
 									"value": "2",
 									"disabled": true
-								},
-								{
-									"key": "group",
-									"value": "5e0ece916f4f994eac9007b0"
 								}
 							]
 						}

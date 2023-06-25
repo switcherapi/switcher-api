@@ -79,10 +79,7 @@ export async function checkAvailability(admin, feature) {
         SwitcherKeys.SLACK_UPDATE
     ]);
 
-    if (process.env.SWITCHER_API_LOGGER == 'true') {
-        Logger.info(`checkAvailability [${feature}]`, { log: Switcher.getLogger(feature) });
-    }
-
+    Logger.info(`checkAvailability [${feature}]`, { log: Switcher.getLogger(feature) });
     return result;
 }
 
