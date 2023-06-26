@@ -1,10 +1,9 @@
 import axios from 'axios';
 import https from 'https';
 import { StrategiesToRelayDataType, RelayMethods } from '../../models/config';
-import { checkHttpsAgent } from '../../external/switcher-api-facade';
 
 const agent = async (url) => {
-    const rejectUnauthorized = !(await checkHttpsAgent(url));
+    const rejectUnauthorized = false;
     return new https.Agent({ rejectUnauthorized });
 };
 
