@@ -2,7 +2,7 @@ import axios from 'axios';
 import https from 'https';
 import { StrategiesToRelayDataType, RelayMethods } from '../../models/config';
 
-const agent = async (url) => {
+const agent = async () => {
     const rejectUnauthorized = false;
     return new https.Agent({ rejectUnauthorized });
 };
@@ -47,7 +47,7 @@ export async function resolveVerification(relay, environment) {
 
 async function post(url, data, headers) {
     try {
-        return await axios.post(url, data, { httpsAgent: await agent(url), headers });
+        return await axios.post(url, data, { httpsAgent: await agent(), headers });
     } catch (error) {
         throw new Error(`Failed to reach ${url} via POST`);
     }
@@ -55,7 +55,7 @@ async function post(url, data, headers) {
 
 async function get(url, data, headers) {
     try {
-        return await axios.get(`${url}${data}`, { httpsAgent: await agent(url), headers });
+        return await axios.get(`${url}${data}`, { httpsAgent: await agent(), headers });
     } catch (error) {
         throw new Error(`Failed to reach ${url} via GET`);
     }
