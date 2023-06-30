@@ -17,7 +17,6 @@ const logger = process.env.SWITCHER_API_LOGGER == 'true';
 const component = 'switcherapi';
 
 Switcher.buildContext({ url, apiKey, domain: domainName, component, environment }, { logger });
-const switcher = Switcher.factory();
 
 export const SwitcherKeys = Object.freeze({
     ELEMENT_CREATION: 'ELEMENT_CREATION',
@@ -37,7 +36,9 @@ function switcherFlagResult(flag, message) {
 }
 
 export async function checkFeature(feature, params, restrictTo = SwitcherKeys) {
+    const switcher = Switcher.factory();
     const key = Object.values(restrictTo).find(element => element === feature);
+    
     if (!key)
         throw new BadRequestError('Invalid feature');
     
@@ -193,6 +194,7 @@ export function notifyAcCreation(adminid) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
         return;
 
+    const switcher = Switcher.factory();
     switcher.isItOn(SwitcherKeys.ACCOUNT_IN_NOTIFY, [
         checkValue(adminid)]);
 }
@@ -201,6 +203,7 @@ export function notifyAcDeletion(adminid) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
         return;
 
+    const switcher = Switcher.factory();
     switcher.isItOn(SwitcherKeys.ACCOUNT_OUT_NOTIFY, [
         checkValue(adminid)]);
 }
