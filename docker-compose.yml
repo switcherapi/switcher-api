@@ -66,6 +66,7 @@ services:
       - BITBUCKET_OAUTH_SECRET=${BITBUCKET_OAUTH_SECRET}
       - GOOGLE_RECAPTCHA_SECRET=${GOOGLE_RECAPTCHA_SECRET}
       - GOOGLE_SKIP_AUTH=${GOOGLE_SKIP_AUTH}
+      - SWITCHER_API_LOGGER=${SWITCHER_API_LOGGER}
 
       - SWITCHER_API_ENABLE=${SWITCHER_API_ENABLE}
       - SWITCHER_API_URL=${SWITCHER_API_URL}
@@ -82,8 +83,7 @@ services:
   switchermanagement:
     image: trackerforce/switcher-management
     container_name: switchermanagement
-    # Enable SSL with "./setup.sh true"
-    command: ["/bin/sh", "-c", "./setup.sh"]
+    command: ["/bin/sh", "-c", "./setup.sh ${SSL_ENABLED}"]
     ports:
       - 443:443
       - 80:80
