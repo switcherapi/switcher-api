@@ -8,7 +8,7 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: "[CHANGE_IT]"
+      device: "${VOLUME_SSL_CERTS}"
 
 networks:
   backend:
