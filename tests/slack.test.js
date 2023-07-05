@@ -60,7 +60,7 @@ describe('Slack Feature Availability', () => {
         process.env.SWITCHER_SLACK_JWT_SECRET = 'SLACK_APP_SECRET';
     });
 
-    test('SLACK_SUITE - Should check feature - Available', async () => {
+    test('SLACK_SUITE - Should check feature - Available (API enabled)', async () => {
         Switcher.assume('SLACK_INTEGRATION').true();
         const response = await request(app)
             .post('/slack/v1/availability')
@@ -70,6 +70,19 @@ describe('Slack Feature Availability', () => {
             }).expect(200);
 
         expect(response.body.result).toBe(true);
+    });
+
+    test('SLACK_SUITE - Should check feature - Available (API disabled)', async () => {
+        process.env.SWITCHER_API_ENABLE = false;
+        const response = await request(app)
+            .post('/slack/v1/availability')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                feature: 'SLACK_INTEGRATION'
+            }).expect(200);
+
+        expect(response.body.result).toBe(true);
+        process.env.SWITCHER_API_ENABLE = true;
     });
 
     test('SLACK_SUITE - Should check feature - Not Available', async () => {
