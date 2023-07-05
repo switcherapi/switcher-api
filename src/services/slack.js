@@ -1,14 +1,12 @@
 import Slack from '../models/slack';
-import { checkValue, Switcher } from 'switcher-client';
 import { TicketStatusType, SLACK_SUB, TicketValidationType } from '../models/slack_ticket';
 import { BadRequestError, NotFoundError, PermissionError } from '../exceptions';
-import { checkSlackIntegration, checkFeature, SwitcherKeys } from '../external/switcher-api-facade';
+import { checkSlackIntegration, checkSlackAvailability } from '../external/switcher-api-facade';
 import { getConfig } from './config';
 import { getDomainById } from './domain';
 import { getEnvironment } from './environment';
 import { getGroupConfig } from './group-config';
 import { containsValue } from '../helpers';
-import Logger from '../helpers/logger';
 
 /**
  * Validates if ticket already exists, if so, return it.
@@ -71,16 +69,7 @@ export async function getSlack(where) {
 }
 
 export async function checkAvailability(admin, feature) {
-    if (!process.env.SWITCHER_SLACK_JWT_SECRET)
-        return false;
-
-    const result = await checkFeature(feature, [checkValue(admin._id)], [
-        SwitcherKeys.SLACK_INTEGRATION, 
-        SwitcherKeys.SLACK_UPDATE
-    ]);
-
-    Logger.info(`checkAvailability [${feature}]`, { log: Switcher.getLogger(feature) });
-    return result;
+    return checkSlackAvailability(admin, feature);
 }
 
 export async function createSlackInstallation(args) {

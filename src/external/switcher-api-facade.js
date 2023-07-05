@@ -190,6 +190,21 @@ export async function checkSlackIntegration(value) {
             ]), 'Slack Integration is not available.');
 }
 
+export async function checkSlackAvailability(admin, feature) {
+    if (process.env.SWITCHER_API_ENABLE != 'true')
+        return true;
+
+    if (!process.env.SWITCHER_SLACK_JWT_SECRET)
+        return false;
+
+    const result = await checkFeature(feature, [checkValue(admin._id)], [
+        SwitcherKeys.SLACK_INTEGRATION, 
+        SwitcherKeys.SLACK_UPDATE
+    ]);
+
+    return result;
+}
+
 export function notifyAcCreation(adminid) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
         return;
