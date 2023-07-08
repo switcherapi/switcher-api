@@ -75,6 +75,9 @@ const permissionSchema = new mongoose.Schema({
         type: String,
         enum: Object.values(KeyTypes)
     },
+    environments: [{
+        type: String
+    }],
     values: [{
         type: String
     }]
