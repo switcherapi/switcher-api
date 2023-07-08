@@ -80,11 +80,16 @@ router.get('/permission/:id', auth, [
     }
 });
 
-router.patch('/permission/:id', auth, verifyInputUpdateParameters([
-    'action', 'active', 'router', 'identifiedBy'
-]), [
-    check('id').isMongoId()
-], validate, async (req, res) => {
+router.patch('/permission/:id', auth, [
+    check('id').isMongoId(),
+    body('action').isString().optional(),
+    body('active').isBoolean().optional(),
+    body('router').isString().optional(),
+    body('identifiedBy').isString().optional(),
+    body('environments').isArray().optional()
+], validate, verifyInputUpdateParameters([
+    'action', 'active', 'router', 'identifiedBy', 'environments'
+]), async (req, res) => {
     await updatePermission(req, res);
 });
 
