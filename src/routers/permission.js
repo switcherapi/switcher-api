@@ -22,8 +22,9 @@ async function updatePermission(req, res) {
 router.post('/permission/create/:team', auth, [
     check('team').isMongoId(),
     body('action').not().isEmpty(),
-    body('router').not().isEmpty()
-], validate, async (req, res) => {
+    body('router').not().isEmpty(),
+    body('environments').isArray().optional(),
+], validate, verifyInputUpdateParameters(['action', 'router', 'environments']), async (req, res) => {
     try {
         const permission = await Services.createPermission(req.body, req.params.team, req.admin);
         res.status(201).send(permission);

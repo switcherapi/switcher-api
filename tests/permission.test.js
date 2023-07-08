@@ -28,11 +28,21 @@ describe('Insertion tests', () => {
             }).expect(201);
 
         // DB validation - document created
-        const permission = await Permission.findById(response.body._id).lean();
+        const permission = await Permission.findById(response.body._id).lean().exec();
         expect(permission).not.toBeNull();
 
         // Response validation
         expect(response.body.action).toBe(ActionTypes.READ);
+    });
+
+    test('PERMISSION_SUITE - Should NOT create a new Permission - Invalid parameter (route instead of router)', async () => {
+        await request(app)
+            .post('/permission/create/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                action: ActionTypes.READ,
+                route: RouterTypes.GROUP
+            }).expect(422);
     });
 
     test('PERMISSION_SUITE - Should NOT create a new Permission - Missing required parameter', async () => {
@@ -52,6 +62,41 @@ describe('Insertion tests', () => {
                 action: ActionTypes.READ,
                 router: RouterTypes.STRATEGY
             }).expect(404);
+    });
+});
+
+describe('Insertion tests - by Environment', () => {
+    beforeAll(setupDatabase);
+
+    test('PERMISSION_SUITE - Should create a new Permission - Development only', async () => {
+        const response = await request(app)
+            .post('/permission/create/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                action: ActionTypes.READ,
+                router: RouterTypes.GROUP,
+                environments: ['development']
+            }).expect(201);
+
+        // DB validation - document created
+        const permission = await Permission.findById(response.body._id).lean().exec();
+        expect(permission).not.toBeNull();
+        expect(permission.environments.includes('development')).toEqual(true);
+
+        // Response validation
+        expect(response.body.action).toBe(ActionTypes.READ);
+        expect(response.body.environments.includes('development')).toEqual(true);
+    });
+
+    test('PERMISSION_SUITE - Should NOT create a new Permission - Environment is not an Array', async () => {
+        await request(app)
+            .post('/permission/create/' + team1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                action: ActionTypes.READ,
+                router: RouterTypes.GROUP,
+                environments: 'development'
+            }).expect(422);
     });
 });
 
@@ -175,7 +220,7 @@ describe('Updating tests', () => {
             }).expect(200);
 
         // DB validation - document updated
-        const permission = await Permission.findById(permission1Id).lean();
+        const permission = await Permission.findById(permission1Id).lean().exec();
         expect(permission.active).toBe(false);
     });
 
@@ -220,7 +265,7 @@ describe('Deletion tests', () => {
             }).expect(201);
 
         // DB validation
-        let team = await Team.findById(team1Id);
+        let team = await Team.findById(team1Id).exec();
         expect(team.permissions.includes(response.body._id)).toEqual(true);
 
         response = await request(app)
@@ -229,10 +274,10 @@ describe('Deletion tests', () => {
             .send().expect(200);
 
         // DB validation - document deleted
-        team = await Team.findById(team1Id);
+        team = await Team.findById(team1Id).exec();
         expect(team.permissions.includes(response.body._id)).toEqual(false);
 
-        let permission = await Permission.findById(response.body._id).lean();
+        let permission = await Permission.findById(response.body._id).lean().exec();
         expect(permission).toBeNull();
     });
 
@@ -263,7 +308,7 @@ describe('Updating permission values tests', () => {
             }).expect(200);
 
         // DB validation
-        const permission = await Permission.findById(permission1Id).lean();
+        const permission = await Permission.findById(permission1Id).lean().exec();
         expect(permission.values[0]).toEqual('NEW VALUE');
     });
 
@@ -276,7 +321,7 @@ describe('Updating permission values tests', () => {
             }).expect(200);
 
         // DB validation
-        let permission = await Permission.findById(permission1Id);
+        let permission = await Permission.findById(permission1Id).exec();
         expect(permission.values.includes('NEW VALUE 1')).toEqual(true);
         expect(permission.values.includes('OLD VALUE')).toEqual(true);
 
@@ -287,7 +332,7 @@ describe('Updating permission values tests', () => {
                 values: ['NEW VALUE']
             }).expect(200);
 
-        permission = await Permission.findById(permission1Id);
+        permission = await Permission.findById(permission1Id).exec();
         expect(permission.values.includes('NEW VALUE')).toEqual(true);
         expect(permission.values.includes('OLD VALUE')).toEqual(false);
     });
@@ -405,7 +450,7 @@ describe('Updating permission values tests', () => {
             }).expect(200);
 
         // DB validation
-        const permission = await Permission.findById(permission1Id).lean();
+        const permission = await Permission.findById(permission1Id).lean().exec();
         expect(permission.values.length).toBe(0);
     });
 });
