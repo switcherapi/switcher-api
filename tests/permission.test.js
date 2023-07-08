@@ -454,3 +454,29 @@ describe('Updating permission values tests', () => {
         expect(permission.values.length).toBe(0);
     });
 });
+
+describe('Updating environments tests', () => {
+    beforeAll(setupDatabase);
+
+    test('PERMISSION_SUITE - Should set an environment to the permission', async () => {
+        await request(app)
+            .patch('/permission/' + permission1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                environments: ['development']
+            }).expect(200);
+
+        // DB validation
+        const permission = await Permission.findById(permission1Id).lean().exec();
+        expect(permission.environments.includes('development')).toEqual(true);
+    });
+
+    test('PERMISSION_SUITE - Should NOT set an environment to the permission - Invalid value (not an array)', async () => {
+        await request(app)
+            .patch('/permission/' + permission1Id)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                environments: 'development'
+            }).expect(422);
+    });
+});
