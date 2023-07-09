@@ -76,6 +76,24 @@ export const permission2 = {
     values: [groupConfig2Document.name]
 };
 
+export const permission21Id = new mongoose.Types.ObjectId();
+export const permission21 = {
+    _id: permission21Id,
+    action: ActionTypes.READ,
+    active: true,
+    router: RouterTypes.GROUP
+};
+
+export const permission22Id = new mongoose.Types.ObjectId();
+export const permission22 = {
+    _id: permission22Id,
+    action: ActionTypes.READ,
+    active: true,
+    router: RouterTypes.GROUP,
+    identifiedBy: KeyTypes.NAME,
+    values: ['RANDOM_VALUE']
+};
+
 export const permission3Id = new mongoose.Types.ObjectId();
 export const permission3 = {
     _id: permission3Id,
@@ -112,6 +130,15 @@ export const team2 = {
     permissions: [permission4Id]
 };
 
+export const team3Id = new mongoose.Types.ObjectId();
+export const team3 = {
+    _id: team3Id,
+    domain: domainId,
+    name: 'Team 3',
+    active: true,
+    permissions: [permission21Id, permission22Id]
+};
+
 export const adminAccountId = new mongoose.Types.ObjectId();
 export const adminAccount = {
     _id: adminAccountId,
@@ -119,7 +146,7 @@ export const adminAccount = {
     email: 'member@admin.com',
     password: '123123123123',
     active: true,
-    teams: [team1Id]
+    teams: [team1Id, team3Id]
 };
 
 export const adminAccount2Id = new mongoose.Types.ObjectId();
@@ -162,8 +189,11 @@ export const setupDatabase = async () => {
     await new Config(configDocument).save();
     await new Permission(permission1).save();
     await new Permission(permission2).save();
+    await new Permission(permission21).save();
+    await new Permission(permission22).save();
     await new Permission(permission3).save();
     await new Permission(permission4).save();
     await new Team(team1).save();
     await new Team(team2).save();
+    await new Team(team3).save();
 };

@@ -18,7 +18,10 @@ import {
     permission3Id,
     adminAccount2,
     team1Id,
-    adminAccount3
+    adminAccount3,
+    permission21Id,
+    permission4Id,
+    permission22Id
  } from '../fixtures/db_team_permission';
 import { PermissionError } from '../../src/exceptions';
 
@@ -48,6 +51,15 @@ afterAll(async () => {
 describe('Success tests', () => {
     beforeAll(setupDatabase);
 
+    beforeEach(async () => {
+        await changePermissionStatus(permission1Id, false);
+        await changePermissionStatus(permission2Id, false);
+        await changePermissionStatus(permission21Id, false);
+        await changePermissionStatus(permission22Id, false);
+        await changePermissionStatus(permission3Id, false);
+        await changePermissionStatus(permission4Id, false);
+    });
+
     test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Element owner', async () => {
         try {
             const element = await verifyOwnership(
@@ -64,11 +76,11 @@ describe('Success tests', () => {
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Member has permission to select group', async () => {
-        // Given
-        // Enabled Read - Group 
+        //given
+        //enabled Read - Group  (by name)
         await changePermissionStatus(permission2Id, true);
 
-        // Test
+        //test
         try {
             const element = await verifyOwnership(
                 adminAccount, 
@@ -84,14 +96,14 @@ describe('Success tests', () => {
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Member has permission to select group - Cascade', async () => {
-        // Given
-        // Disabled Read - Group 
+        //given
+        //disabled Read - Group (by name)
         await changePermissionStatus(permission2Id, false);
 
-        // Enabled Read - Config 
+        //enabled Read - Config (by name)
         await changePermissionStatus(permission3Id, true);
 
-        // Test
+        //test
         try {
             const element = await verifyOwnership(
                 adminAccount, 
@@ -107,30 +119,53 @@ describe('Success tests', () => {
         }
     });
 
-    test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Member has permission to select just one of those', async () => {
-        // Given
-        // Enabled Read - Group 
+    test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Member has permission to select just one of 2 groups', async () => {
+        //given
+        //enabled Read - Group (by name)
         await changePermissionStatus(permission2Id, true);
 
-        // Test
-        try {
-            let groups = await GroupConfig.find({ domain: domainId }).exec();
-            expect(groups.length).toEqual(2);
+        //disabled Read - Group (all)
+        await changePermissionStatus(permission21Id, false);
 
-            const element = await verifyOwnership(
+        let groups = await GroupConfig.find({ domain: domainId }).exec();
+        expect(groups.length).toEqual(2);
+
+        //test
+        const element = await verifyOwnership(
                 adminAccount, 
                 groups, 
                 domainDocument, 
                 ActionTypes.READ, 
                 RouterTypes.GROUP);
 
-            expect(element.length).toEqual(1);
-        } catch (e) {
-            expect(e).toBeNull();
-        }
+        expect(element.length).toEqual(1);
+    });
+
+    test('UNIT_TEAM_PERMISSION_SUITE - Should allow access and merge team permissions', async () => {
+        //given
+        //enabled Read - Group (by name)
+        await changePermissionStatus(permission2Id, true);
+
+        //enabled Read - Group (all)
+        await changePermissionStatus(permission21Id, true);
+
+        let groups = await GroupConfig.find({ domain: domainId }).exec();
+        expect(groups.length).toEqual(2);
+
+        //test
+        const element = await verifyOwnership(
+                adminAccount, 
+                groups, 
+                domainDocument, 
+                ActionTypes.READ, 
+                RouterTypes.GROUP);
+
+        expect(element.length).toEqual(2);
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Member has permission to delete', async () => {
+        await changePermissionStatus(permission1Id, true);
+        
         try {
             const element = await verifyOwnership(
                 adminAccount, 
@@ -146,6 +181,8 @@ describe('Success tests', () => {
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Member has permission to select config', async () => {
+        await changePermissionStatus(permission1Id, true);
+        await changePermissionStatus(permission3Id, true);
         await changePermissionAction(permission1Id, ActionTypes.READ);
         await changePermissionAction(permission3Id, ActionTypes.UPDATE);
         
@@ -167,24 +204,26 @@ describe('Success tests', () => {
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Member has ALL select permissions', async () => {
+        await changePermissionStatus(permission4Id, true);
+
         try {
             let element = await verifyOwnership(
-                adminAccount3, 
-                groupConfig2Document, 
-                domainDocument, 
-                ActionTypes.READ, 
-                RouterTypes.GROUP);
-
-            expect(element._id).toEqual(groupConfig2Document._id);
-
-            element = await verifyOwnership(
                 adminAccount3, 
                 domainDocument, 
                 domainDocument, 
                 ActionTypes.READ, 
                 RouterTypes.DOMAIN);
 
-            expect(element._id).toEqual(domainDocument._id);
+            expect(element).toMatchObject(domainDocument);
+
+            element = await verifyOwnership(
+                adminAccount3, 
+                groupConfig2Document, 
+                domainDocument, 
+                ActionTypes.READ, 
+                RouterTypes.GROUP);
+
+            expect(element).toMatchObject(groupConfig2Document);
 
             element = await verifyOwnership(
                 adminAccount3, 
@@ -193,7 +232,7 @@ describe('Success tests', () => {
                 ActionTypes.READ, 
                 RouterTypes.CONFIG);
 
-            expect(element._id).toEqual(configDocument._id);
+            expect(element).toMatchObject(configDocument);
 
             let groups = await GroupConfig.find({ domain: domainId }).exec();
             expect(groups.length).toEqual(2);
@@ -214,88 +253,95 @@ describe('Success tests', () => {
 });
 
 describe('Error tests', () => {
+    beforeAll(setupDatabase);
+
+    beforeEach(async () => {
+        await changePermissionStatus(permission1Id, false);
+        await changePermissionStatus(permission2Id, false);
+        await changePermissionStatus(permission21Id, false);
+        await changePermissionStatus(permission22Id, false);
+        await changePermissionStatus(permission3Id, false);
+        await changePermissionStatus(permission4Id, false);
+    });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Permission innactive', async () => {
         await changePermissionStatus(permission2Id, false);
-        
-        try {
-            const element = await verifyOwnership(
+
+        expect(async () => {
+            await verifyOwnership(
                 adminAccount, 
                 groupConfig2Document, 
                 domainDocument, 
                 ActionTypes.READ, 
                 RouterTypes.GROUP);
-
-            expect(element).toBeNull();
-        } catch (e) {
-            expect(e).toEqual(new PermissionError(`Permission not found for this operation: '${ActionTypes.READ}' - '${RouterTypes.GROUP}'`));
-        } finally {
-            await changePermissionStatus(permission2Id, true);
-        }
+        }).rejects.toThrow(new PermissionError(`Action forbidden`));
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Permission not found', async () => {
-        try {
-            const element = await verifyOwnership(
+        expect(async () => {
+            await verifyOwnership(
                 adminAccount, 
                 domainDocument, 
                 domainDocument, 
                 ActionTypes.CREATE, 
                 RouterTypes.GROUP);
-
-            expect(element).toBeNull();
-        } catch (e) {
-            expect(e).toEqual(new PermissionError(`Permission not found for this operation: '${ActionTypes.CREATE}' - '${RouterTypes.GROUP}'`));
-        }
+        }).rejects.toThrow(new PermissionError(`Action forbidden`));
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Permission does not match', async () => {
-        try {
-            const element = await verifyOwnership(
+        expect(async () => {
+            await verifyOwnership(
                 adminAccount, 
                 configDocument, 
                 domainDocument, 
                 ActionTypes.READ, 
                 RouterTypes.CONFIG);
-
-            expect(element).toBeNull();
-        } catch (e) {
-            expect(e).toEqual(new Error('It was not possible to match the requiring element to the current permission'));
-        }
+        }).rejects.toThrow(new PermissionError(`Action forbidden`));
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Member does not belong to a team', async () => {
-        try {
-            const element = await verifyOwnership(
+        expect(async () => {
+            await verifyOwnership(
                 adminAccount2, 
                 domainDocument, 
                 domainDocument, 
                 ActionTypes.READ, 
                 RouterTypes.DOMAIN);
-
-            expect(element).toBeNull();
-        } catch (e) {
-            expect(e).toEqual(new Error('It was not possible to find any team that allows you to proceed with this operation'));
-        }
+        }).rejects.toThrow(new PermissionError(`It was not possible to find any team that allows you to proceed with this operation`));
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Team not active', async () => {
         await changeTeamStatus(team1Id, false);
 
-        try {
-            const element = await verifyOwnership(
+        expect(async () => {
+            await verifyOwnership(
                 adminAccount, 
                 groupConfig2Document, 
                 domainDocument, 
                 ActionTypes.READ, 
                 RouterTypes.GROUP);
+        }).rejects.toThrow(new PermissionError(`Action forbidden`));
 
-                expect(element).toBeNull();
-        } catch (e) {
-            expect(e).toEqual(new Error('It was not possible to find any team that allows you to proceed with this operation'));
-        } finally {
-            await changeTeamStatus(team1Id, true);
-        }
+        // tearDown
+        await changeTeamStatus(team1Id, true);
+    });
+
+    test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Group name does not exist', async () => {
+        //given
+        //enabled Read - Group (by name)
+        await changePermissionStatus(permission22Id, true);
+
+        let groups = await GroupConfig.find({ domain: domainId }).exec();
+        expect(groups.length).toEqual(2);
+
+        expect(async () => {
+            await verifyOwnership(
+                adminAccount, 
+                groups, 
+                domainDocument, 
+                ActionTypes.READ, 
+                RouterTypes.GROUP);
+        }).rejects.toThrow(new PermissionError(`Action forbidden`));
     });
 
 });
