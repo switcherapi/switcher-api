@@ -246,7 +246,7 @@ describe('Slack Installation', () => {
             .send({
                 domain: domainId,
                 team_id: installation.team_id
-            }).expect(401);
+            }).expect(403);
     });
 
     test('SLACK_SUITE - Should NOT authorize installation - Invalid Domain Id', async () => {
@@ -445,7 +445,7 @@ describe('Slack Installation', () => {
         const response = await request(app)
             .delete(`/slack/v1/installation/unlink?domain=${String(domainId)}`)
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send().expect(401);
+            .send().expect(403);
 
         expect(response.body.error).toBe('Only the domain owner can unlink integrations');
     });
@@ -874,7 +874,7 @@ describe('Slack Route - Process Ticket', () => {
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 team_id: slack.team_id
-            }).expect(401);
+            }).expect(403);
     });
 
 });

@@ -23,7 +23,7 @@ export class PermissionError extends Error {
     constructor(message) {
         super(message);
         this.name = this.constructor.name;
-        this.code = 401;
+        this.code = 403;
         Error.captureStackTrace(this, this.constructor);
     }
 }

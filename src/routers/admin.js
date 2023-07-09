@@ -103,10 +103,10 @@ router.post('/admin/collaboration/permission', auth, [
     check('router', 'Router name is required').isLength({ min: 1 })
 ], validate, async (req, res) => {
     const element = {
-        _id: req.body.element.id,
-        name: req.body.element.name,
-        key: req.body.element.key,
-        strategy: req.body.element.strategy
+        _id: req.body.element?.id,
+        name: req.body.element?.name,
+        key: req.body.element?.key,
+        strategy: req.body.element?.strategy
     };
 
     let result = [];

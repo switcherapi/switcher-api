@@ -35,7 +35,7 @@ describe('Insertion tests', () => {
             }).expect(201);
 
         // DB validation - document created
-        const environment = await Environment.findById(response.body._id).lean();
+        const environment = await Environment.findById(response.body._id).lean().exec();
         expect(environment).not.toBeNull();
 
         // Response validation
@@ -49,7 +49,7 @@ describe('Insertion tests', () => {
             .send({
                 name: 'QA',
                 domain: domainId
-            }).expect(401);
+            }).expect(403);
     });
 
     test('ENV_SUITE - Should NOT create a new Environment - Environment already exist', async () => {
@@ -121,7 +121,7 @@ describe('Deletion tests', () => {
             .send().expect(200);
 
         // DB validation - document deleted
-        const environment = await Environment.findById(response.body._id).lean();
+        const environment = await Environment.findById(response.body._id).lean().exec();
         expect(environment).toBeNull();
     });
 
@@ -134,7 +134,7 @@ describe('Deletion tests', () => {
         expect(response.body.error).toBe('Unable to delete this environment');
         
         // DB validation - document deleted
-        const environment = await Environment.findById(environment1._id).lean();
+        const environment = await Environment.findById(environment1._id).lean().exec();
         expect(environment).not.toBeNull();
     });
 
@@ -164,7 +164,7 @@ describe('Deletion tests', () => {
         await request(app)
             .delete('/environment/' + response.body._id)
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send().expect(401);
+            .send().expect(403);
     });
 
     test('ENV_SUITE - Should recover an Environment', async () => {
@@ -215,19 +215,19 @@ describe('Deletion tests', () => {
                 env: envName
             }).expect(201);
 
-        let domain = await Domain.findById(domainId).lean();
+        let domain = await Domain.findById(domainId).lean().exec();
         expect(domain.activated[EnvType.DEFAULT]).toEqual(true);
         expect(domain.activated[envName]).toEqual(true);
 
-        let group = await GroupConfig.findById(groupConfigId).lean();
+        let group = await GroupConfig.findById(groupConfigId).lean().exec();
         expect(group.activated[EnvType.DEFAULT]).toEqual(true);
         expect(group.activated[envName]).toEqual(true);
 
-        let config = await Config.findById(configId1).lean();
+        let config = await Config.findById(configId1).lean().exec();
         expect(config.activated[EnvType.DEFAULT]).toEqual(true);
         expect(config.activated[envName]).toEqual(true);
 
-        let strategy = await ConfigStrategy.findById(strategyEnv.body._id).lean();
+        let strategy = await ConfigStrategy.findById(strategyEnv.body._id).lean().exec();
         expect(strategy.activated[envName]).toEqual(true);
 
         await request(app)
@@ -235,19 +235,19 @@ describe('Deletion tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
-        domain = await Domain.findById(domainId).lean();
+        domain = await Domain.findById(domainId).lean().exec();
         expect(domain.activated[EnvType.DEFAULT]).toEqual(true);
         expect(domain.activated[envName]).toEqual(undefined);
 
-        group = await GroupConfig.findById(groupConfigId).lean();
+        group = await GroupConfig.findById(groupConfigId).lean().exec();
         expect(group.activated[EnvType.DEFAULT]).toEqual(true);
         expect(group.activated[envName]).toEqual(undefined);
 
-        config = await Config.findById(configId1).lean();
+        config = await Config.findById(configId1).lean().exec();
         expect(config.activated[EnvType.DEFAULT]).toEqual(true);
         expect(config.activated[envName]).toEqual(undefined);
 
-        strategy = await ConfigStrategy.findById(strategyEnv.body._id).lean();
+        strategy = await ConfigStrategy.findById(strategyEnv.body._id).lean().exec();
         expect(strategy).toBeNull();
     });
 
