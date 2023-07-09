@@ -1,4 +1,3 @@
-import { PermissionError } from '../exceptions';
 import { ActionTypes, RouterTypes } from '../models/permission';
 import { getPermission, getPermissions } from '../services/permission';
 
@@ -10,11 +9,11 @@ export async function verifyPermissions(team, element, action, routerType) {
         router: { $in: [routerType, RouterTypes.ALL] }
     });
 
-    if (permission) {
-        return verifyIdentifiers(permission, element);
-    } else {
-        throw new PermissionError(`Permission not found for this operation: '${action}' - '${routerType}'`);
+    if (!permission) {
+        return undefined;
     }
+
+    return verifyIdentifiers(permission, element);
 }
 
 export async function verifyPermissionsCascade(team, element, action, routerType) {
@@ -66,13 +65,12 @@ function verifyIdentifiers(permission, element) {
                     return element;
                 }
             }
-        } else {
-            if (permission.values.includes(element[`${permission.identifiedBy}`])) {
-                return element;
-            }
+        } else if (permission.values.includes(element[`${permission.identifiedBy}`])) {
+            return element;
         }
-    } else {
-        return element;
+
+        return undefined;
     }
-    throw new PermissionError('It was not possible to match the requiring element to the current permission');
+
+    return element;
 }

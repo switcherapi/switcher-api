@@ -119,16 +119,32 @@ export async function verifyOwnership(admin, element, domainId, action, routerTy
     }
     
     const teams = await getTeams({ _id: { $in: admin.teams }, domain: domain._id, active: true });
-    if (teams.length && admin.teams.length) {
-        for (const team of teams) {
-            if (cascade) {
-                element = await verifyPermissionsCascade(team, element, action, routerType);
-            } else {
-                element = await verifyPermissions(team, element, action, routerType);
-            }
-        }
-    } else {
+    if (!teams.length || !admin.teams.length) {
         throw new PermissionError('It was not possible to find any team that allows you to proceed with this operation');
+    } 
+
+    let hasPermission = [];
+    let allowedElement;
+    for (const team of teams) {
+        if (cascade) {
+            allowedElement = await verifyPermissionsCascade(team, element, action, routerType);
+        } else {
+            allowedElement = await verifyPermissions(team, element, action, routerType);
+        }
+        
+        if (allowedElement) {
+            hasPermission.push(allowedElement);
+        }
+    }
+
+    if (!hasPermission.length) {
+        throw new PermissionError('Action forbidden');
+    }
+    
+    if (Array.isArray(element)) {
+        hasPermission = hasPermission.flat(Infinity);
+        hasPermission = [...new Set(hasPermission)];
+        return hasPermission;
     }
 
     return element;
