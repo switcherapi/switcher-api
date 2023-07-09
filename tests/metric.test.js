@@ -380,7 +380,7 @@ describe('Delete metrics', () => {
         await request(app)
             .delete(`/metric?domainid=${domainId}&key=KEY_1`)
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send().expect(401);
+            .send().expect(403);
     });
 
     test('METRIC_SUITE - Should delete metrics', async () => {

@@ -17,6 +17,7 @@ import {
 } from './fixtures/db_api';
 import { Team } from '../src/models/team';
 import swaggerDocument from '../src/api-docs/swagger-document';
+import { RouterTypes } from '../src/models/permission';
 
 afterAll(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -914,6 +915,60 @@ describe('Testing Admin logout', () => {
     });
 });
 
+describe('Testing Admin collaboration endpoint - Reading permissions', () => {
+    let token;
+
+    beforeAll(async () => {
+        await setupDatabase();
+
+        let responseLogin = await request(app)
+        .post('/admin/login')
+        .send({
+            email: adminMasterAccount.email,
+            password: adminMasterAccount.password
+        }).expect(200);
+
+        //add user to 'teamId'
+        await request(app)
+            .patch('/team/member/add/' + team1Id)
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send({
+                member: adminAccountId
+            }).expect(200);
+
+        //user login
+        responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminAccount.email,
+                password: adminAccount.password
+            }).expect(200);
+
+        token = responseLogin.body.jwt.token;
+    });
+
+    test('ADMIN_SUITE - Should read permissions given request - Group', async () => {
+        const response = await request(app)
+            .post('/admin/collaboration/permission')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                domain: domainId,
+                action: ['READ', 'UPDATE', 'CREATE'],
+                router: RouterTypes.GROUP
+            })
+            .expect(200);
+
+        expect(response.body.length > 0).toEqual(true);
+
+        const read = response.body.filter(permission => permission.action === 'READ');
+        expect(read[0].result).toEqual('ok');
+        const update = response.body.filter(permission => permission.action === 'UPDATE');
+        expect(update[0].result).toEqual('nok');
+        const create = response.body.filter(permission => permission.action === 'CREATE');
+        expect(create[0].result).toEqual('nok');
+    });
+});
+
 
 describe('Testing Admin collaboration endpoint', () => {
     beforeAll(setupDatabase);
@@ -955,51 +1010,6 @@ describe('Testing Admin collaboration endpoint', () => {
             .expect(200);
 
         expect(response.body.length).toEqual(0);
-    });
-
-    test('ADMIN_SUITE - Should read credentials from an user', async () => {
-        let responseLogin = await request(app)
-            .post('/admin/login')
-            .send({
-                email: adminMasterAccount.email,
-                password: adminMasterAccount.password
-            }).expect(200);
-
-        await request(app)
-            .patch('/team/member/add/' + team1Id)
-            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
-            .send({
-                member: adminAccountId
-            }).expect(200);
-
-        responseLogin = await request(app)
-            .post('/admin/login')
-            .send({
-                email: adminAccount.email,
-                password: adminAccount.password
-            }).expect(200);
-
-        const response = await request(app)
-            .post('/admin/collaboration/permission')
-            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
-            .send({
-                domain: domainId,
-                action: ['READ', 'UPDATE', 'CREATE'],
-                router: 'GROUP',
-                element: {
-                    name: 'Optional Group Name Here'
-                }
-            })
-            .expect(200);
-
-        expect(response.body.length > 0).toEqual(true);
-
-        const read = response.body.filter(credential => credential.action === 'READ');
-        expect(read[0].result).toEqual('ok');
-        const update = response.body.filter(credential => credential.action === 'UPDATE');
-        expect(update[0].result).toEqual('nok');
-        const create = response.body.filter(credential => credential.action === 'CREATE');
-        expect(create[0].result).toEqual('nok');
     });
 
     test('ADMIN_SUITE - Should remove user from all teams given a specific Domain', async () => {
