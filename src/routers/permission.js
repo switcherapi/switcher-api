@@ -21,10 +21,15 @@ async function updatePermission(req, res) {
 
 router.post('/permission/create/:team', auth, [
     check('team').isMongoId(),
-    body('action').not().isEmpty(),
-    body('router').not().isEmpty(),
-    body('environments').isArray().optional(),
-], validate, verifyInputUpdateParameters(['action', 'router', 'environments']), async (req, res) => {
+    body('action').isString().optional(),
+    body('active').isBoolean().optional(),
+    body('router').isString().optional(),
+    body('identifiedBy').isString().optional(),
+    body('values').isArray().optional(),
+    body('environments').isArray().optional()
+], validate, verifyInputUpdateParameters([
+    'action', 'active', 'router', 'identifiedBy', 'values', 'environments'
+]), async (req, res) => {
     try {
         const permission = await Services.createPermission(req.body, req.params.team, req.admin);
         res.status(201).send(permission);
@@ -86,9 +91,10 @@ router.patch('/permission/:id', auth, [
     body('active').isBoolean().optional(),
     body('router').isString().optional(),
     body('identifiedBy').isString().optional(),
+    body('values').isArray().optional(),
     body('environments').isArray().optional()
 ], validate, verifyInputUpdateParameters([
-    'action', 'active', 'router', 'identifiedBy', 'environments'
+    'action', 'active', 'router', 'identifiedBy', 'values', 'environments'
 ]), async (req, res) => {
     await updatePermission(req, res);
 });
