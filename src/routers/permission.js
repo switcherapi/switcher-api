@@ -19,14 +19,18 @@ async function updatePermission(req, res) {
     }
 }
 
-router.post('/permission/create/:team', auth, [
-    check('team').isMongoId(),
+const sanitizeBody = [
     body('action').isString().optional(),
     body('active').isBoolean().optional(),
     body('router').isString().optional(),
     body('identifiedBy').isString().optional(),
     body('values').isArray().optional(),
     body('environments').isArray().optional()
+];
+
+router.post('/permission/create/:team', auth, [
+    check('team').isMongoId(),
+    ...sanitizeBody
 ], validate, verifyInputUpdateParameters([
     'action', 'active', 'router', 'identifiedBy', 'values', 'environments'
 ]), async (req, res) => {
@@ -87,12 +91,7 @@ router.get('/permission/:id', auth, [
 
 router.patch('/permission/:id', auth, [
     check('id').isMongoId(),
-    body('action').isString().optional(),
-    body('active').isBoolean().optional(),
-    body('router').isString().optional(),
-    body('identifiedBy').isString().optional(),
-    body('values').isArray().optional(),
-    body('environments').isArray().optional()
+    ...sanitizeBody
 ], validate, verifyInputUpdateParameters([
     'action', 'active', 'router', 'identifiedBy', 'values', 'environments'
 ]), async (req, res) => {
