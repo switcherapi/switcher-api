@@ -100,7 +100,8 @@ router.get('/admin/me', auth, async (req, res) => {
 router.post('/admin/collaboration/permission', auth, [
     check('domain', 'Domain Id is required').isMongoId(),
     check('action', 'Array of actions is required').isArray({ min: 1 }),
-    check('router', 'Router name is required').isLength({ min: 1 })
+    check('router', 'Router name is required').isLength({ min: 1 }),
+    check('environment').isString().optional()
 ], validate, async (req, res) => {
     const element = {
         _id: req.body.element?.id,
@@ -112,7 +113,8 @@ router.post('/admin/collaboration/permission', auth, [
     let result = [];
     for (const action_perm of req.body.action) {
         try {
-            await verifyOwnership(req.admin, element, req.body.domain, action_perm, req.body.router);
+            await verifyOwnership(req.admin, element, req.body.domain, action_perm, 
+                req.body.router, false, req.body.environment);
             result.push({ action: action_perm.toString(), result: 'ok' });
         } catch (e) {
             result.push({ action : action_perm.toString(), result: 'nok' });
