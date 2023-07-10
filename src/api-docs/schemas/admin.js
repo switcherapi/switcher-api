@@ -127,6 +127,9 @@ export default {
                         type: 'string'
                     }
                 }
+            },
+            environment: {
+                type: 'string'
             }
         }
     },

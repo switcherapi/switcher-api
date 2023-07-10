@@ -112,7 +112,7 @@ export function validatePagingArgs(args) {
     return true;
 }
 
-export async function verifyOwnership(admin, element, domainId, action, routerType, cascade = false) {
+export async function verifyOwnership(admin, element, domainId, action, routerType, cascade = false, environment = undefined) {
     const domain = await getDomainById(domainId);
     if (admin._id.equals(domain.owner)) {
         return element;
@@ -121,15 +121,15 @@ export async function verifyOwnership(admin, element, domainId, action, routerTy
     const teams = await getTeams({ _id: { $in: admin.teams }, domain: domain._id, active: true });
     if (!teams.length || !admin.teams.length) {
         throw new PermissionError('It was not possible to find any team that allows you to proceed with this operation');
-    } 
+    }
 
     let hasPermission = [];
     let allowedElement;
     for (const team of teams) {
         if (cascade) {
-            allowedElement = await verifyPermissionsCascade(team, element, action, routerType);
+            allowedElement = await verifyPermissionsCascade(team, element, action, routerType, environment);
         } else {
-            allowedElement = await verifyPermissions(team, element, action, routerType);
+            allowedElement = await verifyPermissions(team, element, action, routerType, environment);
         }
         
         if (allowedElement) {

@@ -72,7 +72,8 @@ export const permission1 = {
     _id: permission1Id,
     action: ActionTypes.READ,
     active: true,
-    router: RouterTypes.GROUP
+    router: RouterTypes.GROUP,
+    environments: [EnvType.DEFAULT, 'dev']
 };
 
 export const component1Id = new mongoose.Types.ObjectId();

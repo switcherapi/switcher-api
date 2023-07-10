@@ -9,21 +9,32 @@ import {
     setupDatabase, 
     adminMasterAccount,
     adminAccount, 
+    adminAccount2,
+    adminAccount3,
     domainDocument,
     groupConfig2Document,
     configDocument,
     domainId,
-    permission1Id,
-    permission2Id,
-    permission3Id,
-    adminAccount2,
     team1Id,
-    adminAccount3,
+    permission1Id,
+    permission11Id,
+    permission2Id,
     permission21Id,
-    permission4Id,
-    permission22Id
+    permission22Id,
+    permission3Id,
+    permission4Id
  } from '../fixtures/db_team_permission';
 import { PermissionError } from '../../src/exceptions';
+
+const disableAllPermissions = async () => {
+    await changePermissionStatus(permission1Id, false);
+    await changePermissionStatus(permission11Id, false);
+    await changePermissionStatus(permission2Id, false);
+    await changePermissionStatus(permission21Id, false);
+    await changePermissionStatus(permission22Id, false);
+    await changePermissionStatus(permission3Id, false);
+    await changePermissionStatus(permission4Id, false);
+};
 
 const changePermissionStatus = async (permissionId, status) => {
     const permission = await Permission.findById(permissionId).exec();
@@ -50,15 +61,7 @@ afterAll(async () => {
 
 describe('Success tests', () => {
     beforeAll(setupDatabase);
-
-    beforeEach(async () => {
-        await changePermissionStatus(permission1Id, false);
-        await changePermissionStatus(permission2Id, false);
-        await changePermissionStatus(permission21Id, false);
-        await changePermissionStatus(permission22Id, false);
-        await changePermissionStatus(permission3Id, false);
-        await changePermissionStatus(permission4Id, false);
-    });
+    beforeEach(disableAllPermissions);
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Element owner', async () => {
         try {
@@ -69,7 +72,7 @@ describe('Success tests', () => {
                 ActionTypes.READ, 
                 RouterTypes.DOMAIN);
 
-            expect(element._id).toEqual(domainDocument._id);
+            expect(element).toMatchObject(domainDocument);
         } catch (e) {
             expect(e).toBeNull();
         }
@@ -89,7 +92,51 @@ describe('Success tests', () => {
                 ActionTypes.READ, 
                 RouterTypes.GROUP);
 
-            expect(element._id).toEqual(groupConfig2Document._id);
+            expect(element).toMatchObject(groupConfig2Document);
+        } catch (e) {
+            expect(e).toBeNull();
+        }
+    });
+
+    test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Member has permission to environment', async () => {
+        //given
+        //enabled Update - Switcher (update only in dev environment)
+        await changePermissionStatus(permission11Id, true);
+
+        //test
+        try {
+            const element = await verifyOwnership(
+                adminAccount, 
+                configDocument, 
+                domainDocument, 
+                ActionTypes.UPDATE, 
+                RouterTypes.CONFIG,
+                false,
+                'dev');
+
+            expect(element).toMatchObject(configDocument);
+        } catch (e) {
+            expect(e).toBeNull();
+        }
+    });
+
+    test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Member has permission to environment - Cascade', async () => {
+        //given
+        //enabled Update - Switcher (update only in dev environment)
+        await changePermissionStatus(permission11Id, true);
+
+        //test
+        try {
+            const element = await verifyOwnership(
+                adminAccount, 
+                configDocument, 
+                domainDocument, 
+                ActionTypes.UPDATE, 
+                RouterTypes.CONFIG,
+                true,
+                'dev');
+
+            expect(element).toMatchObject(configDocument);
         } catch (e) {
             expect(e).toBeNull();
         }
@@ -113,7 +160,7 @@ describe('Success tests', () => {
                 RouterTypes.GROUP,
                 true);
 
-            expect(element._id).toEqual(groupConfig2Document._id);
+            expect(element).toMatchObject(groupConfig2Document);
         } catch (e) {
             expect(e).toBeNull();
         }
@@ -254,15 +301,7 @@ describe('Success tests', () => {
 
 describe('Error tests', () => {
     beforeAll(setupDatabase);
-
-    beforeEach(async () => {
-        await changePermissionStatus(permission1Id, false);
-        await changePermissionStatus(permission2Id, false);
-        await changePermissionStatus(permission21Id, false);
-        await changePermissionStatus(permission22Id, false);
-        await changePermissionStatus(permission3Id, false);
-        await changePermissionStatus(permission4Id, false);
-    });
+    beforeEach(disableAllPermissions);
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Permission innactive', async () => {
         await changePermissionStatus(permission2Id, false);
@@ -341,6 +380,23 @@ describe('Error tests', () => {
                 domainDocument, 
                 ActionTypes.READ, 
                 RouterTypes.GROUP);
+        }).rejects.toThrow(new PermissionError(`Action forbidden`));
+    });
+
+    test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Member does not have permission to environment', async () => {
+        //given
+        //enabled Update - Switcher (update only in dev environment)
+        await changePermissionStatus(permission11Id, true);
+
+        expect(async () => {
+            await verifyOwnership(
+                adminAccount, 
+                configDocument, 
+                domainDocument, 
+                ActionTypes.UPDATE, 
+                RouterTypes.CONFIG,
+                false,
+                'default');
         }).rejects.toThrow(new PermissionError(`Action forbidden`));
     });
 

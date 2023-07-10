@@ -66,6 +66,15 @@ export const permission1 = {
     router: RouterTypes.CONFIG
 };
 
+export const permission11Id = new mongoose.Types.ObjectId();
+export const permission11 = {
+    _id: permission11Id,
+    action: ActionTypes.UPDATE,
+    active: true,
+    router: RouterTypes.CONFIG,
+    environments: ['dev']
+};
+
 export const permission2Id = new mongoose.Types.ObjectId();
 export const permission2 = {
     _id: permission2Id,
@@ -118,7 +127,7 @@ export const team1 = {
     domain: domainId,
     name: 'Team 1',
     active: true,
-    permissions: [permission1Id, permission2Id, permission3Id]
+    permissions: [permission1Id, permission11Id, permission2Id, permission3Id]
 };
 
 export const team2Id = new mongoose.Types.ObjectId();
@@ -188,6 +197,7 @@ export const setupDatabase = async () => {
     await new GroupConfig(groupConfig2Document).save();
     await new Config(configDocument).save();
     await new Permission(permission1).save();
+    await new Permission(permission11).save();
     await new Permission(permission2).save();
     await new Permission(permission21).save();
     await new Permission(permission22).save();

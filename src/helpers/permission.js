@@ -1,7 +1,7 @@
 import { ActionTypes, RouterTypes } from '../models/permission';
 import { getPermission, getPermissions } from '../services/permission';
 
-export async function verifyPermissions(team, element, action, routerType) {
+export async function verifyPermissions(team, element, action, routerType, environment) {
     const permission = await getPermission({
         _id: { $in: team.permissions }, 
         action: { $in: [action, ActionTypes.ALL] },
@@ -9,14 +9,14 @@ export async function verifyPermissions(team, element, action, routerType) {
         router: { $in: [routerType, RouterTypes.ALL] }
     });
 
-    if (!permission) {
+    if (!permission || !verifyEnvironment(permission, environment)) {
         return undefined;
     }
 
     return verifyIdentifiers(permission, element);
 }
 
-export async function verifyPermissionsCascade(team, element, action, routerType) {
+export async function verifyPermissionsCascade(team, element, action, routerType, environment) {
     let orStatement = [];
     if (routerType === RouterTypes.DOMAIN) {
         orStatement = [
@@ -49,9 +49,9 @@ export async function verifyPermissionsCascade(team, element, action, routerType
     });
 
     const matchedPermission = foundPermission.filter(value => value.router === routerType);
-    if (matchedPermission.length) {
+    if (matchedPermission.length && verifyEnvironment(matchedPermission[0], environment)) {
         return verifyIdentifiers(matchedPermission[0], element);
-    } else if (foundPermission[0]) {
+    } else if (foundPermission[0] && verifyEnvironment(foundPermission[0], environment)) {
         return element;
     }
 }
@@ -73,4 +73,12 @@ function verifyIdentifiers(permission, element) {
     }
 
     return element;
+}
+
+function verifyEnvironment(permission, environment) {
+    if (permission.environments?.length) {
+        return environment && permission.environments.includes(environment);
+    }
+    
+    return true;
 }
