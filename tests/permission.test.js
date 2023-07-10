@@ -24,7 +24,9 @@ describe('Insertion tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 action: ActionTypes.READ,
-                router: RouterTypes.GROUP
+                router: RouterTypes.GROUP,
+                identifiedBy: KeyTypes.NAME,
+                values: ['Group 1', 'Group 2']
             }).expect(201);
 
         // DB validation - document created
@@ -42,7 +44,7 @@ describe('Insertion tests', () => {
             .send({
                 action: ActionTypes.READ,
                 route: RouterTypes.GROUP
-            }).expect(422);
+            }).expect(400);
     });
 
     test('PERMISSION_SUITE - Should NOT create a new Permission - Missing required parameter', async () => {
@@ -51,7 +53,7 @@ describe('Insertion tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 action: ActionTypes.READ
-            }).expect(422);
+            }).expect(400);
     });
 
     test('PERMISSION_SUITE - Should NOT create a new Permission - Team not found', async () => {
