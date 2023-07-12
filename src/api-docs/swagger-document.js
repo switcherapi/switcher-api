@@ -10,6 +10,7 @@ import pathPermission from './paths/path-permission';
 import pathMetric from './paths/path-metric';
 import pathSlack from './paths/path-slack';
 import pathClient from './paths/path-client';
+import pathApiManagement from './paths/path-api-management';
 
 import { commonSchema } from './schemas/common';
 import adminSchema from './schemas/admin';
@@ -90,6 +91,7 @@ export default {
         ...pathPermission,
         ...pathMetric,
         ...pathClient,
-        ...pathSlack
+        ...pathSlack,
+        ...pathApiManagement
     }
 };

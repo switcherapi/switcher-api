@@ -247,3 +247,17 @@ export async function checkHttpsAgent(value) {
 
     return checkFeature(SwitcherKeys.HTTPS_AGENT, [checkRegex(value)]);
 }
+
+export async function checkManagementFeature(feature, params) {
+    if (process.env.SWITCHER_API_ENABLE != 'true')
+        return true;
+
+    const switcher = Switcher.factory();
+    const entries = [];
+
+    if (params?.value) {
+        entries.push(checkValue(params.value));
+    }
+
+    return switcher.isItOn(feature, entries);
+}
