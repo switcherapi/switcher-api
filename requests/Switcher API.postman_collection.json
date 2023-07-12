@@ -5724,6 +5724,45 @@
 			]
 		},
 		{
+			"name": "API Management",
+			"item": [
+				{
+					"name": "Management - Feature",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"feature\": \"FEATURE\",\n\t\"parameters\": {\n        \"value\": \"test\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api-management/feature",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api-management",
+								"feature"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "API Check",
 			"event": [
 				{
