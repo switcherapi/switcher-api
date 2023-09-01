@@ -10,7 +10,7 @@ const getMaxRate = (rate_limit) => {
 		return parseInt(DEFAULT_RATE_LIMIT);
 
 	return rate_limit;
-}
+};
 
 export const DEFAULT_RATE_LIMIT = 1000;
 
