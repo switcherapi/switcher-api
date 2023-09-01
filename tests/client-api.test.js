@@ -793,6 +793,38 @@ describe('Testing criteria [REST] ', () => {
     });
 });
 
+describe('Testing criteria [REST] Rate Limit ', () => {
+    let token;
+
+    beforeAll(async () => {
+        process.env.MAX_REQUEST_PER_MINUTE = 1;
+        
+        await setupDatabase();
+        const response = await createRequestAuth();
+        token = response.body.token;
+    });
+
+    afterAll(() => {
+        process.env.MAX_REQUEST_PER_MINUTE = 0;
+    });
+
+    test('CLIENT_SUITE - Should limit run to 1 execution', async () => {
+        await request(app)
+            .post(`/criteria?key=${keyConfig}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send()
+            .expect(200);
+
+        const req = await request(app)
+            .post(`/criteria?key=${keyConfig}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send()
+            .expect(429);
+
+        expect(req.body.error).toBe('API request per minute quota exceeded');
+    });
+});
+
 describe('Testing domain [Adm-GraphQL] ', () => {
 
     afterAll(setupDatabase);
