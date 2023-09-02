@@ -14,9 +14,10 @@ const environment = process.env.SWITCHER_API_ENVIRONMENT;
 const domainName = process.env.SWITCHER_API_DOMAIN;
 const url = process.env.SWITCHER_API_URL;
 const logger = process.env.SWITCHER_API_LOGGER == 'true';
+const certPath = process.env.SSL_CERT;
 const component = 'switcherapi';
 
-Switcher.buildContext({ url, apiKey, domain: domainName, component, environment }, { logger });
+Switcher.buildContext({ url, apiKey, domain: domainName, component, environment }, { logger, certPath });
 
 export const SwitcherKeys = Object.freeze({
     ELEMENT_CREATION: 'ELEMENT_CREATION',
