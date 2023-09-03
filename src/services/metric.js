@@ -1,5 +1,4 @@
 import moment from 'moment';
-import { ObjectId } from 'mongodb';
 import { NotFoundError } from '../exceptions';
 import { verifyOwnership } from '../helpers';
 import { EnvType } from '../models/environment';
@@ -180,7 +179,7 @@ function buildMetricsFilter(req) {
     let args = {};
 
     args.domain = req.query.domainid;
-    aggregate.match({ domain: new ObjectId(String(req.query.domainid)) });
+    aggregate.match({ $expr: { $eq: [{ $toString: '$domain' }, args.domain] } });
 
     if (req.query.environment) {
         args.environment = req.query.environment;

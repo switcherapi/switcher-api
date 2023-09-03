@@ -26,6 +26,9 @@ describe('Fetch overall statistics', () => {
 
         // Response validation
         expect(response.body).not.toBeNull();
+        expect(response.body.reasons.length > 0).toEqual(true);
+        expect(response.body.switchers.length > 0).toEqual(true);
+        expect(response.body.components.length > 0).toEqual(true);
     });
 
     test('METRIC_SUITE - Should return only switcher statistics from a given Domain', async () => {
