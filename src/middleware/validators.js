@@ -1,7 +1,6 @@
 import { validationResult } from 'express-validator';
 import { BadRequestError, responseException } from '../exceptions';
 import { getConfig } from '../services/config';
-import { getComponents } from '../services/component';
 import { getEnvironments } from '../services/environment';
 
 export async function checkConfig(req, res, next) {
@@ -17,10 +16,10 @@ export async function checkConfig(req, res, next) {
 }
 
 export async function checkConfigComponent(req, res, next) {
-    const componentFound = await getComponents(
-        { _id: req.config.components, name: req.component });
-    
-    if (!componentFound.length) {
+    const hasComponent = req.config.components.filter((c) => 
+        c.toString() === req.componentId.toString()).length > 0;
+
+    if (!hasComponent) {
         return res.status(401).send({ 
             error: `Component ${req.component} is not registered to ${req.config.key}` });
     }
