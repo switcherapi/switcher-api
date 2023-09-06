@@ -12,11 +12,9 @@ function checkDifference(diff, documents, defaultIgnoredFields,
         
         if (typeof vals.oldValue === 'object' || typeof vals.newValue === 'object') {
             validateObjects(diff, documents, vals, keyArr, defaultIgnoredFields, keys, pos);
-        } else {
-            if (!Object.is(vals.oldValue, vals.newValue)) {
-                diff.oldValues.set(keys, vals.oldValue);
-                diff.newValues.set(keys, vals.newValue);
-            }
+        } else if (!Object.is(vals.oldValue, vals.newValue)) {
+            diff.oldValues.set(keys, vals.oldValue);
+            diff.newValues.set(keys, vals.newValue);
         }
     }
 }
@@ -41,11 +39,9 @@ function validateObjects(diff, documents, vals, keyArr,
         };
 
         checkDifference(diff, documents, defaultIgnoredFields, keyArr, keys, pos+1);
-    } else {
-        if (!Object.is(extractValue(vals.oldValue), extractValue(vals.newValue))) {
-            diff.oldValues.set(keys, extractValue(vals.oldValue));
-            diff.newValues.set(keys, extractValue(vals.newValue));
-        }
+    } else if (!Object.is(extractValue(vals.oldValue), extractValue(vals.newValue))) {
+        diff.oldValues.set(keys, extractValue(vals.oldValue));
+        diff.newValues.set(keys, extractValue(vals.newValue));
     }
 }
 
@@ -63,13 +59,13 @@ function getValue(document, field) {
         if (document instanceof Map) {
             return typeof document.get(field) === 'boolean' ?
                 String(document.get(field)) : document.get(field);
-        } else {
-            return typeof document[field] === 'boolean' ? 
-                String(document[field]) : document[field];
         }
-    } else {
-        return '';
+
+        return typeof document[field] === 'boolean' ? 
+            String(document[field]) : document[field];
     }
+
+    return '';
 }
 
 export async function recordHistory(modifiedField, oldDocument, newDocument, domainId, ignoredFields = []) {
@@ -77,8 +73,9 @@ export async function recordHistory(modifiedField, oldDocument, newDocument, dom
     const diff = { oldValues: new Map(), newValues: new Map() };
     const documents = { oldDocument, newDocument };
 
-    if (!await checkHistory(domainId))
-        return;
+    if (!await checkHistory(domainId) || process.env.HISTORY_ACTIVATED !== 'true') {
+        return undefined;
+    }
 
     if (ignoredFields.length) {
         ignoredFields.forEach(field => defaultIgnoredFields.push(field));
@@ -90,16 +87,18 @@ export async function recordHistory(modifiedField, oldDocument, newDocument, dom
             keyArr, keys.replace(/\./g, '/'), 0);
     });
     
-    const history = new History({
-        domainId,
-        elementId: newDocument._id,
-        oldValue: diff.oldValues,
-        newValue: diff.newValues,
-        updatedBy: newDocument.updatedBy,
-        date: Date.now()
-    });
-    
-    if (diff.newValues.size > 0 && process.env.HISTORY_ACTIVATED === 'true') {
-        await history.save();
+    if (diff.newValues.size > 0) {
+        const history = new History({
+            domainId,
+            elementId: newDocument._id,
+            oldValue: diff.oldValues,
+            newValue: diff.newValues,
+            updatedBy: newDocument.updatedBy,
+            date: Date.now()
+        });
+
+        return history.save();
     }
+
+    return undefined;
 }
