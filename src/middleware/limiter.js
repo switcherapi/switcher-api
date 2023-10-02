@@ -16,18 +16,20 @@ export const DEFAULT_RATE_LIMIT = 1000;
 
 export const defaultLimiter = rateLimit({
 	windowMs: DEFAULT_WINDOWMS,
-	max: getMaxRate(parseInt(process.env.MAX_REQUEST_PER_MINUTE)),
-	standardHeaders: true,
+	limit: getMaxRate(parseInt(process.env.MAX_REQUEST_PER_MINUTE)),
+	standardHeaders: 'draft-7',
+	legacyHeaders: false,
     message: ERROR_MESSAGE,
-	store: new MemoryStore(),
+	store: new MemoryStore()
 });
 
 export const clientLimiter = rateLimit({
 	windowMs: DEFAULT_WINDOWMS,
-	keyGenerator: (request) => request.domain,
-	max: (request) => getMaxRate(request.rate_limit),
+	keyGenerator: (request) => request.domain.toString(),
+	limit: (request) => getMaxRate(request.rate_limit),
 	skip: (request) => request.rate_limit === 0,
-	standardHeaders: true,
+	standardHeaders: 'draft-7',
+	legacyHeaders: false,
     message: ERROR_MESSAGE,
-	store: new MemoryStore(),
+	store: new MemoryStore()
 });
