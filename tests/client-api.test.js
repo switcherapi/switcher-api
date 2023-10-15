@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
+import sinon from 'sinon';
 import app from '../src/app';
+import { ActionTypes, RouterTypes } from '../src/models/permission';
+import { permissionCache } from '../src/helpers/cache';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
 import { Config } from '../src/models/config';
@@ -27,11 +30,10 @@ import {
     adminAccountId,
     slack
 } from './fixtures/db_client';
-import { RouterTypes } from '../src/models/permission';
 
 const changeStrategy = async (strategyId, newOperation, status, environment) => {
     const strategy = await ConfigStrategy.findById(strategyId).exec();
-    strategy.operation = newOperation ? newOperation : strategy.operation;
+    strategy.operation = newOperation || strategy.operation;
     strategy.activated.set(environment, status !== undefined ? status : strategy.activated.get(environment));
     strategy.updatedBy = adminMasterAccountId;
     await strategy.save();
@@ -964,6 +966,30 @@ describe('Testing domain [Adm-GraphQL] ', () => {
 
         const exptected = '[{"action":"UPDATE","result":"ok"},{"action":"DELETE","result":"ok"}]';
         expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).not.toBe(null);
+        expect(JSON.parse(req.text).data.permission[0].name).toBe("Group Test");
+        expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
+    });
+
+    test('CLIENT_SUITE - Should return list of Groups permissions - from cache', async () => {
+        const cacheSpy = sinon.spy(permissionCache, 'get');
+        permissionCache.permissionReset(domainId, ActionTypes.UPDATE, RouterTypes.GROUP);
+
+        await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(graphqlUtils.permissionsQuery(domainId, undefined, `"UPDATE","DELETE"`, RouterTypes.GROUP));
+
+        expect(cacheSpy.callCount).toBe(0);
+        
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(graphqlUtils.permissionsQuery(domainId, undefined, `"UPDATE","DELETE"`, RouterTypes.GROUP));
+
+        const exptected = '[{"action":"UPDATE","result":"ok"},{"action":"DELETE","result":"ok"}]';
+        expect(req.statusCode).toBe(200);
+        expect(cacheSpy.callCount).toBe(1);
         expect(JSON.parse(req.text)).not.toBe(null);
         expect(JSON.parse(req.text).data.permission[0].name).toBe("Group Test");
         expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));

@@ -3,6 +3,7 @@ import { ActionTypes, Permission, RouterTypes } from '../models/permission';
 import { verifyOwnership } from '../helpers';
 import { response } from './common';
 import { getTeam, getTeams, verifyRequestedTeam } from './team';
+import { permissionCache } from '../helpers/cache';
 
 async function verifyRequestedTeamByPermission(permissionId, admin, action) {
     let team = await getTeam({ permissions: permissionId });
@@ -48,36 +49,41 @@ export async function createPermission(args, teamId, admin) {
 
     const team = await verifyRequestedTeam(teamId, admin, ActionTypes.CREATE);
     team.permissions.push(permission._id);
+    permissionCache.permissionReset(team.domain, permission.action, permission.router);
+
     await team.save();
     return permission;
 }
 
 export async function updatePermission(args, id, admin) {
     const permission = await getPermissionById(id);
-    await verifyRequestedTeamByPermission(permission._id, admin, ActionTypes.UPDATE);
+    const team = await verifyRequestedTeamByPermission(permission._id, admin, ActionTypes.UPDATE);
 
     const updates = Object.keys(args);
     updates.forEach((update) => permission[update] = args[update]);
+
+    permissionCache.permissionReset(team.domain, permission.action, permission.router);
     return permission.save();
 }
 
 export async function deletePermission(id, admin) {
     const permission = await getPermissionById(id);
-    await verifyRequestedTeamByPermission(permission._id, admin, ActionTypes.DELETE);
+    const team = await verifyRequestedTeamByPermission(permission._id, admin, ActionTypes.DELETE);
 
     const teams = await getTeams({ permissions: permission._id });
-    teams.forEach(team => {
-        const indexValue = team.permissions.indexOf(permission._id);
-        team.permissions.splice(indexValue, 1);
-        team.save();
+    teams.forEach(pTeam => {
+        const indexValue = pTeam.permissions.indexOf(permission._id);
+        pTeam.permissions.splice(indexValue, 1);
+        pTeam.save();
     });
     
+    permissionCache.permissionReset(team.domain, permission.action, permission.router);
     return permission.deleteOne();
 }
 
 export async function addValue(args, id, admin) {
     const permission = await verifyPermissionValueInput(id, args.value);
-    await verifyRequestedTeamByPermission(permission._id, admin, ActionTypes.UPDATE);
+    const team = await verifyRequestedTeamByPermission(permission._id, admin, ActionTypes.UPDATE);
 
     const value = args.value.trim();
     if (permission.values.includes(value)) {
@@ -85,12 +91,13 @@ export async function addValue(args, id, admin) {
     }
 
     permission.values.push(value);
+    permissionCache.permissionReset(team.domain, permission.action, permission.router);
     return permission.save();
 }
 
 export async function removeValue(args, id, admin) {
     const permission = await verifyPermissionValueInput(id, args.value);
-    await verifyRequestedTeamByPermission(permission._id, admin, ActionTypes.UPDATE);
+    const team = await verifyRequestedTeamByPermission(permission._id, admin, ActionTypes.UPDATE);
 
     const value = args.value.trim();
     const indexValue = permission.values.indexOf(value);
@@ -100,5 +107,6 @@ export async function removeValue(args, id, admin) {
     }
 
     permission.values.splice(indexValue, 1);
+    permissionCache.permissionReset(team.domain, permission.action, permission.router);
     return permission.save();
 }

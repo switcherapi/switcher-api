@@ -96,6 +96,7 @@ app.get('/check', defaultLimiter, (req, res) => {
             switcherapi_logger: process.env.SWITCHER_API_LOGGER,
             relay_bypass_https: process.env.RELAY_BYPASS_HTTPS,
             relay_bypass_verification: process.env.RELAY_BYPASS_VERIFICATION,
+            permission_cache: process.env.PERMISSION_CACHE_ACTIVATED,
             history: process.env.HISTORY_ACTIVATED,
             metrics: process.env.METRICS_ACTIVATED,
             max_metrics_pages: process.env.METRICS_MAX_PAGE,
