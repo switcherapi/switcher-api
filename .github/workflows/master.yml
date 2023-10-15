@@ -49,6 +49,7 @@ jobs:
           MAX_STRATEGY_OPERATION: 100
           RELAY_BYPASS_HTTPS: true
           RELAY_BYPASS_VERIFICATION: true
+          PERMISSION_CACHE_ACTIVATED: true
           METRICS_ACTIVATED: true
           METRICS_MAX_PAGE: 50
           MAX_REQUEST_PER_MINUTE: 0
@@ -56,7 +57,7 @@ jobs:
           SWITCHER_API_LOGGER: false
 
       - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v1.8
+        uses: sonarsource/sonarcloud-github-action@v2.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

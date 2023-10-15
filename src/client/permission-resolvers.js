@@ -2,6 +2,7 @@ import { verifyOwnership } from '../helpers';
 import { RouterTypes } from '../models/permission';
 import { getConfigs } from '../services/config';
 import { getGroupConfigs } from '../services/group-config';
+import { permissionCache } from '../helpers/cache';
 
 export async function resolvePermission(args, admin) {
     let elements;
@@ -11,6 +12,11 @@ export async function resolvePermission(args, admin) {
         elements = await getConfigs({ domain: args.domain, group: args.parent }, true);
     } else {
         return [];
+    }
+
+    const cacheKey = permissionCache.permissionKey(admin._id, args.domain, elements, args.actions, args.router);
+    if (permissionCache.has(cacheKey)) {
+        return permissionCache.get(cacheKey);
     }
     
     let result = [];
@@ -30,6 +36,7 @@ export async function resolvePermission(args, admin) {
             }
         }
     }
-    
+
+    permissionCache.set(cacheKey, result);
     return result;
 }

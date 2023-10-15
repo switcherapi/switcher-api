@@ -1,4 +1,4 @@
-const { formatInput, containsValue } = require('../../src/helpers');
+import { formatInput, containsValue } from '../../src/helpers';
 
 describe('Test formatInput', () => {
 

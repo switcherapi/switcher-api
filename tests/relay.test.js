@@ -21,7 +21,7 @@ import { StrategiesType, ConfigStrategy } from '../src/models/config-strategy';
 
 const changeStrategy = async (strategyId, newOperation, status, environment) => {
     const strategy = await ConfigStrategy.findById(strategyId).exec();
-    strategy.operation = newOperation ? newOperation : strategy.operation;
+    strategy.operation = newOperation || strategy.operation;
     strategy.activated.set(environment, status !== undefined ? status : strategy.activated.get(environment));
     strategy.updatedBy = adminMasterAccountId;
     await strategy.save();
