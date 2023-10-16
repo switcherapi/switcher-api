@@ -15,13 +15,13 @@ class Cache {
         return this.cache.get(key);
     }
 
-    permissionKey(adminId, domainId, elements, action, router) {
+    permissionKey(adminId, domainId, parentId, actions, router) {
         return JSON.stringify({
             adminId: String(adminId),
             domainId: String(domainId),
-            elements: elements.map(element => String(element._id)),
-            actions: action,
-            router: router
+            parentId: String(parentId),
+            actions,
+            router
         });
     }
 
