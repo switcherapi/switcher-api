@@ -14,7 +14,7 @@ export async function resolvePermission(args, admin) {
         return [];
     }
 
-    const cacheKey = permissionCache.permissionKey(admin._id, args.domain, elements, args.actions, args.router);
+    const cacheKey = permissionCache.permissionKey(admin._id, args.domain, args.parent, args.actions, args.router);
     if (permissionCache.has(cacheKey)) {
         return permissionCache.get(cacheKey);
     }

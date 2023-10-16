@@ -7,7 +7,7 @@ describe("Test permissionCache", () => {
         const cacheKey = permissionCache.permissionKey(
             'adminId', 
             'domainId', 
-            ['element1Id', 'element2Id'], 
+            'parentId',
             [ActionTypes.UPDATE, ActionTypes.READ], 
             RouterTypes.GROUP
         );
@@ -22,7 +22,7 @@ describe("Test permissionCache", () => {
         const cacheKey = permissionCache.permissionKey(
             'adminId', 
             'domainId', 
-            ['element1Id', 'element2Id'], 
+            'parentId',
             [ActionTypes.UPDATE, ActionTypes.READ], 
             RouterTypes.GROUP
         );
@@ -37,7 +37,7 @@ describe("Test permissionCache", () => {
         const cacheKey = permissionCache.permissionKey(
             'adminId', 
             'domainId', 
-            ['element1Id', 'element2Id'], 
+            'parentId',
             [ActionTypes.UPDATE, ActionTypes.READ], 
             RouterTypes.GROUP
         );
@@ -52,7 +52,7 @@ describe("Test permissionCache", () => {
         const cacheKey = permissionCache.permissionKey(
             'adminId', 
             'domainId', 
-            ['element1Id', 'element2Id'], 
+            'parentId',
             [ActionTypes.UPDATE, ActionTypes.READ], 
             RouterTypes.GROUP
         );
