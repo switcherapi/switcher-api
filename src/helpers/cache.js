@@ -1,4 +1,4 @@
-import { ActionTypes } from "../models/permission";
+import { ActionTypes } from '../models/permission';
 
 class Cache {
     constructor() {
