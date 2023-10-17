@@ -6,6 +6,7 @@ import { checkGroup } from '../external/switcher-api-facade';
 import { ActionTypes, RouterTypes } from '../models/permission';
 import { getDomainById, updateDomainVersion } from './domain';
 import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';
+import { permissionCache } from '../helpers/cache';
 
 async function verifyGroupInput(groupId, admin) {
     let groupconfig = await getGroupConfigById(groupId);
@@ -64,6 +65,9 @@ export async function createGroup(args, admin) {
     // creates group config
     updateDomainVersion(domain._id);
     await groupconfig.save();
+    
+    // resets permission cache
+    permissionCache.permissionReset(domain._id, ActionTypes.ALL, RouterTypes.GROUP);
 
     return groupconfig;
 }
@@ -74,6 +78,9 @@ export async function deleteGroup(id, admin) {
 
     await groupconfig.deleteOne();
     updateDomainVersion(groupconfig.domain);
+
+    // resets permission cache
+    permissionCache.permissionReset(groupconfig.domain, ActionTypes.ALL, RouterTypes.GROUP);
 
     return groupconfig;
 }
@@ -88,6 +95,9 @@ export async function updateGroup(id, args, admin) {
         if (groupFound) {
             throw new BadRequestError(`Group ${args.name} already exist`);
         }
+
+        // resets permission cache
+        permissionCache.permissionReset(groupconfig.domain, ActionTypes.ALL, RouterTypes.GROUP);
     }
 
     const updates = Object.keys(args);

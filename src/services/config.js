@@ -10,6 +10,7 @@ import { BadRequestError, NotFoundError } from '../exceptions';
 import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';
 import { getComponentById, getComponents } from './component';
 import { resolveVerification } from '../client/relay';
+import { permissionCache } from '../helpers/cache';
 
 async function verifyAddComponentInput(configId, admin) {
     const config = await getConfigById(configId);
@@ -79,6 +80,9 @@ export async function createConfig(args, admin) {
     await config.save();
     updateDomainVersion(config.domain);
     
+    // resets permission cache
+    permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.group);
+
     return config;
 }
 
@@ -88,6 +92,9 @@ export async function deleteConfig(id, admin) {
 
     await config.deleteOne();
     updateDomainVersion(config.domain);
+
+    // resets permission cache
+    permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.group);
 
     return config;
 }
@@ -106,6 +113,9 @@ export async function updateConfig(id, args, admin) {
         if (duplicatedKey) {
             throw new BadRequestError(`Config ${args.key} already exist`);
         }
+
+        // resets permission cache
+        permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.group);
     }
 
     // validates existing environment

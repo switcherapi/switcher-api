@@ -1,3 +1,5 @@
+import { ActionTypes } from '../models/permission';
+
 class Cache {
     constructor() {
         this.cache = new Map();
@@ -25,7 +27,7 @@ class Cache {
         });
     }
 
-    permissionReset(domainId, action, router) {
+    permissionReset(domainId, action, router, parentId) {
         if (!domainId || !action || !router) {
             return;
         }
@@ -33,12 +35,17 @@ class Cache {
         const keys = this.cache.keys();
         for (const key of keys) {
             const parsedKey = JSON.parse(key);
-            if (parsedKey.domainId === String(domainId) && 
-                parsedKey.actions.includes(action) && 
-                parsedKey.router === router) {
+            if (this.matchesKey(parsedKey, domainId, action, router, parentId)) {
                 this.cache.delete(key);
             }
         }
+    }
+
+    matchesKey(parsedKey, domainId, action, router, parentId) {
+        return parsedKey.domainId === String(domainId) && 
+            (parentId === undefined || parsedKey.parentId === String(parentId)) &&
+            (action === ActionTypes.ALL || parsedKey.actions.includes(action)) && 
+            parsedKey.router === router;
     }
 
     isPermissionCacheActivated() {
