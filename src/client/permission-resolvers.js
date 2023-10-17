@@ -5,20 +5,13 @@ import { getGroupConfigs } from '../services/group-config';
 import { permissionCache } from '../helpers/cache';
 
 export async function resolvePermission(args, admin) {
-    let elements;
-    if (args.router === RouterTypes.GROUP) {
-        elements = await getGroupConfigs({ domain: args.domain }, true);
-    } else if (args.router === RouterTypes.CONFIG) {
-        elements = await getConfigs({ domain: args.domain, group: args.parent }, true);
-    } else {
-        return [];
-    }
-
     const cacheKey = permissionCache.permissionKey(admin._id, args.domain, args.parent, args.actions, args.router);
     if (permissionCache.has(cacheKey)) {
         return permissionCache.get(cacheKey);
     }
     
+    let elements = await getElements(args.domain, args.parent, args.router);
+
     let result = [];
     for (const element of elements) {
         result.push({
@@ -37,6 +30,21 @@ export async function resolvePermission(args, admin) {
         }
     }
 
-    permissionCache.set(cacheKey, result);
+    if (result.length) {
+        permissionCache.set(cacheKey, result);
+    }
+
     return result;
 }
+
+const getElements = async (domain, parent, router) => {
+    if (router === RouterTypes.GROUP) {
+        return getGroupConfigs({ domain }, true);
+    }
+    
+    if (router === RouterTypes.CONFIG) {
+        return getConfigs({ domain, group: parent }, true);
+    }
+
+    return Promise.resolve([]);
+};
