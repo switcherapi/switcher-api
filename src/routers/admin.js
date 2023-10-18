@@ -112,7 +112,9 @@ router.post('/admin/collaboration/permission', auth, [
     };
 
     const parentId = element._id || element.key || element.name || element.strategy;
-    const cacheKey = permissionCache.permissionKey(req.admin._id, req.body.domain, parentId, req.body.action, req.body.router);
+    const cacheKey = permissionCache.permissionKey(req.admin._id, req.body.domain, parentId, 
+        req.body.action, req.body.router, req.body.environment);
+        
     if (permissionCache.has(cacheKey)) {
         return res.send(permissionCache.get(cacheKey));
     }
