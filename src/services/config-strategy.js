@@ -2,6 +2,7 @@ import { response } from './common';
 import { ConfigStrategy } from '../models/config-strategy';
 import { ActionTypes, RouterTypes } from '../models/permission';
 import { verifyOwnership } from '../helpers';
+import { permissionCache } from '../helpers/cache';
 import { updateDomainVersion } from './domain';
 import { getConfigById } from './config';
 import { BadRequestError } from '../exceptions';
@@ -68,6 +69,9 @@ export async function deleteStrategy(id, admin) {
     
     await configStrategy.deleteOne();
     updateDomainVersion(configStrategy.domain);
+
+    // resets permission cache
+    permissionCache.permissionReset(configStrategy.domain, ActionTypes.ALL, RouterTypes.STRATEGY, configStrategy.name);
 
     return configStrategy;
 }

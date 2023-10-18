@@ -4,6 +4,7 @@ import { ConfigStrategy } from '../models/config-strategy';
 import { Environment, EnvType } from '../models/environment';
 import { ActionTypes, RouterTypes } from '../models/permission';
 import { formatInput, verifyOwnership } from '../helpers';
+import { permissionCache } from '../helpers/cache';
 import { response } from './common';
 import { getConfigs, removeConfigStatus } from './config';
 import { getDomainById, removeDomainStatus } from './domain';
@@ -82,6 +83,9 @@ export async function deleteEnvironment(id, admin) {
     }
 
     environment = await verifyOwnership(admin, environment, environment.domain, ActionTypes.DELETE, RouterTypes.ENVIRONMENT);
+
+    // resets permission cache
+    permissionCache.permissionReset(environment.domain, ActionTypes.ALL, RouterTypes.ENVIRONMENT, environment.name);
 
     await removeEnvironmentFromElements(environment);
     return environment.deleteOne();

@@ -3,6 +3,7 @@ import { auth, authRefreshToken } from '../middleware/auth';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators';
 import { check } from 'express-validator';
 import { verifyOwnership } from '../helpers';
+import { permissionCache } from '../helpers/cache';
 import { responseException } from '../exceptions';
 import * as Services from '../services/admin';
 import { SwitcherKeys } from '../external/switcher-api-facade';
@@ -110,6 +111,12 @@ router.post('/admin/collaboration/permission', auth, [
         strategy: req.body.element?.strategy
     };
 
+    const parentId = element._id || element.key || element.name || element.strategy;
+    const cacheKey = permissionCache.permissionKey(req.admin._id, req.body.domain, parentId, req.body.action, req.body.router);
+    if (permissionCache.has(cacheKey)) {
+        return res.send(permissionCache.get(cacheKey));
+    }
+
     let result = [];
     for (const action_perm of req.body.action) {
         try {
@@ -119,6 +126,10 @@ router.post('/admin/collaboration/permission', auth, [
         } catch (e) {
             result.push({ action : action_perm.toString(), result: 'nok' });
         }
+    }
+
+    if (result.length) {
+        permissionCache.set(cacheKey, result);
     }
     
     res.send(result);

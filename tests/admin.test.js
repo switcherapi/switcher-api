@@ -5,6 +5,11 @@ import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import app from '../src/app';
 import Admin from '../src/models/admin';
+import { Team } from '../src/models/team';
+import { EnvType } from '../src/models/environment';
+import { permissionCache } from '../src/helpers/cache';
+import { ActionTypes, RouterTypes } from '../src/models/permission';
+import swaggerDocument from '../src/api-docs/swagger-document';
 import { 
     setupDatabase, 
     adminMasterAccountId, 
@@ -15,10 +20,6 @@ import {
     domainId,
     team1Id
 } from './fixtures/db_api';
-import { Team } from '../src/models/team';
-import swaggerDocument from '../src/api-docs/swagger-document';
-import { RouterTypes } from '../src/models/permission';
-import { EnvType } from '../src/models/environment';
 
 afterAll(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -961,6 +962,45 @@ describe('Testing Admin collaboration endpoint - Reading permissions', () => {
             .expect(200);
 
         expect(response.body.length > 0).toEqual(true);
+
+        const read = response.body.filter(permission => permission.action === 'READ');
+        expect(read[0].result).toEqual('ok');
+        const update = response.body.filter(permission => permission.action === 'UPDATE');
+        expect(update[0].result).toEqual('nok');
+        const create = response.body.filter(permission => permission.action === 'CREATE');
+        expect(create[0].result).toEqual('nok');
+    });
+
+    test('ADMIN_SUITE - Should read permissions given request - Group - From Cache', async () => {
+        const cacheSpy = sinon.spy(permissionCache, 'get');
+        permissionCache.permissionReset(domainId, ActionTypes.ALL, RouterTypes.GROUP);
+
+        await request(app)
+            .post('/admin/collaboration/permission')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                domain: domainId,
+                action: ['READ', 'UPDATE', 'CREATE'],
+                router: RouterTypes.GROUP,
+                environment: EnvType.DEFAULT
+            })
+            .expect(200);
+
+        expect(cacheSpy.callCount).toBe(0);
+
+        const response = await request(app)
+            .post('/admin/collaboration/permission')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                domain: domainId,
+                action: ['READ', 'UPDATE', 'CREATE'],
+                router: RouterTypes.GROUP,
+                environment: EnvType.DEFAULT
+            })
+            .expect(200);
+
+        expect(response.body.length > 0).toEqual(true);
+        expect(cacheSpy.callCount).toBe(1);
 
         const read = response.body.filter(permission => permission.action === 'READ');
         expect(read[0].result).toEqual('ok');

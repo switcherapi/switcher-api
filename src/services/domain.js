@@ -9,6 +9,7 @@ import GroupConfig from '../models/group-config';
 import History from '../models/history';
 import { ActionTypes, RouterTypes } from '../models/permission';
 import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers';
+import { permissionCache } from '../helpers/cache';
 import { response } from './common';
 
 export async function removeDomainStatus(domain, environmentName) {
@@ -67,6 +68,9 @@ export async function deleteDomainHistory(id, admin) {
 export async function deleteDomain(id, admin) {
     let domain = await getDomainById(id);
     domain = await verifyOwnership(admin, domain, domain._id, ActionTypes.DELETE, RouterTypes.DOMAIN);
+
+    // resets permission cache
+    permissionCache.permissionReset(id, ActionTypes.ALL, RouterTypes.DOMAIN, domain.name);
     return domain.deleteOne();
 }
 

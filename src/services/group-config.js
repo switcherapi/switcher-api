@@ -81,6 +81,7 @@ export async function deleteGroup(id, admin) {
 
     // resets permission cache
     permissionCache.permissionReset(groupconfig.domain, ActionTypes.ALL, RouterTypes.GROUP);
+    permissionCache.permissionReset(groupconfig.domain, ActionTypes.ALL, RouterTypes.GROUP, groupconfig.name);
 
     return groupconfig;
 }
@@ -98,6 +99,7 @@ export async function updateGroup(id, args, admin) {
 
         // resets permission cache
         permissionCache.permissionReset(groupconfig.domain, ActionTypes.ALL, RouterTypes.GROUP);
+        permissionCache.permissionReset(groupconfig.domain, ActionTypes.ALL, RouterTypes.GROUP, groupconfig.name);
     }
 
     const updates = Object.keys(args);

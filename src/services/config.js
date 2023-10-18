@@ -95,7 +95,7 @@ export async function deleteConfig(id, admin) {
 
     // resets permission cache
     permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.group);
-
+    permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.key);
     return config;
 }
 
@@ -116,6 +116,7 @@ export async function updateConfig(id, args, admin) {
 
         // resets permission cache
         permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.group);
+        permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.key);
     }
 
     // validates existing environment
