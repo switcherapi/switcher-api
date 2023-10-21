@@ -40,6 +40,7 @@ router.get('/groupconfig', auth, [
 
         let groups = domain.groupConfig;
         groups = await verifyOwnership(req.admin, groups, domain._id, ActionTypes.READ, RouterTypes.GROUP, true);
+        await Services.populateAdmin(groups);
 
         res.send(groups);
     } catch (e) {

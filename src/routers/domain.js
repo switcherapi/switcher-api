@@ -35,7 +35,24 @@ router.get('/domain', auth, async (req, res) => {
             sort: sortBy(req.query)
         }
     });
+
+    req.admin.domain.forEach(domain => domain.admin = {
+        _id: req.admin._id,
+        name: req.admin.name
+    });
+
     res.send(req.admin.domain);
+});
+
+router.get('/domain/collaboration', auth, async (req, res) => {
+    await req.admin.populate({ path: 'team_list' });
+
+    const domains = [];
+    for (const adm of req.admin.team_list) {
+        domains.push(await Services.getDomainById(adm.domain.toString(), false, true));
+    }
+
+    res.send(domains);
 });
 
 router.get('/domain/:id', auth, [

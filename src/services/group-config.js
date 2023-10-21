@@ -47,6 +47,12 @@ export async function getTotalGroupsByDomainId(domain) {
     return GroupConfig.find({ domain }).countDocuments();
 }
 
+export async function populateAdmin(groups) {
+    for (const group of groups) {
+        await group.populate({ path: 'admin', select: 'name' });
+    }
+}
+
 export async function createGroup(args, admin) {
     let groupconfig = new GroupConfig({
         ...args,
