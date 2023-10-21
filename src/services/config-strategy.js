@@ -26,8 +26,13 @@ function validateValues(values) {
     }
 }
 
-export async function getStrategyById(id) {
+export async function getStrategyById(id, populateAdmin = false) {
     let strategy = await ConfigStrategy.findById(id).exec();
+
+    if (strategy && populateAdmin) {
+        await strategy.populate({ path: 'admin', select: 'name' });
+    }
+    
     return response(strategy, 'Strategy not found');
 }
 

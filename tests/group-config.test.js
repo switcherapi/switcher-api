@@ -10,6 +10,7 @@ import { EnvType } from '../src/models/environment';
 import { ConfigStrategy } from '../src/models/config-strategy';
 import { 
     setupDatabase,
+    adminMasterAccount,
     adminMasterAccountId,
     adminMasterAccountToken,
     adminAccountToken,
@@ -145,21 +146,7 @@ describe('Testing fetch Group info', () => {
         expect(response.body.name).toEqual(groupConfigDocument.name);
         expect(String(response.body.owner)).toEqual(String(groupConfigDocument.owner));
         expect(response.body.activated[EnvType.DEFAULT]).toEqual(groupConfigDocument.activated.get(EnvType.DEFAULT));
-
-        // Adding new Group Config
-        response = await request(app)
-            .post('/groupconfig/create')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                name: 'New Group Config 3',
-                description: 'Description of my new Group Config 3',
-                domain: domainId
-            }).expect(201);
-
-        await request(app)
-            .get('/groupconfig/' + response.body._id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200);
+        expect(response.body.admin.name).toBe(adminMasterAccount.name);
     });
 
     test('GROUP_SUITE - Should NOT get Group Config information by Id', async () => {

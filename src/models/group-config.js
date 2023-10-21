@@ -61,6 +61,13 @@ async function recordGroupHistory(group, modifiedField) {
     }
 }
 
+groupConfigSchema.virtual('admin', {
+    ref: 'Admin',
+    localField: 'owner',
+    foreignField: '_id',
+    justOne: true
+});
+
 groupConfigSchema.virtual('config', {
     ref: 'Config',
     localField: '_id',

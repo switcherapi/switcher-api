@@ -58,7 +58,7 @@ router.get('/configstrategy/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        let configStrategy = await Services.getStrategyById(req.params.id);
+        let configStrategy = await Services.getStrategyById(req.params.id, true);
         configStrategy = await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY);
 
         res.send(configStrategy);

@@ -42,7 +42,7 @@ router.get('/domain/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        let domain = await Services.getDomainById(req.params.id);
+        let domain = await Services.getDomainById(req.params.id, false, true);
         domain = await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN, true);
         res.send(domain);
     } catch (e) {

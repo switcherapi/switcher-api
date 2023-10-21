@@ -22,8 +22,13 @@ export async function removeDomainStatus(domain, environmentName) {
     }
 }
 
-export async function getDomainById(id, lean = false) {
+export async function getDomainById(id, lean = false, populateAdmin = false) {
     let domain = await Domain.findById(id, null, { lean }).exec();
+
+    if (!lean && domain && populateAdmin) {
+        await domain.populate({ path: 'admin', select: 'name' });
+    }
+
     return response(domain, 'Domain not found');
 }
 

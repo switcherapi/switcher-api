@@ -13,8 +13,13 @@ async function verifyGroupInput(groupId, admin) {
     return verifyOwnership(admin, groupconfig, groupconfig.domain, ActionTypes.UPDATE, RouterTypes.GROUP);
 }
 
-export async function getGroupConfigById(id, lean = false) {
+export async function getGroupConfigById(id, lean = false, populateAdmin = false) {
     let group = await GroupConfig.findById(id, null, { lean }).exec();
+
+    if (!lean && group && populateAdmin) {
+        await group.populate({ path: 'admin', select: 'name' });
+    }
+
     return response(group, 'Group Config not found');
 }
 

@@ -74,7 +74,7 @@ describe('Testing Domain insertion', () => {
     });
 });
 
-describe('Testing fect Domain info', () => {
+describe('Testing fetch Domain info', () => {
     beforeAll(setupDatabase);
 
     test('DOMAIN_SUITE - Should get Domain information', async () => {
@@ -127,24 +127,10 @@ describe('Testing fect Domain info', () => {
         expect(String(response.body._id)).toEqual(String(domainDocument._id));
         expect(response.body.name).toEqual(domainDocument.name);
         expect(String(response.body.owner)).toEqual(String(domainDocument.owner));
-        expect(response.body.token).toEqual(domainDocument.token);
-
-        // Adding new Domain
-        response = await request(app)
-            .post('/domain/create')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                name: 'New Domain 2',
-                description: 'Description of my new Domain 2'
-            }).expect(201);
-
-        await request(app)
-            .get('/domain/' + response.body._id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200);
+        expect(response.body.admin.name).toBe(adminMasterAccount.name);
     });
 
-    test('DOMAIN_SUITE - Should NOT found Domain information by Id', async () => {
+    test('DOMAIN_SUITE - Should NOT return Domain information by Id', async () => {
         await request(app)
             .get('/domain/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)

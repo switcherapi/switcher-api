@@ -42,6 +42,19 @@ export const domain = {
             type: 'uuid',
             description: 'The owner id of the domain'
         },
+        admin: {
+            type: 'object',
+            properties: {
+                _id: {
+                    type: 'uuid',
+                    description: 'The unique identifier of the admin'
+                },
+                name: {
+                    type: 'string',
+                    description: 'The name of the admin who created the domain'
+                }
+            }
+        },
         transfer: {
             type: 'boolean',
             description: 'The domain is set to be transferred'
