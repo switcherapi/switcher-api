@@ -47,6 +47,7 @@ router.get('/configstrategy', auth, [
             elements => elements.activated.get(req.query.env ? req.query.env : EnvType.DEFAULT) != undefined);
 
         configStrategies = await verifyOwnership(req.admin, configStrategies, config.domain, ActionTypes.READ, RouterTypes.STRATEGY, true);
+        await Services.populateAdmin(configStrategies);
 
         res.send(configStrategies);
     } catch (e) {

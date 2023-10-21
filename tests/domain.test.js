@@ -22,7 +22,8 @@ import {
     configStrategyId,
     environment1Id,
     adminAccountId,
-    component1Id
+    component1Id,
+    teamId
 } from './fixtures/db_api';
 import Component from '../src/models/component';
 
@@ -88,7 +89,7 @@ describe('Testing fetch Domain info', () => {
         expect(String(response.body[0]._id)).toEqual(String(domainDocument._id));
         expect(response.body[0].name).toEqual(domainDocument.name);
         expect(String(response.body[0].owner)).toEqual(String(domainDocument.owner));
-        expect(response.body[0].token).toEqual(domainDocument.token);
+        expect(response.body[0].admin.name).toBe(adminMasterAccount.name);
 
         // Adding new Domain
         response = await request(app)
@@ -116,6 +117,25 @@ describe('Testing fetch Domain info', () => {
             .send().expect(200);
 
         expect(response.body.length).toEqual(1);
+    });
+
+    test('DOMAIN_SUITE - Should read domains in which a user is collaborating', async () => {
+        await request(app)
+            .patch('/team/member/add/' + teamId)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                member: adminMasterAccountId
+            }).expect(200);
+            
+        let response = await request(app)
+            .get('/domain/collaboration')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send()
+            .expect(200);
+
+        expect(response.body.length).toEqual(1);
+        expect(response.body[0].name).toEqual(domainDocument.name);
+        expect(response.body[0].admin.name).toEqual(adminMasterAccount.name);
     });
 
     test('DOMAIN_SUITE - Should get Domain information by Id', async () => {

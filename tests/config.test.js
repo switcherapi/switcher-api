@@ -98,6 +98,7 @@ describe('Testing fetch configuration info', () => {
         expect(response.body[0].key).toEqual(config1Document.key);
         expect(String(response.body[0].owner)).toEqual(String(config1Document.owner));
         expect(response.body[0].activated[EnvType.DEFAULT]).toEqual(config1Document.activated.get(EnvType.DEFAULT));
+        expect(response.body[0].admin.name).toEqual(adminMasterAccount.name);
     });
 
     test('CONFIG_SUITE - Should get Config information - only fields (key, activated.default)', async () => {

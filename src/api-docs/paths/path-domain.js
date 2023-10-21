@@ -207,6 +207,19 @@ export default {
             }
         }
     },
+    '/doamin/collaboration': {
+        get: {
+            tags: ['Domain'],
+            description: 'Get domains for collaboration',
+            security: [{ bearerAuth: [] }],
+            responses: {
+                '200': {
+                    description: 'Success',
+                    content: commonArraySchemaContent('Domain')
+                }
+            }
+        }
+    },
     '/domain/history/{id}': {
         get: {
             tags: ['Domain'],

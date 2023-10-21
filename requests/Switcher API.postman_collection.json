@@ -2807,6 +2807,24 @@
 					"response": []
 				},
 				{
+					"name": "Domain - Read Collab",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/domain/collaboration",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"domain",
+								"collaboration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Domain - Read Single",
 					"request": {
 						"method": "GET",

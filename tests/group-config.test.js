@@ -98,6 +98,7 @@ describe('Testing fetch Group info', () => {
         expect(response.body[0].name).toEqual(groupConfigDocument.name);
         expect(String(response.body[0].owner)).toEqual(String(groupConfigDocument.owner));
         expect(response.body[0].activated[EnvType.DEFAULT]).toEqual(groupConfigDocument.activated.get(EnvType.DEFAULT));
+        expect(response.body[0].admin.name).toBe(adminMasterAccount.name);
 
         // Adding new Group Config
         response = await request(app)

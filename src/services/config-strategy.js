@@ -43,6 +43,12 @@ export async function getStrategies(where, lean = false) {
     return query.exec();
 }
 
+export async function populateAdmin(configStrategies) {
+    for (const configStrategy of configStrategies) {
+        await configStrategy.populate({ path: 'admin', select: 'name' });
+    }
+}
+
 export async function createStrategy(args, admin) {
     const config = await getConfigById(args.config);
 

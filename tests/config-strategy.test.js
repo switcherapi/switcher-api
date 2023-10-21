@@ -325,6 +325,7 @@ describe('Testing reading strategies #1', () => {
         expect(response.body[0].operation).toEqual(configStrategyDocument.operation);
         expect(String(response.body[0].owner)).toEqual(String(configStrategyDocument.owner));
         expect(response.body[0].activated[EnvType.DEFAULT]).toEqual(configStrategyDocument.activated.get(EnvType.DEFAULT));
+        expect(response.body[0].admin.name).toEqual(adminMasterAccount.name);
 
         // Adding new Config Strategy
         response = await request(app)

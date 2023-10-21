@@ -53,6 +53,7 @@ router.get('/config', auth, [
 
         let configs = groupConfig.config;
         configs = await verifyOwnership(req.admin, configs, groupConfig.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
+        await Services.populateAdmin(configs);
 
         if (req.query.fields) {
             configs = getFields(configs, req.query.fields);
