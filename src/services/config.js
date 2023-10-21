@@ -17,8 +17,13 @@ async function verifyAddComponentInput(configId, admin) {
     return verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
 }
 
-export async function getConfigById(id) {
+export async function getConfigById(id, populateAdmin = false) {
     let config = await Config.findById(id).exec();
+
+    if (config && populateAdmin) {
+        await config.populate({ path: 'admin', select: 'name' });
+    }
+    
     return response(config, 'Config not found');
 }
 

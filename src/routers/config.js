@@ -69,7 +69,7 @@ router.get('/config/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        let config = await Services.getConfigById(req.params.id);
+        let config = await Services.getConfigById(req.params.id, true);
         config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
 
         if (req.query.resolveComponents === 'true') {

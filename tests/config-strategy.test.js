@@ -10,6 +10,7 @@ import { EnvType } from '../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType, strategyRequirements } from '../src/models/config-strategy';
 import { 
     setupDatabase,
+    adminMasterAccount,
     adminMasterAccountId,
     adminMasterAccountToken,
     domainId,
@@ -384,24 +385,7 @@ describe('Testing reading strategies #2', () => {
         expect(response.body.operation).toEqual(configStrategyDocument.operation);
         expect(String(response.body.owner)).toEqual(String(configStrategyDocument.owner));
         expect(response.body.activated[EnvType.DEFAULT]).toEqual(configStrategyDocument.activated.get(EnvType.DEFAULT));
-
-        // Adding new Config Strategy
-        response = await request(app)
-            .post('/configstrategy/create')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                description: 'Description of my new Config Strategy',
-                strategy: StrategiesType.NETWORK,
-                operation: OperationsType.EXIST,
-                values: ['192.168.0.1/16'],
-                config: configId1,
-                env: EnvType.DEFAULT
-            }).expect(201);
-
-        await request(app)
-            .get('/configstrategy/' + response.body._id)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(200);
+        expect(response.body.admin.name).toEqual(adminMasterAccount.name);
     });
 
     test('STRATEGY_SUITE - Should not found Config Strategy information by Id', async () => {

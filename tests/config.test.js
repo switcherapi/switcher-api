@@ -10,6 +10,7 @@ import { EnvType } from '../src/models/environment';
 import { ConfigStrategy } from '../src/models/config-strategy';
 import { 
     setupDatabase,
+    adminMasterAccount,
     adminMasterAccountId,
     adminMasterAccountToken,
     domainId,
@@ -165,6 +166,7 @@ describe('Testing fetch configuration info', () => {
         expect(String(response.body.group)).toEqual(String(config1Document.group));
         expect(response.body.activated[EnvType.DEFAULT]).toEqual(config1Document.activated.get(EnvType.DEFAULT));
         expect(response.body.components[0].name).toEqual(component1.name);
+        expect(response.body.admin.name).toEqual(adminMasterAccount.name);
     });
 
     test('CONFIG_SUITE - Should get Config information by Id - resolveComponents as false', async () => {

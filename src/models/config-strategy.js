@@ -359,6 +359,13 @@ const configStrategySchema = new mongoose.Schema({
     timestamps: true
 });
 
+configStrategySchema.virtual('admin', {
+    ref: 'Admin',
+    localField: 'owner',
+    foreignField: '_id',
+    justOne: true
+});
+
 configStrategySchema.options.toJSON = {
     getters: true,
     virtuals: true,

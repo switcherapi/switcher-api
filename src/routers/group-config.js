@@ -51,7 +51,7 @@ router.get('/groupconfig/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        let groupconfig = await Services.getGroupConfigById(req.params.id);
+        let groupconfig = await Services.getGroupConfigById(req.params.id, false, true);
         groupconfig = await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP, true);
 
         res.send(groupconfig);

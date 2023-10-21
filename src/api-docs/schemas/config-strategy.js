@@ -43,6 +43,19 @@ export const configStrategy = {
             type: 'uuid',
             description: 'The owner id of the config strategy'
         },
+        admin: {
+            type: 'object',
+            properties: {
+                _id: {
+                    type: 'uuid',
+                    description: 'The unique identifier of the admin'
+                },
+                name: {
+                    type: 'string',
+                    description: 'The name of the admin who created the config strategy'
+                }
+            }
+        },
         createdAt: {
             type: 'string',
             description: 'The date when the config strategy was created'

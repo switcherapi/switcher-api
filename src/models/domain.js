@@ -58,6 +58,13 @@ const domainSchema = new mongoose.Schema({
     timestamps: true
 });
 
+domainSchema.virtual('admin', {
+    ref: 'Admin',
+    localField: 'owner',
+    foreignField: '_id',
+    justOne: true
+});
+
 domainSchema.virtual('groupConfig', {
     ref: 'GroupConfig',
     localField: '_id',

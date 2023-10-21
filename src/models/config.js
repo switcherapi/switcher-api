@@ -110,6 +110,13 @@ const configSchema = new mongoose.Schema({
 
 configSchema.index({ key: 1 });
 
+configSchema.virtual('admin', {
+    ref: 'Admin',
+    localField: 'owner',
+    foreignField: '_id',
+    justOne: true
+});
+
 configSchema.virtual('component_list', {
     ref: 'Component',
     localField: 'components',

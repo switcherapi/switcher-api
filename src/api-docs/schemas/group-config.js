@@ -27,6 +27,19 @@ const groupConfig = {
             type: 'uuid',
             description: 'The owner id of the config'
         },
+        admin: {
+            type: 'object',
+            properties: {
+                _id: {
+                    type: 'uuid',
+                    description: 'The unique identifier of the admin'
+                },
+                name: {
+                    type: 'string',
+                    description: 'The name of the admin who created the group config'
+                }
+            }
+        },
         createdAt: {
             type: 'string',
             description: 'The date when the group config was created'
