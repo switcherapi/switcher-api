@@ -1,6 +1,6 @@
 import { Switcher, checkValue, checkPayload, checkRegex } from 'switcher-client';
 import { EnvType } from '../models/environment';
-import { BadRequestError, FeatureUnavailableError } from '../exceptions';
+import { FeatureUnavailableError } from '../exceptions';
 import { getDomainById, getTotalDomainsByOwner } from '../services/domain';
 import { getTotalGroupsByDomainId } from '../services/group-config';
 import { getTotalConfigsByDomainId } from '../services/config';
