@@ -2,46 +2,6 @@ import { pathParameter, queryParameter } from '../schemas/common';
 import { commonSchemaContent } from './common';
 
 export default {
-    '/slack/v1/availability': {
-        post: {
-            tags: ['Switcher Slack App'],
-            description: 'Check if the feature is available',
-            security: [{ bearerAuth: [] }],
-            requestBody: {
-                content: {
-                    'application/json': {
-                        schema: {
-                            type: 'object',
-                            properties: {
-                                feature: {
-                                    type: 'string',
-                                    description: 'The feature to check'
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            responses: {
-                200: {
-                    description: 'The feature is available',
-                    content: {
-                        'application/json': {
-                            schema: {
-                                type: 'object',
-                                properties: {
-                                    result: {
-                                        type: 'boolean',
-                                        description: 'The feature is available'
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    },
     '/slack/v1/installation': {
         post: {
             tags: ['Slack App'],

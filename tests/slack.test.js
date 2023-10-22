@@ -9,6 +9,7 @@ import { getConfig } from '../src/services/config';
 import { mock1_slack_installation } from './fixtures/db_slack';
 import { EnvType } from '../src/models/environment';
 import Slack from '../src/models/slack';
+import { TicketValidationType } from '../src/models/slack_ticket';
 import { 
     setupDatabase,
     slack,
@@ -18,7 +19,6 @@ import {
     groupConfigDocument,
     adminAccountToken
 } from './fixtures/db_api';
-import { TicketValidationType } from '../src/models/slack_ticket';
 
 afterAll(async () => {
     await Slack.deleteMany().exec();
@@ -36,88 +36,13 @@ const generateToken = (expiresIn) => {
 };
 
 const buildInstallation = async (team_id, domain) => {
-    const installation = Object.assign({}, mock1_slack_installation);
+    const installation = { ...mock1_slack_installation };
     installation.domain = domain;
     installation.team_id = team_id;
     installation.bot_payload.app_id = 'APP_ID';
     await Services.createSlackInstallation(installation);
     return installation;
 };
-
-describe('Slack Feature Availability', () => {
-    const logger_status = process.env.SWITCHER_API_LOGGER == 'true';
-
-    beforeAll(async () => {
-        await setupDatabase();
-        process.env.SWITCHER_API_ENABLE = true;
-        if (!logger_status)
-            process.env.SWITCHER_API_LOGGER = true;
-    });
-
-    afterAll(() => {
-        process.env.SWITCHER_API_ENABLE = false;
-        process.env.SWITCHER_API_LOGGER = logger_status;
-        process.env.SWITCHER_SLACK_JWT_SECRET = 'SLACK_APP_SECRET';
-    });
-
-    test('SLACK_SUITE - Should check feature - Available (API enabled)', async () => {
-        Switcher.assume('SLACK_INTEGRATION').true();
-        const response = await request(app)
-            .post('/slack/v1/availability')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                feature: 'SLACK_INTEGRATION'
-            }).expect(200);
-
-        expect(response.body.result).toBe(true);
-    });
-
-    test('SLACK_SUITE - Should check feature - Available (API disabled)', async () => {
-        process.env.SWITCHER_API_ENABLE = false;
-        const response = await request(app)
-            .post('/slack/v1/availability')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                feature: 'SLACK_INTEGRATION'
-            }).expect(200);
-
-        expect(response.body.result).toBe(true);
-        process.env.SWITCHER_API_ENABLE = true;
-    });
-
-    test('SLACK_SUITE - Should check feature - Not Available', async () => {
-        Switcher.assume('SLACK_INTEGRATION').false();
-        const response = await request(app)
-            .post('/slack/v1/availability')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                feature: 'SLACK_INTEGRATION'
-            }).expect(200);
-
-        expect(response.body.result).toBe(false);
-    });
-
-    test('SLACK_SUITE - Should check - Not available: Invalid feature', async () => {
-        await request(app)
-            .post('/slack/v1/availability')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                feature: 'INVALID_FEATURE_KEY'
-            }).expect(400);
-    });
-
-    test('SLACK_SUITE - Should check - Not available: No secret defined', async () => {
-        process.env.SWITCHER_SLACK_JWT_SECRET = '';
-        const response = await request(app)
-            .post('/slack/v1/availability')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                feature: 'SLACK_INTEGRATION'
-            }).expect(200);
-
-        expect(response.body.result).toBe(false);
-    });
-});
 
 describe('Slack Installation', () => {
     beforeAll(setupDatabase);
@@ -136,7 +61,7 @@ describe('Slack Installation', () => {
     });
 
     test('SLACK_SUITE - Should save installation - Enterprise Account', async () => {
-        const enterpriseSlack = Object.assign({}, mock1_slack_installation);
+        const enterpriseSlack = { ...mock1_slack_installation };
         enterpriseSlack.enterprise_id = 'ENTERPRISE_ACCNT';
 
         const response = await request(app)
@@ -177,7 +102,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should NOT save installation - Missing installation payload', async () => {
         //given
-        const slack_install = Object.assign({}, mock1_slack_installation);
+        const slack_install = { ...mock1_slack_installation };
         delete slack_install.installation_payload;
         
         //test
@@ -280,7 +205,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should find bot', async () => {
         //given
-        const installation = Object.assign({}, mock1_slack_installation);
+        const installation = { ...mock1_slack_installation };
         installation.team_id = 'T_FIND_BOT';
         installation.bot_payload.app_id = 'TEST_FIND_BOT1';
         await Services.createSlackInstallation(installation);
@@ -310,7 +235,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should find installation', async () => {
         //given
-        const installation = Object.assign({}, mock1_slack_installation);
+        const installation = { ...mock1_slack_installation };
         installation.team_id = 'T_FIND_INSTALL';
         installation.installation_payload.app_id = 'TEST_FIND_INSTALLATION1';
         await Services.createSlackInstallation(installation);
@@ -340,7 +265,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should find installation (Admin)', async () => {
         //given
-        const installation = Object.assign({}, mock1_slack_installation);
+        const installation = { ...mock1_slack_installation };
         installation.team_id = 'T_FIND_INSTALL_ADMIN';
         installation.installation_payload.app_id = 'TEST_FIND_INSTALLATION2';
         await Services.createSlackInstallation(installation);
@@ -356,7 +281,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should delete not authorized installation', async () => {
         //given
-        const installation = Object.assign({}, mock1_slack_installation);
+        const installation = { ...mock1_slack_installation };
         installation.team_id = 'T_DELETE_INSTALL';
         installation.installation_payload.app_id = 'TEST_DELETE_INSTALLATION1';
         await Services.createSlackInstallation(installation);
