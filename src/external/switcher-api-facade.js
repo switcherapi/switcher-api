@@ -1,6 +1,6 @@
 import { Switcher, checkValue, checkPayload, checkRegex } from 'switcher-client';
 import { EnvType } from '../models/environment';
-import { BadRequestError, FeatureUnavailableError } from '../exceptions';
+import { FeatureUnavailableError } from '../exceptions';
 import { getDomainById, getTotalDomainsByOwner } from '../services/domain';
 import { getTotalGroupsByDomainId } from '../services/group-config';
 import { getTotalConfigsByDomainId } from '../services/config';
@@ -25,7 +25,6 @@ export const SwitcherKeys = Object.freeze({
     ACCOUNT_IN_NOTIFY: 'ACCOUNT_IN_NOTIFY',
     ACCOUNT_OUT_NOTIFY: 'ACCOUNT_OUT_NOTIFY',
     SLACK_INTEGRATION: 'SLACK_INTEGRATION',
-    SLACK_UPDATE: 'SLACK_UPDATE',
     RATE_LIMIT: 'RATE_LIMIT',
     HTTPS_AGENT: 'HTTPS_AGENT'
 });
@@ -36,13 +35,8 @@ function switcherFlagResult(flag, message) {
     }
 }
 
-export async function checkFeature(feature, params, restrictTo = SwitcherKeys) {
+async function checkFeature(feature, params) {
     const switcher = Switcher.factory();
-    const key = Object.values(restrictTo).find(element => element === feature);
-    
-    if (!key)
-        throw new BadRequestError('Invalid feature');
-    
     return switcher.isItOn(feature, params, true);
 }
 
@@ -191,21 +185,6 @@ export async function checkSlackIntegration(value) {
             ]), 'Slack Integration is not available.');
 }
 
-export async function checkSlackAvailability(admin, feature) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
-        return true;
-
-    if (!process.env.SWITCHER_SLACK_JWT_SECRET)
-        return false;
-
-    const result = await checkFeature(feature, [checkValue(admin._id)], [
-        SwitcherKeys.SLACK_INTEGRATION, 
-        SwitcherKeys.SLACK_UPDATE
-    ]);
-
-    return result;
-}
-
 export function notifyAcCreation(adminid) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
         return;
@@ -247,18 +226,4 @@ export async function checkHttpsAgent(value) {
         return;
 
     return checkFeature(SwitcherKeys.HTTPS_AGENT, [checkRegex(value)]);
-}
-
-export async function checkManagementFeature(feature, params) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
-        return true;
-
-    const switcher = Switcher.factory();
-    const entries = [];
-
-    if (params?.value) {
-        entries.push(checkValue(params.value));
-    }
-
-    return switcher.isItOn(feature, entries);
 }

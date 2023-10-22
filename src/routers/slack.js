@@ -46,15 +46,6 @@ const createTicketContent = (req) => {
     };
 };
 
-router.post('/slack/v1/availability', auth, async (req, res) => {
-    try {
-        const result = await Services.checkAvailability(req.admin, req.body.feature);
-        res.send({ result });
-    } catch (e) {
-        responseException(res, e, 400, req.body.feature);
-    }
-});
-
 router.post('/slack/v1/installation', slackAuth, [
     check('installation_payload').exists(),
     check('bot_payload').exists()

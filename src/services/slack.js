@@ -1,7 +1,7 @@
 import Slack from '../models/slack';
 import { TicketStatusType, SLACK_SUB, TicketValidationType } from '../models/slack_ticket';
 import { BadRequestError, NotFoundError, PermissionError } from '../exceptions';
-import { checkSlackIntegration, checkSlackAvailability } from '../external/switcher-api-facade';
+import { checkSlackIntegration } from '../external/switcher-api-facade';
 import { getConfig } from './config';
 import { getDomainById } from './domain';
 import { getEnvironment } from './environment';
@@ -66,10 +66,6 @@ export async function getSlack(where) {
     if (where.enterprise_id) query.where('enterprise_id', where.enterprise_id);
 
     return query.exec();
-}
-
-export async function checkAvailability(admin, feature) {
-    return checkSlackAvailability(admin, feature);
 }
 
 export async function createSlackInstallation(args) {

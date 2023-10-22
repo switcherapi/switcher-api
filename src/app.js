@@ -20,7 +20,6 @@ import metricRouter from './routers/metric';
 import teamRouter from './routers/team';
 import permissionRouter from './routers/permission';
 import slackRouter from './routers/slack';
-import apiManagementRouter from './routers/api-management';
 import schema from './client/schema';
 import { appAuth, auth, resourcesAuth, slackAuth } from './middleware/auth';
 import { clientLimiter, defaultLimiter } from './middleware/limiter';
@@ -51,7 +50,6 @@ app.use(metricRouter);
 app.use(teamRouter);
 app.use(permissionRouter);
 app.use(slackRouter);
-app.use(apiManagementRouter);
 
 /**
  * GraphQL Routes

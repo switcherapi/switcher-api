@@ -4787,34 +4787,6 @@
 					"response": []
 				},
 				{
-					"name": "Slack - Feature Availability",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"feature\": \"SLACK_INTEGRATION\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/slack/v1/availability",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"slack",
-								"v1",
-								"availability"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Slack -  Ticket History Reset",
 					"request": {
 						"method": "POST",
@@ -5734,45 +5706,6 @@
 							],
 							"path": [
 								"adm-graphql"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "API Management",
-			"item": [
-				{
-					"name": "Management - Feature",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"type": "text",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"feature\": \"FEATURE\",\n\t\"parameters\": {\n        \"value\": \"test\"\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/api-management/feature",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"api-management",
-								"feature"
 							]
 						}
 					},
