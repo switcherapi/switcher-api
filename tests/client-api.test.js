@@ -928,36 +928,6 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected111));
     });
 
-    test('CLIENT_SUITE - Should NOT return domain structure for an excluded team member', async () => {
-        //given
-        const admin = await Admin.findById(adminAccountId).exec();
-        admin.teams = [];
-        await admin.save();
-        
-        const req = await request(app)
-            .post('/adm-graphql')
-            .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]]));
-
-        const expected = '{"data":{"domain":null}}';
-        expect(req.statusCode).toBe(200);
-        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
-    });
-
-    test('CLIENT_SUITE - Should NOT return domain Flat-structure for am excluded team member', async () => {
-        const req = await request(app)
-            .post('/adm-graphql')
-            .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send(graphqlUtils.configurationQuery([
-                ['domain', domainId], 
-                ['key', keyConfig], 
-                ['environment', EnvType.DEFAULT]]));
-
-        const expected = '{"data":{"configuration":{"domain":null,"group":null,"config":null,"strategies":null}}}';
-        expect(req.statusCode).toBe(200);
-        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
-    });
-
     test('CLIENT_SUITE - Should return list of Groups permissions', async () => {
         const req = await request(app)
             .post('/adm-graphql')
@@ -990,6 +960,19 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         const exptected = '[{"action":"UPDATE","result":"ok"},{"action":"DELETE","result":"ok"}]';
         expect(req.statusCode).toBe(200);
         expect(cacheSpy.callCount).toBe(1);
+        expect(JSON.parse(req.text)).not.toBe(null);
+        expect(JSON.parse(req.text).data.permission[0].name).toBe("Group Test");
+        expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
+    });
+
+    test('CLIENT_SUITE - Should return list of Groups permissions - by environment', async () => {
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send(graphqlUtils.permissionsQuery(domainId, undefined, `"CREATE"`, RouterTypes.GROUP, EnvType.DEFAULT));
+        
+        const exptected = '[{"action":"CREATE","result":"ok"}]';
+        expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).not.toBe(null);
         expect(JSON.parse(req.text).data.permission[0].name).toBe("Group Test");
         expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
@@ -1048,4 +1031,40 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).not.toBe(null);
         expect(JSON.parse(req.text).data.permission).toStrictEqual([]);
     });
+});
+
+describe('Testing domain/configuration [Adm-GraphQL] - Excluded team member ', () => {
+
+    afterAll(setupDatabase);
+
+    test('CLIENT_SUITE - Should NOT return domain structure for an excluded team member', async () => {
+        //given
+        const admin = await Admin.findById(adminAccountId).exec();
+        admin.teams = [];
+        await admin.save();
+        
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]]));
+
+        const expected = '{"data":{"domain":null}}';
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
+    });
+
+    test('CLIENT_SUITE - Should NOT return domain Flat-structure for am excluded team member', async () => {
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send(graphqlUtils.configurationQuery([
+                ['domain', domainId], 
+                ['key', keyConfig], 
+                ['environment', EnvType.DEFAULT]]));
+
+        const expected = '{"data":{"configuration":{"domain":null,"group":null,"config":null,"strategies":null}}}';
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
+    });
+    
 });

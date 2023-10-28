@@ -63,7 +63,7 @@ export const  buildEntries = (entries) => {
     return `${entries.map(createStrategyInput)}`;
 };
 
-export const permissionsQuery = (domainId, parentId, actions, router) => {
+export const permissionsQuery = (domainId, parentId, actions, router, environment) => {
     return { 
         query: `
             {
@@ -71,7 +71,8 @@ export const permissionsQuery = (domainId, parentId, actions, router) => {
                     domain: "${domainId}",
                     parent: "${parentId}",
                     actions: [${actions}],
-                    router: "${router}"
+                    router: "${router}",
+                    environment: "${environment}"
                 ) {
                     id,
                     name,
