@@ -37,7 +37,7 @@ export const adminAccount = {
     active: true
 };
 
-export let apiKey = undefined;
+export let apiKey;
 export const domainId = new mongoose.Types.ObjectId();
 export const domainDocument = {
     _id: domainId,
@@ -172,13 +172,22 @@ export const permissionConfigs = {
     router: RouterTypes.CONFIG
 };
 
+export const permissionConfigs2Id = new mongoose.Types.ObjectId();
+export const permissionConfigs2 = {
+    _id: permissionConfigs2Id,
+    action: ActionTypes.CREATE,
+    active: true,
+    router: RouterTypes.GROUP,
+    environments: [EnvType.DEFAULT]
+};
+
 export const teamId = new mongoose.Types.ObjectId();
 export const team = {
     _id: teamId,
     domain: domainId,
     name: 'Team Dev',
     active: true,
-    permissions: [permissionConfigsId]
+    permissions: [permissionConfigsId, permissionConfigs2Id]
 };
 
 export const slack = {
@@ -218,6 +227,7 @@ export const setupDatabase = async () => {
     await new Slack(slack).save();
     await new Team(team).save();
     await new Permission(permissionConfigs).save();
+    await new Permission(permissionConfigs2).save();
 
     await new GroupConfig(groupConfigDocument).save();
     await new Config(configDocument).save();

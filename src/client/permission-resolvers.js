@@ -5,7 +5,9 @@ import { getGroupConfigs } from '../services/group-config';
 import { permissionCache } from '../helpers/cache';
 
 export async function resolvePermission(args, admin) {
-    const cacheKey = permissionCache.permissionKey(admin._id, args.domain, args.parent, args.actions, args.router);
+    const cacheKey = permissionCache.permissionKey(admin._id, args.domain, args.parent, 
+        args.actions, args.router, args.environment);
+
     if (permissionCache.has(cacheKey)) {
         return permissionCache.get(cacheKey);
     }
@@ -22,7 +24,7 @@ export async function resolvePermission(args, admin) {
 
         for (const action_perm of args.actions) {
             try {
-                await verifyOwnership(admin, element, args.domain, action_perm, args.router);
+                await verifyOwnership(admin, element, args.domain, action_perm, args.router, false, args.environment);
                 result[result.length - 1].permissions.push({ action: action_perm.toString(), result: 'ok' });
             } catch (e) {
                 result[result.length - 1].permissions.push({ action: action_perm.toString(), result: 'nok' });

@@ -101,6 +101,9 @@ const queryType = new GraphQLObjectType({
                 },
                 router: {
                     type: GraphQLString
+                },
+                environment: {
+                    type: GraphQLString
                 }
             },
             resolve: async (_source, args, context) => {
