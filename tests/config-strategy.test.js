@@ -372,7 +372,7 @@ describe('Testing reading strategies #1', () => {
     });
 });
 
-describe('Testing reading strategies #2', () => {
+describe('Testing reading/deleting strategies #2', () => {
     beforeAll(setupDatabase);
 
     test('STRATEGY_SUITE - Should get Config Strategy information by Id', async () => {

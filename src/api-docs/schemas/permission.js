@@ -14,6 +14,12 @@ const permission = {
             type: 'string',
             enum: Object.values(RouterTypes)
         },
+        enviroments: {
+            type: 'array',
+            items: {
+                type: 'string'
+            }
+        },
         identifiedBy: {
             type: 'string',
             enum: Object.values(KeyTypes)
@@ -42,6 +48,12 @@ export default {
             router: {
                 type: 'string',
                 enum: Object.values(RouterTypes)
+            },
+            enviroments: {
+                type: 'array',
+                items: {
+                    type: 'string'
+                }
             },
             identifiedBy: {
                 type: 'string',

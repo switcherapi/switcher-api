@@ -7,7 +7,7 @@ import { getDomainById, updateDomainVersion } from './domain';
 import { getGroupConfigById } from './group-config';
 import { checkSwitcher } from '../external/switcher-api-facade';
 import { BadRequestError, NotFoundError } from '../exceptions';
-import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';
+import { checkEnvironmentStatusChange } from '../middleware/validators';
 import { getComponentById, getComponents } from './component';
 import { resolveVerification } from '../client/relay';
 import { permissionCache } from '../helpers/cache';
@@ -132,7 +132,7 @@ export async function updateConfig(id, args, admin) {
 
     // validates existing environment
     if (args.disable_metrics) {
-        await checkEnvironmentStatusChange_v2(args, config.domain, args.disable_metrics);
+        await checkEnvironmentStatusChange(args, config.domain, args.disable_metrics);
     }
 
     // check permissions
@@ -152,13 +152,21 @@ export async function updateConfig(id, args, admin) {
 export async function updateConfigRelay(id, args, admin) {
     let config = await getConfigById(id);
     isRelayValid(args);
+    
+    const actions = [ActionTypes.UPDATE, ActionTypes.UPDATE_RELAY];
 
-    config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
+    // Verifies if the user is updating the status of the environment
+    if (Object.keys(args).length == 1 && args.activated) {
+        actions.push(ActionTypes.UPDATE_ENV_STATUS);
+    }
+
+    config = await verifyOwnership(admin, config, config.domain, actions, 
+        RouterTypes.CONFIG, false, Object.keys(args.activated)[0]);
     config.updatedBy = admin.email;
 
     for (const update of Object.keys(args)) {
         if (config.relay[update] && 'activated endpoint auth_token'.indexOf(update) >= 0) {
-            await checkEnvironmentStatusChange_v2(args, config.domain, args[update]);
+            await checkEnvironmentStatusChange(args, config.domain, args[update]);
             Object.keys(args[update]).forEach((map) =>
                 config.relay[update].set(map, args[update][map]));
         } else {
@@ -174,10 +182,11 @@ export async function updateConfigRelay(id, args, admin) {
 
 export async function updateConfigStatus(id, args, admin) {
     let config = await getConfigById(id);
-    config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
+    config = await verifyOwnership(admin, config, config.domain, [ActionTypes.UPDATE, ActionTypes.UPDATE_ENV_STATUS],
+        RouterTypes.CONFIG, false, Object.keys(args)[0]);
     config.updatedBy = admin.email;
 
-    const updates = await checkEnvironmentStatusChange_v2(args, config.domain);
+    const updates = await checkEnvironmentStatusChange(args, config.domain);
     
     updates.forEach((update) => config.activated.set(update, args[update]));
     await config.save();
@@ -188,7 +197,8 @@ export async function updateConfigStatus(id, args, admin) {
 
 export async function removeConfigStatusEnv(id, env, admin) {
     let config = await getConfigById(id);
-    config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
+    config = await verifyOwnership(admin, config, config.domain, [ActionTypes.UPDATE, ActionTypes.UPDATE_ENV_STATUS],
+        RouterTypes.CONFIG, false, env);
     config.updatedBy = admin.email;
 
     updateDomainVersion(config.domain);
@@ -265,7 +275,8 @@ export async function updateComponent(id, args, admin) {
 
 export async function removeRelay(id, env, admin) {
     let config = await getConfigById(id);
-    config = await verifyOwnership(admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG);
+    config = await verifyOwnership(admin, config, config.domain, [ActionTypes.DELETE, ActionTypes.DELETE_RELAY], 
+        RouterTypes.CONFIG, false, env);
     config.updatedBy = admin.email;
 
     if (config.relay.activated?.get(env) != undefined) {
@@ -288,7 +299,8 @@ export async function removeRelay(id, env, admin) {
 export async function verifyRelay(id, env, admin) {
     let config = await getConfigById(id);
     let domain = await getDomainById(config.domain);
-    config = await verifyOwnership(admin, config, config.domain, ActionTypes.UPDATE, RouterTypes.CONFIG);
+    config = await verifyOwnership(admin, config, config.domain, [ActionTypes.UPDATE, ActionTypes.UPDATE_RELAY], 
+        RouterTypes.CONFIG, false, env);
 
     const code = await resolveVerification(config.relay, env);
     if (!config.relay.verified?.get(env) && Object.is(domain.integrations.relay.verification_code, code)) {

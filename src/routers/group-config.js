@@ -134,7 +134,7 @@ router.patch('/groupconfig/removeStatus/:id', auth, [
     check('id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        const groupconfig = await Services.removeGroupStatusEnv(req.params.id, req.body, req.admin);
+        const groupconfig = await Services.removeGroupStatusEnv(req.params.id, req.body.env, req.admin);
         res.send(groupconfig);
     } catch (e) {
         responseException(res, e, 500);

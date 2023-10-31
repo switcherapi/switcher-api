@@ -63,6 +63,16 @@ describe('Testing relay verification', () => {
             .send(bodyRelay).expect(200);
     });
 
+    test('CONFIG_RELAY_SUITE - Should update Relay status', async () => {
+        await request(app)
+            .patch(`/config/updateRelay/${configId1}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({ activated: { default: false } }).expect(200);
+
+        const config = await Config.findById(configId1).lean().exec();
+        expect(config.relay.activated['default']).toEqual(false);
+    });
+
     test('CONFIG_RELAY_SUITE - Should configure new Relay - All capital HTTPS', async () => {
         // Given HTTPS
         bodyRelay.endpoint.default = 'HTTPS://localhost:3001';

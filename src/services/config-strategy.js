@@ -6,7 +6,7 @@ import { permissionCache } from '../helpers/cache';
 import { updateDomainVersion } from './domain';
 import { getConfigById } from './config';
 import { BadRequestError } from '../exceptions';
-import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';
+import { checkEnvironmentStatusChange } from '../middleware/validators';
 import { getEnvironment } from './environment';
 
 async function verifyStrategyValueInput(strategyId, value) {
@@ -66,7 +66,8 @@ export async function createStrategy(args, admin) {
         owner: admin._id
     });
 
-    configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.CREATE, RouterTypes.STRATEGY);
+    configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.CREATE, 
+        RouterTypes.STRATEGY, false, environment.name);
 
     await configStrategy.save();
     updateDomainVersion(configStrategy.domain);
@@ -76,7 +77,8 @@ export async function createStrategy(args, admin) {
 
 export async function deleteStrategy(id, admin) {
     let configStrategy = await getStrategyById(id);
-    configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.DELETE, RouterTypes.STRATEGY);
+    configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.DELETE, 
+        RouterTypes.STRATEGY, false, configStrategy.activated.keys().next().value);
     
     await configStrategy.deleteOne();
     updateDomainVersion(configStrategy.domain);
@@ -89,7 +91,8 @@ export async function deleteStrategy(id, admin) {
 
 export async function updateStrategy(id, args, admin) {
     let configStrategy = await getStrategyById(id);
-    configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY);
+    configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, 
+        RouterTypes.STRATEGY, configStrategy.activated.keys().next().value);
     configStrategy.updatedBy = admin.email;
     
     const updates = Object.keys(args);
@@ -111,7 +114,8 @@ export async function addVal(id, args, admin) {
         throw new BadRequestError(`Value '${value}' already exist`);
     }
 
-    configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY);
+    configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, 
+        RouterTypes.STRATEGY, configStrategy.activated.keys().next().value);
     configStrategy.updatedBy = admin.email;
 
     configStrategy.values.push(value);
@@ -143,7 +147,8 @@ export async function updateVal(id, args, admin) {
         throw new BadRequestError(`Value '${newvalue}' already exist`);
     }
 
-    configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY);
+    configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, 
+        RouterTypes.STRATEGY, configStrategy.activated.keys().next().value);
     configStrategy.updatedBy = admin.email;
 
     configStrategy.values.splice(indexOldValue, 1);
@@ -164,7 +169,8 @@ export async function removeVal(id, args, admin) {
         throw new BadRequestError(`Value '${value}' does not exist`);
     }
 
-    configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY);
+    configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, 
+        RouterTypes.STRATEGY, configStrategy.activated.keys().next().value);
     configStrategy.updatedBy = admin.email;
 
     configStrategy.values.splice(indexValue, 1);
@@ -182,12 +188,13 @@ export async function updateStatusEnv(id, args, admin) {
     }
 
     let configStrategy = await getStrategyById(id);
-    updates = await checkEnvironmentStatusChange_v2(args, configStrategy.domain);
+    updates = await checkEnvironmentStatusChange(args, configStrategy.domain);
     if (configStrategy.activated.get(updates[0]) === undefined) {
         throw new BadRequestError('Strategy does not exist on this environment');
     }
 
-    configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, RouterTypes.STRATEGY);
+    configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, [ActionTypes.UPDATE, ActionTypes.UPDATE_ENV_STATUS], 
+        RouterTypes.STRATEGY, false, Object.keys(args)[0]);
     configStrategy.updatedBy = admin.email;
     
     configStrategy.activated.set(updates[0], args[updates[0]]);
