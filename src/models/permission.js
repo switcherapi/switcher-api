@@ -5,7 +5,10 @@ export const ActionTypes = Object.freeze({
     CREATE: 'CREATE',
     READ: 'READ',
     UPDATE: 'UPDATE',
-    DELETE: 'DELETE'
+    UPDATE_ENV_STATUS: 'UPDATE_ENV_STATUS',
+    UPDATE_RELAY: 'UPDATE_RELAY',
+    DELETE: 'DELETE',
+    DELETE_RELAY: 'DELETE_RELAY'
 });
 
 export const RouterTypes = Object.freeze({

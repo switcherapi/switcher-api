@@ -5,13 +5,8 @@ import { BadRequestError } from '../exceptions';
 import { checkGroup } from '../external/switcher-api-facade';
 import { ActionTypes, RouterTypes } from '../models/permission';
 import { getDomainById, updateDomainVersion } from './domain';
-import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';
+import { checkEnvironmentStatusChange } from '../middleware/validators';
 import { permissionCache } from '../helpers/cache';
-
-async function verifyGroupInput(groupId, admin) {
-    let groupconfig = await getGroupConfigById(groupId);
-    return verifyOwnership(admin, groupconfig, groupconfig.domain, ActionTypes.UPDATE, RouterTypes.GROUP);
-}
 
 export async function getGroupConfigById(id, lean = false, populateAdmin = false) {
     let group = await GroupConfig.findById(id, null, { lean }).exec();
@@ -98,7 +93,9 @@ export async function deleteGroup(id, admin) {
 }
 
 export async function updateGroup(id, args, admin) {
-    const groupconfig = await verifyGroupInput(id, admin);
+    let groupconfig = await getGroupConfigById(id);
+
+    groupconfig = await verifyOwnership(admin, groupconfig, groupconfig.domain, ActionTypes.UPDATE, RouterTypes.GROUP);
     groupconfig.updatedBy = admin.email;
 
     if (args.name) {
@@ -123,10 +120,13 @@ export async function updateGroup(id, args, admin) {
 }
 
 export async function updateGroupStatusEnv(id, args, admin) {
-    const groupconfig = await verifyGroupInput(id, admin);
+     let groupconfig = await getGroupConfigById(id);
+    
+    groupconfig = await verifyOwnership(admin, groupconfig, groupconfig.domain, [ActionTypes.UPDATE, ActionTypes.UPDATE_ENV_STATUS],
+        RouterTypes.GROUP, false, Object.keys(args)[0]);
     groupconfig.updatedBy = admin.email;
 
-    const updates = await checkEnvironmentStatusChange_v2(args, groupconfig.domain);
+    const updates = await checkEnvironmentStatusChange(args, groupconfig.domain);
     updates.forEach((update) => groupconfig.activated.set(update, args[update]));
     await groupconfig.save();
     updateDomainVersion(groupconfig.domain);
@@ -134,11 +134,14 @@ export async function updateGroupStatusEnv(id, args, admin) {
     return groupconfig;
 }
 
-export async function removeGroupStatusEnv(id, args, admin) {
-    const groupconfig = await verifyGroupInput(id, admin);
+export async function removeGroupStatusEnv(id, env, admin) {
+    let groupconfig = await getGroupConfigById(id);
+    
+    groupconfig = await verifyOwnership(admin, groupconfig, groupconfig.domain, [ActionTypes.UPDATE, ActionTypes.UPDATE_ENV_STATUS],
+        RouterTypes.GROUP, false, env);
     groupconfig.updatedBy = admin.email;
     updateDomainVersion(groupconfig.domain);
-    return removeGroupStatus(groupconfig, args.env);
+    return removeGroupStatus(groupconfig, env);
 }
 
 export async function removeGroupStatus(groupconfig, environmentName) {

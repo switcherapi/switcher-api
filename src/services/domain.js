@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { checkEnvironmentStatusChange_v2 } from '../middleware/validators';
+import { checkEnvironmentStatusChange } from '../middleware/validators';
 import Component from '../models/component';
 import { Config } from '../models/config';
 import { ConfigStrategy } from '../models/config-strategy';
@@ -119,11 +119,12 @@ export async function updateDomain(id, args, admin) {
 export async function updateDomainStatus(id, args, admin) {
     let domain = await getDomainById(id);
 
-    domain = await verifyOwnership(admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN);
+    domain = await verifyOwnership(admin, domain, domain._id, [ActionTypes.UPDATE, ActionTypes.UPDATE_ENV_STATUS],
+        RouterTypes.DOMAIN, false, Object.keys(args)[0]);
     domain.updatedBy = admin.email;
     domain.lastUpdate = Date.now();
 
-    const updates = await checkEnvironmentStatusChange_v2(args, id);
+    const updates = await checkEnvironmentStatusChange(args, id);
 
     updates.forEach((update) => domain.activated.set(update, args[update]));
     return domain.save();
@@ -132,7 +133,8 @@ export async function updateDomainStatus(id, args, admin) {
 export async function removeDomainStatusEnv(id, env, admin) {
     let domain = await getDomainById(id);
 
-    domain = await verifyOwnership(admin, domain, domain._id, ActionTypes.UPDATE, RouterTypes.DOMAIN);
+    domain = await verifyOwnership(admin, domain, domain._id, [ActionTypes.UPDATE, ActionTypes.UPDATE_ENV_STATUS],
+        RouterTypes.DOMAIN, false, env);
     domain.updatedBy = admin.email;
     domain.lastUpdate = Date.now();
     

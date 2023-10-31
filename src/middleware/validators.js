@@ -27,7 +27,7 @@ export async function checkConfigComponent(req, res, next) {
     next();
 }
 
-export async function checkEnvironmentStatusChange_v2(args, domain, field) {
+export async function checkEnvironmentStatusChange(args, domain, field) {
     const environment = await getEnvironments({ domain }, ['_id', 'name']);
     const updates = Object.keys(field || args);
     const isValidOperation = updates.every((update) => {

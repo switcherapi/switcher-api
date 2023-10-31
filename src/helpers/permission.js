@@ -1,10 +1,12 @@
 import { ActionTypes, RouterTypes } from '../models/permission';
 import { getPermission, getPermissions } from '../services/permission';
 
-export async function verifyPermissions(team, element, action, routerType, environment) {
+export async function verifyPermissions(team, element, actions, routerType, environment) {
+    actions.push(ActionTypes.ALL);
+    
     const permission = await getPermission({
         _id: { $in: team.permissions }, 
-        action: { $in: [action, ActionTypes.ALL] },
+        action: { $in: actions },
         active: true,
         router: { $in: [routerType, RouterTypes.ALL] }
     });
@@ -16,7 +18,7 @@ export async function verifyPermissions(team, element, action, routerType, envir
     return verifyIdentifiers(permission, element);
 }
 
-export async function verifyPermissionsCascade(team, element, action, routerType, environment) {
+export async function verifyPermissionsCascade(team, element, actions, routerType, environment) {
     let orStatement = [];
     if (routerType === RouterTypes.DOMAIN) {
         orStatement = [
@@ -41,9 +43,10 @@ export async function verifyPermissionsCascade(team, element, action, routerType
         ];
     }
 
+    actions.push(ActionTypes.ALL);
     const foundPermission = await getPermissions({
         _id: { $in: team.permissions }, 
-        action: { $in: [action, ActionTypes.ALL] },
+        action: { $in: actions },
         active: true,
         $or: orStatement
     });
