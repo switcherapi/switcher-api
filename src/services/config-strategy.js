@@ -92,7 +92,7 @@ export async function deleteStrategy(id, admin) {
 export async function updateStrategy(id, args, admin) {
     let configStrategy = await getStrategyById(id);
     configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, 
-        RouterTypes.STRATEGY, configStrategy.activated.keys().next().value);
+        RouterTypes.STRATEGY, false, configStrategy.activated.keys().next().value);
     configStrategy.updatedBy = admin.email;
     
     const updates = Object.keys(args);
@@ -115,7 +115,7 @@ export async function addVal(id, args, admin) {
     }
 
     configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, 
-        RouterTypes.STRATEGY, configStrategy.activated.keys().next().value);
+        RouterTypes.STRATEGY, false, configStrategy.activated.keys().next().value);
     configStrategy.updatedBy = admin.email;
 
     configStrategy.values.push(value);
@@ -148,7 +148,7 @@ export async function updateVal(id, args, admin) {
     }
 
     configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, 
-        RouterTypes.STRATEGY, configStrategy.activated.keys().next().value);
+        RouterTypes.STRATEGY, false, configStrategy.activated.keys().next().value);
     configStrategy.updatedBy = admin.email;
 
     configStrategy.values.splice(indexOldValue, 1);
@@ -170,7 +170,7 @@ export async function removeVal(id, args, admin) {
     }
 
     configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, 
-        RouterTypes.STRATEGY, configStrategy.activated.keys().next().value);
+        RouterTypes.STRATEGY, false, configStrategy.activated.keys().next().value);
     configStrategy.updatedBy = admin.email;
 
     configStrategy.values.splice(indexValue, 1);
