@@ -286,7 +286,7 @@ export async function removeRelay(id, env, admin) {
             config.relay.auth_token.delete(env);
             config.relay.verified.delete(env);
         } else {
-            config.relay = {};
+            config.relay = undefined;
         }
 
         await config.save();

@@ -357,7 +357,7 @@ describe('Testing relay association', () => {
             .send().expect(200);
         
         const config = await Config.findById(configId1).lean().exec();
-        expect(config.relay).toEqual({});
+        expect(config.relay).toEqual(undefined);
     });
 
     test('CONFIG_RELAY_SUITE - Should get Relay specs', async () => {
