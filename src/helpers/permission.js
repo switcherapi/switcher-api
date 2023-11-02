@@ -57,25 +57,27 @@ export async function verifyPermissionsCascade(team, element, actions, routerTyp
     } else if (foundPermission[0] && verifyEnvironment(foundPermission[0], environment)) {
         return element;
     }
+
+    return undefined;
 }
 
 function verifyIdentifiers(permission, element) {
-    if (permission.identifiedBy) {
-        if (Array.isArray(element)) {
-            if (permission.values.length) {
-                element = element.filter(child => permission.values.includes(child[`${permission.identifiedBy}`]));
-                if (element.length) {
-                    return element;
-                }
+    if (!permission.identifiedBy) {
+        return element;
+    }
+    
+    if (Array.isArray(element)) {
+        if (permission.values.length) {
+            element = element.filter(child => permission.values.includes(child[`${permission.identifiedBy}`]));
+            if (element.length) {
+                return element;
             }
-        } else if (permission.values.includes(element[`${permission.identifiedBy}`])) {
-            return element;
         }
-
-        return undefined;
+    } else if (permission.values.includes(element[`${permission.identifiedBy}`])) {
+        return element;
     }
 
-    return element;
+    return undefined;
 }
 
 function verifyEnvironment(permission, environment) {
