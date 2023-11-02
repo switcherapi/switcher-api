@@ -332,7 +332,7 @@ describe('Updating team members tests', () => {
         await request(app)
             .post(`/team/member/invite/accept/${teamInvite._id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(404);
+            .send().expect(400);
     });
 
     test('TEAM_SUITE - Should NOT create invite request - Invalid Team ID', async () => {
