@@ -3,7 +3,7 @@ import { TicketStatusType, SLACK_SUB, TicketValidationType } from '../models/sla
 import { BadRequestError, NotFoundError, PermissionError } from '../exceptions';
 import { checkSlackIntegration } from '../external/switcher-api-facade';
 import { getConfig } from './config';
-import { getDomainById } from './domain';
+import { getDomainById, updateDomainVersion } from './domain';
 import { getEnvironment } from './environment';
 import { getGroupConfig } from './group-config';
 import { containsValue } from '../helpers';
@@ -218,4 +218,6 @@ async function approveChange(domain, ticket) {
         group.updatedBy = SLACK_SUB;
         await group.save();
     }
+    
+    updateDomainVersion(domain);
 }
