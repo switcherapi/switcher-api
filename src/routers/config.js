@@ -95,7 +95,7 @@ router.get('/config/history/:id', auth, [
         const query = 'oldValue newValue updatedBy date -_id';
         const history = await getHistory(query, config.domain, config._id, req.query);
 
-        await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG);
+        await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
 
         res.send(history);
     } catch (e) {

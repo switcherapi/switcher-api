@@ -79,7 +79,7 @@ router.get('/domain/history/:id', auth, [
         const query = 'oldValue newValue updatedBy date -_id';
         const history = await getHistory(query, domain._id, domain._id, req.query);
 
-        await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN);
+        await verifyOwnership(req.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN, true);
 
         res.send(history);
     } catch (e) {

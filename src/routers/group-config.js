@@ -73,7 +73,7 @@ router.get('/groupconfig/history/:id', auth, [
         const query = 'oldValue newValue updatedBy date -_id';
         const history = await getHistory(query, groupconfig.domain, groupconfig._id, req.query);
 
-        await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP);
+        await verifyOwnership(req.admin, groupconfig, groupconfig.domain, ActionTypes.READ, RouterTypes.GROUP, true);
 
         res.send(history);
     } catch (e) {
