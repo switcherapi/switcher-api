@@ -80,7 +80,7 @@ router.get('/configstrategy/history/:id', auth, [
         const query = 'oldValue newValue updatedBy date -_id';
         const history = await getHistory(query, configStrategy.domain, configStrategy._id, req.query);
 
-        await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY);
+        await verifyOwnership(req.admin, configStrategy, configStrategy.domain, ActionTypes.READ, RouterTypes.STRATEGY, true);
 
         res.send(history);
     } catch (e) {
