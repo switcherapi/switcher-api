@@ -41,7 +41,7 @@
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.29.4",
     "mongodb": "^6.2.0",
-    "mongoose": "^7.6.3",
+    "mongoose": "^8.0.0",
     "pino": "^8.16.1",
     "pino-pretty": "^10.2.3",
     "swagger-ui-express": "^5.0.0",
