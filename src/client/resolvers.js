@@ -105,14 +105,17 @@ export async function resolveGroupConfig(source, _id, name, activated, context) 
 export async function resolveDomain(_id, name, activated, context) {
     const args = {};
 
-    if (_id) { args._id = _id; }
-    if (name) {
-        if (context.admin) {
-            args.name = name; 
+    // When Admin
+    if (context.admin) {
+        if (name) {
+            args.name = name;
             args.owner = context.admin._id;
         } else {
-            args._id = context.domain;
+            args._id = _id;
         }
+    // When Component
+    } else if (context.domain) {
+        args._id = context.domain;
     }
     
     let domain = await Domain.findOne({ ...args }).lean().exec();

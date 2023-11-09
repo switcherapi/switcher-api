@@ -418,7 +418,6 @@ describe('Testing domain', () => {
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
             .send(graphqlUtils.domainQuery([
-                ['name', domainDocument.name], 
                 ['environment', EnvType.DEFAULT]])
             );
         
@@ -432,7 +431,6 @@ describe('Testing domain', () => {
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
             .send(graphqlUtils.domainQuery([
-                ['name', domainDocument.name], 
                 ['environment', EnvType.DEFAULT],
                 ['_component', 'TestApp']])
             );
@@ -448,7 +446,6 @@ describe('Testing domain', () => {
             .post('/graphql')
             .set('Authorization', `Bearer ${token}`)
             .send(graphqlUtils.domainQuery([
-                ['name', domainDocument.name], 
                 ['environment', EnvType.DEFAULT]], true, true, true)
             );
 
@@ -849,6 +846,17 @@ describe('Testing domain [Adm-GraphQL] ', () => {
 
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected107));
+    });
+
+    test('CLIENT_SUITE - Should NOT return domain structure - Missing query params', async () => {
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send(graphqlUtils.domainQuery([['environment', EnvType.DEFAULT]]));
+
+        const expected = '{"data":{"domain":null}}';
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
     });
 
     test('CLIENT_SUITE - Should return domain Flat-structure - By Switcher Key', async () => {
