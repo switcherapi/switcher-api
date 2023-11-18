@@ -91,11 +91,7 @@ export const configType = new GraphQLObjectType({
                     type: GraphQLString
                 }, 
                 activated: {
-                    type: GraphQLBoolean,
-                    resolve: (source, _args, { environment }) => {
-                        return source.activated[`${environment}`] === undefined ? 
-                            source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`];
-                    }
+                    type: GraphQLBoolean
                 }
             },
             resolve: async (source, { _id, strategy, operation, activated }, context) => {
@@ -146,11 +142,7 @@ export const groupConfigType = new GraphQLObjectType({
                     type: GraphQLString
                 }, 
                 activated: {
-                    type: GraphQLBoolean,
-                    resolve: (source, _args, { environment }) => {
-                        return source.activated[`${environment}`] === undefined ? 
-                            source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`];
-                    }
+                    type: GraphQLBoolean
                 }
             },
             resolve: async (source, { _id, key, activated }, context) => {
@@ -215,11 +207,7 @@ export const domainType = new GraphQLObjectType({
                     type: GraphQLString
                 }, 
                 activated: {
-                    type: GraphQLBoolean,
-                    resolve: (source, _args, { environment }) => {
-                        return source.activated[`${environment}`] === undefined ? 
-                            source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`];
-                    }
+                    type: GraphQLBoolean
                 }
             },
             resolve: async (source, { _id, name, activated }, context) => {
