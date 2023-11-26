@@ -101,7 +101,7 @@ app.get('/check', defaultLimiter, (req, res) => {
             max_stretegy_op: process.env.MAX_STRATEGY_OPERATION,
             max_rpm: process.env.MAX_REQUEST_PER_MINUTE,
             regex_max_timeout: process.env.REGEX_MAX_TIMEOUT,
-            regex_max_blacklist: process.env.REGEX_MAX_BLACLIST
+            regex_max_blacklist: process.env.REGEX_MAX_BLACKLIST
         };
     }
 
