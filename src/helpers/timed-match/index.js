@@ -8,7 +8,7 @@ const cp = require('child_process');
 class TimedMatch {
     static _worker = this._createChildProcess();
     static _blacklisted = [];
-    static _maxBlackListed = process.env.REGEX_MAX_BLACLIST || 50;
+    static _maxBlackListed = process.env.REGEX_MAX_BLACKLIST || 50;
     static _maxTimeLimit = process.env.REGEX_MAX_TIMEOUT || 3000;
 
     /**
