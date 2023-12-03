@@ -118,9 +118,9 @@ const existComponent = async ({ domain, name, __v }) => {
 componentSchema.pre('validate', async function (next) {
     const component = this;
 
-    // Verify if component already exist
+    // Verify if component already exists
     if (await existComponent(component)) {
-        const err = new Error(`Unable to complete the operation. Component '${component.name}' already exist for this Domain`);
+        const err = new Error(`Unable to complete the operation. Component '${component.name}' already exists for this Domain`);
         next(err);
     }
 

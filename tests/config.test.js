@@ -57,7 +57,7 @@ describe('Testing configuration insertion', () => {
                 group: groupConfigId
             }).expect(400);
 
-        expect(response.body.error).toBe('Config NEW_CONFIG already exist');
+        expect(response.body.error).toBe('Config NEW_CONFIG already exists');
     });
 
     test('CONFIG_SUITE - Should NOT create a new Config - with wrong group config Id', async () => {
@@ -279,7 +279,7 @@ describe('Testing update info', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({ key: 'NEWKEY' }).expect(400);
 
-        expect(response.body.error).toEqual('Config NEWKEY already exist');
+        expect(response.body.error).toEqual('Config NEWKEY already exists');
     });
 
     test('CONFIG_SUITE - Should NOT update Config info', async () => {

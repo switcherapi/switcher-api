@@ -52,7 +52,7 @@ describe('Insertion tests', () => {
         component1Id = response.body.component._id;
     });
 
-    test('COMPONENT_SUITE - Should NOT create a new Component - Component already exist', async () => {
+    test('COMPONENT_SUITE - Should NOT create a new Component - Component already exists', async () => {
         const response = await request(app)
             .post('/component/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -62,7 +62,7 @@ describe('Insertion tests', () => {
                 domain: domainId
             }).expect(400);
 
-        expect(response.body.error).toBe('Unable to complete the operation. Component \'my-web-app\' already exist for this Domain');
+        expect(response.body.error).toBe('Unable to complete the operation. Component \'my-web-app\' already exists for this Domain');
     });
 
     test('COMPONENT_SUITE - Should NOT create a new Component - Domain not found', async () => {

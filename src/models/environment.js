@@ -46,7 +46,7 @@ environmentSchema.pre('validate', async function (next) {
     const existEnv = await Environment.findOne({ name, domain }).exec();
     
     if (existEnv) {
-        const err = new Error(`Unable to complete the operation. Environment '${name}' already exist for this Domain`);
+        const err = new Error(`Unable to complete the operation. Environment '${name}' already exists for this Domain`);
         next(err);
     }
 

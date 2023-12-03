@@ -96,7 +96,7 @@ describe('Testing strategy creation #1', () => {
             }).expect(400);
 
         expect(response.body.error)
-            .toBe(`Unable to complete the operation. Strategy '${StrategiesType.VALUE}' already exist for this configuration and environment`);
+            .toBe(`Unable to complete the operation. Strategy '${StrategiesType.VALUE}' already exists for this configuration and environment`);
     });
 
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Operation not available', async () => {
@@ -665,7 +665,7 @@ describe('Testing update strategies #1', () => {
         expect('USER_4').toEqual(foundExistingOne);
     });
 
-    test('STRATEGY_SUITE - Should NOT add new value to Strategy values - Value already exist', async () => {
+    test('STRATEGY_SUITE - Should NOT add new value to Strategy values - Value already exists', async () => {
         const response = await request(app)
             .patch('/configstrategy/addval/' + configStrategyId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -673,7 +673,7 @@ describe('Testing update strategies #1', () => {
                 value: 'USER_3'
             }).expect(400);
 
-        expect(response.body.error).toEqual('Value \'USER_3\' already exist');
+        expect(response.body.error).toEqual('Value \'USER_3\' already exists');
     });
 
     test('STRATEGY_SUITE - Should NOT add new value to Strategy values - Invalid parameter', async () => {
@@ -776,7 +776,7 @@ describe('Testing update strategies #2', () => {
                 newvalue: 'USER_2'
             }).expect(400);
 
-        expect(response.body.error).toEqual('Value \'USER_2\' already exist');
+        expect(response.body.error).toEqual('Value \'USER_2\' already exists');
 
         response = await request(app)
             .patch('/configstrategy/updateval/' + configStrategyId)

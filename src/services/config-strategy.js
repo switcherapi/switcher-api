@@ -111,7 +111,7 @@ export async function addVal(id, args, admin) {
 
     validateValues([value]);
     if (foundExistingOne) {
-        throw new BadRequestError(`Value '${value}' already exist`);
+        throw new BadRequestError(`Value '${value}' already exists`);
     }
 
     configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, 
@@ -144,7 +144,7 @@ export async function updateVal(id, args, admin) {
 
     validateValues([newvalue]);
     if (indexNewValue >= 0) {
-        throw new BadRequestError(`Value '${newvalue}' already exist`);
+        throw new BadRequestError(`Value '${newvalue}' already exists`);
     }
 
     configStrategy = await verifyOwnership(admin, configStrategy, configStrategy.domain, ActionTypes.UPDATE, 

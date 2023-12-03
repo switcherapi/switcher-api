@@ -59,7 +59,7 @@ export async function createGroup(args, admin) {
     // validates existing group config
     let group = await getGroupConfig({ name: args.name, domain: args.domain });
     if (group) {
-        throw new BadRequestError(`Group ${group.name} already exist`);
+        throw new BadRequestError(`Group ${group.name} already exists`);
     }
 
     const domain = await getDomainById(args.domain);
@@ -102,7 +102,7 @@ export async function updateGroup(id, args, admin) {
         let groupFound = await getGroupConfig({ name: args.name, domain: groupconfig.domain });
 
         if (groupFound) {
-            throw new BadRequestError(`Group ${args.name} already exist`);
+            throw new BadRequestError(`Group ${args.name} already exists`);
         }
 
         // resets permission cache
