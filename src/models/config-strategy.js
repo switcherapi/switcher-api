@@ -397,9 +397,9 @@ configStrategySchema.pre('save', async function (next) {
     const operationStrategy = strategyConfig.operation;
     const { min, max } = OperationValuesValidation.filter(element => element.operation === operationStrategy)[0];
 
-    // Verify if strategy already exist
+    // Verify if strategy already exists
     if (await existStrategy(strategyConfig)) {
-        const err = new Error(`Unable to complete the operation. Strategy '${strategy}' already exist for this configuration and environment`);
+        const err = new Error(`Unable to complete the operation. Strategy '${strategy}' already exists for this configuration and environment`);
         return next(err);
     }
 

@@ -57,7 +57,7 @@ describe('Testing Group insertion', () => {
                 domain: domainId
             }).expect(400);
 
-        expect(response.body.error).toBe('Group New Group Config already exist');
+        expect(response.body.error).toBe('Group New Group Config already exists');
     });
 
     test('GROUP_SUITE - Should not create a new Group Config - with wrong domain Id', async () => {
@@ -257,7 +257,7 @@ describe('Testing update Group info', () => {
                 name: 'Updated Group Name'
             }).expect(400);
 
-        expect(response.body.error).toEqual('Group Updated Group Name already exist');
+        expect(response.body.error).toEqual('Group Updated Group Name already exists');
     });
 
     test('GROUP_SUITE - Should NOT update Group Config info', async () => {

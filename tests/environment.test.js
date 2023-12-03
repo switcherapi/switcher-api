@@ -52,7 +52,7 @@ describe('Insertion tests', () => {
             }).expect(403);
     });
 
-    test('ENV_SUITE - Should NOT create a new Environment - Environment already exist', async () => {
+    test('ENV_SUITE - Should NOT create a new Environment - Environment already exists', async () => {
         const response = await request(app)
             .post('/environment/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -61,7 +61,7 @@ describe('Insertion tests', () => {
                 domain: domainId
             }).expect(400);
 
-        expect(response.body.error).toBe(`Unable to complete the operation. Environment '${EnvType.DEFAULT}' already exist for this Domain`);
+        expect(response.body.error).toBe(`Unable to complete the operation. Environment '${EnvType.DEFAULT}' already exists for this Domain`);
     });
 
     test('ENV_SUITE - Should NOT create a new Environment - Domain not found', async () => {

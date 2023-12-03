@@ -69,9 +69,9 @@ const existTeam = async (team) => {
 teamSchema.pre('validate', async function (next) {
     const team = this;
 
-    // Verify if team already exist
+    // Verify if team already exists
     if (await existTeam(team)) {
-        const err = new Error(`Unable to complete the operation. Team '${team.name}' already exist for this Domain`);
+        const err = new Error(`Unable to complete the operation. Team '${team.name}' already exists for this Domain`);
         next(err);
     }
 

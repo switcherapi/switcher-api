@@ -87,7 +87,7 @@ export async function addValue(args, id, admin) {
 
     const value = args.value.trim();
     if (permission.values.includes(value)) {
-        throw new BadRequestError(`Value '${value}' already exist`);
+        throw new BadRequestError(`Value '${value}' already exists`);
     }
 
     permission.values.push(value);

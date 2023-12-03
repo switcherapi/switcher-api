@@ -73,7 +73,7 @@ export async function createConfig(args, admin) {
     });
     
     if (config) {
-        throw new BadRequestError(`Config ${config.key} already exist`);
+        throw new BadRequestError(`Config ${args.key} already exists`);
     }
 
     config = new Config({
@@ -122,7 +122,7 @@ export async function updateConfig(id, args, admin) {
         });
         
         if (duplicatedKey) {
-            throw new BadRequestError(`Config ${args.key} already exist`);
+            throw new BadRequestError(`Config ${args.key} already exists`);
         }
 
         // resets permission cache
