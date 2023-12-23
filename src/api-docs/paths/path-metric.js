@@ -2,23 +2,23 @@ import { queryParameter } from '../schemas/common';
 import { commonSchemaContent } from './common';
 
 export default {
-    '/metric/data/': {
+    '/metric/data': {
         get: {
             tags: ['Metric'],
             description: 'Get metrics data',
             security: [{ bearerAuth: [] }],
             parameters: [
-                queryParameter('domainid', 'The domain id', 'string', true),
-                queryParameter('page', 'The page number', 'integer', true),
-                queryParameter('key', 'Switcher Key', 'string', false),
-                queryParameter('group', 'Group name', 'string', false),
-                queryParameter('component', 'Component name', 'string', false),
-                queryParameter('result', 'Result', 'boolean', false),
-                queryParameter('environment', 'Environment', 'string', false),
-                queryParameter('dateGroupPattern', 'Date group pattern', 'string', false),
-                queryParameter('dateAfter', 'Date after', 'string', false),
-                queryParameter('dateBefore', 'Date before', 'string', false),
-                queryParameter('sortBy', 'Sort by | Can add params separated by ;', 'string', false)
+                queryParameter('domainid', 'The domain id', true, 'string'),
+                queryParameter('page', 'The page number', true, 'integer'),
+                queryParameter('key', 'Switcher Key', false, 'string'),
+                queryParameter('group', 'Group name', false, 'string'),
+                queryParameter('component', 'Component name', false, 'string'),
+                queryParameter('result', 'Result', false, 'boolean'),
+                queryParameter('environment', 'Environment', false, 'string'),
+                queryParameter('dateGroupPattern', 'Date group pattern', false, 'string'),
+                queryParameter('dateAfter', 'Date after', false, 'string'),
+                queryParameter('dateBefore', 'Date before', false, 'string'),
+                queryParameter('sortBy', 'Sort by | Can add params separated by ;', false, 'string')
             ],
             responses: {
                 200: {
@@ -28,23 +28,23 @@ export default {
             }
         }
     },
-    '/metric/statistics/': {
+    '/metric/statistics': {
         get: {
             tags: ['Metric'],
             description: 'Get metrics statistics',
             security: [{ bearerAuth: [] }],
             parameters: [
-                queryParameter('domainid', 'The domain id', 'string', true),
-                queryParameter('statistics', '[switchers, components, reasons, all]', 'string', true),
-                queryParameter('key', 'Switcher Key', 'string', false),
-                queryParameter('group', 'Group name', 'string', false),
-                queryParameter('component', 'Component name', 'string', false),
-                queryParameter('result', 'Result', 'boolean', false),
-                queryParameter('environment', 'Environment', 'string', false),
-                queryParameter('dateGroupPattern', 'Date group pattern', 'string', false),
-                queryParameter('dateAfter', 'Date after', 'string', false),
-                queryParameter('dateBefore', 'Date before', 'string', false),
-                queryParameter('sortBy', 'Sort by | Can add params separated by ;', 'string', false)
+                queryParameter('domainid', 'The domain id', true, 'string'),
+                queryParameter('statistics', '[switchers, components, reasons, all]', true, 'string'),
+                queryParameter('key', 'Switcher Key', false, 'string'),
+                queryParameter('group', 'Group name', false, 'string'),
+                queryParameter('component', 'Component name', false, 'string'),
+                queryParameter('result', 'Result', false, 'boolean'),
+                queryParameter('environment', 'Environment', false, 'string'),
+                queryParameter('dateGroupPattern', 'Date group pattern', false, 'string'),
+                queryParameter('dateAfter', 'Date after', false, 'string'),
+                queryParameter('dateBefore', 'Date before', false, 'string'),
+                queryParameter('sortBy', 'Sort by | Can add params separated by ;', false, 'string')
             ],
             responses: {
                 200: {
@@ -60,8 +60,8 @@ export default {
             description: 'Delete metrics',
             security: [{ bearerAuth: [] }],
             parameters: [
-                queryParameter('domainid', 'The domain id', 'string', true),
-                queryParameter('key', 'Switcher Key', 'string', true)
+                queryParameter('domainid', 'The domain id', true, 'string'),
+                queryParameter('key', 'Switcher Key', true, 'string')
             ],
             responses: {
                 200: {

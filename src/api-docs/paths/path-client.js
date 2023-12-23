@@ -9,10 +9,10 @@ export default {
             description: 'Execute criteria query against the API settings',
             security: [{ appAuth: [] }],
             parameters: [
-                queryParameter('key', 'string', 'Switcher Key', true),
-                queryParameter('showReason', 'boolean', 'Show criteria execution reason (default: true)', false),
-                queryParameter('showStrategy', 'boolean', 'Show criteria execution strategy (default: true)', false),
-                queryParameter('bypassMetric', 'boolean', 'Bypass metric check (default: true)', false)
+                queryParameter('key', 'Switcher Key', true, 'string'),
+                queryParameter('showReason', 'Show criteria execution reason (default: true)', false, 'boolean'),
+                queryParameter('showStrategy', 'Show criteria execution strategy (default: true)', false, 'boolean'),
+                queryParameter('bypassMetric', 'Bypass metric check (default: true)', false, 'boolean')
             ],
             requestBody: {
                 content: {
@@ -56,7 +56,7 @@ export default {
                                     },
                                     strategies: {
                                         type: 'array',
-                                        items: configStrategy
+                                        items: configStrategy.ConfigStrategy
                                     }
                                 }
                             }
@@ -66,13 +66,13 @@ export default {
             }
         }
     },
-    '/criteria/snapshot_check/:version': {
+    '/criteria/snapshot_check/{version}': {
         get: {
             tags: ['Client API'],
             description: 'Check if snapshot version is up to date',
             security: [{ appAuth: [] }],
             parameters: [
-                pathParameter('version', 'string', 'Snapshot version', true)
+                pathParameter('version', 'Snapshot version', true)
             ],
             responses: {
                 200: {

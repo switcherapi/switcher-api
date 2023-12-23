@@ -253,7 +253,10 @@ export default {
                             type: 'object',
                             properties: {
                                 token: {
-                                    refreshToken: 'string'
+                                    type: 'string'
+                                },
+                                refreshToken: {
+                                    type: 'string'
                                 }
                             }
                         }

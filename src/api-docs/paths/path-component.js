@@ -18,13 +18,13 @@ export default {
             }
         }
     },
-    '/component/generateApiKey/:component/': {
+    '/component/generateApiKey/{component}': {
         get: {
             tags: ['Component'],
             description: 'Generate an API key for a component',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('component', 'Component ID', 'string', true)
+                pathParameter('component', 'Component ID', true)
             ],
             responses: {
                 200: {
@@ -51,7 +51,7 @@ export default {
             description: 'Get all components',
             security: [{ bearerAuth: [] }],
             parameters: [
-                queryParameter('domain', 'Domain ID', 'string', true),
+                queryParameter('domain', 'Domain ID', true, 'string'),
                 ...pagination
             ],
             responses: {
@@ -62,13 +62,13 @@ export default {
             }
         }
     },
-    '/component/:id': {
+    '/component/{id}': {
         get: {
             tags: ['Component'],
             description: 'Get a component',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Component ID', 'string', true)
+                pathParameter('id', 'Component ID', true)
             ],
             responses: {
                 200: {
@@ -82,7 +82,7 @@ export default {
             description: 'Update a component',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Component ID', 'string', true),
+                pathParameter('id', 'Component ID', true),
             ],
             requestBody: {
                 content: {
@@ -113,7 +113,7 @@ export default {
             description: 'Delete a component',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Component ID', 'string', true)
+                pathParameter('id', 'Component ID', true)
             ],
             responses: {
                 200: {

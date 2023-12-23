@@ -14,7 +14,7 @@ const environment = {
             format: 'uuid'
         },
         owner: {
-            type: 'uuid',
+            type: 'string',
             description: 'The owner id of the environment'
         },
         createdAt: {

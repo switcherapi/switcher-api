@@ -6,7 +6,7 @@ export const domain = {
             description: 'The unique identifier of the domain'
         },
         integrations: {
-            type: 'obejct',
+            type: 'object',
             properties: {
                 slack: {
                     type: 'string',
@@ -39,14 +39,14 @@ export const domain = {
             }
         },
         owner: {
-            type: 'uuid',
+            type: 'string',
             description: 'The owner id of the domain'
         },
         admin: {
             type: 'object',
             properties: {
                 _id: {
-                    type: 'uuid',
+                    type: 'string',
                     description: 'The unique identifier of the admin'
                 },
                 name: {

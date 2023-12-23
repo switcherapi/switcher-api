@@ -22,7 +22,7 @@ export default {
             description: 'Delete a slack installation',
             security: [{ slackAuth: [] }],
             parameters: [
-                queryParameter('team_id', 'The team id', 'string', true)
+                queryParameter('team_id', 'The team id', true, 'string')
             ],
             responses: {
                 200: {
@@ -147,7 +147,7 @@ export default {
             description: 'Find the bot',
             security: [{ slackAuth: [] }],
             parameters: [
-                queryParameter('team_id', 'The Slack team ID', 'string', true)
+                queryParameter('team_id', 'The Slack team ID', true, 'string')
             ],
             responses: {
                 200: {
@@ -163,7 +163,7 @@ export default {
             description: 'Find the installation without checking the domain',
             security: [{ slackAuth: [] }],
             parameters: [
-                queryParameter('team_id', 'The Slack team ID', 'string', true)
+                queryParameter('team_id', 'The Slack team ID', true, 'string')
             ],
             responses: {
                 200: {
@@ -179,7 +179,7 @@ export default {
             description: 'Find the installation',
             security: [{ bearerAuth: [] }],
             parameters: [
-                queryParameter('team_id', 'The Slack team ID', 'string', true)
+                queryParameter('team_id', 'The Slack team ID', true, 'string')
             ],
             responses: {
                 200: {
@@ -189,13 +189,13 @@ export default {
             }
         }
     },
-    '/slack/v1/installation/:domain': {
+    '/slack/v1/installation/{domain}': {
         get: {
             tags: ['Switcher Slack App'],
             description: 'Return complete installation and settings given a domain ID',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('domain', 'The domain ID', 'string', true)
+                pathParameter('domain', 'The domain ID', true)
             ],
             responses: {
                 200: {
@@ -211,7 +211,7 @@ export default {
             description: 'Decline the installation',
             security: [{ bearerAuth: [] }],
             parameters: [
-                queryParameter('team_id', 'The Slack team ID', 'string', true)
+                queryParameter('team_id', 'The Slack team ID', true, 'string')
             ],
             responses: {
                 200: {
@@ -227,7 +227,7 @@ export default {
             description: 'Unlink the installation',
             security: [{ bearerAuth: [] }],
             parameters: [
-                queryParameter('domain', 'Domain ID', 'string', true)
+                queryParameter('domain', 'Domain ID', true, 'string')
             ],
             responses: {
                 200: {
@@ -237,14 +237,14 @@ export default {
             }
         }
     },
-    '/slack/v1/settings/:param/:domain': {
+    '/slack/v1/settings/{param}/{domain}': {
         patch: {
             tags: ['Switcher Slack App'],
             description: 'Update Slack Installation settings given a parameter',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('param', 'Parameter to be updated', 'string', true),
-                pathParameter('domain', 'The domain ID', 'string', true)
+                pathParameter('param', 'Parameter to be updated', true),
+                pathParameter('domain', 'The domain ID', true)
             ],
             responses: {
                 200: {

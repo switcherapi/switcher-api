@@ -38,7 +38,7 @@ export default {
             description: 'Get all teams',
             security: [{ bearerAuth: [] }],
             parameters: [
-                queryParameter('domain', 'string', 'Domain ID', true),
+                queryParameter('domain', 'Domain ID', true, 'string'),
                 ...pagination
             ],
             responses: {
@@ -49,7 +49,7 @@ export default {
             }
         }
     },
-    '/team/:id': {
+    '/team/{id}': {
         get: {
             tags: ['Team'],
             description: 'Get single team',
@@ -110,7 +110,7 @@ export default {
             }
         }
     },
-    '/team/member/invite/:id': {
+    '/team/member/invite/{id}': {
         post: {
             tags: ['Team'],
             description: 'Invite member to team',
@@ -170,7 +170,7 @@ export default {
             }
         }
     },
-    '/team/member/invite/pending/:id': {
+    '/team/member/invite/pending/{id}': {
         get: {
             tags: ['Team'],
             description: 'Get pending invites',
@@ -186,7 +186,7 @@ export default {
             }
         }
     },
-    '/team/member/invite/accept/:request_id': {
+    '/team/member/invite/accept/{request_id}': {
         post: {
             tags: ['Team'],
             description: 'Accept invite',
@@ -202,7 +202,7 @@ export default {
             }
         }
     },
-    '/team/member/invite/remove/:id/:request_id': {
+    '/team/member/invite/remove/{id}/{request_id}': {
         delete: {
             tags: ['Team'],
             description: 'Remove invite',
@@ -219,7 +219,7 @@ export default {
             }
         }
     },
-    '/team/member/add/:id': {
+    '/team/member/add/{id}': {
         patch: {
             tags: ['Team'],
             description: 'Add member to team',
@@ -250,7 +250,7 @@ export default {
             }
         }
     },
-    '/team/member/remove/:id': {
+    '/team/member/remove/{id}': {
         patch: {
             tags: ['Team'],
             description: 'Remove member from team',
@@ -281,7 +281,7 @@ export default {
             }
         }
     },
-    '/team/permission/remove/:id': {
+    '/team/permission/remove/{id}': {
         patch: {
             tags: ['Team'],
             description: 'Remove permission from team',

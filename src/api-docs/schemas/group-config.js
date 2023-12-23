@@ -24,14 +24,14 @@ const groupConfig = {
             format: 'uuid'
         },
         owner: {
-            type: 'uuid',
+            type: 'string',
             description: 'The owner id of the config'
         },
         admin: {
             type: 'object',
             properties: {
                 _id: {
-                    type: 'uuid',
+                    type: 'string',
                     description: 'The unique identifier of the admin'
                 },
                 name: {

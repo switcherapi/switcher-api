@@ -24,7 +24,7 @@ export default {
             description: 'Get all group configs',
             security: [{ bearerAuth: [] }],
             parameters: [
-                queryParameter('domain', 'Domain ID', 'string', true),
+                queryParameter('domain', 'Domain ID', true, 'string'),
                 ...pagination
             ],
             responses: {
@@ -35,13 +35,13 @@ export default {
             }
         }
     },
-    '/groupconfig/:id': {
+    '/groupconfig/{id}': {
         get: {
             tags: ['GroupConfig'],
             description: 'Get a group config',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'GroupConfig ID', 'string', true)
+                pathParameter('id', 'GroupConfig ID', true)
             ],
             responses: {
                 200: {
@@ -55,7 +55,7 @@ export default {
             description: 'Delete a group config',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'GroupConfig ID', 'string', true)
+                pathParameter('id', 'GroupConfig ID', true)
             ],
             responses: {
                 200: {
@@ -69,7 +69,7 @@ export default {
             description: 'Update a group config',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'GroupConfig ID', 'string', true)
+                pathParameter('id', 'GroupConfig ID', true)
             ],
             requestBody: {
                 content: {
@@ -96,13 +96,13 @@ export default {
             }
         }
     },
-    '/groupconfig/history/:id': {
+    '/groupconfig/history/{id}': {
         get: {
             tags: ['GroupConfig'],
             description: 'Get a Group Config history',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'GroupConfig ID', 'string', true),
+                pathParameter('id', 'GroupConfig ID', true),
                 ...pagination
             ],
             responses: {
@@ -117,7 +117,7 @@ export default {
             description: 'Delete a group config history',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'GroupConfig ID', 'string', true)
+                pathParameter('id', 'GroupConfig ID', true)
             ],
             responses: {
                 200: {
@@ -127,7 +127,7 @@ export default {
             }
         }
     },
-    '/groupconfig/updateStatus/:id': {
+    '/groupconfig/updateStatus/{id}': {
         patch: {
             tags: ['GroupConfig'],
             description: 'Group Config environment update',
