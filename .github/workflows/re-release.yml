@@ -1,5 +1,5 @@
-name: Re-release CI $
-run-name: Re-Release CI - ${{ github.event.inputs.tag }} by @${{ github.actor }}
+name: Re-release CI
+run-name: Re-releasing - ${{ github.event.inputs.tag }} by @${{ github.actor }}
 
 on:
   workflow_dispatch:
