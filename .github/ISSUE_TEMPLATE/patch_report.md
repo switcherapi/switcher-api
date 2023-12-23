@@ -11,12 +11,10 @@ assignees: petruki
 A clear and concise description of why the patch is needed.
 
 **Current dependency**
-- **Name**:
-- **Version**:
+- **name@version**:
 
 **Optional - Remediation**
-- **Name**:
-- **Version**:
+- **name@version**:
 
 **Additional context**
 Links or documentation to the vulnerability or dependency update.
