@@ -1,6 +1,6 @@
 import { OperationsType, StrategiesType } from '../../models/config-strategy';
 
-export const configStrategy = {
+const configStrategy = {
     type: 'object',
     properties: {
         _id: {
@@ -22,9 +22,12 @@ export const configStrategy = {
             type: 'string',
             enum: Object.values(StrategiesType)
         },
-        values: [{
-            type: 'string'
-        }],
+        values: {
+            type: 'array',
+            items: {
+                type: 'string'
+            }
+        },
         operation: {
             type: 'string',
             enum: Object.values(OperationsType)
@@ -40,14 +43,14 @@ export const configStrategy = {
             format: 'uuid'
         },
         owner: {
-            type: 'uuid',
+            type: 'string',
             description: 'The owner id of the config strategy'
         },
         admin: {
             type: 'object',
             properties: {
                 _id: {
-                    type: 'uuid',
+                    type: 'string',
                     description: 'The unique identifier of the admin'
                 },
                 name: {
@@ -80,9 +83,12 @@ export default {
                 type: 'string',
                 enum: Object.values(StrategiesType)
             },
-            values: [{
-                type: 'string'
-            }],
+            values: {
+                type: 'array',
+                items: {
+                    type: 'string'
+                }
+            },
             operation: {
                 type: 'string',
                 enum: Object.values(OperationsType)

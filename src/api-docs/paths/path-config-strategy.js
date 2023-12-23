@@ -37,7 +37,7 @@ export default {
             }
         }
     },
-    '/configstrategy/:id': {
+    '/configstrategy/{id}': {
         get: {
             tags: ['ConfigStrategy'],
             description: 'Get a Config Strategy',
@@ -105,7 +105,7 @@ export default {
             }
         }
     },
-    '/configstrategy/history/:id': {
+    '/configstrategy/history/{id}': {
         get: {
             tags: ['ConfigStrategy'],
             description: 'Get a Config Strategy history',
@@ -136,7 +136,7 @@ export default {
             }
         }
     },
-    '/configstrategy/req/:strategy': {
+    '/configstrategy/req/{strategy}': {
         get: {
             tags: ['ConfigStrategy'],
             description: 'Get Config Strategy requirements specification',
@@ -172,11 +172,13 @@ export default {
                         'application/json': {
                             schema: {
                                 type: 'object',
-                                strategiesAvailable: {
-                                    type: 'array',
-                                    items: {
-                                        type: 'string',
-                                        enum: Object.values(StrategiesType)
+                                properties: {
+                                    strategiesAvailable: {
+                                        type: 'array',
+                                        items: {
+                                            type: 'string',
+                                            enum: Object.values(StrategiesType)
+                                        }
                                     }
                                 }
                             }
@@ -186,7 +188,7 @@ export default {
             }
         }
     },
-    '/configstrategy/addval/:id': {
+    '/configstrategy/addval/{id}': {
         patch: {
             tags: ['ConfigStrategy'],
             description: 'Add a value to a Config Strategy',
@@ -216,7 +218,7 @@ export default {
             }
         }
     },
-    '/configstrategy/updateval/:id': {
+    '/configstrategy/updateval/{id}': {
         patch: {
             tags: ['ConfigStrategy'],
             description: 'Update a value of a Config Strategy',
@@ -249,7 +251,7 @@ export default {
             }
         }
     },
-    '/configstrategy/removeval/:id': {
+    '/configstrategy/removeval/{id}': {
         patch: {
             tags: ['ConfigStrategy'],
             description: 'Remove a value of a Config Strategy',
@@ -279,7 +281,7 @@ export default {
             }
         }
     },
-    '/configstrategy/values/:id': {
+    '/configstrategy/values/{id}': {
         get: {
             tags: ['ConfigStrategy'],
             description: 'Get a Config Strategy values',
@@ -305,7 +307,7 @@ export default {
             }
         }
     },
-    '/configstrategy/updateStatus/:id': {
+    '/configstrategy/updateStatus/{id}': {
         patch: {
             tags: ['ConfigStrategy'],
             description: 'Update a Config Strategy status',

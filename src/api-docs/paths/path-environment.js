@@ -24,7 +24,7 @@ export default {
             description: 'Get all environments',
             security: [{ bearerAuth: [] }],
             parameters: [
-                queryParameter('domain', 'Domain ID', 'string', true),
+                queryParameter('domain', 'Domain ID', true, 'string'),
                 ...pagination
             ],
             responses: {
@@ -35,13 +35,13 @@ export default {
             }
         }
     },
-    '/environment/:id': {
+    '/environment/{id}': {
         get: {
             tags: ['Environment'],
             description: 'Get an environment',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Environment ID', 'string', true)
+                pathParameter('id', 'Environment ID', true)
             ],
             responses: {
                 200: {
@@ -55,7 +55,7 @@ export default {
             description: 'Delete an environment',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Environment ID', 'string', true)
+                pathParameter('id', 'Environment ID', true)
             ],
             responses: {
                 200: {
@@ -65,13 +65,13 @@ export default {
             }
         }
     },
-    '/environment/recover/:id': {
+    '/environment/recover/{id}': {
         patch: {
             tags: ['Environment'],
             description: 'Recover an environment',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Environment ID', 'string', true)
+                pathParameter('id', 'Environment ID', true)
             ],
             responses: {
                 200: {

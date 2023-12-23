@@ -3,13 +3,13 @@ import { pathParameter, queryParameter } from '../schemas/common';
 import { commonArraySchemaContent, commonSchemaContent } from './common';
 
 export default {
-    '/permission/create/:team': {
+    '/permission/create/{team}': {
         post: {
             tags: ['Permission'],
             description: 'Create a new permission',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('team', 'Team ID', 'string', true)
+                pathParameter('team', 'Team ID', true)
             ],
             requestBody: {
                 content: commonSchemaContent('Permission')
@@ -50,13 +50,13 @@ export default {
             }
         }
     },
-    '/permission/spec/router/:router': {
+    '/permission/spec/router/{router}': {
         get: {
             tags: ['Permission'],
             description: 'Get key available for a router',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('router', 'Router Name', 'string', true)
+                pathParameter('router', 'Router Name', true)
             ],
             responses: {
                 200: {
@@ -111,7 +111,7 @@ export default {
             description: 'Get all permissions',
             security: [{ bearerAuth: [] }],
             parameters: [
-                queryParameter('team', 'Team ID', 'string', true)
+                queryParameter('team', 'Team ID', true, 'string')
             ],
             responses: {
                 200: {
@@ -121,13 +121,13 @@ export default {
             }
         }
     },
-    '/permission/:id': {
+    '/permission/{id}': {
         get: {
             tags: ['Permission'],
             description: 'Get a permission',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Permission ID', 'string', true)
+                pathParameter('id', 'Permission ID', true)
             ],
             responses: {
                 200: {
@@ -141,7 +141,7 @@ export default {
             description: 'Update a permission',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Permission ID', 'string', true)
+                pathParameter('id', 'Permission ID', true)
             ],
             requestBody: {
                 content: commonSchemaContent('PermissionUpdateRequest')
@@ -158,7 +158,7 @@ export default {
             description: 'Delete a permission',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Permission ID', 'string', true)
+                pathParameter('id', 'Permission ID', true)
             ],
             responses: {
                 200: {
@@ -168,13 +168,13 @@ export default {
             }
         }
     },
-    '/permission/value/add/:id': {
+    '/permission/value/add/{id}': {
         patch: {
             tags: ['Permission'],
             description: 'Add a value to a permission',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Permission ID', 'string', true)
+                pathParameter('id', 'Permission ID', true)
             ],
             requestBody: {
                 content: {
@@ -198,13 +198,13 @@ export default {
             }
         }
     },
-    '/permission/value/remove/:id': {
+    '/permission/value/remove/{id}': {
         patch: {
             tags: ['Permission'],
             description: 'Remove a value from a permission',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Permission ID', 'string', true)
+                pathParameter('id', 'Permission ID', true)
             ],
             requestBody: {
                 content: {
@@ -228,13 +228,13 @@ export default {
             }
         }
     },
-    '/permission/updateValues/:id': {
+    '/permission/updateValues/{id}': {
         patch: {
             tags: ['Permission'],
             description: 'Update values of a permission',
             security: [{ bearerAuth: [] }],
             parameters: [
-                pathParameter('id', 'Permission ID', 'string', true)
+                pathParameter('id', 'Permission ID', true)
             ],
             requestBody: {
                 content: commonSchemaContent('Permission')

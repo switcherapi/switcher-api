@@ -125,7 +125,7 @@ const installation_payload = {
             description: 'Is enterprise install'
         },
         installed_at: {
-            type: 'double',
+            type: 'number',
             description: 'The date installed'
         }
     }

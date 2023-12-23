@@ -2,7 +2,7 @@ import { pagination, pathParameter } from '../schemas/common';
 import { commonArraySchemaContent, commonSchemaContent } from './common';
 
 export default {
-    'domain/create': {
+    '/domain/create': {
         post: {
             tags: ['Domain'],
             description: 'Domain creation',
@@ -225,7 +225,10 @@ export default {
             tags: ['Domain'],
             description: 'Get domain history',
             security: [{ bearerAuth: [] }],
-            parameters: [...pagination],
+            parameters: [
+                pathParameter('id', 'Domain ID', true),
+                ...pagination
+            ],
             responses: {
                 '200': {
                     description: 'Success',
@@ -237,6 +240,9 @@ export default {
             tags: ['Domain'],
             description: 'Delete domain history',
             security: [{ bearerAuth: [] }],
+            parameters: [
+                pathParameter('id', 'Domain ID', true)
+            ],
             responses: {
                 '200': {
                     description: 'Success',

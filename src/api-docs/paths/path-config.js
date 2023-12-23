@@ -324,7 +324,7 @@ export default {
             parameters: [
                 ...pagination,
                 queryParameter('group', 'Group ID', true),
-                queryParameter('fields', 'Fields to return', false, 'string', 'E.g.: key,description,activated.default')
+                queryParameter('fields', 'Fields to return - E.g.: key,description,activated.default', false, 'string')
             ],
             responses: {
                 '200': {
@@ -339,7 +339,10 @@ export default {
             tags: ['Config'],
             description: 'Get Config history',
             security: [{ bearerAuth: [] }],
-            parameters: [...pagination],
+            parameters: [
+                pathParameter('id', 'Config ID', true),
+                ...pagination
+            ],
             responses: {
                 '200': {
                     description: 'Success',
@@ -351,6 +354,9 @@ export default {
             tags: ['Config'],
             description: 'Delete Config history',
             security: [{ bearerAuth: [] }],
+            parameters: [
+                pathParameter('id', 'Config ID', true)
+            ],
             responses: {
                 '200': {
                     description: 'Success',

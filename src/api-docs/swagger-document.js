@@ -54,8 +54,7 @@ export default {
             },
             appAuth: {
                 type: 'http',
-                scheme: 'bearer',
-                name: 'JWT'
+                scheme: 'bearer'
             },
             apiKey: {
                 type: 'apiKey',
