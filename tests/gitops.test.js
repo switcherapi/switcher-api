@@ -36,4 +36,14 @@ describe('GitOps', () => {
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected102));
     });
+
+    test('GITOPS_SUITE - Should return error when token is expired', async () => {
+        const token = generateToken('0s');
+        const req = await request(app)
+            .post('/gitops-graphql')
+            .set('Authorization', `Bearer ${token}`)
+            .send(graphqlUtils.domainQuery([['_id', domainId]], true, true, true));
+
+        expect(req.statusCode).toBe(401);
+    });
 });
