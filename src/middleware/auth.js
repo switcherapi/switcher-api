@@ -6,6 +6,7 @@ import Admin from '../models/admin';
 import Component from '../models/component';
 import { getRateLimit } from '../external/switcher-api-facade';
 import { responseExceptionSilent } from '../exceptions';
+import { EnvType } from '../models/environment';
 
 export async function auth(req, res, next) {
     try {
@@ -54,7 +55,7 @@ export async function authRefreshToken(req, res, next) {
     }
 }
 
-export async function appAuth(req, res, next) {
+export async function componentAuth(req, res, next) {
     try {
         const token = req.header('Authorization').replace('Bearer ', '');
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -80,6 +81,20 @@ export async function slackAuth(req, res, next) {
     try {
         const token = req.header('Authorization').replace('Bearer ', '');
         jwt.verify(token, process.env.SWITCHER_SLACK_JWT_SECRET);
+        next();
+    } catch (err) {
+        responseExceptionSilent(res, err, 401, 'Invalid API token.');
+    }
+}
+
+export async function gitopsAuth(req, res, next) {
+    try {
+        const token = req.header('Authorization').replace('Bearer ', '');
+        const decoded = jwt.verify(token, process.env.SWITCHER_GITOPS_JWT_SECRET);
+
+        req.token = token;
+        req.domain = decoded.subject;
+        req.environment = EnvType.DEFAULT;
         next();
     } catch (err) {
         responseExceptionSilent(res, err, 401, 'Invalid API token.');

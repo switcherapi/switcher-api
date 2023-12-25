@@ -21,7 +21,7 @@ import teamRouter from './routers/team';
 import permissionRouter from './routers/permission';
 import slackRouter from './routers/slack';
 import schema from './client/schema';
-import { appAuth, auth, resourcesAuth, slackAuth } from './middleware/auth';
+import { componentAuth, auth, resourcesAuth, slackAuth, gitopsAuth } from './middleware/auth';
 import { clientLimiter, defaultLimiter } from './middleware/limiter';
 import { createServer } from './app-server';
 
@@ -59,11 +59,13 @@ const handler = (req, res, next) =>
     createHandler({ schema, context: req })(req, res, next);
 
 // Component: Client API
-app.use('/graphql', appAuth, clientLimiter, handler);
+app.use('/graphql', componentAuth, clientLimiter, handler);
 // Admin: Client API
 app.use('/adm-graphql', auth, defaultLimiter, handler);
 // Slack: Client API
 app.use('/slack-graphql', slackAuth, handler);
+// GitOps: Client API
+app.use('/gitops-graphql', gitopsAuth, handler);
 
 /**
  * API Docs and Health Check
