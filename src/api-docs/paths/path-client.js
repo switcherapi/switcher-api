@@ -7,7 +7,7 @@ export default {
         post: {
             tags: ['Client API'],
             description: 'Execute criteria query against the API settings',
-            security: [{ appAuth: [] }],
+            security: [{ componentAuth: [] }],
             parameters: [
                 queryParameter('key', 'Switcher Key', true, 'string'),
                 queryParameter('showReason', 'Show criteria execution reason (default: true)', false, 'boolean'),
@@ -70,7 +70,7 @@ export default {
         get: {
             tags: ['Client API'],
             description: 'Check if snapshot version is up to date',
-            security: [{ appAuth: [] }],
+            security: [{ componentAuth: [] }],
             parameters: [
                 pathParameter('version', 'Snapshot version', true)
             ],
@@ -98,7 +98,7 @@ export default {
         post: {
             tags: ['Client API'],
             description: 'Check if switcher keys are valid',
-            security: [{ appAuth: [] }],
+            security: [{ componentAuth: [] }],
             requestBody: {
                 content: {
                     'application/json': {

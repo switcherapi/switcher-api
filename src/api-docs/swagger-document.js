@@ -52,7 +52,7 @@ export default {
                 scheme: 'bearer',
                 bearerFormat: 'JWT'
             },
-            appAuth: {
+            componentAuth: {
                 type: 'http',
                 scheme: 'bearer'
             },

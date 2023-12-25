@@ -113,7 +113,7 @@ export async function resolveDomain(_id, name, activated, context) {
         } else {
             args._id = _id;
         }
-    // When Component
+    // When Component / GitOps
     } else if (context.domain) {
         args._id = context.domain;
     }
