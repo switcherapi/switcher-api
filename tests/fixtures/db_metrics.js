@@ -9,6 +9,7 @@ import GroupConfig from '../../src/models/group-config';
 import { Config } from '../../src/models/config';
 import Domain from '../../src/models/domain';
 import Component from '../../src/models/component';
+import { EncryptionSalts } from '../../src/models/common';
 
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test_secret';
 
@@ -171,7 +172,7 @@ export const setupDatabase = async () => {
     await new Metric(entry4).save();
 
     const newApiKey = randomUUID();
-    const hash = await bcryptjs.hash(newApiKey, 8);
+    const hash = await bcryptjs.hash(newApiKey, EncryptionSalts.COMPONENT);
     component1.apihash = hash;
     await new Component(component1).save();
 };

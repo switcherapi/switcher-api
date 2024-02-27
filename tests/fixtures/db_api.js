@@ -15,6 +15,7 @@ import { Metric } from '../../src/models/metric';
 import { EnvType, Environment } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
 import Slack from '../../src/models/slack';
+import { EncryptionSalts } from '../../src/models/common';
 
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test_secret';
 
@@ -274,7 +275,7 @@ export const setupDatabase = async () => {
     await new Permission(permissionAll3).save();
     await new Permission(permissionAll4).save();
     
-    const hash = await bcryptjs.hash(component1Key, 8);
+    const hash = await bcryptjs.hash(component1Key, EncryptionSalts.COMPONENT);
     component1.apihash = hash;
     await new Component(component1).save();
 };

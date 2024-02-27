@@ -10,6 +10,7 @@ import {
     domainDocument
  } from '../fixtures/db_api';
 import Component from '../../src/models/component';
+import { EncryptionSalts } from '../../src/models/common';
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -25,13 +26,13 @@ describe('(Deprecated) Testing component authentication', () => {
     const generateApiKeyDeprecated = async (component) => {
         const buffer = randomBytes(32);
         const apiKey = Buffer.from(buffer).toString('base64');
-        const hash = await bcryptjs.hash(apiKey, 8);
+        const hash = await bcryptjs.hash(apiKey, EncryptionSalts.COMPONENT);
         component.apihash = hash;
         await component.save();
 
         const generatedApiKey = Buffer.from(apiKey).toString('base64');
         return generatedApiKey;
-    }
+    };
 
     test('COMPONENT_MODEL - Should authenticate component using old API key format', async () => {
         // Given

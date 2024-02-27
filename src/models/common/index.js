@@ -1,6 +1,11 @@
 import History from '../history';
 import { checkHistory } from '../../external/switcher-api-facade';
 
+export const EncryptionSalts = Object.freeze({
+    ADMIN: 8,
+    COMPONENT: 8
+});
+
 function checkDifference(diff, documents, defaultIgnoredFields, 
     keyArr, keys, pos) {
     

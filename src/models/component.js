@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
 import { Config } from './config';
 import Domain from './domain';
+import { EncryptionSalts } from './common';
 
 const componentSchema = new mongoose.Schema({
     name: {
@@ -56,7 +57,7 @@ componentSchema.methods.generateApiKey = async function () {
     const component = this;
 
     const apiKey = randomUUID();
-    const hash = await bcryptjs.hash(apiKey, 8);
+    const hash = await bcryptjs.hash(apiKey, EncryptionSalts.COMPONENT);
     component.apihash = hash;
     await component.save();
     

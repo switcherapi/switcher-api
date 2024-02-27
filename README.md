@@ -119,11 +119,3 @@ See also our SDKs to integrate Switcher API with your application.
 
 - **Auth** - Client API: /criteria/auth [POST]
 - **Executing** -  Client API: /criteria?key=SWITCHER_KEY [POST]
-
-* * *
-
-## Donations
-Donations for coffee, cookies or pizza are extremely welcomed.<br>
-Please, find the sponsor button at the top for more options.
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?business=A5R6K3JAD8SW4&no_recurring=0&item_name=Thank+you+for+supporting+the+Open+Source+Community&currency_code=CAD)
