@@ -14,6 +14,7 @@ import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models
 import { ActionTypes, RouterTypes, Permission } from '../../src/models/permission';
 import { Team } from '../../src/models/team';
 import Slack from '../../src/models/slack';
+import { EncryptionSalts } from '../../src/models/common';
 
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test_secret';
 
@@ -37,7 +38,7 @@ export const adminAccount = {
     active: true
 };
 
-export let apiKey;
+export const apiKey = randomUUID();
 export const domainId = new mongoose.Types.ObjectId();
 export const domainDocument = {
     _id: domainId,
@@ -237,9 +238,7 @@ export const setupDatabase = async () => {
     await new ConfigStrategy(configStrategyTIME_BETWEENDocument).save();
     await new ConfigStrategy(configStrategyTIME_GREATDocument).save();
 
-    const newApiKey = randomUUID();
-    const hash = await bcryptjs.hash(newApiKey, 8);
+    const hash = await bcryptjs.hash(apiKey, EncryptionSalts.COMPONENT);
     component1.apihash = hash;
     await new Component(component1).save();
-    apiKey = newApiKey;
 };

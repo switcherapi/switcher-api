@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { Team } from './team';
 import { notifyAcCreation, notifyAcDeletion } from '../external/switcher-api-facade';
+import { EncryptionSalts } from './common';
 
 const adminSchema = new mongoose.Schema({
     name: {
@@ -196,7 +197,7 @@ adminSchema.pre('save', async function (next) {
     const admin = this;
 
     if (admin.isModified('password')) {
-        admin.password = await bcryptjs.hash(admin.password, 8);
+        admin.password = await bcryptjs.hash(admin.password, EncryptionSalts.ADMIN);
         notifyAcCreation(admin._id);
     }
     
