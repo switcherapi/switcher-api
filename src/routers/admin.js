@@ -7,6 +7,7 @@ import { permissionCache } from '../helpers/cache';
 import { responseException } from '../exceptions';
 import * as Services from '../services/admin';
 import { SwitcherKeys } from '../external/switcher-api-facade';
+import { checkActionType } from '../models/permission';
 
 const router = new express.Router();
 
@@ -101,6 +102,7 @@ router.get('/admin/me', auth, async (req, res) => {
 router.post('/admin/collaboration/permission', auth, [
     check('domain', 'Domain Id is required').isMongoId(),
     check('action', 'Array of actions is required').isArray({ min: 1 }),
+    check('action.*').custom(async value => checkActionType([value])),
     check('router', 'Router name is required').isLength({ min: 1 }),
     check('environment').isString().optional()
 ], validate, async (req, res) => {
@@ -124,9 +126,9 @@ router.post('/admin/collaboration/permission', auth, [
         try {
             await verifyOwnership(req.admin, element, req.body.domain, action_perm, 
                 req.body.router, false, req.body.environment);
-            result.push({ action: action_perm.toString(), result: 'ok' });
+            result.push({ action: action_perm, result: 'ok' });
         } catch (e) {
-            result.push({ action : action_perm.toString(), result: 'nok' });
+            result.push({ action : action_perm, result: 'nok' });
         }
     }
 

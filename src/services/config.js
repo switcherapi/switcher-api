@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import { response } from './common';
 import { Config } from '../models/config';
 import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers';
@@ -258,15 +257,14 @@ export async function removeComponent(id, args, admin) {
 
 export async function updateComponent(id, args, admin) {
     const config = await verifyAddComponentInput(id, admin);
-    const componentIds = args.components.map(component => new mongoose.Types.ObjectId(component));
-    const components = await getComponents({ _id: { $in: componentIds } });
+    const components = await getComponents({ _id: { $in: args.components } });
 
     if (components.length != args.components.length) {
         throw new NotFoundError('One or more component was not found');
     }
 
     config.updatedBy = admin.email;
-    config.components = componentIds;
+    config.components = args.components;
     await config.save();
     updateDomainVersion(config.domain);
 
