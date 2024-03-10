@@ -949,6 +949,22 @@ describe('Testing Admin collaboration endpoint - Reading permissions', () => {
         token = responseLogin.body.jwt.token;
     });
 
+    test('ADMIN_SUITE - Should NOT read permissions given invalid action request', async () => {
+        const response = await request(app)
+            .post('/admin/collaboration/permission')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                domain: domainId,
+                action: ['INVALID_ACTION'],
+                router: RouterTypes.GROUP,
+                environment: EnvType.DEFAULT
+            })
+            .expect(422);
+
+        expect(response.body.errors[0].msg).toEqual(
+            'Permission validation failed: action: \'INVALID_ACTION\' is not a valid enum value.');
+    });
+
     test('ADMIN_SUITE - Should read permissions given request - Group', async () => {
         const response = await request(app)
             .post('/admin/collaboration/permission')
