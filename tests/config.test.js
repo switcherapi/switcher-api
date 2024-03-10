@@ -590,7 +590,7 @@ describe('Testing component association', () => {
             }).expect(200);
 
         // DB validation - document updated
-        const config = await Config.findById(configId1).exec()
+        const config = await Config.findById(configId1).exec();
         expect(config.components.includes(responseComponent.body.component._id)).toBe(true);
     });
 
