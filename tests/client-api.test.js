@@ -940,12 +940,12 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(graphqlUtils.permissionsQuery(domainId, undefined, `"UPDATE","DELETE"`, RouterTypes.GROUP));
+            .send(graphqlUtils.permissionsQuery(domainId, undefined, '"UPDATE","DELETE"', RouterTypes.GROUP));
 
         const exptected = '[{"action":"UPDATE","result":"ok"},{"action":"DELETE","result":"ok"}]';
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).not.toBe(null);
-        expect(JSON.parse(req.text).data.permission[0].name).toBe("Group Test");
+        expect(JSON.parse(req.text).data.permission[0].name).toBe('Group Test');
         expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
     });
 
@@ -956,20 +956,20 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(graphqlUtils.permissionsQuery(domainId, undefined, `"UPDATE","DELETE"`, RouterTypes.GROUP));
+            .send(graphqlUtils.permissionsQuery(domainId, undefined, '"UPDATE","DELETE"', RouterTypes.GROUP));
 
         expect(cacheSpy.callCount).toBe(0);
         
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(graphqlUtils.permissionsQuery(domainId, undefined, `"UPDATE","DELETE"`, RouterTypes.GROUP));
+            .send(graphqlUtils.permissionsQuery(domainId, undefined, '"UPDATE","DELETE"', RouterTypes.GROUP));
 
         const exptected = '[{"action":"UPDATE","result":"ok"},{"action":"DELETE","result":"ok"}]';
         expect(req.statusCode).toBe(200);
         expect(cacheSpy.callCount).toBe(1);
         expect(JSON.parse(req.text)).not.toBe(null);
-        expect(JSON.parse(req.text).data.permission[0].name).toBe("Group Test");
+        expect(JSON.parse(req.text).data.permission[0].name).toBe('Group Test');
         expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
     });
 
@@ -977,12 +977,12 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send(graphqlUtils.permissionsQuery(domainId, undefined, `"CREATE"`, RouterTypes.GROUP, EnvType.DEFAULT));
+            .send(graphqlUtils.permissionsQuery(domainId, undefined, '"CREATE"', RouterTypes.GROUP, EnvType.DEFAULT));
         
         const exptected = '[{"action":"CREATE","result":"ok"}]';
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).not.toBe(null);
-        expect(JSON.parse(req.text).data.permission[0].name).toBe("Group Test");
+        expect(JSON.parse(req.text).data.permission[0].name).toBe('Group Test');
         expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
     });
 
@@ -990,12 +990,12 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send(graphqlUtils.permissionsQuery(domainId, undefined, `"UPDATE","DELETE"`, RouterTypes.GROUP));
+            .send(graphqlUtils.permissionsQuery(domainId, undefined, '"UPDATE","DELETE"', RouterTypes.GROUP));
 
         const exptected = '[{"action":"UPDATE","result":"nok"},{"action":"DELETE","result":"nok"}]';
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).not.toBe(null);
-        expect(JSON.parse(req.text).data.permission[0].name).toBe("Group Test");
+        expect(JSON.parse(req.text).data.permission[0].name).toBe('Group Test');
         expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
     });
 
@@ -1003,13 +1003,13 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(graphqlUtils.permissionsQuery(domainId, groupConfigId, `"UPDATE","DELETE"`, RouterTypes.CONFIG));
+            .send(graphqlUtils.permissionsQuery(domainId, groupConfigId, '"UPDATE","DELETE"', RouterTypes.CONFIG));
 
         const exptected = '[{"action":"UPDATE","result":"ok"},{"action":"DELETE","result":"ok"}]';
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).not.toBe(null);
-        expect(JSON.parse(req.text).data.permission[0].name).toBe("TEST_CONFIG_KEY");
-        expect(JSON.parse(req.text).data.permission[1].name).toBe("TEST_CONFIG_KEY_PRD_QA");
+        expect(JSON.parse(req.text).data.permission[0].name).toBe('TEST_CONFIG_KEY');
+        expect(JSON.parse(req.text).data.permission[1].name).toBe('TEST_CONFIG_KEY_PRD_QA');
         expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
         expect(JSON.parse(req.text).data.permission[1].permissions).toMatchObject(JSON.parse(exptected));
     });
@@ -1018,13 +1018,13 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send(graphqlUtils.permissionsQuery(domainId, groupConfigId, `"UPDATE","DELETE"`, RouterTypes.CONFIG));
+            .send(graphqlUtils.permissionsQuery(domainId, groupConfigId, '"UPDATE","DELETE"', RouterTypes.CONFIG));
 
         const exptected = '[{"action":"UPDATE","result":"nok"},{"action":"DELETE","result":"nok"}]';
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).not.toBe(null);
-        expect(JSON.parse(req.text).data.permission[0].name).toBe("TEST_CONFIG_KEY");
-        expect(JSON.parse(req.text).data.permission[1].name).toBe("TEST_CONFIG_KEY_PRD_QA");
+        expect(JSON.parse(req.text).data.permission[0].name).toBe('TEST_CONFIG_KEY');
+        expect(JSON.parse(req.text).data.permission[1].name).toBe('TEST_CONFIG_KEY_PRD_QA');
         expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
         expect(JSON.parse(req.text).data.permission[1].permissions).toMatchObject(JSON.parse(exptected));
     });
@@ -1033,7 +1033,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send(graphqlUtils.permissionsQuery(domainId, undefined, `"UPDATE","DELETE"`, RouterTypes.DOMAIN));
+            .send(graphqlUtils.permissionsQuery(domainId, undefined, '"UPDATE","DELETE"', RouterTypes.DOMAIN));
 
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).not.toBe(null);

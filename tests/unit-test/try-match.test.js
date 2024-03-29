@@ -4,7 +4,7 @@ describe('Test tryMatch', () => {
 
     const evilRE = '^(([a-z])+.)+[A-Z]([a-z])+$';
     const evilInput1 = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-    const evilInput2 = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+    const evilInput2 = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
 
     beforeEach(() => {
         TimedMatch.setMaxBlackListed(50);
