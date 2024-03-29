@@ -4,6 +4,10 @@ import { getDomainById } from '../services/domain';
 import { getEnvironments } from '../services/environment';
 import { getTeams } from '../services/team';
 import { verifyPermissions, verifyPermissionsCascade } from './permission';
+import { some } from 'lodash';
+
+const PATTERN_ALPHANUMERIC_SPACE = /^[a-zA-Z0-9_\- ]*$/;
+const PATTERN_ALPHANUMERIC = /^[a-zA-Z0-9_-]*$/;
 
 export async function checkEnvironmentStatusRemoval(domainId, environmentName, strategy = false) {
     const environment = await getEnvironments({ domain: domainId }, ['_id', 'name']);
@@ -41,7 +45,10 @@ export function parseJSON(str) {
 }
 
 export function containsValue(arr, value) {
-    return arr?.filter(item => item.match(value)).length > 0;
+    return some(arr, item => {
+        const regex = new RegExp(value);
+        return regex.test(item);
+    });
 }
 
 export function formatInput(input, 
@@ -54,12 +61,13 @@ export function formatInput(input,
 
     let regexStr;
     if (options.autoUnderscore) {
-        regexStr = /^[a-zA-Z0-9_\- ]*$/;
+        regexStr = PATTERN_ALPHANUMERIC_SPACE;
     } else {
-        regexStr = options.allowSpace ? /^[a-zA-Z0-9_\- ]*$/ : /^[a-zA-Z0-9_-]*$/;
+        regexStr = options.allowSpace ? PATTERN_ALPHANUMERIC_SPACE : PATTERN_ALPHANUMERIC;
     }
 
-    if (!input.match(regexStr)) {
+    const regex = new RegExp(regexStr);
+    if (!regex.test(input)) {
         throw new Error('Invalid input format. Use only alphanumeric digits.');
     }
     
