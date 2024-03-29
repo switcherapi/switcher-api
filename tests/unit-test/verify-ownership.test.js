@@ -1,5 +1,4 @@
-// eslint-disable-next-line no-unused-vars
-import app from '../../src/app';
+import '../../src/app';
 import mongoose from 'mongoose';
 import GroupConfig from '../../src/models/group-config';
 import { Team } from '../../src/models/team';
@@ -313,7 +312,7 @@ describe('Error tests', () => {
                 domainDocument, 
                 ActionTypes.READ, 
                 RouterTypes.GROUP);
-        }).rejects.toThrow(new PermissionError(`Action forbidden`));
+        }).rejects.toThrow(new PermissionError('Action forbidden'));
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Permission not found', async () => {
@@ -324,7 +323,7 @@ describe('Error tests', () => {
                 domainDocument, 
                 ActionTypes.CREATE, 
                 RouterTypes.GROUP);
-        }).rejects.toThrow(new PermissionError(`Action forbidden`));
+        }).rejects.toThrow(new PermissionError('Action forbidden'));
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Permission does not match', async () => {
@@ -335,7 +334,7 @@ describe('Error tests', () => {
                 domainDocument, 
                 ActionTypes.READ, 
                 RouterTypes.CONFIG);
-        }).rejects.toThrow(new PermissionError(`Action forbidden`));
+        }).rejects.toThrow(new PermissionError('Action forbidden'));
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Member does not belong to a team', async () => {
@@ -346,7 +345,7 @@ describe('Error tests', () => {
                 domainDocument, 
                 ActionTypes.READ, 
                 RouterTypes.DOMAIN);
-        }).rejects.toThrow(new PermissionError(`It was not possible to find any team that allows you to proceed with this operation`));
+        }).rejects.toThrow(new PermissionError('It was not possible to find any team that allows you to proceed with this operation'));
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Team not active', async () => {
@@ -359,7 +358,7 @@ describe('Error tests', () => {
                 domainDocument, 
                 ActionTypes.READ, 
                 RouterTypes.GROUP);
-        }).rejects.toThrow(new PermissionError(`Action forbidden`));
+        }).rejects.toThrow(new PermissionError('Action forbidden'));
 
         // tearDown
         await changeTeamStatus(team1Id, true);
@@ -380,7 +379,7 @@ describe('Error tests', () => {
                 domainDocument, 
                 ActionTypes.READ, 
                 RouterTypes.GROUP);
-        }).rejects.toThrow(new PermissionError(`Action forbidden`));
+        }).rejects.toThrow(new PermissionError('Action forbidden'));
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Member does not have permission to environment', async () => {
@@ -397,7 +396,7 @@ describe('Error tests', () => {
                 RouterTypes.CONFIG,
                 false,
                 'default');
-        }).rejects.toThrow(new PermissionError(`Action forbidden`));
+        }).rejects.toThrow(new PermissionError('Action forbidden'));
     });
 
 });
