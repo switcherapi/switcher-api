@@ -4,7 +4,6 @@ import { getDomainById } from '../services/domain';
 import { getEnvironments } from '../services/environment';
 import { getTeams } from '../services/team';
 import { verifyPermissions, verifyPermissionsCascade } from './permission';
-import { some } from 'lodash';
 
 const PATTERN_ALPHANUMERIC_SPACE = /^[a-zA-Z0-9_\- ]*$/;
 const PATTERN_ALPHANUMERIC = /^[a-zA-Z0-9_-]*$/;
@@ -45,10 +44,15 @@ export function parseJSON(str) {
 }
 
 export function containsValue(arr, value) {
-    return some(arr, item => {
-        const regex = new RegExp(value);
-        return regex.test(item);
-    });
+    if (!arr?.length) {
+        return false;
+    }
+
+    for (const v of arr) {
+        if (v.includes(value)) {
+            return true;
+        }
+    }
 }
 
 export function formatInput(input, 
