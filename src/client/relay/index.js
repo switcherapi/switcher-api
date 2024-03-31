@@ -9,8 +9,9 @@ const agent = async (url) => {
 };
 
 export async function resolveNotification(relay, entry, environment) {
-    const url = relay.endpoint[environment];
-    const header = createHeader(relay.auth_prefix, relay.auth_token, environment);
+    const env = Object.keys(relay.endpoint).find(e => e === environment);
+    const url = relay.endpoint[env];
+    const header = createHeader(relay.auth_prefix, relay.auth_token, env);
 
     if (relay.method === RelayMethods.GET) {
         get(url, createParams(entry), header);
@@ -22,8 +23,9 @@ export async function resolveNotification(relay, entry, environment) {
 export async function resolveValidation(relay, entry, environment) {
     let response;
     
-    const url = relay.endpoint[environment];
-    const header = createHeader(relay.auth_prefix, relay.auth_token, environment);
+    const env = Object.keys(relay.endpoint).find(e => e === environment);
+    const url = relay.endpoint[env];
+    const header = createHeader(relay.auth_prefix, relay.auth_token, env);
 
     if (relay.method === RelayMethods.GET) {
         response = await get(url, createParams(entry), header);
