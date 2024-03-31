@@ -545,6 +545,46 @@ describe('Testing criteria [REST] ', () => {
         expect(req.body.result).toBe(false);
     });
 
+    test('CLIENT_SUITE - Should NOT return success on a entry-based CRITERIA response - Entry not an array', async () => {
+        await request(app)
+            .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                entry: {
+                    strategy: StrategiesType.VALUE,
+                    input: 'USER_1'
+                }})
+            .expect(422);
+    });
+
+    test('CLIENT_SUITE - Should NOT return success on a entry-based CRITERIA response - Invalid Strategy', async () => {
+        await request(app)
+            .post(`/criteria?key=${keyConfig}&showReason=true&showStrategy=true`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                entry: [
+                    {
+                        strategy: 'INVALID_STRATEGY',
+                        input: 'USER_1'
+                    }
+                ]})
+            .expect(422);
+    });
+
+    test('CLIENT_SUITE - Should NOT return success on a entry-based CRITERIA response - Missing key', async () => {
+        await request(app)
+            .post('/criteria?showReason=true&showStrategy=true')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                entry: [
+                    {
+                        strategy: StrategiesType.VALUE,
+                        input: 'USER_1'
+                    }
+                ]})
+            .expect(422);
+    });
+
     test('CLIENT_SUITE - Should NOT return success on a entry-based CRITERIA response - Component not registered', async () => {
         // Given
         const component = new Component({

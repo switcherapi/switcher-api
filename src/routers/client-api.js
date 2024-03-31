@@ -6,6 +6,7 @@ import { resolveCriteria, checkDomain } from '../client/resolvers';
 import { getConfigs } from '../services/config';
 import { body, check, query } from 'express-validator';
 import { clientLimiter } from '../middleware/limiter';
+import { StrategiesType } from '../models/config-strategy';
 
 const router = new express.Router();
 
@@ -14,8 +15,11 @@ const router = new express.Router();
 // GET /check?key=KEY&showStrategy=true
 // GET /check?key=KEY&bypassMetric=true
 router.post('/criteria', componentAuth, clientLimiter, [
-    query('key').isLength({ min: 1 }),
-    body('entry.*.input').isString()
+    query('key').isLength({ min: 1 }).withMessage('Key is required'),
+    body('entry').isArray().optional().withMessage('Entry must be an array'),
+    body('entry.*.input').isString(),
+    body('entry.*.strategy').isString()
+        .custom(value => Object.values(StrategiesType).includes(value)).withMessage('Invalid strategy type')
 ], validate, checkConfig, checkConfigComponent, async (req, res) => {
     try {
         const environment = req.environment;
