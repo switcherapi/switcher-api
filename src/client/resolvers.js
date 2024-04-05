@@ -187,6 +187,7 @@ async function resolveRelay(config, environment, entry, response) {
                 response.result = relayResponse.result;
                 response.reason = relayResponse.result ? 'Success' : 'Relay does not agree';
                 response.message = relayResponse.message;
+                response.metadata = relayResponse.metadata;
             }
         }
     } catch (e) {
