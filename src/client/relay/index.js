@@ -35,7 +35,8 @@ export async function resolveValidation(relay, entry, environment) {
 
     return {
         result: response.data.result,
-        message: response.data.message
+        message: response.data.message,
+        metadata: response.data.metadata
     };
 }
 

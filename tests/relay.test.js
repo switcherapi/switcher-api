@@ -90,7 +90,7 @@ describe('Testing Switcher Relay', () => {
         axiosStub = sinon.stub(axios, 'get');
 
         // Given
-        const mockRelayService = { data: { result: true, reason: 'Success' } };
+        const mockRelayService = { data: { result: true, message: 'A message', metadata: { custom: 'VALUE' } } };
         axiosStub.returns(Promise.resolve(mockRelayService));
 
         // Setup Switcher
@@ -117,8 +117,9 @@ describe('Testing Switcher Relay', () => {
             
         axiosStub.restore();
         expect(req.statusCode).toBe(200);
-        expect(req.body.reason).toEqual('Success');
+        expect(req.body.message).toBe('A message');
         expect(req.body.result).toBe(true);
+        expect(req.body.metadata).toEqual({ custom: 'VALUE' });
     });
 
     test('RELAY_SUITE - Should return success when validating relay using POST method', async () => {
