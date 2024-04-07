@@ -3,9 +3,9 @@ import moment from 'moment';
 import bcryptjs from 'bcryptjs';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import { Team } from './team';
-import { notifyAcCreation, notifyAcDeletion } from '../external/switcher-api-facade';
-import { EncryptionSalts } from './common';
+import { Team } from './team.js';
+import { notifyAcCreation, notifyAcDeletion } from '../external/switcher-api-facade.js';
+import { EncryptionSalts } from './common/index.js';
 
 const adminSchema = new mongoose.Schema({
     name: {

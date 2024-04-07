@@ -1,12 +1,12 @@
 import express from 'express';
-import jwt from 'jsonwebtoken';
-import { checkConfig, checkConfigComponent, validate } from '../middleware/validators';
-import { componentAuth, appGenerateCredentials } from '../middleware/auth';
-import { resolveCriteria, checkDomain } from '../client/resolvers';
-import { getConfigs } from '../services/config';
 import { body, check, query } from 'express-validator';
-import { clientLimiter } from '../middleware/limiter';
-import { StrategiesType } from '../models/config-strategy';
+import jwt from 'jsonwebtoken';
+import { checkConfig, checkConfigComponent, validate } from '../middleware/validators.js';
+import { componentAuth, appGenerateCredentials } from '../middleware/auth.js';
+import { resolveCriteria, checkDomain } from '../client/resolvers.js';
+import { getConfigs } from '../services/config.js';
+import { clientLimiter } from '../middleware/limiter.js';
+import { StrategiesType } from '../models/config-strategy.js';
 
 const router = new express.Router();
 

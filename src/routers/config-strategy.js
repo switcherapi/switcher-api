@@ -1,15 +1,15 @@
 import express from 'express';
 import { check, query } from 'express-validator';
-import { EnvType } from '../models/environment';
-import { validate, verifyInputUpdateParameters } from '../middleware/validators';
-import { strategyRequirements, StrategiesType } from '../models/config-strategy';
-import { auth } from '../middleware/auth';
-import { verifyOwnership, sortBy } from '../helpers';
-import { ActionTypes, RouterTypes } from '../models/permission';
-import { getConfigById } from '../services/config';
-import { getHistory, deleteHistory } from '../services/history';
-import * as Services from '../services/config-strategy';
-import { responseException } from '../exceptions';
+import { EnvType } from '../models/environment.js';
+import { validate, verifyInputUpdateParameters } from '../middleware/validators.js';
+import { strategyRequirements, StrategiesType } from '../models/config-strategy.js';
+import { auth } from '../middleware/auth.js';
+import { verifyOwnership, sortBy } from '../helpers/index.js';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
+import { getConfigById } from '../services/config.js';
+import { getHistory, deleteHistory } from '../services/history.js';
+import * as Services from '../services/config-strategy.js';
+import { responseException } from '../exceptions/index.js';
 
 const router = new express.Router();
 

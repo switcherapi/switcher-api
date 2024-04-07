@@ -1,4 +1,4 @@
-require('../../src/db/mongoose');
+import '../../src/db/mongoose';
 
 import { randomBytes } from 'crypto';
 import bcryptjs from 'bcryptjs';

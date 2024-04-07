@@ -1,5 +1,5 @@
 import { Switcher } from 'switcher-client';
-import Logger from '../helpers/logger';
+import Logger from '../helpers/logger.js';
 
 export class NotFoundError extends Error {
     constructor(message) {

@@ -1,5 +1,5 @@
-import { queryParameter } from '../schemas/common';
-import { commonSchemaContent } from './common';
+import { queryParameter } from '../schemas/common.js';
+import { commonSchemaContent } from './common.js';
 
 export default {
     '/metric/data': {

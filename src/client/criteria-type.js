@@ -1,7 +1,7 @@
-import { domainType, groupConfigType, strategyType } from './configuration-type';
-import { EnvType } from '../models/environment';
-import { resolveCriteria } from './resolvers';
 import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLNonNull, GraphQLInputObjectType } from 'graphql';
+import { domainType, groupConfigType, strategyType } from './configuration-type.js';
+import { EnvType } from '../models/environment.js';
+import { resolveCriteria } from './resolvers.js';
 
 export const strategyInputType = new GraphQLInputObjectType({
     name: 'StrategyInput',

@@ -1,6 +1,6 @@
-import History from '../models/history';
-import { sortBy, validatePagingArgs } from '../helpers';
-import { BadRequestError } from '../exceptions';
+import History from '../models/history.js';
+import { sortBy, validatePagingArgs } from '../helpers/index.js';
+import { BadRequestError } from '../exceptions/index.js';
 
 export async function getHistory(query, domainId, elementId, pagingArgs = {}) {
     if (!validatePagingArgs(pagingArgs))

@@ -1,9 +1,9 @@
-import { BadRequestError, PermissionError } from '../exceptions';
-import { EnvType } from '../models/environment';
-import { getDomainById } from '../services/domain';
-import { getEnvironments } from '../services/environment';
-import { getTeams } from '../services/team';
-import { verifyPermissions, verifyPermissionsCascade } from './permission';
+import { BadRequestError, PermissionError } from '../exceptions/index.js';
+import { EnvType } from '../models/environment.js';
+import { getDomainById } from '../services/domain.js';
+import { getEnvironments } from '../services/environment.js';
+import { getTeams } from '../services/team.js';
+import { verifyPermissions, verifyPermissionsCascade } from './permission.js';
 
 const PATTERN_ALPHANUMERIC_SPACE = /^[a-zA-Z0-9_\- ]*$/;
 const PATTERN_ALPHANUMERIC = /^[a-zA-Z0-9_-]*$/;

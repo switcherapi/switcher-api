@@ -1,5 +1,5 @@
-import { ActionTypes, RouterTypes } from '../models/permission';
-import { getPermission, getPermissions } from '../services/permission';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
+import { getPermission, getPermissions } from '../services/permission.js';
 
 export async function verifyPermissions(team, element, actions, routerType, environment) {
     actions.push(ActionTypes.ALL);

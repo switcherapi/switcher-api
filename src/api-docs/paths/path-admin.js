@@ -1,6 +1,6 @@
-import { jwt } from '../schemas/admin';
-import { pathParameter, queryParameter } from '../schemas/common';
-import { commonSchemaContent } from './common';
+import { jwt } from '../schemas/admin.js';
+import { pathParameter, queryParameter } from '../schemas/common.js';
+import { commonSchemaContent } from './common.js';
 
 export default {
     '/admin/signup': {

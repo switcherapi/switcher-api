@@ -1,12 +1,12 @@
 import express from 'express';
-import { auth } from '../middleware/auth';
-import { RouterTypes, ActionTypes, getKeysByRouter } from '../models/permission';
-import { validate, verifyInputUpdateParameters } from '../middleware/validators';
-import { verifyOwnership } from '../helpers';
-import { responseException } from '../exceptions';
 import { body, check, query } from 'express-validator';
-import * as Services from '../services/permission';
-import { getTeamById } from '../services/team';
+import { auth } from '../middleware/auth.js';
+import { RouterTypes, ActionTypes, getKeysByRouter } from '../models/permission.js';
+import { validate, verifyInputUpdateParameters } from '../middleware/validators.js';
+import { verifyOwnership } from '../helpers/index.js';
+import { responseException } from '../exceptions/index.js';
+import * as Services from '../services/permission.js';
+import { getTeamById } from '../services/team.js';
 
 const router = new express.Router();
 

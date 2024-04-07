@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { Config } from './config';
-import History from './history';
-import { EnvType } from '../models/environment';
-import { recordHistory } from './common/index';
+import { Config } from './config.js';
+import History from './history.js';
+import { EnvType } from '../models/environment.js';
+import { recordHistory } from './common/index.js';
 
 const groupConfigSchema = new mongoose.Schema({
     name: {

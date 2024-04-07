@@ -1,13 +1,13 @@
-import { BadRequestError, NotFoundError } from '../exceptions';
-import { validate_token } from '../external/google-recaptcha';
-import { getBitBucketToken, getBitBucketUserInfo } from '../external/oauth-bitbucket';
-import { getGitToken, getGitUserInfo } from '../external/oauth-git';
-import { sendAccountRecoveryCode, sendAuthCode } from '../external/sendgrid';
-import { checkAdmin } from '../external/switcher-api-facade';
-import Admin from '../models/admin';
-import Domain from '../models/domain';
-import { response } from './common';
-import { getTeams } from './team';
+import { BadRequestError, NotFoundError } from '../exceptions/index.js';
+import { validate_token } from '../external/google-recaptcha.js';
+import { getBitBucketToken, getBitBucketUserInfo } from '../external/oauth-bitbucket.js';
+import { getGitToken, getGitUserInfo } from '../external/oauth-git.js';
+import { sendAccountRecoveryCode, sendAuthCode } from '../external/sendgrid.js';
+import { checkAdmin } from '../external/switcher-api-facade.js';
+import Admin from '../models/admin.js';
+import Domain from '../models/domain.js';
+import { response } from './common.js';
+import { getTeams } from './team.js';
 
 export async function getAdminById(id) {
     let admin = await Admin.findById(id).exec();

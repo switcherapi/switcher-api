@@ -1,8 +1,8 @@
-import { verifyOwnership } from '../helpers';
-import { RouterTypes } from '../models/permission';
-import { getConfigs } from '../services/config';
-import { getGroupConfigs } from '../services/group-config';
-import { permissionCache } from '../helpers/cache';
+import { verifyOwnership } from '../helpers/index.js';
+import { RouterTypes } from '../models/permission.js';
+import { getConfigs } from '../services/config.js';
+import { getGroupConfigs } from '../services/group-config.js';
+import { permissionCache } from '../helpers/cache.js';
 
 export async function resolvePermission(args, admin) {
     const cacheKey = permissionCache.permissionKey(admin._id, args.domain, args.parent, 

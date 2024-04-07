@@ -1,6 +1,6 @@
-import { StrategiesType } from '../../models/config-strategy';
-import { pathParameter, queryParameter } from '../schemas/common';
-import configStrategy from '../schemas/config-strategy';
+import { StrategiesType } from '../../models/config-strategy.js';
+import { pathParameter, queryParameter } from '../schemas/common.js';
+import configStrategy from '../schemas/config-strategy.js';
 
 export default {
     '/criteria': {

@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import Component from './component';
-import GroupConfig from './group-config';
-import History from './history';
-import { Metric } from './metric';
-import { Team } from './team';
-import { EnvType, Environment } from './environment';
-import { recordHistory } from './common/index';
+import Component from './component.js';
+import GroupConfig from './group-config.js';
+import History from './history.js';
+import { Metric } from './metric.js';
+import { Team } from './team.js';
+import { EnvType, Environment } from './environment.js';
+import { recordHistory } from './common/index.js';
 
 const domainSchema = new mongoose.Schema({
     name: {

@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import History from './history';
-import { ConfigStrategy } from './config-strategy';
-import { EnvType } from './environment';
-import { recordHistory } from './common/index';
-import { checkMetrics } from '../external/switcher-api-facade';
+import History from './history.js';
+import { ConfigStrategy } from './config-strategy.js';
+import { EnvType } from './environment.js';
+import { recordHistory } from './common/index.js';
+import { checkMetrics } from '../external/switcher-api-facade.js';
 
 export const RelayMethods = Object.freeze({
     POST: 'POST',

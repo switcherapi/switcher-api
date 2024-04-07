@@ -1,4 +1,4 @@
-class IPCIDR {
+export default class IPCIDR {
   constructor(cidr) {
     this.cidr = cidr;
   }
@@ -13,5 +13,3 @@ class IPCIDR {
     return (this.ip4ToInt(ip) & mask) === (this.ip4ToInt(range) & mask);
   }
 }
-
-module.exports = IPCIDR;

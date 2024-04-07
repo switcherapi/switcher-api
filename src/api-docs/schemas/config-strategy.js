@@ -1,4 +1,4 @@
-import { OperationsType, StrategiesType } from '../../models/config-strategy';
+import { OperationsType, StrategiesType } from '../../models/config-strategy.js';
 
 const configStrategy = {
     type: 'object',

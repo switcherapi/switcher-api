@@ -1,7 +1,7 @@
 import { validationResult } from 'express-validator';
-import { BadRequestError, responseException } from '../exceptions';
-import { getConfig } from '../services/config';
-import { getEnvironments } from '../services/environment';
+import { BadRequestError, responseException } from '../exceptions/index.js';
+import { getConfig } from '../services/config.js';
+import { getEnvironments } from '../services/environment.js';
 
 export async function checkConfig(req, res, next) {
     const config = await getConfig({ domain: req.domain, key: String(req.query.key) }, true);

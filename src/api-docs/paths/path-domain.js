@@ -1,5 +1,5 @@
-import { pagination, pathParameter } from '../schemas/common';
-import { commonArraySchemaContent, commonSchemaContent } from './common';
+import { pagination, pathParameter } from '../schemas/common.js';
+import { commonArraySchemaContent, commonSchemaContent } from './common.js';
 
 export default {
     '/domain/create': {

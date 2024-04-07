@@ -1,14 +1,14 @@
-import { BadRequestError } from '../exceptions';
-import { checkEnvironment } from '../external/switcher-api-facade';
-import { ConfigStrategy } from '../models/config-strategy';
-import { Environment, EnvType } from '../models/environment';
-import { ActionTypes, RouterTypes } from '../models/permission';
-import { formatInput, verifyOwnership } from '../helpers';
-import { permissionCache } from '../helpers/cache';
-import { response } from './common';
-import { getConfigs, removeConfigStatus } from './config';
-import { getDomainById, removeDomainStatus } from './domain';
-import { getGroupConfigs, removeGroupStatus } from './group-config';
+import { BadRequestError } from '../exceptions/index.js';
+import { checkEnvironment } from '../external/switcher-api-facade.js';
+import { ConfigStrategy } from '../models/config-strategy.js';
+import { Environment, EnvType } from '../models/environment.js';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
+import { formatInput, verifyOwnership } from '../helpers/index.js';
+import { permissionCache } from '../helpers/cache.js';
+import { response } from './common.js';
+import { getConfigs, removeConfigStatus } from './config.js';
+import { getDomainById, removeDomainStatus } from './domain.js';
+import { getGroupConfigs, removeGroupStatus } from './group-config.js';
 
 async function removeEnvironmentFromElements(environment) {
     await ConfigStrategy.deleteMany({ domain: environment.domain, $or: [ 

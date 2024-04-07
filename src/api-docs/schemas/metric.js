@@ -1,4 +1,4 @@
-import { StrategiesType } from '../../models/config-strategy';
+import { StrategiesType } from '../../models/config-strategy.js';
 
 const data = {
     type: 'object',

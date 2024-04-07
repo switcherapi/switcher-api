@@ -1,11 +1,11 @@
-import { BadRequestError, NotFoundError } from '../exceptions';
-import { checkTeam } from '../external/switcher-api-facade';
-import Admin from '../models/admin';
-import { ActionTypes, checkActionType, Permission, RouterTypes } from '../models/permission';
-import { addDefaultPermission, Team } from '../models/team';
-import TeamInvite from '../models/team-invite';
-import { verifyOwnership } from '../helpers';
-import { response } from './common';
+import { BadRequestError, NotFoundError } from '../exceptions/index.js';
+import { checkTeam } from '../external/switcher-api-facade.js';
+import Admin from '../models/admin.js';
+import { ActionTypes, checkActionType, Permission, RouterTypes } from '../models/permission.js';
+import { addDefaultPermission, Team } from '../models/team.js';
+import TeamInvite from '../models/team-invite.js';
+import { verifyOwnership } from '../helpers/index.js';
+import { response } from './common.js';
 
 async function addMemberToTeam(admin, team) {
     if (!admin) {

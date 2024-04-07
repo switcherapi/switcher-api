@@ -1,4 +1,4 @@
-import { ActionTypes, KeyTypes, RouterTypes } from '../../models/permission';
+import { ActionTypes, KeyTypes, RouterTypes } from '../../models/permission.js';
 
 const permission = {
     type: 'object',

@@ -1,15 +1,15 @@
-import { EnvType } from '../models/environment';
-import Domain from '../models/domain';
-import GroupConfig from '../models/group-config';
-import { Config, RelayTypes} from '../models/config';
-import { addMetrics } from '../models/metric';
-import { ConfigStrategy, processOperation } from '../models/config-strategy';
-import { ActionTypes, RouterTypes } from '../models/permission';
-import { verifyOwnership } from '../helpers';
-import { resolveNotification, resolveValidation } from './relay/index';
-import Component from '../models/component';
-import Logger from '../helpers/logger';
-import { isRelayVerified, isRelayValid } from '../services/config';
+import { EnvType } from '../models/environment.js';
+import Domain from '../models/domain.js';
+import GroupConfig from '../models/group-config.js';
+import { Config, RelayTypes} from '../models/config.js';
+import { addMetrics } from '../models/metric.js';
+import { ConfigStrategy, processOperation } from '../models/config-strategy.js';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
+import { verifyOwnership } from '../helpers/index.js';
+import { resolveNotification, resolveValidation } from './relay/index.js';
+import Component from '../models/component.js';
+import Logger from '../helpers/logger.js';
+import { isRelayVerified, isRelayValid } from '../services/config.js';
 
 export const resolveConfigByKey = async (domain, key) => Config.findOne({ domain, key }, null, { lean: true });
 

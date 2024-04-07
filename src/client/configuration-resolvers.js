@@ -1,12 +1,12 @@
-import { verifyOwnership } from '../helpers';
-import { ActionTypes, RouterTypes } from '../models/permission';
-import { getGroupConfigById, getGroupConfigs } from '../services/group-config';
-import { getConfigs } from '../services/config';
-import { getStrategies } from '../services/config-strategy';
-import { getEnvironments } from '../services/environment';
-import { getSlack } from '../services/slack';
-import { getDomainById } from '../services/domain';
-import { getComponents } from '../services/component';
+import { verifyOwnership } from '../helpers/index.js';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
+import { getGroupConfigById, getGroupConfigs } from '../services/group-config.js';
+import { getConfigs } from '../services/config.js';
+import { getStrategies } from '../services/config-strategy.js';
+import { getEnvironments } from '../services/environment.js';
+import { getSlack } from '../services/slack.js';
+import { getDomainById } from '../services/domain.js';
+import { getComponents } from '../services/component.js';
 
 async function resolveConfigByConfig(domainId, key, configId) {
     const config = await getConfigs({ 
