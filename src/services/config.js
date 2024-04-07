@@ -1,15 +1,15 @@
-import { response } from './common';
-import { Config } from '../models/config';
-import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers';
-import { ActionTypes, RouterTypes } from '../models/permission';
-import { getDomainById, updateDomainVersion } from './domain';
-import { getGroupConfigById } from './group-config';
-import { checkSwitcher } from '../external/switcher-api-facade';
-import { BadRequestError, NotFoundError } from '../exceptions';
-import { checkEnvironmentStatusChange } from '../middleware/validators';
-import { getComponentById, getComponents } from './component';
-import { resolveVerification } from '../client/relay';
-import { permissionCache } from '../helpers/cache';
+import { response } from './common.js';
+import { Config } from '../models/config.js';
+import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers/index.js';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
+import { getDomainById, updateDomainVersion } from './domain.js';
+import { getGroupConfigById } from './group-config.js';
+import { checkSwitcher } from '../external/switcher-api-facade.js';
+import { BadRequestError, NotFoundError } from '../exceptions/index.js';
+import { checkEnvironmentStatusChange } from '../middleware/validators.js';
+import { getComponentById, getComponents } from './component.js';
+import { resolveVerification } from '../client/relay/index.js';
+import { permissionCache } from '../helpers/cache.js';
 
 async function verifyAddComponentInput(configId, admin) {
     const config = await getConfigById(configId);

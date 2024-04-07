@@ -1,12 +1,12 @@
 import basicAuth from 'express-basic-auth';
 import jwt from 'jsonwebtoken';
-import { getAdmin, getAdminById } from '../services/admin';
-import { getComponentById } from '../services/component';
-import Admin from '../models/admin';
-import Component from '../models/component';
-import { getRateLimit } from '../external/switcher-api-facade';
-import { responseExceptionSilent } from '../exceptions';
-import { EnvType } from '../models/environment';
+import { getAdmin, getAdminById } from '../services/admin.js';
+import { getComponentById } from '../services/component.js';
+import Admin from '../models/admin.js';
+import Component from '../models/component.js';
+import { getRateLimit } from '../external/switcher-api-facade.js';
+import { responseExceptionSilent } from '../exceptions/index.js';
+import { EnvType } from '../models/environment.js';
 
 export async function auth(req, res, next) {
     try {

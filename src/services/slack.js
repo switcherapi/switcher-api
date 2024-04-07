@@ -1,12 +1,12 @@
-import Slack from '../models/slack';
-import { TicketStatusType, SLACK_SUB, TicketValidationType } from '../models/slack_ticket';
-import { BadRequestError, NotFoundError, PermissionError } from '../exceptions';
-import { checkSlackIntegration } from '../external/switcher-api-facade';
-import { getConfig } from './config';
-import { getDomainById, updateDomainVersion } from './domain';
-import { getEnvironment } from './environment';
-import { getGroupConfig } from './group-config';
-import { containsValue } from '../helpers';
+import Slack from '../models/slack.js';
+import { TicketStatusType, SLACK_SUB, TicketValidationType } from '../models/slack_ticket.js';
+import { BadRequestError, NotFoundError, PermissionError } from '../exceptions/index.js';
+import { checkSlackIntegration } from '../external/switcher-api-facade.js';
+import { getConfig } from './config.js';
+import { getDomainById, updateDomainVersion } from './domain.js';
+import { getEnvironment } from './environment.js';
+import { getGroupConfig } from './group-config.js';
+import { containsValue } from '../helpers/index.js';
 
 /**
  * Validates if ticket already exists, if so, return it.

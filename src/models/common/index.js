@@ -1,5 +1,5 @@
-import History from '../history';
-import { checkHistory } from '../../external/switcher-api-facade';
+import History from '../history.js';
+import { checkHistory } from '../../external/switcher-api-facade.js';
 
 export const EncryptionSalts = Object.freeze({
     ADMIN: 8,

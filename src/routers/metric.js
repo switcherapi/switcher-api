@@ -1,13 +1,13 @@
 import express from 'express';
 import { check, query } from 'express-validator';
-import { auth } from '../middleware/auth';
-import { responseException } from '../exceptions';
+import { auth } from '../middleware/auth.js';
+import { responseException } from '../exceptions/index.js';
 import { 
     deleteMetrics,
     getData,
     getStatistics
-} from '../services/metric';
-import { validate } from '../middleware/validators';
+} from '../services/metric.js';
+import { validate } from '../middleware/validators.js';
 
 const router = new express.Router();
 

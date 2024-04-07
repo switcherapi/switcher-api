@@ -1,11 +1,16 @@
-const cp = require('child_process');
+import cp from 'child_process';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * This class will run a match operation using a child process.
  * Workers should be killed given a specified (3000 ms default) time limit.
  * Blacklist caching is available to prevent sequence of matching failures and resource usage.
  */
-class TimedMatch {
+export default class TimedMatch {
     static _worker = this._createChildProcess();
     static _blacklisted = [];
     static _maxBlackListed = process.env.REGEX_MAX_BLACKLIST || 50;
@@ -102,5 +107,3 @@ class TimedMatch {
         return match_proc;
     }
 }
-
-module.exports = TimedMatch;

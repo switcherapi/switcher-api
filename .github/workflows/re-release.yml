@@ -39,6 +39,7 @@ jobs:
       - name: Run tests
         run: npm test
         env:
+          NODE_OPTIONS: "--experimental-vm-modules"
           MONGODB_URI: mongodb://127.0.0.1:27017/switcher-api-test
           HISTORY_ACTIVATED: true
           JWT_ADMIN_TOKEN_RENEW_INTERVAL: 5m

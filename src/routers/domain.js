@@ -1,13 +1,13 @@
 import express from 'express';
-import { auth } from '../middleware/auth';
 import { check } from 'express-validator';
-import { validate, verifyInputUpdateParameters } from '../middleware/validators';
-import { verifyOwnership, sortBy } from '../helpers';
-import { ActionTypes, RouterTypes } from '../models/permission';
-import { checkDomain, SwitcherKeys } from '../external/switcher-api-facade';
-import * as Services from '../services/domain';
-import { getHistory } from '../services/history';
-import { responseException } from '../exceptions';
+import { auth } from '../middleware/auth.js';
+import { validate, verifyInputUpdateParameters } from '../middleware/validators.js';
+import { verifyOwnership, sortBy } from '../helpers/index.js';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
+import { checkDomain, SwitcherKeys } from '../external/switcher-api-facade.js';
+import * as Services from '../services/domain.js';
+import { getHistory } from '../services/history.js';
+import { responseException } from '../exceptions/index.js';
 
 const router = new express.Router();
 

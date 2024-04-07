@@ -1,6 +1,6 @@
-import { OperationsType, StrategiesType } from '../../models/config-strategy';
-import { pagination, pathParameter, queryParameter } from '../schemas/common';
-import { commonArraySchemaContent, commonSchemaContent } from './common';
+import { OperationsType, StrategiesType } from '../../models/config-strategy.js';
+import { pagination, pathParameter, queryParameter } from '../schemas/common.js';
+import { commonArraySchemaContent, commonSchemaContent } from './common.js';
 
 export default {
     '/configstrategy/create': {

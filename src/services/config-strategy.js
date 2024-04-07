@@ -1,13 +1,13 @@
-import { response } from './common';
-import { ConfigStrategy } from '../models/config-strategy';
-import { ActionTypes, RouterTypes } from '../models/permission';
-import { verifyOwnership } from '../helpers';
-import { permissionCache } from '../helpers/cache';
-import { updateDomainVersion } from './domain';
-import { getConfigById } from './config';
-import { BadRequestError } from '../exceptions';
-import { checkEnvironmentStatusChange } from '../middleware/validators';
-import { getEnvironment } from './environment';
+import { response } from './common.js';
+import { ConfigStrategy } from '../models/config-strategy.js';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
+import { verifyOwnership } from '../helpers/index.js';
+import { permissionCache } from '../helpers/cache.js';
+import { updateDomainVersion } from './domain.js';
+import { getConfigById } from './config.js';
+import { BadRequestError } from '../exceptions/index.js';
+import { checkEnvironmentStatusChange } from '../middleware/validators.js';
+import { getEnvironment } from './environment.js';
 
 async function verifyStrategyValueInput(strategyId, value) {
     const configStrategy = await getStrategyById(strategyId);

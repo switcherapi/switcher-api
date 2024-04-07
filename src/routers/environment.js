@@ -1,10 +1,10 @@
 import express from 'express';
 import { check, query } from 'express-validator';
-import { auth } from '../middleware/auth';
-import { responseException } from '../exceptions';
-import { validate, verifyInputUpdateParameters } from '../middleware/validators';
-import * as Services from '../services/environment';
-import { SwitcherKeys } from '../external/switcher-api-facade';
+import { auth } from '../middleware/auth.js';
+import { responseException } from '../exceptions/index.js';
+import { validate, verifyInputUpdateParameters } from '../middleware/validators.js';
+import * as Services from '../services/environment.js';
+import { SwitcherKeys } from '../external/switcher-api-facade.js';
 
 const router = new express.Router();
 

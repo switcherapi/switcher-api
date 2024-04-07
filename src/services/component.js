@@ -1,9 +1,9 @@
-import { checkComponent } from '../external/switcher-api-facade';
-import Component from '../models/component';
-import { ActionTypes, RouterTypes } from '../models/permission';
-import { formatInput, verifyOwnership } from '../helpers';
-import { permissionCache } from '../helpers/cache';
-import { response } from './common';
+import { checkComponent } from '../external/switcher-api-facade.js';
+import Component from '../models/component.js';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
+import { formatInput, verifyOwnership } from '../helpers/index.js';
+import { permissionCache } from '../helpers/cache.js';
+import { response } from './common.js';
 
 export async function getComponentById(id) {
     let component = await Component.findById(id).exec();

@@ -1,9 +1,9 @@
-import { BadRequestError, NotFoundError } from '../exceptions';
-import { ActionTypes, Permission, RouterTypes } from '../models/permission';
-import { verifyOwnership } from '../helpers';
-import { response } from './common';
-import { getTeam, getTeams, verifyRequestedTeam } from './team';
-import { permissionCache } from '../helpers/cache';
+import { BadRequestError, NotFoundError } from '../exceptions/index.js';
+import { ActionTypes, Permission, RouterTypes } from '../models/permission.js';
+import { verifyOwnership } from '../helpers/index.js';
+import { response } from './common.js';
+import { getTeam, getTeams, verifyRequestedTeam } from './team.js';
+import { permissionCache } from '../helpers/cache.js';
 
 async function verifyRequestedTeamByPermission(permissionId, admin, action) {
     let team = await getTeam({ permissions: permissionId });

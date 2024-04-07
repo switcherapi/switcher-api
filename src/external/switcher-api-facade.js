@@ -1,13 +1,13 @@
 import { Switcher, checkValue, checkPayload, checkRegex } from 'switcher-client';
-import { EnvType } from '../models/environment';
-import { FeatureUnavailableError } from '../exceptions';
-import { getDomainById, getTotalDomainsByOwner } from '../services/domain';
-import { getTotalGroupsByDomainId } from '../services/group-config';
-import { getTotalConfigsByDomainId } from '../services/config';
-import { getTotalComponentsByDomainId } from '../services/component';
-import { getTotalEnvByDomainId } from '../services/environment';
-import { getTotalTeamsByDomainId } from '../services/team';
-import { DEFAULT_RATE_LIMIT } from '../middleware/limiter';
+import { EnvType } from '../models/environment.js';
+import { FeatureUnavailableError } from '../exceptions/index.js';
+import { getDomainById, getTotalDomainsByOwner } from '../services/domain.js';
+import { getTotalGroupsByDomainId } from '../services/group-config.js';
+import { getTotalConfigsByDomainId } from '../services/config.js';
+import { getTotalComponentsByDomainId } from '../services/component.js';
+import { getTotalEnvByDomainId } from '../services/environment.js';
+import { getTotalTeamsByDomainId } from '../services/team.js';
+import { DEFAULT_RATE_LIMIT } from '../middleware/limiter.js';
 
 const apiKey = process.env.SWITCHER_API_KEY;
 const environment = process.env.SWITCHER_API_ENVIRONMENT;

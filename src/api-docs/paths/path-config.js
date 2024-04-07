@@ -1,5 +1,5 @@
-import { pagination, pathParameter, queryParameter } from '../schemas/common';
-import { commonArraySchemaContent, commonOneOfSchemaContent, commonSchemaContent } from './common';
+import { pagination, pathParameter, queryParameter } from '../schemas/common.js';
+import { commonArraySchemaContent, commonOneOfSchemaContent, commonSchemaContent } from './common.js';
 
 export default {
     '/config/create': {

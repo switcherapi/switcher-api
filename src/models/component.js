@@ -3,9 +3,9 @@ import moment from 'moment';
 import bcryptjs from 'bcryptjs';
 import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
-import { Config } from './config';
-import Domain from './domain';
-import { EncryptionSalts } from './common';
+import { Config } from './config.js';
+import Domain from './domain.js';
+import { EncryptionSalts } from './common/index.js';
 
 const componentSchema = new mongoose.Schema({
     name: {

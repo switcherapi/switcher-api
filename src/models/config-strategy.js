@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
-import History from './history';
-import { recordHistory } from './common/index';
 import moment from 'moment';
-import { NotFoundError } from '../exceptions';
-import { parseJSON, payloadReader } from '../helpers';
-import IPCIDR from '../helpers/ipcidr';
-import TimedMatch from '../helpers/timed-match/';
+import History from './history.js';
+import { recordHistory } from './common/index.js';
+import { NotFoundError } from '../exceptions/index.js';
+import { parseJSON, payloadReader } from '../helpers/index.js';
+import IPCIDR from '../helpers/ipcidr.js';
+import TimedMatch from '../helpers/timed-match/index.js';
 
 export const StrategiesType = Object.freeze({
     NETWORK: 'NETWORK_VALIDATION',

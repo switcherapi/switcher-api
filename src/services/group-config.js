@@ -1,12 +1,12 @@
-import { response } from './common';
-import GroupConfig from '../models/group-config';
-import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers';
-import { BadRequestError } from '../exceptions';
-import { checkGroup } from '../external/switcher-api-facade';
-import { ActionTypes, RouterTypes } from '../models/permission';
-import { getDomainById, updateDomainVersion } from './domain';
-import { checkEnvironmentStatusChange } from '../middleware/validators';
-import { permissionCache } from '../helpers/cache';
+import { response } from './common.js';
+import GroupConfig from '../models/group-config.js';
+import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers/index.js';
+import { BadRequestError } from '../exceptions/index.js';
+import { checkGroup } from '../external/switcher-api-facade.js';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
+import { getDomainById, updateDomainVersion } from './domain.js';
+import { checkEnvironmentStatusChange } from '../middleware/validators.js';
+import { permissionCache } from '../helpers/cache.js';
 
 export async function getGroupConfigById(id, lean = false, populateAdmin = false) {
     let group = await GroupConfig.findById(id, null, { lean }).exec();

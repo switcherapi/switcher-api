@@ -1,18 +1,18 @@
 import express from 'express';
 import { check, query } from 'express-validator';
-import { relayOptions } from '../models/config';
-import { auth } from '../middleware/auth';
-import { ActionTypes, RouterTypes } from '../models/permission';
-import { responseException } from '../exceptions';
+import { relayOptions } from '../models/config.js';
+import { auth } from '../middleware/auth.js';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
+import { responseException } from '../exceptions/index.js';
 import {
     validate,
-    verifyInputUpdateParameters } from '../middleware/validators';
-import { sortBy, verifyOwnership } from '../helpers';
-import * as Services from '../services/config';
-import { getHistory, deleteHistory } from '../services/history';
-import { getGroupConfigById } from '../services/group-config';
-import { SwitcherKeys } from '../external/switcher-api-facade';
-import { getFields } from './common';
+    verifyInputUpdateParameters } from '../middleware/validators.js';
+import { sortBy, verifyOwnership } from '../helpers/index.js';
+import * as Services from '../services/config.js';
+import { getHistory, deleteHistory } from '../services/history.js';
+import { getGroupConfigById } from '../services/group-config.js';
+import { SwitcherKeys } from '../external/switcher-api-facade.js';
+import { getFields } from './common/index.js';
 
 const router = new express.Router();
 

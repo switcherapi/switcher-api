@@ -1,6 +1,6 @@
-import { ActionTypes, RouterTypes } from '../../models/permission';
-import { pathParameter, queryParameter } from '../schemas/common';
-import { commonArraySchemaContent, commonSchemaContent } from './common';
+import { ActionTypes, RouterTypes } from '../../models/permission.js';
+import { pathParameter, queryParameter } from '../schemas/common.js';
+import { commonArraySchemaContent, commonSchemaContent } from './common.js';
 
 export default {
     '/permission/create/{team}': {

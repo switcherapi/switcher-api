@@ -1,4 +1,4 @@
-import { TicketStatusType } from '../../models/slack_ticket';
+import { TicketStatusType } from '../../models/slack_ticket.js';
 
 const ticket = {
     type: 'object',

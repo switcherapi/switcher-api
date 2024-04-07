@@ -1,12 +1,12 @@
 import express from 'express';
 import { check, query } from 'express-validator';
-import { NotFoundError, responseException } from '../exceptions';
-import { auth, slackAuth } from '../middleware/auth';
-import { validate } from '../middleware/validators';
-import { TicketStatusType } from '../models/slack_ticket';
-import { SwitcherKeys } from '../external/switcher-api-facade';
-import { getDomainById } from '../services/domain';
-import * as Services from '../services/slack';
+import { NotFoundError, responseException } from '../exceptions/index.js';
+import { auth, slackAuth } from '../middleware/auth.js';
+import { validate } from '../middleware/validators.js';
+import { TicketStatusType } from '../models/slack_ticket.js';
+import { SwitcherKeys } from '../external/switcher-api-facade.js';
+import { getDomainById } from '../services/domain.js';
+import * as Services from '../services/slack.js';
 
 const router = new express.Router();
 

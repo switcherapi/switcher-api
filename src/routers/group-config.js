@@ -1,14 +1,14 @@
 import express from 'express';
 import { check, query } from 'express-validator';
-import { auth } from '../middleware/auth';
-import { validate, verifyInputUpdateParameters } from '../middleware/validators';
-import { sortBy, verifyOwnership } from '../helpers';
-import { responseException } from '../exceptions';
-import { ActionTypes, RouterTypes } from '../models/permission';
-import * as Services from '../services/group-config';
-import { getHistory, deleteHistory } from '../services/history';
-import { getDomainById } from '../services/domain';
-import { SwitcherKeys } from '../external/switcher-api-facade';
+import { auth } from '../middleware/auth.js';
+import { validate, verifyInputUpdateParameters } from '../middleware/validators.js';
+import { sortBy, verifyOwnership } from '../helpers/index.js';
+import { responseException } from '../exceptions/index.js';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
+import * as Services from '../services/group-config.js';
+import { getHistory, deleteHistory } from '../services/history.js';
+import { getDomainById } from '../services/domain.js';
+import { SwitcherKeys } from '../external/switcher-api-facade.js';
 
 const router = new express.Router();
 

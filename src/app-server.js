@@ -1,7 +1,7 @@
 import https from 'https';
 import http from 'http';
 import fs from 'fs';
-import Logger from './helpers/logger';
+import Logger from './helpers/logger.js';
 
 export const createServer = (app) => {
     if (process.env.SSL_CERT && process.env.SSL_KEY) {

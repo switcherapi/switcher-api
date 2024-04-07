@@ -1,16 +1,16 @@
 import { randomUUID } from 'crypto';
-import { checkEnvironmentStatusChange } from '../middleware/validators';
-import Component from '../models/component';
-import { Config } from '../models/config';
-import { ConfigStrategy } from '../models/config-strategy';
-import Domain from '../models/domain';
-import { Environment } from '../models/environment';
-import GroupConfig from '../models/group-config';
-import History from '../models/history';
-import { ActionTypes, RouterTypes } from '../models/permission';
-import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers';
-import { permissionCache } from '../helpers/cache';
-import { response } from './common';
+import { checkEnvironmentStatusChange } from '../middleware/validators.js';
+import Component from '../models/component.js';
+import { Config } from '../models/config.js';
+import { ConfigStrategy } from '../models/config-strategy.js';
+import Domain from '../models/domain.js';
+import { Environment } from '../models/environment.js';
+import GroupConfig from '../models/group-config.js';
+import History from '../models/history.js';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
+import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers/index.js';
+import { permissionCache } from '../helpers/cache.js';
+import { response } from './common.js';
 
 export async function removeDomainStatus(domain, environmentName) {
     try {

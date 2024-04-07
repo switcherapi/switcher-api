@@ -1,4 +1,4 @@
-require('../../src/db/mongoose');
+import '../../src/db/mongoose';
 
 import mongoose from 'mongoose';
 import { getHistory, deleteHistory } from '../../src/services/history';

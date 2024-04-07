@@ -1,5 +1,5 @@
-import { pathParameter, queryParameter } from '../schemas/common';
-import { commonSchemaContent } from './common';
+import { pathParameter, queryParameter } from '../schemas/common.js';
+import { commonSchemaContent } from './common.js';
 
 export default {
     '/slack/v1/installation': {

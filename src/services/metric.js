@@ -1,10 +1,10 @@
 import moment from 'moment';
-import { NotFoundError } from '../exceptions';
-import { verifyOwnership } from '../helpers';
-import { EnvType } from '../models/environment';
-import { Metric } from '../models/metric';
-import { ActionTypes, RouterTypes } from '../models/permission';
-import { getConfig } from './config';
+import { NotFoundError } from '../exceptions/index.js';
+import { verifyOwnership } from '../helpers/index.js';
+import { EnvType } from '../models/environment.js';
+import { Metric } from '../models/metric.js';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
+import { getConfig } from './config.js';
 
 export async function getData(req, page) {
     const { args } = buildMetricsFilter(req);

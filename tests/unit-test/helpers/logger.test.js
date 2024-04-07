@@ -1,4 +1,5 @@
 import Logger from '../../../src/helpers/logger';
+import { jest } from '@jest/globals';
 
 describe('Helper: Logger', () => {
     beforeAll(() => {

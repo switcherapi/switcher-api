@@ -1,4 +1,4 @@
-import componentSchema from './component';
+import componentSchema from './component.js';
 
 const configComponents = {
     type: 'array',

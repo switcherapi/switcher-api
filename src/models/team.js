@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { Permission, RouterTypes } from './permission';
-import Admin from './admin';
+import { Permission, RouterTypes } from './permission.js';
+import Admin from './admin.js';
 
 const teamSchema = new mongoose.Schema({
     name: {
