@@ -14,6 +14,7 @@ const environment = process.env.SWITCHER_API_ENVIRONMENT;
 const domainName = process.env.SWITCHER_API_DOMAIN;
 const url = process.env.SWITCHER_API_URL;
 const logger = process.env.SWITCHER_API_LOGGER == 'true';
+const throttle = process.env.SWITCHER_API_THROTTLE;
 const certPath = process.env.SSL_CERT;
 const component = 'switcherapi';
 
@@ -26,8 +27,7 @@ export const SwitcherKeys = Object.freeze({
     ACCOUNT_OUT_NOTIFY: 'ACCOUNT_OUT_NOTIFY',
     SLACK_INTEGRATION: 'SLACK_INTEGRATION',
     RATE_LIMIT: 'RATE_LIMIT',
-    HTTPS_AGENT: 'HTTPS_AGENT',
-    SWITCHER_AC_METADATA: 'SWITCHER_AC_METADATA'
+    HTTPS_AGENT: 'HTTPS_AGENT'
 });
 
 function switcherFlagResult(response, message) {
@@ -38,6 +38,11 @@ function switcherFlagResult(response, message) {
 
 async function checkFeature(feature, params) {
     const switcher = Switcher.factory();
+
+    if (throttle) {
+        switcher.throttle(throttle);
+    }
+
     return switcher.detail().isItOn(feature, params);
 }
 
@@ -206,20 +211,12 @@ export function notifyAcDeletion(adminid) {
 
 export async function getRateLimit(key, component) {
     if (process.env.SWITCHER_API_ENABLE === 'true' && key !== process.env.SWITCHER_API_KEY) {
-        const fromMetadata = await checkFeature(SwitcherKeys.SWITCHER_AC_METADATA);
         const domain = await getDomainById(component.domain);
         const response = await checkFeature(SwitcherKeys.RATE_LIMIT, [
             checkValue(String(domain.owner))
         ]);
 
         if (response.result) {
-            if (!fromMetadata.result) {
-                const log = Switcher.getLogger(SwitcherKeys.RATE_LIMIT)
-                    .find(log => log.input[0][1] === String(domain.owner));
-            
-                return JSON.parse(log.response.message).rate_limit;
-            }
-
             return response.metadata.rate_limit;
         }
     }
