@@ -4,8 +4,8 @@ import { StrategiesToRelayDataType, RelayMethods } from '../../models/config.js'
 import { checkHttpsAgent } from '../../external/switcher-api-facade.js';
 
 const agent = async (url) => {
-    const rejectUnauthorized = !(await checkHttpsAgent(url));
-    return new https.Agent({ rejectUnauthorized });
+    const response = await checkHttpsAgent(url);
+    return new https.Agent({ rejectUnauthorized: !(response?.result) });
 };
 
 export async function resolveNotification(relay, entry, environment) {
