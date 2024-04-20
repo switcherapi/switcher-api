@@ -26,18 +26,19 @@ export const SwitcherKeys = Object.freeze({
     ACCOUNT_OUT_NOTIFY: 'ACCOUNT_OUT_NOTIFY',
     SLACK_INTEGRATION: 'SLACK_INTEGRATION',
     RATE_LIMIT: 'RATE_LIMIT',
-    HTTPS_AGENT: 'HTTPS_AGENT'
+    HTTPS_AGENT: 'HTTPS_AGENT',
+    SWITCHER_AC_METADATA: 'SWITCHER_AC_METADATA'
 });
 
-function switcherFlagResult(flag, message) {
-    if (!flag) {
+function switcherFlagResult(response, message) {
+    if (!response.result) {
         throw new FeatureUnavailableError(message);
     }
 }
 
 async function checkFeature(feature, params) {
     const switcher = Switcher.factory();
-    return switcher.isItOn(feature, params, true);
+    return switcher.detail().isItOn(feature, params);
 }
 
 export async function checkDomain(req) {
@@ -133,14 +134,14 @@ export async function checkMetrics(config) {
         return true;
 
     const { owner } = await getDomainById(config.domain);
-    const flag = await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
+    const response = await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
         checkPayload(JSON.stringify({
             feature: 'metrics',
             owner
         }))
     ]);
 
-    if (!flag) {
+    if (!response.result) {
         if (!config.disable_metrics) {
             config.disable_metrics = new Map();
             config.disable_metrics.set(EnvType.DEFAULT, true);
@@ -180,9 +181,9 @@ export async function checkSlackIntegration(value) {
         return;
 
     switcherFlagResult(
-            await checkFeature(SwitcherKeys.SLACK_INTEGRATION, [
-                checkValue(value)
-            ]), 'Slack Integration is not available.');
+        await checkFeature(SwitcherKeys.SLACK_INTEGRATION, [
+            checkValue(value)
+        ]), 'Slack Integration is not available.');
 }
 
 export function notifyAcCreation(adminid) {
@@ -205,16 +206,21 @@ export function notifyAcDeletion(adminid) {
 
 export async function getRateLimit(key, component) {
     if (process.env.SWITCHER_API_ENABLE === 'true' && key !== process.env.SWITCHER_API_KEY) {
+        const fromMetadata = await checkFeature(SwitcherKeys.SWITCHER_AC_METADATA);
         const domain = await getDomainById(component.domain);
-        const result = await checkFeature(SwitcherKeys.RATE_LIMIT, [
+        const response = await checkFeature(SwitcherKeys.RATE_LIMIT, [
             checkValue(String(domain.owner))
         ]);
 
-        if (result) {
-            const log = Switcher.getLogger(SwitcherKeys.RATE_LIMIT)
-                .find(log => log.input[0][1] === String(domain.owner));
+        if (response.result) {
+            if (!fromMetadata.result) {
+                const log = Switcher.getLogger(SwitcherKeys.RATE_LIMIT)
+                    .find(log => log.input[0][1] === String(domain.owner));
             
-            return JSON.parse(log.response.message).rate_limit;
+                return JSON.parse(log.response.message).rate_limit;
+            }
+
+            return response.metadata.rate_limit;
         }
     }
 
