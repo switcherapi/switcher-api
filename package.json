@@ -54,7 +54,7 @@
     "pino": "^8.20.0",
     "pino-pretty": "^11.0.0",
     "swagger-ui-express": "^5.0.0",
-    "switcher-client": "^4.0.2",
+    "switcher-client": "^4.0.3",
     "validator": "^13.11.0"
   },
   "devDependencies": {
