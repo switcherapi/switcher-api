@@ -44,7 +44,7 @@
     "express-rate-limit": "^7.2.0",
     "express-validator": "^7.0.1",
     "graphql": "^16.8.1",
-    "graphql-http": "^1.22.0",
+    "graphql-http": "^1.22.1",
     "graphql-tag": "^2.12.6",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
@@ -66,6 +66,9 @@
     "nodemon": "^3.1.0",
     "sinon": "^17.0.1",
     "supertest": "^6.3.4"
+  },
+  "overrides": {
+    "formidable": "^3.5.1"
   },
   "repository": {
     "type": "git",

@@ -9,6 +9,7 @@ import * as Services from '../services/group-config.js';
 import { getHistory, deleteHistory } from '../services/history.js';
 import { getDomainById } from '../services/domain.js';
 import { SwitcherKeys } from '../external/switcher-api-facade.js';
+import { getFields } from './common/index.js';
 
 const router = new express.Router();
 
@@ -25,7 +26,11 @@ router.post('/groupconfig/create', auth, async (req, res) => {
 // GET /groupconfig?domain=ID&sortBy=createdAt:desc
 // GET /groupconfig?domain=ID
 router.get('/groupconfig', auth, [
-    query('domain', 'Please, specify the \'domain\' id').isMongoId()
+    query('domain', 'Please, specify the \'domain\' id').isMongoId(),
+    query('fields').isString().optional(),
+    query('limit').isInt().optional(),
+    query('skip').isInt().optional(),
+    query('sortBy').isString().optional()
 ], validate, async (req, res) => {
     try {
         const domain = await getDomainById(req.query.domain);
@@ -41,6 +46,10 @@ router.get('/groupconfig', auth, [
         let groups = domain.groupConfig;
         groups = await verifyOwnership(req.admin, groups, domain._id, ActionTypes.READ, RouterTypes.GROUP, true);
         await Services.populateAdmin(groups);
+
+        if (req.query.fields) {
+            groups = getFields(groups, req.query.fields);
+        }
 
         res.send(groups);
     } catch (e) {
