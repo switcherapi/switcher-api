@@ -137,6 +137,18 @@ describe('Testing fetch Group info', () => {
         expect(response.body.length).toEqual(2);
     });
 
+    test('GROUP_SUITE - Should get Group Config information - only fields (name, activated.default)', async () => {
+        let response = await request(app)
+            .get('/groupconfig?domain=' + domainId + '&fields=name,activated.default')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+            
+        expect(response.body[0].name).toBeDefined();
+        expect(response.body[0].activated.default).toBeDefined();
+        expect(response.body[0].description).toBeUndefined();
+        expect(response.body[0].owner).toBeUndefined();
+    });
+
     test('GROUP_SUITE - Should get Group Config information by Id', async () => {
         let response = await request(app)
             .get('/groupconfig/' + groupConfigId)
