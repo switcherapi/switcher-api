@@ -142,23 +142,6 @@ describe('Testing criteria [GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected101));
     });
 
-    test('CLIENT_SUITE - Should return success on Flat view resolved by Config Key - Unknown environment, should look to production', async () => {
-        const response = await request(app)
-            .post('/criteria/auth')
-            .set('switcher-api-key', `${apiKey}`)
-            .send({
-                domain: domainDocument.name,
-                component: component1.name,
-                environment: 'UNKNOWN ENVIRONMENT'
-            }).expect(200);
-
-        await request(app)
-            .post('/graphql')
-            .set('Authorization', `Bearer ${response.body.token}`)
-            .send(graphqlUtils.configurationQuery([['key', keyConfig]]))
-            .expect(200);
-    });
-
     test('CLIENT_SUITE - Should NOT authenticate invalid component', async () => {
         await request(app)
             .post('/criteria/auth')
@@ -167,6 +150,17 @@ describe('Testing criteria [GraphQL] ', () => {
                 domain: domainDocument.name,
                 component: 'UNKNOWN COMPONENT',
                 environment: EnvType.DEFAULT
+            }).expect(401);
+    });
+
+    test('CLIENT_SUITE - Should NOT authenticate invalid environment', async () => {
+        await request(app)
+            .post('/criteria/auth')
+            .set('switcher-api-key', `${apiKey}`)
+            .send({
+                domain: domainDocument.name,
+                component: component1.name,
+                environment: 'UNKNOWN ENVIRONMENT'
             }).expect(401);
     });
 
@@ -772,8 +766,8 @@ describe('Testing criteria [REST] ', () => {
             .set('Authorization', `Bearer ${token}`)
             .send();
 
-        expect(req.statusCode).toBe(400);
-        expect(req.body.error).toEqual('Wrong value for domain version');
+        expect(req.statusCode).toBe(422);
+        expect(req.body.errors[0].msg).toEqual('Wrong value for domain version');
     });
 
     test('CLIENT_SUITE - Should return error when validating snapshot version - Invalid token', async () => {

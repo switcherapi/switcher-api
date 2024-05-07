@@ -1,5 +1,5 @@
 import express from 'express';
-import { body, check, query } from 'express-validator';
+import { body, check, query, header } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import { checkConfig, checkConfigComponent, validate } from '../middleware/validators.js';
 import { componentAuth, appGenerateCredentials } from '../middleware/auth.js';
@@ -47,14 +47,12 @@ router.post('/criteria', componentAuth, clientLimiter, [
     }
 });
 
-router.get('/criteria/snapshot_check/:version', componentAuth, clientLimiter, async (req, res) => {
+router.get('/criteria/snapshot_check/:version', componentAuth, clientLimiter, [
+    check('version', 'Wrong value for domain version').isNumeric()
+], validate, async (req, res) => {
     try {
         const domain = await checkDomain(req.domain);
         const version = req.params.version;
-
-        if (isNaN(version)) {
-            return res.status(400).send({ error: 'Wrong value for domain version' });
-        }
 
         if (domain.lastUpdate > version) {
             res.send({ status: false });
@@ -78,7 +76,12 @@ router.post('/criteria/switchers_check', componentAuth, clientLimiter, [
     }
 });
 
-router.post('/criteria/auth', appGenerateCredentials, clientLimiter, async (req, res) => {
+router.post('/criteria/auth', [
+    header('switcher-api-key').isString().withMessage('API Key header is required'),
+    body('domain').isString().withMessage('Domain is required'),
+    body('component').isString().withMessage('Component is required'),
+    body('environment').isString().withMessage('Environment is required')
+], validate, appGenerateCredentials, clientLimiter, async (req, res) => {
     try {
         const { exp } = jwt.decode(req.token);
         res.send({ token: req.token, exp });
