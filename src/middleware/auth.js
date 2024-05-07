@@ -2,6 +2,7 @@ import basicAuth from 'express-basic-auth';
 import jwt from 'jsonwebtoken';
 import { getAdmin, getAdminById } from '../services/admin.js';
 import { getComponentById } from '../services/component.js';
+import { getEnvironmentByName } from '../services/environment.js';
 import Admin from '../models/admin.js';
 import Component from '../models/component.js';
 import { getRateLimit } from '../external/switcher-api-facade.js';
@@ -114,6 +115,11 @@ export async function appGenerateCredentials(req, res, next) {
     try {
         const key = req.header('switcher-api-key');
         const { component, domain } = await Component.findByCredentials(req.body.domain, req.body.component, key);
+        const environment = await getEnvironmentByName(component.domain, req.body.environment);
+
+        if (!environment) {
+            throw new Error('Invalid environment');
+        }
 
         const rate_limit = await getRateLimit(key, component);
         const token = await component.generateAuthToken(req.body.environment, rate_limit);
