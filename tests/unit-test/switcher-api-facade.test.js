@@ -27,7 +27,7 @@ import {
     component1,
     component1Key
 } from '../fixtures/db_api';
-import { Switcher } from 'switcher-client';
+import { Client } from 'switcher-client';
 
 afterAll(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -48,7 +48,7 @@ describe('Testing Switcher API Facade', () => {
         };
 
         const call = async () => {
-            Switcher.assume(SwitcherKeys.ELEMENT_CREATION).true();
+            Client.assume(SwitcherKeys.ELEMENT_CREATION).true();
             await checkDomain(req);
         }; 
 
@@ -61,7 +61,7 @@ describe('Testing Switcher API Facade', () => {
         };
 
         const call = async () => {
-            Switcher.assume(SwitcherKeys.ELEMENT_CREATION).false();
+            Client.assume(SwitcherKeys.ELEMENT_CREATION).false();
             await checkDomain(req);
         }; 
 
@@ -70,7 +70,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should enable feature - Create Group', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.ELEMENT_CREATION).true();
+            Client.assume(SwitcherKeys.ELEMENT_CREATION).true();
             await checkGroup(domainDocument);
         }; 
 
@@ -79,7 +79,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should NOT enable feature - Create Group', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.ELEMENT_CREATION).false();
+            Client.assume(SwitcherKeys.ELEMENT_CREATION).false();
             await checkGroup(domainDocument);
         }; 
 
@@ -88,7 +88,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should enable feature - Create Switcher', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.ELEMENT_CREATION).true();
+            Client.assume(SwitcherKeys.ELEMENT_CREATION).true();
             await checkSwitcher(groupConfigDocument);
         }; 
 
@@ -97,7 +97,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should NOT enable feature - Create Switcher', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.ELEMENT_CREATION).false();
+            Client.assume(SwitcherKeys.ELEMENT_CREATION).false();
             await checkSwitcher(groupConfigDocument);
         }; 
 
@@ -106,7 +106,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should enable feature - Create Component', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.ELEMENT_CREATION).true();
+            Client.assume(SwitcherKeys.ELEMENT_CREATION).true();
             await checkComponent(domainId);
         }; 
 
@@ -115,7 +115,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should NOT enable feature - Create Component', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.ELEMENT_CREATION).false();
+            Client.assume(SwitcherKeys.ELEMENT_CREATION).false();
             await checkComponent(domainId);
         }; 
 
@@ -124,7 +124,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should enable feature - Create Environment', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.ELEMENT_CREATION).true();
+            Client.assume(SwitcherKeys.ELEMENT_CREATION).true();
             await checkEnvironment(domainId);
         }; 
 
@@ -133,7 +133,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should NOT enable feature - Create Environment', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.ELEMENT_CREATION).false();
+            Client.assume(SwitcherKeys.ELEMENT_CREATION).false();
             await checkEnvironment(domainId);
         }; 
 
@@ -142,7 +142,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should enable feature - Create Team', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.ELEMENT_CREATION).true();
+            Client.assume(SwitcherKeys.ELEMENT_CREATION).true();
             await checkTeam(domainId);
         }; 
 
@@ -151,7 +151,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should NOT enable feature - Create Team', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.ELEMENT_CREATION).false();
+            Client.assume(SwitcherKeys.ELEMENT_CREATION).false();
             await checkTeam(domainId);
         }; 
 
@@ -160,7 +160,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should enable feature - Metrics', async () => {
         //given
-        Switcher.assume(SwitcherKeys.ELEMENT_CREATION).true();
+        Client.assume(SwitcherKeys.ELEMENT_CREATION).true();
         await checkMetrics(config1Document);
 
         //test
@@ -169,7 +169,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should NOT enable feature - Metrics', async () => {
         //given
-        Switcher.assume(SwitcherKeys.ELEMENT_CREATION).false();
+        Client.assume(SwitcherKeys.ELEMENT_CREATION).false();
         await checkMetrics(config1Document);
 
         //test
@@ -178,7 +178,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should enable feature - History', async () => {
         //given
-        Switcher.assume(SwitcherKeys.ELEMENT_CREATION).true();
+        Client.assume(SwitcherKeys.ELEMENT_CREATION).true();
         const response = await checkHistory(domainId);
 
         //test
@@ -187,7 +187,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should NOT enable feature - History', async () => {
         //given
-        Switcher.assume(SwitcherKeys.ELEMENT_CREATION).false();
+        Client.assume(SwitcherKeys.ELEMENT_CREATION).false();
         const response = await checkHistory(domainId);
 
         //test
@@ -196,7 +196,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should enable feature - Sign up new Account', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.ACCOUNT_CREATION).true();
+            Client.assume(SwitcherKeys.ACCOUNT_CREATION).true();
             await checkAdmin('mail@mail.com');
         }; 
 
@@ -205,7 +205,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should NOT enable feature - Sign up new Account', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.ACCOUNT_CREATION).false();
+            Client.assume(SwitcherKeys.ACCOUNT_CREATION).false();
             await checkAdmin('dev@dev.com');
         }; 
 
@@ -213,18 +213,18 @@ describe('Testing Switcher API Facade', () => {
     });
 
     test('UNIT_API_FACADE - Should notify external service - Account being registered', async () => {
-        Switcher.assume(SwitcherKeys.ACCOUNT_IN_NOTIFY).true();
+        Client.assume(SwitcherKeys.ACCOUNT_IN_NOTIFY).true();
         expect(notifyAcCreation(adminAccountId)).toBe(undefined);
     });
 
     test('UNIT_API_FACADE - Should notify external service - Account being unregistered', async () => {
-        Switcher.assume(SwitcherKeys.ACCOUNT_OUT_NOTIFY).true();
+        Client.assume(SwitcherKeys.ACCOUNT_OUT_NOTIFY).true();
         expect(notifyAcDeletion(adminAccountId)).toBe(undefined);
     });
 
     test('UNIT_API_FACADE - Should enable feature - Slack Integration', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.SLACK_INTEGRATION).true();
+            Client.assume(SwitcherKeys.SLACK_INTEGRATION).true();
             await checkSlackIntegration('admin_id');
         }; 
 
@@ -233,7 +233,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should NOT enable feature - Slack Integration', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.SLACK_INTEGRATION).false();
+            Client.assume(SwitcherKeys.SLACK_INTEGRATION).false();
             await checkSlackIntegration('admin_id');
         }; 
 
@@ -242,7 +242,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should read rate limit - 100 Request Per Minute', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.RATE_LIMIT).true().withMetadata({ rate_limit: 100 });
+            Client.assume(SwitcherKeys.RATE_LIMIT).true().withMetadata({ rate_limit: 100 });
             return getRateLimit(component1Key, component1);
         }; 
 
@@ -251,7 +251,7 @@ describe('Testing Switcher API Facade', () => {
 
     test('UNIT_API_FACADE - Should NOT read rate limit - Default Request Per Minute', async () => {
         const call = async () => {
-            Switcher.assume(SwitcherKeys.RATE_LIMIT).false();
+            Client.assume(SwitcherKeys.RATE_LIMIT).false();
             return getRateLimit(component1Key, component1);
         }; 
 

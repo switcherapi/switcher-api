@@ -54,8 +54,8 @@
     "pino": "^9.0.0",
     "pino-pretty": "^11.0.0",
     "swagger-ui-express": "^5.0.0",
-    "switcher-client": "^4.0.3",
-    "validator": "^13.11.0"
+    "switcher-client": "^4.1.0",
+    "validator": "^13.12.0"
   },
   "devDependencies": {
     "env-cmd": "^10.1.0",
@@ -64,7 +64,7 @@
     "jest-sonar-reporter": "^2.0.0",
     "node-notifier": "^10.0.1",
     "nodemon": "^3.1.0",
-    "sinon": "^17.0.1",
+    "sinon": "^17.0.2",
     "supertest": "^7.0.0"
   },
   "overrides": {

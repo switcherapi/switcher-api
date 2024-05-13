@@ -1,4 +1,4 @@
-import { Switcher } from 'switcher-client';
+import { Client } from 'switcher-client';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
@@ -79,7 +79,7 @@ describe('Slack Installation', () => {
     test('SLACK_SUITE - Should NOT save installation - Slack unavailable', async () => {
         //given
         process.env.SWITCHER_API_ENABLE = true;
-        Switcher.assume('SLACK_INTEGRATION').false();
+        Client.assume('SLACK_INTEGRATION').false();
 
         //test
         const response = await request(app)
