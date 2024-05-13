@@ -4,7 +4,7 @@ import axios from 'axios';
 import { RelayMethods } from '../../../src/models/config';
 import { StrategiesType } from '../../../src/models/config-strategy';
 import { EnvType } from '../../../src/models/environment';
-import { Switcher } from 'switcher-client';
+import { Client } from 'switcher-client';
 
 describe('Testing Client Relay', () => {
 
@@ -21,7 +21,7 @@ describe('Testing Client Relay', () => {
         // Given
         const mockRelayService = { data: { result: true, reason: 'Success' } };
         axiosStub.returns(Promise.resolve(mockRelayService));
-        Switcher.assume('HTTPS_AGENT').true();
+        Client.assume('HTTPS_AGENT').true();
 
         const relay = {
             endpoint: {

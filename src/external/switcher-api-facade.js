@@ -1,4 +1,4 @@
-import { Switcher, checkValue, checkPayload, checkRegex } from 'switcher-client';
+import { Client } from 'switcher-client';
 import { EnvType } from '../models/environment.js';
 import { FeatureUnavailableError } from '../exceptions/index.js';
 import { getDomainById, getTotalDomainsByOwner } from '../services/domain.js';
@@ -18,7 +18,7 @@ const throttle = process.env.SWITCHER_API_THROTTLE;
 const certPath = process.env.SSL_CERT;
 const component = 'switcherapi';
 
-Switcher.buildContext({ url, apiKey, domain: domainName, component, environment }, { logger, certPath });
+Client.buildContext({ url, apiKey, domain: domainName, component, environment }, { logger, certPath });
 
 export const SwitcherKeys = Object.freeze({
     ELEMENT_CREATION: 'ELEMENT_CREATION',
@@ -36,14 +36,14 @@ function switcherFlagResult(response, message) {
     }
 }
 
-async function checkFeature(feature, params) {
-    const switcher = Switcher.factory();
+function getFeatureFlag(feature) {
+    const switcher = Client.getSwitcher(feature);
 
     if (throttle) {
         switcher.throttle(throttle);
     }
 
-    return switcher.detail().isItOn(feature, params);
+    return switcher.detail();
 }
 
 export async function checkDomain(req) {
@@ -51,13 +51,14 @@ export async function checkDomain(req) {
         return;
 
     const total = await getTotalDomainsByOwner(req.admin._id);
-    switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkPayload(JSON.stringify({
+    const featureFlag = await getFeatureFlag(SwitcherKeys.ELEMENT_CREATION)
+        .checkPayload(JSON.stringify({
             feature: 'domain',
             owner: req.admin._id,
             total
-        }))
-    ]), 'Domain limit has been reached.');
+        })).isItOn();
+
+    switcherFlagResult(featureFlag, 'Domain limit has been reached.');
 }
 
 export async function checkGroup(domain) {
@@ -65,13 +66,14 @@ export async function checkGroup(domain) {
         return;
 
     const total = await getTotalGroupsByDomainId(domain._id);
-    switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkPayload(JSON.stringify({
+    const featureFlag = await getFeatureFlag(SwitcherKeys.ELEMENT_CREATION)
+        .checkPayload(JSON.stringify({
             feature: 'group',
             owner: domain.owner,
             total
-        }))
-    ]), 'Group limit has been reached.');
+        })).isItOn();
+
+    switcherFlagResult(featureFlag, 'Group limit has been reached.');
 }
 
 export async function checkSwitcher(group) {
@@ -80,13 +82,14 @@ export async function checkSwitcher(group) {
 
     const total = await getTotalConfigsByDomainId(group.domain);
     const { owner } = await getDomainById(group.domain);
-    switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkPayload(JSON.stringify({
+    const featureFlag = await getFeatureFlag(SwitcherKeys.ELEMENT_CREATION)
+        .checkPayload(JSON.stringify({
             feature: 'switcher',
             owner,
             total
-        }))
-    ]), 'Switcher limit has been reached.');
+        })).isItOn();
+
+    switcherFlagResult(featureFlag, 'Switcher limit has been reached.');
 }
 
 export async function checkComponent(domain) {
@@ -95,13 +98,14 @@ export async function checkComponent(domain) {
 
     const total = await getTotalComponentsByDomainId(domain);
     const { owner } = await getDomainById(domain);
-    switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkPayload(JSON.stringify({
+    const featureFlag = await getFeatureFlag(SwitcherKeys.ELEMENT_CREATION)
+        .checkPayload(JSON.stringify({
             feature: 'component',
             owner,
             total
-        }))
-    ]), 'Component limit has been reached.');
+        })).isItOn();
+
+    switcherFlagResult(featureFlag, 'Component limit has been reached.');
 }
 
 export async function checkEnvironment(domain) {
@@ -110,13 +114,14 @@ export async function checkEnvironment(domain) {
 
     const total = await getTotalEnvByDomainId(domain);
     const { owner } = await getDomainById(domain);
-    switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkPayload(JSON.stringify({
+    const featureFlag = await getFeatureFlag(SwitcherKeys.ELEMENT_CREATION)
+        .checkPayload(JSON.stringify({
             feature: 'environment',
             owner,
             total
-        }))
-    ]), 'Environment limit has been reached.');
+        })).isItOn();
+
+    switcherFlagResult(featureFlag, 'Environment limit has been reached.');
 }
 
 export async function checkTeam(domain) {
@@ -125,13 +130,14 @@ export async function checkTeam(domain) {
 
     const total = await getTotalTeamsByDomainId(domain);
     const { owner } = await getDomainById(domain);
-    switcherFlagResult(await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkPayload(JSON.stringify({
+    const featureFlag = await getFeatureFlag(SwitcherKeys.ELEMENT_CREATION)
+        .checkPayload(JSON.stringify({
             feature: 'team',
             owner,
             total
-        }))
-    ]), 'Team limit has been reached.');
+        })).isItOn();
+
+    switcherFlagResult(featureFlag, 'Team limit has been reached.');
 }
 
 export async function checkMetrics(config) {
@@ -139,12 +145,11 @@ export async function checkMetrics(config) {
         return true;
 
     const { owner } = await getDomainById(config.domain);
-    const response = await checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkPayload(JSON.stringify({
+    const response = await getFeatureFlag(SwitcherKeys.ELEMENT_CREATION)
+        .checkPayload(JSON.stringify({
             feature: 'metrics',
             owner
-        }))
-    ]);
+        })).isItOn();
 
     if (!response.result) {
         if (!config.disable_metrics) {
@@ -163,61 +168,62 @@ export async function checkHistory(domain) {
         return true;
 
     const { owner } = await getDomainById(domain);
-    return checkFeature(SwitcherKeys.ELEMENT_CREATION, [
-        checkPayload(JSON.stringify({
+    return getFeatureFlag(SwitcherKeys.ELEMENT_CREATION)
+        .checkPayload(JSON.stringify({
             feature: 'history',
             owner
-        }))
-    ]);
+        })).isItOn();
 }
 
 export async function checkAdmin(login) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
         return;
 
-    switcherFlagResult(
-        await checkFeature(SwitcherKeys.ACCOUNT_CREATION, [
-            checkValue(login)
-        ]), 'Account not released to use the API.');
+    const featureFlag = await getFeatureFlag(SwitcherKeys.ACCOUNT_CREATION)
+        .checkValue(login)
+        .isItOn();
+
+    switcherFlagResult(featureFlag, 'Account not released to use the API.');
 }
 
 export async function checkSlackIntegration(value) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
         return;
 
-    switcherFlagResult(
-        await checkFeature(SwitcherKeys.SLACK_INTEGRATION, [
-            checkValue(value)
-        ]), 'Slack Integration is not available.');
+    const featureFlag = await getFeatureFlag(SwitcherKeys.SLACK_INTEGRATION)
+        .checkValue(value)
+        .isItOn();
+
+    switcherFlagResult(featureFlag, 'Slack Integration is not available.');
 }
 
 export function notifyAcCreation(adminid) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
         return;
 
-    const switcher = Switcher.factory();
-    switcher.isItOn(SwitcherKeys.ACCOUNT_IN_NOTIFY, [
-        checkValue(adminid)]);
+    Client.getSwitcher(SwitcherKeys.ACCOUNT_IN_NOTIFY)
+        .checkValue(adminid)
+        .isItOn();
 }
 
 export function notifyAcDeletion(adminid) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
         return;
 
-    const switcher = Switcher.factory();
-    switcher.isItOn(SwitcherKeys.ACCOUNT_OUT_NOTIFY, [
-        checkValue(adminid)]);
+    Client.getSwitcher(SwitcherKeys.ACCOUNT_OUT_NOTIFY)
+        .checkValue(adminid)
+        .isItOn();
 }
 
 export async function getRateLimit(key, component) {
     if (process.env.SWITCHER_API_ENABLE === 'true' && key !== process.env.SWITCHER_API_KEY) {
         const domain = await getDomainById(component.domain);
-        const response = await checkFeature(SwitcherKeys.RATE_LIMIT, [
-            checkValue(String(domain.owner))
-        ]);
+        const featureFlag = await getFeatureFlag(SwitcherKeys.RATE_LIMIT)
+            .checkValue(String(domain.owner))
+            .isItOn();
 
-        if (response.result) {
-            return response.metadata.rate_limit;
+        if (featureFlag.result) {
+            return featureFlag.metadata.rate_limit;
         }
     }
 
@@ -228,5 +234,7 @@ export async function checkHttpsAgent(value) {
     if (process.env.SWITCHER_API_ENABLE != 'true')
         return;
 
-    return checkFeature(SwitcherKeys.HTTPS_AGENT, [checkRegex(value)]);
+    return getFeatureFlag(SwitcherKeys.HTTPS_AGENT)
+        .checkRegex(value)
+        .isItOn();
 }

@@ -1,4 +1,4 @@
-import { Switcher } from 'switcher-client';
+import { Client } from 'switcher-client';
 import Logger from '../helpers/logger.js';
 
 export class NotFoundError extends Error {
@@ -38,7 +38,7 @@ export class FeatureUnavailableError extends Error {
 
 export function responseException(res, err, code, feature = undefined) {
     if (feature) {
-        Logger.info(`Feature [${feature}]`, { log: Switcher.getLogger(feature) });
+        Logger.info(`Feature [${feature}]`, { log: Client.getLogger(feature) });
     }
 
     responseExceptionSilent(res, err, code, err.message);
