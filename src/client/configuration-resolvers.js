@@ -7,6 +7,7 @@ import { getEnvironments } from '../services/environment.js';
 import { getSlack } from '../services/slack.js';
 import { getDomainById } from '../services/domain.js';
 import { getComponents } from '../services/component.js';
+import Logger from '../helpers/logger.js';
 
 async function resolveConfigByConfig(domainId, key, configId) {
     const config = await getConfigs({ 
@@ -85,6 +86,7 @@ export async function resolveFlatConfigStrategy(source, context) {
                 context.admin, strategies, source.config[0].domain, ActionTypes.READ, RouterTypes.STRATEGY, true);
         }
     } catch (e) {
+        Logger.debug('resolveFlatConfigStrategy', e);
         return null;
     }
 
@@ -109,6 +111,7 @@ export async function resolveFlatConfig(source, context) {
                 context.admin, configs, domainId, ActionTypes.READ, RouterTypes.CONFIG, true);
         }
     } catch (e) {
+        Logger.debug('resolveFlatConfig', e);
         return null;
     }
 
@@ -130,6 +133,7 @@ export async function resolveFlatGroupConfig(source, context) {
                 context.admin, group, group[0].domain, ActionTypes.READ, RouterTypes.GROUP, true);
         }
     } catch (e) {
+        Logger.debug('resolveFlatGroupConfig', e);
         return null;
     }
 
@@ -149,6 +153,7 @@ export async function resolveFlatDomain(_source, context) {
                 context.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN, true);
         }
     } catch (e) {
+        Logger.debug('resolveFlatDomain', e);
         return null;
     }
 

@@ -6,8 +6,9 @@ const ERROR_MESSAGE = {
 };
 
 const getMaxRate = (rate_limit) => {
-	if (rate_limit === 0)
+	if (rate_limit === 0) {
 		return parseInt(DEFAULT_RATE_LIMIT);
+	}
 
 	return rate_limit;
 };

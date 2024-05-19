@@ -47,8 +47,9 @@ function getFeatureFlag(feature) {
 }
 
 export async function checkDomain(req) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
         return;
+    }
 
     const total = await getTotalDomainsByOwner(req.admin._id);
     const featureFlag = await getFeatureFlag(SwitcherKeys.ELEMENT_CREATION)
@@ -62,8 +63,9 @@ export async function checkDomain(req) {
 }
 
 export async function checkGroup(domain) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
         return;
+    }
 
     const total = await getTotalGroupsByDomainId(domain._id);
     const featureFlag = await getFeatureFlag(SwitcherKeys.ELEMENT_CREATION)
@@ -77,8 +79,9 @@ export async function checkGroup(domain) {
 }
 
 export async function checkSwitcher(group) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
         return;
+    }
 
     const total = await getTotalConfigsByDomainId(group.domain);
     const { owner } = await getDomainById(group.domain);
@@ -93,8 +96,9 @@ export async function checkSwitcher(group) {
 }
 
 export async function checkComponent(domain) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
         return;
+    }
 
     const total = await getTotalComponentsByDomainId(domain);
     const { owner } = await getDomainById(domain);
@@ -109,8 +113,9 @@ export async function checkComponent(domain) {
 }
 
 export async function checkEnvironment(domain) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
         return;
+    }
 
     const total = await getTotalEnvByDomainId(domain);
     const { owner } = await getDomainById(domain);
@@ -125,8 +130,9 @@ export async function checkEnvironment(domain) {
 }
 
 export async function checkTeam(domain) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
         return;
+    }
 
     const total = await getTotalTeamsByDomainId(domain);
     const { owner } = await getDomainById(domain);
@@ -141,8 +147,9 @@ export async function checkTeam(domain) {
 }
 
 export async function checkMetrics(config) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
         return true;
+    }
 
     const { owner } = await getDomainById(config.domain);
     const response = await getFeatureFlag(SwitcherKeys.ELEMENT_CREATION)
@@ -164,8 +171,9 @@ export async function checkMetrics(config) {
 }
 
 export async function checkHistory(domain) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
         return true;
+    }
 
     const { owner } = await getDomainById(domain);
     return getFeatureFlag(SwitcherKeys.ELEMENT_CREATION)
@@ -176,8 +184,9 @@ export async function checkHistory(domain) {
 }
 
 export async function checkAdmin(login) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
         return;
+    }
 
     const featureFlag = await getFeatureFlag(SwitcherKeys.ACCOUNT_CREATION)
         .checkValue(login)
@@ -187,8 +196,9 @@ export async function checkAdmin(login) {
 }
 
 export async function checkSlackIntegration(value) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
         return;
+    }
 
     const featureFlag = await getFeatureFlag(SwitcherKeys.SLACK_INTEGRATION)
         .checkValue(value)
@@ -198,8 +208,9 @@ export async function checkSlackIntegration(value) {
 }
 
 export function notifyAcCreation(adminid) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
         return;
+    }
 
     Client.getSwitcher(SwitcherKeys.ACCOUNT_IN_NOTIFY)
         .checkValue(adminid)
@@ -207,8 +218,9 @@ export function notifyAcCreation(adminid) {
 }
 
 export function notifyAcDeletion(adminid) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
         return;
+    }
 
     Client.getSwitcher(SwitcherKeys.ACCOUNT_OUT_NOTIFY)
         .checkValue(adminid)
@@ -231,8 +243,9 @@ export async function getRateLimit(key, component) {
 }
 
 export async function checkHttpsAgent(value) {
-    if (process.env.SWITCHER_API_ENABLE != 'true')
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
         return;
+    }
 
     return getFeatureFlag(SwitcherKeys.HTTPS_AGENT)
         .checkRegex(value)

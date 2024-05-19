@@ -3,8 +3,9 @@ import { sortBy, validatePagingArgs } from '../helpers/index.js';
 import { BadRequestError } from '../exceptions/index.js';
 
 export async function getHistory(query, domainId, elementId, pagingArgs = {}) {
-    if (!validatePagingArgs(pagingArgs))
+    if (!validatePagingArgs(pagingArgs)) {
         throw new BadRequestError('Invalid paging args');
+    }
 
     return History.find({ domainId, elementId })
             .select(query)

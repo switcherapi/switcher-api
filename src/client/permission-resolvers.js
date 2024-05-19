@@ -3,6 +3,7 @@ import { RouterTypes } from '../models/permission.js';
 import { getConfigs } from '../services/config.js';
 import { getGroupConfigs } from '../services/group-config.js';
 import { permissionCache } from '../helpers/cache.js';
+import Logger from '../helpers/logger.js';
 
 export async function resolvePermission(args, admin) {
     const cacheKey = permissionCache.permissionKey(admin._id, args.domain, args.parent, 
@@ -27,6 +28,7 @@ export async function resolvePermission(args, admin) {
                 await verifyOwnership(admin, element, args.domain, action_perm, args.router, false, args.environment);
                 result[result.length - 1].permissions.push({ action: action_perm.toString(), result: 'ok' });
             } catch (e) {
+                Logger.debug('resolvePermission', e);
                 result[result.length - 1].permissions.push({ action: action_perm.toString(), result: 'nok' });
             }
         }

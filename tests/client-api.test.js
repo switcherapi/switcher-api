@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import sinon from 'sinon';
 import app from '../src/app';
-import { ActionTypes, RouterTypes } from '../src/models/permission';
+import { ActionTypes, Permission, RouterTypes } from '../src/models/permission';
 import { permissionCache } from '../src/helpers/cache';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
@@ -30,6 +30,7 @@ import {
     adminAccountId,
     slack
 } from './fixtures/db_client';
+import { Team } from '../src/models/team';
 
 const changeStrategy = async (strategyId, newOperation, status, environment) => {
     const strategy = await ConfigStrategy.findById(strategyId).exec();
@@ -79,6 +80,21 @@ const createRequestAuth = async () => {
             component: component1.name,
             environment: EnvType.DEFAULT
         });
+};
+
+const setPermissionsToTeam = async (teamId, permission, reset) => {
+    const permissionId = new mongoose.Types.ObjectId();
+    permission._id = permissionId;
+
+    await new Permission(permission).save();
+    const team = await Team.findById(teamId).exec();
+
+    if (reset) {
+        team.permissions = [];
+    }
+
+    team.permissions.push(permissionId);
+    await team.save();
 };
 
 beforeAll(setupDatabase);
@@ -344,7 +360,7 @@ describe('Testing criteria [GraphQL] ', () => {
     });
 
     test('CLIENT_SUITE - Should not add to metrics when Config has disabled metric flag = true', async () => {
-        //given
+        // Given
         await changeConfigStatus(configId, true, EnvType.DEFAULT);
 
         //add one metric data
@@ -1075,12 +1091,76 @@ describe('Testing domain [Adm-GraphQL] ', () => {
     });
 });
 
+describe('Testing domain [Adm-GraphQL] - Permission', () => {
+
+    afterAll(setupDatabase);
+
+    test('CLIENT_SUITE - Should return domain partial structure based on permission', async () => {
+        // Given
+        const admin = await Admin.findById(adminAccountId).exec();
+        await setPermissionsToTeam(admin.teams[0], {
+            action: ActionTypes.READ,
+            active: true,
+            identifiedBy: 'key',
+            values: ['TEST_CONFIG_KEY_PRD_QA'],
+            router: RouterTypes.CONFIG
+        }, true);
+
+        // Test
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]]));
+
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected1071));
+    });
+
+    test('CLIENT_SUITE - Should NOT return complete domain structure - no valid COnfig permission', async () => {
+        // Given
+        const admin = await Admin.findById(adminAccountId).exec();
+        await setPermissionsToTeam(admin.teams[0], {
+            action: ActionTypes.READ,
+            active: true,
+            router: RouterTypes.GROUP
+        }, true);
+
+        // Test
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]]));
+        
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected1072));
+    });
+
+    test('CLIENT_SUITE - Should NOT return complete domain structure - no valid Group permission', async () => {
+        // Given
+        const admin = await Admin.findById(adminAccountId).exec();
+        await setPermissionsToTeam(admin.teams[0], {
+            action: ActionTypes.READ,
+            active: true,
+            router: RouterTypes.DOMAIN
+        }, true);
+
+        // Test
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]]));
+        
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected1073));
+    });
+});
+
 describe('Testing domain/configuration [Adm-GraphQL] - Excluded team member ', () => {
 
     afterAll(setupDatabase);
 
     test('CLIENT_SUITE - Should NOT return domain structure for an excluded team member', async () => {
-        //given
+        // Given
         const admin = await Admin.findById(adminAccountId).exec();
         admin.teams = [];
         await admin.save();

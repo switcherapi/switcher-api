@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Logger from '../helpers/logger.js';
 
 export const githubAccessTokenUrl = 'https://github.com/login/oauth/access_token';
 export const githubAPIUserUrl = 'https://api.github.com/user';
@@ -15,6 +16,7 @@ export async function getGitToken(code) {
         
         return response.data.access_token;
     } catch (error) {
+        Logger.debug('getGitToken', error);
         throw new GitAuthError('Failed to get GitHub access token');
     }
 }
@@ -35,7 +37,8 @@ export async function getGitUserInfo(token) {
             avatar: response.data.avatar_url
         };
    } catch (error) {
-       throw new GitAuthError('Failed to get GitHub user info');
+        Logger.debug('getGitUserInfo', error);
+        throw new GitAuthError('Failed to get GitHub user info');
    }
 }
 

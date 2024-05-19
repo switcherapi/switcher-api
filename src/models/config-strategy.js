@@ -278,8 +278,9 @@ async function processREGEX(operation, input, values) {
 
 function processPAYLOAD(operation, input, values) {
     const inputJson = parseJSON(input);
-    if (!inputJson)
+    if (!inputJson) {
         return false;
+    }
 
     const keys = payloadReader(inputJson);
     switch(operation) {

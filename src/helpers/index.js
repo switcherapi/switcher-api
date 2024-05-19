@@ -3,6 +3,7 @@ import { EnvType } from '../models/environment.js';
 import { getDomainById } from '../services/domain.js';
 import { getEnvironments } from '../services/environment.js';
 import { getTeams } from '../services/team.js';
+import Logger from './logger.js';
 import { verifyPermissions, verifyPermissionsCascade } from './permission.js';
 
 const PATTERN_ALPHANUMERIC_SPACE = /^[a-zA-Z0-9_\- ]*$/;
@@ -21,16 +22,19 @@ export async function checkEnvironmentStatusRemoval(domainId, environmentName, s
 
 export function payloadReader(payload) {
     let payloadRead = payload + '' === payload || payload || 0;
-    if (Array.isArray(payloadRead))
+    if (Array.isArray(payloadRead)) {
         return payloadRead.flatMap(p => payloadReader(p));
+    }
 
     return Object.keys(payloadRead)
         .flatMap(field => [field, ...payloadReader(payload[field])
         .map(nestedField => `${field}.${nestedField}`)])
         .filter(field => isNaN(Number(field)))
         .reduce((acc, curr) => {
-            if (!acc.includes(curr))
+            if (!acc.includes(curr)) {
                 acc.push(curr);
+            }
+
             return acc;
         }, []);
 }
@@ -39,6 +43,7 @@ export function parseJSON(str) {
     try {
         return JSON.parse(str);
     } catch (e) {
+        Logger.debug('parseJSON', e);
         return undefined;
     }
 }
@@ -100,25 +105,28 @@ export function sortBy(args) {
 }
 
 export function validatePagingArgs(args) {
-    if (args.limit && !Number.isInteger(parseInt(args.limit)) || 
-        parseInt(args.limit) < 1)
+    if (args.limit && !Number.isInteger(parseInt(args.limit)) || parseInt(args.limit) < 1) {
         return false;
+    }
      
-    if (args.skip && !Number.isInteger(parseInt(args.skip)) ||
-        parseInt(args.skip) < 0)
+    if (args.skip && !Number.isInteger(parseInt(args.skip)) || parseInt(args.skip) < 0) {
         return false;
+    }
 
     if (args.sortBy) {
         const parts = args.sortBy.split(':');
 
-        if (parts.length != 2)
+        if (parts.length != 2) {
             return false;
+        }
             
-        if (!parts[0].match(/^[A-Za-z]+$/))
+        if (!parts[0].match(/^[A-Za-z]+$/)) {
             return false;
+        }
 
-        if (parts[1] != 'asc' && parts[1] != 'desc')
+        if (parts[1] != 'asc' && parts[1] != 'desc') {
             return false;
+        }
     }
 
     return true;
@@ -170,7 +178,7 @@ export async function verifyOwnership(admin, element, domainId, actions, routerT
             hasPermission.push(allowedElement);
         }
     }
-
+    
     if (!hasPermission.length) {
         throw new PermissionError('Action forbidden');
     }
