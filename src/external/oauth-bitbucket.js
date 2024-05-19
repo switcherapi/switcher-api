@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Logger from '../helpers/logger.js';
 
 export const bitBucketAccessTokenUrl = 'https://bitbucket.org/site/oauth2/access_token';
 export const bitBucketAPIUserUrl = 'https://api.bitbucket.org/2.0/user';
@@ -22,6 +23,7 @@ export async function getBitBucketToken(code) {
             
         return response.data.access_token;
     } catch (error) {
+        Logger.debug('getBitBucketToken', error);
         throw new BitBucketAuthError('Failed to get Bitbucket access token');
     }
 }
@@ -42,7 +44,8 @@ export async function getBitBucketUserInfo(token) {
             avatar: response.data?.links?.avatar?.href
         };
    } catch (error) {
-       throw new BitBucketAuthError('Failed to get Bitbucket user info');
+        Logger.debug('getBitBucketUserInfo', error);
+        throw new BitBucketAuthError('Failed to get Bitbucket user info');
    }
 }
 

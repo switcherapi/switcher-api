@@ -48,6 +48,7 @@ export async function resolveConfigStrategy(source, _id, strategy, operation, ac
             strategies = await verifyOwnership(context.admin, strategies, parentConfig.domain, ActionTypes.READ, RouterTypes.STRATEGY);
         }
     } catch (e) {
+        Logger.debug('resolveConfigStrategy', e);
         return null;
     }
 
@@ -60,19 +61,20 @@ export async function resolveConfig(source, _id, key, activated, context) {
     if (_id) { args._id = _id; }
     if (key) { args.key = key; }
     if (context._component) { args.components = context._component; }
-
+    
     let configs = await Config.find({ group: source._id, ...args }).lean().exec();
-
+    
     if (activated !== undefined) {
         configs = configs.filter(config => config.activated[context.environment] === activated);
     }
-
+    
     try {
         if (context.admin) {
             let parentGroup = await GroupConfig.findById(source._id).exec();
             configs = await verifyOwnership(context.admin, configs, parentGroup.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
         }
     } catch (e) {
+        Logger.debug('resolveConfig', e);
         return null;
     }
 
@@ -96,6 +98,7 @@ export async function resolveGroupConfig(source, _id, name, activated, context) 
             groups = await verifyOwnership(context.admin, groups, source._id, ActionTypes.READ, RouterTypes.GROUP, true);
         }
     } catch (e) {
+        Logger.debug('resolveGroupConfig', e);
         return null;
     }
 
@@ -119,10 +122,8 @@ export async function resolveDomain(_id, name, activated, context) {
     }
     
     let domain = await Domain.findOne({ ...args }).lean().exec();
-    if (activated !== undefined) {
-        if (domain.activated[context.environment] !== activated) {
-            return null;
-        }
+    if (activated !== undefined && domain.activated[context.environment] !== activated) {
+        return null;
     }
 
     try {
@@ -130,6 +131,7 @@ export async function resolveDomain(_id, name, activated, context) {
             domain = await verifyOwnership(context.admin, domain, domain._id, ActionTypes.READ, RouterTypes.DOMAIN, true);
         }
     } catch (e) {
+        Logger.debug('resolveDomain', e);
         return null;
     }
 
@@ -222,8 +224,9 @@ function checkFlags(config, group, domain, environment) {
 async function checkStrategy(entry, strategies, environment) {
     if (strategies) {
         for (const strategy of strategies) {
-            if (!strategy.activated[environment]) 
+            if (!strategy.activated[environment]) {
                 continue;
+            }
             
             await checkStrategyInput(entry, strategy);
         }

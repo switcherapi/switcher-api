@@ -2,6 +2,7 @@ import axios from 'axios';
 import https from 'https';
 import { StrategiesToRelayDataType, RelayMethods } from '../../models/config.js';
 import { checkHttpsAgent } from '../../external/switcher-api-facade.js';
+import Logger from '../../helpers/logger.js';
 
 const agent = async (url) => {
     const response = await checkHttpsAgent(url);
@@ -53,6 +54,7 @@ async function post(url, data, headers) {
     try {
         return await axios.post(url, data, { httpsAgent: await agent(url), headers });
     } catch (error) {
+        Logger.debug('post', error);
         throw new Error(`Failed to reach ${url} via POST`);
     }
 }
@@ -61,6 +63,7 @@ async function get(url, data, headers) {
     try {
         return await axios.get(`${url}${data}`, { httpsAgent: await agent(url), headers });
     } catch (error) {
+        Logger.debug('get', error);
         throw new Error(`Failed to reach ${url} via GET`);
     }
 }

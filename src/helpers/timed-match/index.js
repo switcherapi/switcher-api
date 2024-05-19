@@ -27,8 +27,9 @@ export default class TimedMatch {
         let result = false;
         let timer, resolveListener;
 
-        if (this._isBlackListed({ values, input }))
+        if (this._isBlackListed({ values, input })) {
             return false;
+        }
     
         const matchPromise = new Promise((resolve) => {
             resolveListener = resolve;
@@ -88,8 +89,9 @@ export default class TimedMatch {
         this._worker.kill();
         this._worker = this._createChildProcess();
 
-        if (this._blacklisted.length == this._maxBlackListed)
+        if (this._blacklisted.length == this._maxBlackListed) {
             this._blacklisted.splice(0, 1);
+        }
 
         this._blacklisted.push({
             res: values,

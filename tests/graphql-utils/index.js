@@ -289,6 +289,29 @@ export const expected107 = `
             {"key":"TEST_CONFIG_KEY_PRD_QA","description":"Test config 2 - Off in PRD and ON in QA","statusByEnv":[{"env":"default","value":false},{"env":"QA","value":true}],"strategies":null}]}]}}}
     `;
 
+export const expected1071 = `
+    {"data":
+    {"domain":{"name":"Domain","description":"Test Domain","statusByEnv":[{"env":"default","value":true}],
+    "group":[
+        {"name":"Group Test","description":"Test Group","statusByEnv":[{"env":"default","value":true}],
+        "config":[
+            {"key":"TEST_CONFIG_KEY_PRD_QA","description":"Test config 2 - Off in PRD and ON in QA","statusByEnv":[{"env":"default","value":false},{"env":"QA","value":true}],"strategies":null}]}]}}}
+    `;
+
+export const expected1072 = `
+    {"data":
+    {"domain":{"name":"Domain","description":"Test Domain","statusByEnv":[{"env":"default","value":true}],
+    "group":[
+        {"name":"Group Test","description":"Test Group","statusByEnv":[{"env":"default","value":true}]}
+    ]}}}
+    `;
+
+export const expected1073 = `
+    {"data":
+    {"domain":{"name":"Domain","description":"Test Domain","statusByEnv":[{"env":"default","value":true}]}}}
+    `;
+
+
 export const expected108 = `
     {"data":
     {"configuration":

@@ -8,6 +8,7 @@ import { responseException } from '../exceptions/index.js';
 import * as Services from '../services/admin.js';
 import { SwitcherKeys } from '../external/switcher-api-facade.js';
 import { checkActionType } from '../models/permission.js';
+import Logger from '../helpers/logger.js';
 
 const router = new express.Router();
 
@@ -63,6 +64,7 @@ router.post('/admin/login', [
 
         res.send({ admin, jwt });
     } catch (e) {
+        Logger.httpError('Login', 401, e.message, e);
         res.status(401).send({ error: 'Invalid email/password' });
     }
 });
@@ -128,6 +130,7 @@ router.post('/admin/collaboration/permission', auth, [
                 req.body.router, false, req.body.environment);
             result.push({ action: action_perm, result: 'ok' });
         } catch (e) {
+            Logger.debug('resolvePermission', e);
             result.push({ action : action_perm, result: 'nok' });
         }
     }

@@ -68,8 +68,10 @@ export async function getTeamInvites(where) {
 export async function getTeamInvite(where, validate = true) {
     let teamInvite = await TeamInvite.findOne(where).exec();
 
-    if (validate)
+    if (validate) {
         return response(teamInvite, 'Invite request not found');
+    }
+    
     return teamInvite;
 }
 

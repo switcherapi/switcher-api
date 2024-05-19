@@ -139,13 +139,13 @@ adminSchema.statics.findByCredentials = async (email, password) => {
     const admin = await Admin.findOne({ email, active: true }).exec();
 
     if (!admin) {
-        throw new Error('Unable to login');
+        throw new Error('Unable to login - account not found or not active.');
     }
 
     const isMatch = await bcryptjs.compare(password, admin.password);
 
     if (!isMatch) {
-        throw new Error('Unable to login');
+        throw new Error('Unable to login - invalid credentials.');
     }
 
     return admin;
@@ -205,8 +205,9 @@ adminSchema.pre('save', async function (next) {
 });
 
 adminSchema.post('save', function(error, _doc, next) {
-    if (error.name === 'MongoServerError' && error.code === 11000)
+    if (error.name === 'MongoServerError' && error.code === 11000) {
         return next(new Error('Account is already registered.'));
+    }
     
     next(error);
 });

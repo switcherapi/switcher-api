@@ -3,11 +3,13 @@ import axios from 'axios';
 export const url = 'https://www.google.com/recaptcha/api/siteverify';
 
 export async function validate_token(token, remoteAddress) {
-    if (!process.env.GOOGLE_RECAPTCHA_SECRET || process.env.GOOGLE_SKIP_AUTH == 'true')
+    if (!process.env.GOOGLE_RECAPTCHA_SECRET || process.env.GOOGLE_SKIP_AUTH == 'true') {
         return;
+    }
 
-    if (token === null || token === undefined)
+    if (token === null || token === undefined) {
         throw new GoogleRecaptchaError('Token is empty or invalid');
+    }
 
     const response = await axios.post(
         `${url}?secret=${process.env.GOOGLE_RECAPTCHA_SECRET}&response=${token}&remoteip=${remoteAddress}`, null,
