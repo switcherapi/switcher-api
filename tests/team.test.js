@@ -448,7 +448,7 @@ describe('Updating team members tests', () => {
         await request(app)
             .patch(`/team/member/add/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 
     test('TEAM_SUITE - Should NOT add a team member - Member already joined', async () => {
@@ -461,12 +461,21 @@ describe('Updating team members tests', () => {
     });
 
     test('TEAM_SUITE - Should NOT add a team member - Invalid parameter', async () => {
+        // Test - invalid parameter key
         await request(app)
             .patch(`/team/member/add/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 admin: adminAccountId
-            }).expect(400);
+            }).expect(422);
+
+        // Test - invalid parameter value
+        await request(app)
+            .patch(`/team/member/add/${team1Id}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                member: 'INVALID_ID'
+            }).expect(422);
     });
     
     test('TEAM_SUITE - Should NOT remove a team member - Team not found', async () => {
@@ -509,16 +518,25 @@ describe('Updating team members tests', () => {
         await request(app)
             .patch(`/team/member/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+            .send().expect(422);
     });
 
     test('TEAM_SUITE - Should NOT remove a team member - Invalid parameter', async () => {
+        // Test - invalid parameter key
         await request(app)
             .patch(`/team/member/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 admin: adminAccountId
-            }).expect(400);
+            }).expect(422);
+
+        // Test - invalid parameter value
+        await request(app)
+            .patch(`/team/member/remove/${team1Id}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                member: 'INVALID_ID'
+            }).expect(422);
     });
 
     test('TEAM_SUITE - Should remove a team member', async () => {
@@ -650,12 +668,21 @@ describe('Updating team permissions tests', () => {
     });
 
     test('TEAM_SUITE - Should NOT remove a permission - Invalid parameter', async () => {
+        // Test - invalid parameter key
         await request(app)
             .patch(`/team/permission/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: permission1Id
-            }).expect(400);
+            }).expect(422);
+
+        // Test - invalid parameter value
+        await request(app)
+            .patch(`/team/permission/remove/${team1Id}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                permission: 'INVALID_ID'
+            }).expect(422);
     });
 
     test('TEAM_SUITE - Should NOT remove a permission - Permission not found', async () => {

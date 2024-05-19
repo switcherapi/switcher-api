@@ -36,8 +36,9 @@ Main features:
 - Exclusive Slack App to control and test changes.
  
 
-- **JavaScript lib**: (https://github.com/switcherapi/switcher-client-master)
-- **Java lib**: (https://github.com/switcherapi/switcher-client)
+- **JS Client SDK**: (https://github.com/switcherapi/switcher-client-js)
+- **Deno Client SDK**: (https://github.com/switcherapi/switcher-client-deno)
+- **Java Client SDK**: (https://github.com/switcherapi/switcher-client-java)
 - **Switcher Management**: (https://github.com/switcherapi/switcher-management)
 - **Switcher Slack App**: (https://github.com/switcherapi/switcher-slack-app)
 

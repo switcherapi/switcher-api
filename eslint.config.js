@@ -1,13 +1,13 @@
-import js from "@eslint/js";
-import globals from "globals";
+import js from '@eslint/js';
+import globals from 'globals';
 
 export default [
     {
         ...js.configs.recommended,
-        files: ["src/**/*.js"]
+        files: ['src/**/*.js']
     },
     {
-        files: ["src/**/*.js"],
+        files: ['src/**/*.js'],
         rules: {
             quotes: ['error', 'single'],
             semi: ['error', 'always'],
