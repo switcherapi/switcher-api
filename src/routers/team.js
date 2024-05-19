@@ -1,6 +1,6 @@
 import express from 'express';
 import { auth } from '../middleware/auth.js';
-import { check, query } from 'express-validator';
+import { body, check, query } from 'express-validator';
 import { ActionTypes, RouterTypes } from '../models/permission.js';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators.js';
 import { verifyOwnership } from '../helpers/index.js';
@@ -148,7 +148,8 @@ router.delete('/team/member/invite/remove/:id/:request_id', auth, [
 });
 
 router.patch('/team/member/add/:id', auth, [
-    check('id').isMongoId()
+    check('id').isMongoId(),
+    body('member').isMongoId()
 ], validate, verifyInputUpdateParameters(['member']), async (req, res) => {
     try {
         const adminMember = await Services.addTeamMember(req.body.member, req.params.id, req.admin);
@@ -159,7 +160,8 @@ router.patch('/team/member/add/:id', auth, [
 });
 
 router.patch('/team/member/remove/:id', auth, [
-    check('id').isMongoId()
+    check('id').isMongoId(),
+    body('member').isMongoId()
 ], validate, verifyInputUpdateParameters(['member']), async (req, res) => {
     try {
         const adminMember = await Services.removeTeamMember(req.body.member, req.params.id, req.admin);
@@ -170,7 +172,8 @@ router.patch('/team/member/remove/:id', auth, [
 });
 
 router.patch('/team/permission/remove/:id', auth, [
-    check('id').isMongoId()
+    check('id').isMongoId(),
+    body('permission').isMongoId()
 ], validate, verifyInputUpdateParameters(['permission']), async (req, res) => {
     try {
         const team = await Services.removeTeamPermission(req.body.permission, req.params.id, req.admin);
