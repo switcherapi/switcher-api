@@ -227,6 +227,7 @@ export const slack = {
         incoming_webhook_channel_id : 'CHANNEL_ID'
     },
 };
+domainDocument.integrations = { slack: slack._id };
 
 export const setupDatabase = async () => {
     await ConfigStrategy.deleteMany().exec();

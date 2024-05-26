@@ -7,6 +7,7 @@ import { getDomainById, updateDomainVersion } from './domain.js';
 import { getEnvironment } from './environment.js';
 import { getGroupConfig } from './group-config.js';
 import { containsValue } from '../helpers/index.js';
+import { isQueryValid } from './common.js';
 
 /**
  * Validates if ticket already exists, if so, return it.
@@ -63,6 +64,10 @@ export async function getSlackOrError(where) {
 }
 
 export async function getSlack(where) {
+    if (!isQueryValid(where)) {
+        throw new NotFoundError('Slack installation not found - no valid query provided');
+    }
+
     const query = Slack.findOne();
 
     if (where.id) query.where('_id', where.id);

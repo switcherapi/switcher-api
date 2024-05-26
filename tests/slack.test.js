@@ -146,6 +146,26 @@ describe('Slack Installation', () => {
             mock1_slack_installation.installation_payload.incoming_webhook_channel);
     });
 
+    test('SLACK_SUITE - Should NOT query installation by Domain - Domain has no Slack integration', async () => {
+        //given
+        const domain = await getDomainById(domainId);
+        const slackId = domain.integrations.slack;
+        domain.integrations.slack = null;
+        await domain.save();
+
+        //test
+        const response = await request(app)
+            .get(`/slack/v1/installation/${String(domainId)}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404);
+
+        expect(response.body.error).toBe('Slack installation not found - no valid query provided');
+
+        //teardown
+        domain.integrations.slack = slackId;
+        await domain.save();
+    });
+
     test('SLACK_SUITE - Should NOT query installation by Domain - Domain not found', async () => {
         await request(app)
             .get(`/slack/v1/installation/${new mongoose.Types.ObjectId()}`)
