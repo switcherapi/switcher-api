@@ -53,8 +53,8 @@ async function deleteSlackInstallation(slack) {
     return slack.deleteOne();
 }
 
-export async function getSlackOrError(where) {
-    const slack = await getSlack(where);
+export async function getSlackOrError(where, newInstallation = false) {
+    const slack = await getSlack(where, newInstallation);
 
     if (!slack) {
         throw new NotFoundError('Slack installation not found');
@@ -63,7 +63,7 @@ export async function getSlackOrError(where) {
     return slack;
 }
 
-export async function getSlack(where) {
+export async function getSlack(where, newInstallation = false) {
     if (!isQueryValid(where)) {
         throw new NotFoundError('Slack installation not found - no valid query provided');
     }
@@ -73,6 +73,7 @@ export async function getSlack(where) {
     if (where.id) query.where('_id', where.id);
     if (where.team_id) query.where('team_id', where.team_id);
     if (where.enterprise_id) query.where('enterprise_id', where.enterprise_id);
+    if (newInstallation) query.where('domain', null);
 
     return query.exec();
 }
@@ -80,16 +81,13 @@ export async function getSlack(where) {
 export async function createSlackInstallation(args) {
     await checkSlackIntegration(args.team_id);
 
-    // Remove old installation
-    await deleteSlack(args.enterprise_id, args.team_id);
-
     // Create new slack instance
     let slackInstallation = new Slack({...args});
     return slackInstallation.save();
 }
 
 export async function authorizeSlackInstallation(domain, team_id, admin) {
-    const slack = await getSlackOrError({ team_id });
+    const slack = await getSlackOrError({ team_id }, true);
     const _domain = await getDomainById(domain);
 
     if (String(_domain.owner) != String(admin._id)) {

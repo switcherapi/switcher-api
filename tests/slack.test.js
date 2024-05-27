@@ -17,8 +17,10 @@ import {
     domainId,
     config1Document,
     groupConfigDocument,
-    adminAccountToken
+    adminAccountToken,
+    adminMasterAccountId
 } from './fixtures/db_api';
+import Domain from '../src/models/domain';
 
 afterAll(async () => {
     await Slack.deleteMany().exec();
@@ -42,6 +44,20 @@ const buildInstallation = async (team_id, domain) => {
     installation.bot_payload.app_id = 'APP_ID';
     await Services.createSlackInstallation(installation);
     return installation;
+};
+
+const createDomain = async (name) => {
+    const _id = new mongoose.Types.ObjectId();
+    const domainDocument = {
+        _id,
+        name,
+        description: 'Test Domain for Slack Integration',
+        activated: new Map().set(EnvType.DEFAULT, true),
+        owner: adminMasterAccountId
+    };
+
+    await new Domain(domainDocument).save();
+    return _id;
 };
 
 describe('Slack Installation', () => {
@@ -384,6 +400,42 @@ describe('Slack Installation', () => {
             team_id: 'SHOULD_UNLINK_INTEGRATION'
         });
         expect(slackDb).toBe(null);
+    });
+
+    test('SLACK_SUITE - Should unlink single installation from Multi Slack Installation', async () => {
+        //given - installation/authorization for Domain 1
+        const installation = await buildInstallation('MULTI_DOMAIN_TEAM_ID', null);
+        await request(app)
+            .post('/slack/v1/authorize')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                domain: domainId,
+                team_id: installation.team_id
+            }).expect(200);
+
+        //given - installation/authorization for Domain 2
+        const domainId2 = await createDomain('Domain 2');
+        const installation2 = await buildInstallation('MULTI_DOMAIN_TEAM_ID', null);
+        await request(app)
+            .post('/slack/v1/authorize')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                domain: domainId2,
+                team_id: installation2.team_id
+            }).expect(200);
+
+        //test - unlink installation for Domain 1 without affecting Domain 2
+        await request(app)
+            .delete(`/slack/v1/installation/unlink?domain=${String(domainId)}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        //check DB
+        const domain = await getDomainById(domainId);
+        expect(domain.integrations.slack).toBe(null);
+
+        const domain2 = await getDomainById(domainId2);
+        expect(domain2.integrations.slack).not.toBe(null);
     });
 
     test('SLACK_SUITE - Should NOT unlink installation - Admin is not owner', async () => {
