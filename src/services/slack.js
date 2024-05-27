@@ -73,6 +73,7 @@ export async function getSlack(where, newInstallation = false) {
     if (where.id) query.where('_id', where.id);
     if (where.team_id) query.where('team_id', where.team_id);
     if (where.enterprise_id) query.where('enterprise_id', where.enterprise_id);
+    if (where.domain) query.where('domain', where.domain);
     if (newInstallation) query.where('domain', null);
 
     return query.exec();

@@ -15,9 +15,12 @@ const findInstallation = async (req, res, checkDomain = false) => {
         const slack = await Services.getSlack({
             enterprise_id: req.query.enterprise_id, 
             team_id: req.query.team_id
-        });
+        }, checkDomain);
 
-        if (!slack || (checkDomain && slack.domain)) throw new NotFoundError();
+        if (!slack || (checkDomain && slack.domain)) {
+            throw new NotFoundError();
+        }
+        
         res.send(slack.installation_payload);
     } catch (e) {
         responseException(res, e, 400);

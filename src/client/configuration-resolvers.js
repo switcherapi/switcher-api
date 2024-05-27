@@ -7,6 +7,7 @@ import { getEnvironments } from '../services/environment.js';
 import { getSlack } from '../services/slack.js';
 import { getDomainById } from '../services/domain.js';
 import { getComponents } from '../services/component.js';
+import { checkSlackMultiDomain } from '../external/switcher-api-facade.js';
 import Logger from '../helpers/logger.js';
 
 async function resolveConfigByConfig(domainId, key, configId) {
@@ -37,8 +38,13 @@ async function resolveGroupByGroup(domainId, groupConfig, groupId) {
 }
 
 async function resolveSlackInstallation(args) {
-    const slack = await getSlack({ team_id: args.slack_team_id });
+    const featureFlag = await checkSlackMultiDomain(args.slack_team_id);
 
+    if (featureFlag.result) {
+        return getSlack({ team_id: args.slack_team_id, domain: args.domain });
+    }
+
+    const slack = await getSlack({ team_id: args.slack_team_id });
     if (slack) {
         args.domain = slack.domain;
     }

@@ -1,12 +1,14 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 import sinon from 'sinon';
+import { Client } from 'switcher-client';
 import app from '../src/app';
 import { ActionTypes, Permission, RouterTypes } from '../src/models/permission';
 import { permissionCache } from '../src/helpers/cache';
 import Domain from '../src/models/domain';
 import GroupConfig from '../src/models/group-config';
 import { Config } from '../src/models/config';
+import { Team } from '../src/models/team';
 import Component from '../src/models/component';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../src/models/config-strategy';
 import { EnvType } from '../src/models/environment';
@@ -30,7 +32,6 @@ import {
     adminAccountId,
     slack
 } from './fixtures/db_client';
-import { Team } from '../src/models/team';
 
 const changeStrategy = async (strategyId, newOperation, status, environment) => {
     const strategy = await ConfigStrategy.findById(strategyId).exec();
@@ -975,7 +976,28 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected110));
     });
 
-    test('CLIENT_SUITE - Should return environments Flat-structure - By Slack Team ID', async () => {
+    test('CLIENT_SUITE - Should return environments Flat-structure - By Slack Team ID and Domain ID', async () => {
+        process.env.SWITCHER_API_ENABLE = true;
+        Client.assume('SLACK_MULTI_DOMAIN').true();
+
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send(graphqlUtils.configurationQuery([
+                ['slack_team_id', slack.team_id],
+                ['domain', domainId]], false, false, false, false, true));
+                
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected111));
+
+        Client.forget('SLACK_MULTI_DOMAIN');
+        process.env.SWITCHER_API_ENABLE = false;
+    });
+
+    test('CLIENT_SUITE - Should return environments Flat-structure - By Slack Team ID (deprecate)', async () => {
+        process.env.SWITCHER_API_ENABLE = true;
+        Client.assume('SLACK_MULTI_DOMAIN').false();
+        
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
@@ -984,6 +1006,9 @@ describe('Testing domain [Adm-GraphQL] ', () => {
                 
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected111));
+
+        Client.forget('SLACK_MULTI_DOMAIN');
+        process.env.SWITCHER_API_ENABLE = false;
     });
 
     test('CLIENT_SUITE - Should return list of Groups permissions', async () => {
