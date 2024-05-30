@@ -173,7 +173,7 @@ export async function checkMetrics(config) {
 
 export async function checkHistory(domain) {
     if (process.env.SWITCHER_API_ENABLE != 'true') {
-        return true;
+        return { result: true };
     }
 
     const { owner } = await getDomainById(domain);
@@ -210,7 +210,7 @@ export async function checkSlackIntegration(value) {
 
 export async function checkSlackMultiDomain(value) {
     if (process.env.SWITCHER_API_ENABLE != 'true') {
-        return;
+        return { result: true };
     }
     
     return getFeatureFlag(SwitcherKeys.SLACK_MULTI_DOMAIN)
@@ -255,7 +255,7 @@ export async function getRateLimit(key, component) {
 
 export async function checkHttpsAgent(value) {
     if (process.env.SWITCHER_API_ENABLE != 'true') {
-        return;
+        return { result: true };
     }
 
     return getFeatureFlag(SwitcherKeys.HTTPS_AGENT)

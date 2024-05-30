@@ -37,17 +37,14 @@ async function resolveGroupByGroup(domainId, groupConfig, groupId) {
     return [];
 }
 
-async function resolveSlackInstallation(args) {
+async function resolveBySlackInstallation(args) {
     const featureFlag = await checkSlackMultiDomain(args.slack_team_id);
 
-    if (featureFlag.result) {
+    if (featureFlag?.result) {
         return getSlack({ team_id: args.slack_team_id, domain: args.domain });
     }
 
-    const slack = await getSlack({ team_id: args.slack_team_id });
-    if (slack) {
-        args.domain = slack.domain;
-    }
+    return getSlack({ team_id: args.slack_team_id });
 }
 
 export async function resolveConfiguration(args, context) {
@@ -56,7 +53,7 @@ export async function resolveConfiguration(args, context) {
     }
 
     if (args.slack_team_id) {
-        await resolveSlackInstallation(args);
+        args.domain = (await resolveBySlackInstallation(args))?.domain;
     }
 
     if (context.domain || args.domain) {
@@ -65,7 +62,7 @@ export async function resolveConfiguration(args, context) {
         if (args.key || args.config_id) {
             return resolveConfigByConfig(context.domain, args.key, args.config_id);
         }
-
+        
         return resolveGroupByGroup(context.domain, args.group, args.group_id);
     }
 }
