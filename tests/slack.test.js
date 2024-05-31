@@ -371,13 +371,13 @@ describe('Slack Installation', () => {
         const installation = await buildInstallation('SHOULD_DELETE_AUTHORIZE_INSTALLATION', null);
         await authorizeInstallation(installation, domainId, adminMasterAccountToken);
 
-        const responseCreateTicket = await createTicket(installation.team_id);
+        const { ticket } = await createTicket(installation.team_id);
 
         //verify that
         let domain = await getDomainById(domainId);
         expect(domain.integrations.slack).not.toBe(null);
 
-        let slackTickets = await SlackTicket.find({ slack: responseCreateTicket.ticket.slack }).exec();
+        let slackTickets = await SlackTicket.find({ slack: ticket.slack }).exec();
         expect(slackTickets.length).toBe(1);
 
         //test
@@ -395,7 +395,7 @@ describe('Slack Installation', () => {
         });
         expect(slackDb).toBe(null);
 
-        slackTickets = await SlackTicket.find({ slack: responseCreateTicket.ticket.slack }).exec();
+        slackTickets = await SlackTicket.find({ slack: ticket.slack }).exec();
         expect(slackTickets.length).toBe(0);
     });
 
@@ -500,6 +500,52 @@ describe('Slack Installation', () => {
         expect(slackDb).toBe(null);
     });
 
+    test('SLACK_SUITE - Should find Domains by Slack Team Id', async () => {
+        //given
+        const teamId = 'SLACK_INSTALLATION_DOMAINS';
+        const domainId2 = await createDomain('Domain 2 (findByTeamId)');
+        await buildInstallation(teamId, domainId2);
+
+        const domainId3 = await createDomain('Domain 3 (findByTeamId)');
+        await buildInstallation(teamId, domainId3);
+
+        //test
+        const response = await request(app)
+            .get(`/slack/v1/domains?team_id=${teamId}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        expect(response.body).toMatchObject([
+            { id: String(domainId2), name: 'Domain 2 (findByTeamId)' },
+            { id: String(domainId3), name: 'Domain 3 (findByTeamId)' }
+        ]);
+    });
+
+    test('SLACK_SUITE - Should NOT find Domains by Slack Team Id - Missing param', async () => {
+        await request(app)
+            .get('/slack/v1/domains')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(422);
+    });
+
+    test('SLACK_SUITE - Should NOT find Domains by Slack Team Id - Team Id not found', async () => {
+        await request(app)
+            .get('/slack/v1/domains?team_id=NOT_FOUND')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404);
+    });
+
+    test('SLACK_SUITE - Should NOT find Domains by Slack Team Id - Slack Installation not associated with a Domain', async () => {
+        //given
+        const teamId = 'NO_DOMAIN_TEAM_ID';
+        await buildInstallation(teamId, null);
+
+        //test
+        await request(app)
+            .get(`/slack/v1/domains?team_id=${teamId}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(404);
+    });
 });
 
 describe('Slack Settings', () => {

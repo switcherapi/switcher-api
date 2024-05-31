@@ -1,6 +1,5 @@
 import { StrategiesType } from '../../models/config-strategy.js';
 import { pathParameter, queryParameter } from '../schemas/common.js';
-import configStrategy from '../schemas/config-strategy.js';
 
 export default {
     '/criteria': {
@@ -59,7 +58,9 @@ export default {
                                     },
                                     strategies: {
                                         type: 'array',
-                                        items: configStrategy.ConfigStrategyCriteriaResponse
+                                        items: {
+                                            $ref: '#/components/schemas/ConfigStrategyCriteriaResponse'
+                                        }
                                     }
                                 }
                             }

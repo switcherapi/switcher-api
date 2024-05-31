@@ -128,6 +128,20 @@ const installation_payload = {
     }
 };
 
+const domains_payload = {
+    type: 'object',
+    properties: {
+        id: {
+            type: 'string',
+            description: 'The domain ID'
+        },
+        name: {
+            type: 'string',
+            description: 'The domain name'
+        }
+    }
+};
+
 const bot_payload = {
     type: 'object',
     properties: {
@@ -223,6 +237,7 @@ const ticket_content = {
 export default {
     Slack: slack,
     SlackInstallation: installation_payload,
+    SlackDomains: domains_payload,
     SlackBot: bot_payload,
     SlackTicket: ticket,
     SlackInstallationRequest: {
