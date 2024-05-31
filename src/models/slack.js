@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { SlackTicket } from './slack_ticket';
+import { SlackTicket } from './slack_ticket.js';
 
 const slackSchema = new mongoose.Schema({
     user_id: {

@@ -1,8 +1,10 @@
-import { TicketStatusType } from '../../models/slack_ticket.js';
-
 const ticket = {
     type: 'object',
     properties: {
+        slack: {
+            type: 'string',
+            description: 'The Slack ID'
+        },
         environment: {
             type: 'string',
             description: 'The environment'
@@ -22,11 +24,6 @@ const ticket = {
         observations: {
             type: 'string',
             description: 'The ticket observations'
-        },
-        ticket_status: {
-            type: 'string',
-            enum: Object.values(TicketStatusType),
-            default: TicketStatusType.OPENED
         },
         date_closed: {
             type: 'string',
@@ -186,10 +183,6 @@ const slack = {
                     }
                 }
             }
-        },
-        tickets: {
-            type: 'array',
-            items: ticket
         },
         createdAt: {
             type: 'string',

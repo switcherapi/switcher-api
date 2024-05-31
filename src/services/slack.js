@@ -1,5 +1,5 @@
 import Slack from '../models/slack.js';
-import { TicketStatusType, SLACK_SUB, TicketValidationType, SlackTicket } from '../models/slack_ticket.js';
+import { SLACK_SUB, TicketValidationType, SlackTicket } from '../models/slack_ticket.js';
 import { BadRequestError, NotFoundError, PermissionError } from '../exceptions/index.js';
 import { checkSlackIntegration } from '../external/switcher-api-facade.js';
 import { getConfig } from './config.js';
@@ -14,8 +14,7 @@ import { isQueryValid } from './common.js';
  * Otherwise, validates if ticket content is valid
  */
 async function canCreateTicket(slack, ticket_content) {
-    const slackTickets = await hasSlackTicket(
-        slack._id, ticket_content, TicketStatusType.OPENED);
+    const slackTickets = await hasSlackTicket(slack._id, ticket_content);
         
     if (slackTickets.length) {
         return slackTickets[0];
@@ -59,11 +58,10 @@ async function deleteSlackTicketsBySlackId(slackId) {
     return SlackTicket.deleteMany({ slack: slackId });
 }
 
-async function hasSlackTicket(slackId, ticket_content, status) {
+async function hasSlackTicket(slackId, ticket_content) {
     const tickets = await SlackTicket.find({ 
         slack: slackId, 
-        ...ticket_content, 
-        ticket_status: status 
+        ...ticket_content
     });
     
     return tickets;
@@ -211,31 +209,30 @@ export async function createTicket(ticket_content, enterprise_id, team_id) {
 export async function processTicket(enterprise_id, team_id, ticket_id, approved) {
     const slack = await getSlackOrError({ enterprise_id, team_id });
     await getDomainById(slack.domain);
-    const ticket = slack.slack_ticket.filter(
-        t => String(t.id) === String(ticket_id) &&
-            t.ticket_status === TicketStatusType.OPENED);
+    const ticket = slack.slack_ticket.filter(t => String(t.id) === String(ticket_id));
     
     if (!ticket.length) {
         throw new NotFoundError('Ticket not found');
     }
 
     if (approved) {
-        ticket[0].ticket_status = TicketStatusType.APPROVED;
         await closeTicket(slack.domain, ticket[0]);
     } else {
-        ticket[0].ticket_status = TicketStatusType.DENIED;
         await closeTicket(null, ticket[0]);
     }
 
-    await slack.save();
     return ticket[0];
 }
 
 async function closeTicket(domain, ticket) {
     ticket.date_closed = Date.now();
-    if (ticket.ticket_status === TicketStatusType.APPROVED) {
+
+    // Approved when domain is provided
+    if (domain) {
         await approveChange(domain, ticket);
     }
+
+    await SlackTicket.deleteOne({ _id: ticket._id });
 }
 
 async function approveChange(domain, ticket) {
