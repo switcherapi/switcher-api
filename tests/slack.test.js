@@ -6,10 +6,11 @@ import app from '../src/app';
 import * as Services from '../src/services/slack';
 import { getDomainById } from '../src/services/domain';
 import { getConfig } from '../src/services/config';
-import { mock1_slack_installation } from './fixtures/db_slack';
 import { EnvType } from '../src/models/environment';
+import Domain from '../src/models/domain';
+import { SlackTicket, TicketValidationType } from '../src/models/slack_ticket';
 import Slack from '../src/models/slack';
-import { TicketValidationType } from '../src/models/slack_ticket';
+import { mock1_slack_installation } from './fixtures/db_slack';
 import { 
     setupDatabase,
     slack,
@@ -20,7 +21,6 @@ import {
     adminAccountToken,
     adminMasterAccountId
 } from './fixtures/db_api';
-import Domain from '../src/models/domain';
 
 afterAll(async () => {
     await Slack.deleteMany().exec();
@@ -46,6 +46,16 @@ const buildInstallation = async (team_id, domain) => {
     return installation;
 };
 
+const authorizeInstallation = async (installation, domainId, token) => {
+    await request(app)
+        .post('/slack/v1/authorize')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+            domain: domainId,
+            team_id: installation.team_id
+        }).expect(200);
+}
+
 const createDomain = async (name) => {
     const _id = new mongoose.Types.ObjectId();
     const domainDocument = {
@@ -60,7 +70,27 @@ const createDomain = async (name) => {
     return _id;
 };
 
+const createTicket = async (team_id) => {
+    let ticket_content = {
+        environment: EnvType.DEFAULT,
+        group: groupConfigDocument.name,
+        switcher: config1Document.key,
+        status: false
+    };
+
+    const response = await request(app)
+        .post('/slack/v1/ticket/create')
+        .set('Authorization', `Bearer ${generateToken('30s')}`)
+        .send({
+            team_id,
+            ticket_content
+        });
+
+    return response.body;
+};
+
 describe('Slack Installation', () => {
+
     beforeAll(setupDatabase);
 
     test('SLACK_SUITE - Should save installation', async () => {
@@ -337,13 +367,22 @@ describe('Slack Installation', () => {
     });
 
     test('SLACK_SUITE - Should delete authorized installation', async () => {
+        //given
+        const installation = await buildInstallation('SHOULD_DELETE_AUTHORIZE_INSTALLATION', null);
+        await authorizeInstallation(installation, domainId, adminMasterAccountToken);
+
+        const responseCreateTicket = await createTicket(installation.team_id);
+
         //verify that
         let domain = await getDomainById(domainId);
         expect(domain.integrations.slack).not.toBe(null);
 
+        let slackTickets = await SlackTicket.find({ slack: responseCreateTicket.ticket.slack }).exec();
+        expect(slackTickets.length).toBe(1);
+
         //test
         await request(app)
-            .delete('/slack/v1/installation?team_id=SHOULD_AUTHORIZE_DOMAIN')
+            .delete(`/slack/v1/installation?team_id=${installation.team_id}`)
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(200);
 
@@ -352,9 +391,12 @@ describe('Slack Installation', () => {
         expect(domain.integrations.slack).toBe(null);
 
         const slackDb = await Services.getSlack({
-            team_id: 'SHOULD_AUTHORIZE_DOMAIN'
+            team_id: installation.team_id
         });
         expect(slackDb).toBe(null);
+
+        slackTickets = await SlackTicket.find({ slack: responseCreateTicket.ticket.slack }).exec();
+        expect(slackTickets.length).toBe(0);
     });
 
     test('SLACK_SUITE - Should NOT delete installation - Not found', async () => {
@@ -374,13 +416,7 @@ describe('Slack Installation', () => {
     test('SLACK_SUITE - Should unlink installation', async () => {
         //given
         const installation = await buildInstallation('SHOULD_UNLINK_INTEGRATION', null);
-        await request(app)
-            .post('/slack/v1/authorize')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                domain: domainId,
-                team_id: installation.team_id
-            }).expect(200);
+        await authorizeInstallation(installation, domainId, adminMasterAccountToken);
 
         //verify that
         let domain = await getDomainById(domainId);
@@ -405,13 +441,7 @@ describe('Slack Installation', () => {
     test('SLACK_SUITE - Should unlink single installation from Multi Slack Installation', async () => {
         //given - installation/authorization for Domain 1
         const installation = await buildInstallation('MULTI_DOMAIN_TEAM_ID', null);
-        await request(app)
-            .post('/slack/v1/authorize')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({
-                domain: domainId,
-                team_id: installation.team_id
-            }).expect(200);
+        await authorizeInstallation(installation, domainId, adminMasterAccountToken);
 
         //given - installation/authorization for Domain 2
         const domainId2 = await createDomain('Domain 2');
@@ -849,9 +879,12 @@ describe('Slack Route - Process Ticket', () => {
     });
 
     test('SLACK_SUITE - Should reset installation tickets', async () => {
+        //given
+        await createTicket();
+
         //verify that
-        let slackInstallation = await Slack.findOne({ team_id: slack.team_id }).exec();
-        expect(slackInstallation.tickets.length).toBeGreaterThan(0);
+        let slackTickets = await SlackTicket.find({ slack: slack._id }).exec();
+        expect(slackTickets.length).toBeGreaterThan(0);
 
         //test
         await request(app)
@@ -861,8 +894,8 @@ describe('Slack Route - Process Ticket', () => {
                 team_id: slack.team_id
             }).expect(200);
 
-        slackInstallation = await Slack.findOne({ team_id: slack.team_id }).exec();
-        expect(slackInstallation.tickets.length).toEqual(0);
+        slackTickets = await SlackTicket.find({ slack: slack._id }).exec();
+        expect(slackTickets.length).toEqual(0);
     });
 
     test('SLACK_SUITE - Should NOT reset installation tickets - Admin not owner', async () => {
