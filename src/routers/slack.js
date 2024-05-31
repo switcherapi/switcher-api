@@ -3,7 +3,6 @@ import { check, query } from 'express-validator';
 import { NotFoundError, responseException } from '../exceptions/index.js';
 import { auth, slackAuth } from '../middleware/auth.js';
 import { validate } from '../middleware/validators.js';
-import { TicketStatusType } from '../models/slack_ticket.js';
 import { SwitcherKeys } from '../external/switcher-api-facade.js';
 import { getDomainById } from '../services/domain.js';
 import * as Services from '../services/slack.js';
@@ -177,9 +176,6 @@ router.get('/slack/v1/installation/:domain', auth, [
         const { slack_ticket, installation_payload, settings } = 
             await Services.getSlackOrError({ id: domain.integrations.slack });
 
-        const openedTickets = slack_ticket.filter(t => t.ticket_status === TicketStatusType.OPENED).length;
-        const approvedTickets = slack_ticket.filter(t => t.ticket_status === TicketStatusType.APPROVED).length;
-
         res.send({
             team_id: installation_payload.team_id,
             team_name: installation_payload.team_name,
@@ -187,9 +183,7 @@ router.get('/slack/v1/installation/:domain', auth, [
             channel: installation_payload.incoming_webhook_channel,
             is_enterprise: installation_payload.is_enterprise_install,
             installed_at: installation_payload.installed_at,
-            tickets_opened: openedTickets,
-            tickets_approved: approvedTickets,
-            tickets_denied: (slack_ticket.length - openedTickets - approvedTickets),
+            tickets_opened: slack_ticket.length,
             settings
         });
     } catch (e) {

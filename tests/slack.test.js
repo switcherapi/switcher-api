@@ -809,6 +809,10 @@ describe('Slack Route - Process Ticket', () => {
         //given
         const { ticket } = await createTicket();
 
+        //verify that
+        let ticketDb = await SlackTicket.findById(ticket._id).exec();
+        expect(ticketDb).not.toBe(null);
+
         //test
         const response = await request(app)
             .post('/slack/v1/ticket/process')
@@ -820,6 +824,10 @@ describe('Slack Route - Process Ticket', () => {
             }).expect(200);
 
         expect(response.body.message).toBe(`Ticket ${ticket._id} processed`);
+
+        //check DB
+        ticketDb = await SlackTicket.findById(ticket._id).exec();
+        expect(ticketDb).toBe(null);
     });
 
     test('SLACK_SUITE - Should approve a ticket - Group Change Request', async () => {
@@ -865,6 +873,10 @@ describe('Slack Route - Process Ticket', () => {
         //given
         const { ticket } = await createTicket();
 
+        //verify that
+        let ticketDb = await SlackTicket.findById(ticket._id).exec();
+        expect(ticketDb).not.toBe(null);
+
         //test
         const response = await request(app)
             .post('/slack/v1/ticket/process')
@@ -876,6 +888,10 @@ describe('Slack Route - Process Ticket', () => {
             }).expect(200);
 
         expect(response.body.message).toBe(`Ticket ${ticket._id} processed`);
+
+        //check DB
+        ticketDb = await SlackTicket.findById(ticket._id).exec();
+        expect(ticketDb).toBe(null);
     });
 
     test('SLACK_SUITE - Should reset installation tickets', async () => {
