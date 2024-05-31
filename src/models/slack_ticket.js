@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
 
 export const SLACK_SUB = 'Switcher Slack App';
 export const TicketStatusType = Object.freeze({
@@ -13,7 +14,12 @@ export const TicketValidationType = Object.freeze({
     FROZEN_ENVIRONMENT: 'FROZEN_ENVIRONMENT'
 });
 
-export const slackTicketSchema = new mongoose.Schema({
+const slackTicketSchema = new mongoose.Schema({
+    slack: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Slack'
+    },
     environment: {
         type: String,
         required: true
@@ -44,3 +50,18 @@ export const slackTicketSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
+slackTicketSchema.options.toJSON = {
+    getters: true,
+    virtuals: true,
+    minimize: false,
+    transform: function (_doc, ret) {
+        if (ret.updatedAt || ret.createdAt) {
+            ret.updatedAt = moment(ret.updatedAt).format('YYYY-MM-DD HH:mm:ss');
+            ret.createdAt = moment(ret.createdAt).format('YYYY-MM-DD HH:mm:ss');
+        }
+        return ret;
+    }
+};
+
+export const SlackTicket = mongoose.model('SlackTicket', slackTicketSchema);

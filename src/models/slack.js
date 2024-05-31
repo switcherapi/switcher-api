@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { slackTicketSchema, TicketStatusType } from './slack_ticket.js';
+import { SlackTicket } from './slack_ticket';
 
 const slackSchema = new mongoose.Schema({
     user_id: {
@@ -35,9 +35,14 @@ const slackSchema = new mongoose.Schema({
             type: String    
         }]
     },
-    tickets: [slackTicketSchema]
 }, {
     timestamps: true
+});
+
+slackSchema.virtual('slack_ticket', {
+    ref: 'SlackTicket',
+    localField: '_id',
+    foreignField: 'slack'
 });
 
 slackSchema.options.toJSON = {
@@ -53,14 +58,11 @@ slackSchema.options.toJSON = {
     }
 };
 
-slackSchema.methods.isTicketOpened = function (ticket_content) {
+slackSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
     const slack = this;
-    return slack.tickets.filter(ticket => 
-        ticket.environment === ticket_content.environment &&
-        ticket.group === ticket_content.group &&
-        ticket.switcher === ticket_content.switcher &&
-        ticket.ticket_status === TicketStatusType.OPENED);
-};
+    await SlackTicket.deleteMany({ slack: slack._id }).exec();
+    next();
+});
 
 const Slack = mongoose.model('Slack', slackSchema);
 

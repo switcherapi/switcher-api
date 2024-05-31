@@ -1,5 +1,5 @@
 import Slack from '../models/slack.js';
-import { TicketStatusType, SLACK_SUB, TicketValidationType } from '../models/slack_ticket.js';
+import { TicketStatusType, SLACK_SUB, TicketValidationType, SlackTicket } from '../models/slack_ticket.js';
 import { BadRequestError, NotFoundError, PermissionError } from '../exceptions/index.js';
 import { checkSlackIntegration } from '../external/switcher-api-facade.js';
 import { getConfig } from './config.js';
@@ -14,9 +14,11 @@ import { isQueryValid } from './common.js';
  * Otherwise, validates if ticket content is valid
  */
 async function canCreateTicket(slack, ticket_content) {
-    const existingTicket = slack.isTicketOpened(ticket_content);
-    if (existingTicket.length) {
-        return existingTicket[0];
+    const slackTickets = await hasSlackTicket(
+        slack._id, ticket_content, TicketStatusType.OPENED);
+        
+    if (slackTickets.length) {
+        return slackTickets[0];
     }
 
     let group, config;
@@ -53,6 +55,20 @@ async function deleteSlackInstallation(slack) {
     return slack.deleteOne();
 }
 
+async function deleteSlackTicketsBySlackId(slackId) {
+    return SlackTicket.deleteMany({ slack: slackId });
+}
+
+async function hasSlackTicket(slackId, ticket_content, status) {
+    const tickets = await SlackTicket.find({ 
+        slack: slackId, 
+        ...ticket_content, 
+        ticket_status: status 
+    });
+    
+    return tickets;
+}
+
 export async function getSlackOrError(where, newInstallation = false) {
     const slack = await getSlack(where, newInstallation);
 
@@ -60,6 +76,7 @@ export async function getSlackOrError(where, newInstallation = false) {
         throw new NotFoundError('Slack installation not found');
     }
 
+    await slack.populate({ path: 'slack_ticket' });
     return slack;
 }
 
@@ -146,8 +163,7 @@ export async function resetTicketHistory(enterprise_id, team_id, admin) {
         throw new PermissionError('Only the domain owner can reset Ticket history');
     }
 
-    slack.tickets = [];
-    return slack.save();
+    await deleteSlackTicketsBySlackId(slack._id);
 }
 
 export async function validateTicket(ticket_content, enterprise_id, team_id) {
@@ -177,9 +193,12 @@ export async function createTicket(ticket_content, enterprise_id, team_id) {
             ...ticket_content
         };
     
-        slack.tickets.push(slackTicket);
-        const { tickets } = await slack.save();
-        _ticket = tickets[tickets.length - 1];
+        _ticket = new SlackTicket({
+            slack: slack._id,
+            ...slackTicket
+        });
+
+        await _ticket.save();
     }
 
     return {
@@ -192,7 +211,7 @@ export async function createTicket(ticket_content, enterprise_id, team_id) {
 export async function processTicket(enterprise_id, team_id, ticket_id, approved) {
     const slack = await getSlackOrError({ enterprise_id, team_id });
     await getDomainById(slack.domain);
-    const ticket = slack.tickets.filter(
+    const ticket = slack.slack_ticket.filter(
         t => String(t.id) === String(ticket_id) &&
             t.ticket_status === TicketStatusType.OPENED);
     

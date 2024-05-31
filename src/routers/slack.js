@@ -174,11 +174,11 @@ router.get('/slack/v1/installation/:domain', auth, [
 ], validate, async (req, res) => {
     try {
         const domain = await getDomainById(req.params.domain);
-        const { tickets, installation_payload, settings } = 
+        const { slack_ticket, installation_payload, settings } = 
             await Services.getSlackOrError({ id: domain.integrations.slack });
 
-        const openedTickets = tickets.filter(t => t.ticket_status === TicketStatusType.OPENED).length;
-        const approvedTickets = tickets.filter(t => t.ticket_status === TicketStatusType.APPROVED).length;
+        const openedTickets = slack_ticket.filter(t => t.ticket_status === TicketStatusType.OPENED).length;
+        const approvedTickets = slack_ticket.filter(t => t.ticket_status === TicketStatusType.APPROVED).length;
 
         res.send({
             team_id: installation_payload.team_id,
@@ -189,7 +189,7 @@ router.get('/slack/v1/installation/:domain', auth, [
             installed_at: installation_payload.installed_at,
             tickets_opened: openedTickets,
             tickets_approved: approvedTickets,
-            tickets_denied: (tickets.length - openedTickets - approvedTickets),
+            tickets_denied: (slack_ticket.length - openedTickets - approvedTickets),
             settings
         });
     } catch (e) {

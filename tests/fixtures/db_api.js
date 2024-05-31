@@ -14,6 +14,7 @@ import { Permission, ActionTypes, RouterTypes } from '../../src/models/permissio
 import { Metric } from '../../src/models/metric';
 import { EnvType, Environment } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
+import { SlackTicket } from '../../src/models/slack_ticket';
 import Slack from '../../src/models/slack';
 import { EncryptionSalts } from '../../src/models/common';
 
@@ -238,6 +239,7 @@ export const setupDatabase = async () => {
     await Environment.deleteMany().exec();
     await Component.deleteMany().exec();
     await Slack.deleteMany().exec();
+    await SlackTicket.deleteMany().exec();
 
     await History.deleteMany().exec();
     await Metric.deleteMany().exec();
