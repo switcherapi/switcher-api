@@ -191,6 +191,17 @@ router.get('/slack/v1/installation/:domain', auth, [
     }
 });
 
+router.get('/slack/v1/domains', auth, [
+    query('team_id').exists()
+], validate, async (req, res) => {
+    try {
+        const domains = await Services.getDomainsByTeamId(req.query.team_id);
+        res.send(domains);
+    } catch (e) {
+        responseException(res, e, 400);
+    }
+});
+
 router.delete('/slack/v1/installation', slackAuth, [
     query('team_id').exists()
 ], validate, async (req, res) => {

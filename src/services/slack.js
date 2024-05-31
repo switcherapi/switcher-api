@@ -67,6 +67,24 @@ async function hasSlackTicket(slackId, ticket_content) {
     return tickets;
 }
 
+export async function getDomainsByTeamId(team_id) {
+    const slacks = await Slack.find({ team_id });
+    
+    if (!slacks.length) {
+        throw new NotFoundError('Slack installation not found');
+    }
+
+    const domains = await Promise.all(slacks.map(async slack => {
+        const domain = await getDomainById(slack.domain);
+        return {
+            id: domain._id,
+            name: domain.name
+        };
+    }));
+
+    return domains;
+}
+
 export async function getSlackOrError(where, newInstallation = false) {
     const slack = await getSlack(where, newInstallation);
 

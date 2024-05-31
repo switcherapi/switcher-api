@@ -1,5 +1,5 @@
 import { pathParameter, queryParameter } from '../schemas/common.js';
-import { commonSchemaContent } from './common.js';
+import { commonArraySchemaContent, commonSchemaContent } from './common.js';
 
 export default {
     '/slack/v1/installation': {
@@ -189,6 +189,22 @@ export default {
             }
         }
     },
+    '/slack/v1/domains': {
+        get: {
+            tags: ['Switcher Slack App'],
+            description: 'Return all domains given a team ID',
+            security: [{ bearerAuth: [] }],
+            parameters: [
+                queryParameter('team_id', 'The Slack team ID', true, 'string')
+            ],
+            responses: {
+                200: {
+                    description: 'The domains were found',
+                    content: commonSchemaContent('SlackDomains')
+                }
+            }
+        }
+    },
     '/slack/v1/installation/{domain}': {
         get: {
             tags: ['Switcher Slack App'],
@@ -200,7 +216,7 @@ export default {
             responses: {
                 200: {
                     description: 'The installation was found',
-                    content: commonSchemaContent('SlackInstallationSummary')
+                    content: commonArraySchemaContent('SlackInstallationSummary')
                 }
             }
         }

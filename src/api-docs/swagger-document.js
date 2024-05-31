@@ -38,8 +38,6 @@ export default {
             description: 'Cloud API'
         }
     ],
-    consumes: ['application/json'],
-    produces: ['application/json'],
     components: {
         securitySchemes: {
             bearerAuth: {
