@@ -15,6 +15,11 @@ const slackTicketSchema = new mongoose.Schema({
         required: true,
         ref: 'Slack'
     },
+    domain: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Domain'
+    },
     environment: {
         type: String,
         required: true

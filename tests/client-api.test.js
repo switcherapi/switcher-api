@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 import sinon from 'sinon';
-import { Client } from 'switcher-client';
 import app from '../src/app';
 import { ActionTypes, Permission, RouterTypes } from '../src/models/permission';
 import { permissionCache } from '../src/helpers/cache';
@@ -977,9 +976,6 @@ describe('Testing domain [Adm-GraphQL] ', () => {
     });
 
     test('CLIENT_SUITE - Should return environments Flat-structure - By Slack Team ID and Domain ID', async () => {
-        process.env.SWITCHER_API_ENABLE = true;
-        Client.assume('SLACK_MULTI_DOMAIN').true();
-
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
@@ -989,26 +985,6 @@ describe('Testing domain [Adm-GraphQL] ', () => {
                 
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected111));
-
-        Client.forget('SLACK_MULTI_DOMAIN');
-        process.env.SWITCHER_API_ENABLE = false;
-    });
-
-    test('CLIENT_SUITE - Should return environments Flat-structure - By Slack Team ID (deprecate)', async () => {
-        process.env.SWITCHER_API_ENABLE = true;
-        Client.assume('SLACK_MULTI_DOMAIN').false();
-        
-        const req = await request(app)
-            .post('/adm-graphql')
-            .set('Authorization', `Bearer ${adminAccountToken}`)
-            .send(graphqlUtils.configurationQuery([
-                ['slack_team_id', slack.team_id]], false, false, false, false, true));
-                
-        expect(req.statusCode).toBe(200);
-        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected111));
-
-        Client.forget('SLACK_MULTI_DOMAIN');
-        process.env.SWITCHER_API_ENABLE = false;
     });
 
     test('CLIENT_SUITE - Should return list of Groups permissions', async () => {

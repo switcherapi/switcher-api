@@ -28,8 +28,7 @@ const findInstallation = async (req, res, checkDomain = false) => {
 
 const deleteInstallation = async (req, res) => {
     try {
-        const slack = await Services.deleteSlack(
-            req.query.enterprise_id, req.query.team_id);
+        const slack = await Services.deleteSlack(req.query, req.query.enterprise_id);
 
         if (!slack) throw new NotFoundError();
         res.send({ message: 'Installation deleted' });
@@ -54,6 +53,7 @@ router.post('/slack/v1/installation', slackAuth, [
 ], validate, async (req, res) => {
     try {
         const slackInstallation = await Services.createSlackInstallation(req.body);
+
         res.status(201).send(slackInstallation);
     } catch (e) {
         responseException(res, e, 400, SwitcherKeys.SLACK_INTEGRATION);
@@ -65,8 +65,7 @@ router.post('/slack/v1/authorize', auth, [
     check('team_id').exists()
 ], validate, auth, async (req, res) => {
     try {
-        await Services.authorizeSlackInstallation(
-            req.body.domain, req.body.team_id, req.admin);
+        await Services.authorizeSlackInstallation(req.body, req.admin);
 
         res.status(200).send({ message: 'Authorization completed' });
     } catch (e) {
@@ -78,8 +77,7 @@ router.post('/slack/v1/ticket/clear', auth, [
     check('team_id').exists()
 ], validate, async (req, res) => {
     try {
-        await Services.resetTicketHistory(
-            req.body.enterprise_id, req.body.team_id, req.admin);
+        await Services.resetTicketHistory(req.body, req.admin, req.body.enterprise_id);
 
         res.status(200).send({ message: 'Tickets cleared with success' });
     } catch (e) {
@@ -89,6 +87,7 @@ router.post('/slack/v1/ticket/clear', auth, [
 
 router.post('/slack/v1/ticket/validate', slackAuth, [
     check('team_id').exists(),
+    check('domain_id').isMongoId(),
     check('ticket_content.environment').exists(),
     check('ticket_content.group').exists(),
     check('ticket_content.switcher').isLength({ min: 0 }),
@@ -97,7 +96,7 @@ router.post('/slack/v1/ticket/validate', slackAuth, [
     try {
         const ticket_content = createTicketContent(req);
         const validation = await Services.validateTicket(
-            ticket_content, req.body.enterprise_id, req.body.team_id);
+            ticket_content, req.body, req.body.enterprise_id);
         
         res.status(200).send({ message: 'Ticket validated', result: validation.result });
     } catch (e) {
@@ -107,6 +106,7 @@ router.post('/slack/v1/ticket/validate', slackAuth, [
 
 router.post('/slack/v1/ticket/create', slackAuth, [
     check('team_id').exists(),
+    check('domain_id').isMongoId(),
     check('ticket_content.environment').exists(),
     check('ticket_content.group').exists(),
     check('ticket_content.switcher').isLength({ min: 0 }),
@@ -116,7 +116,7 @@ router.post('/slack/v1/ticket/create', slackAuth, [
     try {
         const ticket_content = createTicketContent(req);
         const ticket = await Services.createTicket(
-            ticket_content, req.body.enterprise_id, req.body.team_id);
+            ticket_content, req.body, req.body.enterprise_id);
             
         res.status(201).send(ticket);
     } catch (e) {
@@ -126,14 +126,12 @@ router.post('/slack/v1/ticket/create', slackAuth, [
 
 router.post('/slack/v1/ticket/process', slackAuth, [
     check('team_id').exists(),
+    check('domain_id').isMongoId(),
     check('ticket_id').isMongoId(),
     check('approved').isBoolean()
 ], validate, async (req, res) => {
     try {
-        const ticket = await Services.processTicket(
-            req.body.enterprise_id, req.body.team_id, 
-            req.body.ticket_id, req.body.approved);
-
+        const ticket = await Services.processTicket(req.body, req.body.enterprise_id);
         res.status(200).send({ message: `Ticket ${ticket._id} processed` });
     } catch (e) {
         responseException(res, e, 400);

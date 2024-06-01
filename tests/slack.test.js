@@ -83,6 +83,7 @@ const createTicket = async (team_id) => {
         .set('Authorization', `Bearer ${generateToken('30s')}`)
         .send({
             team_id,
+            domain_id: domainId,
             ticket_content
         });
 
@@ -95,6 +96,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should generate token', async () => {
         const token = generateToken('30m');
+        console.log(token);
         const decoded = jwt.verify(token, process.env.SWITCHER_SLACK_JWT_SECRET);
         expect(decoded.iss).toBe('Switcher Slack App');
         expect(decoded.sub).toBe('/resource');
@@ -650,6 +652,7 @@ describe('Slack Route - Create Ticket', () => {
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
+                domain_id: domainId,
                 ticket_content
             }).expect(200);
 
@@ -664,6 +667,7 @@ describe('Slack Route - Create Ticket', () => {
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
+                domain_id: domainId,
                 ticket_content
             }).expect(201);
 
@@ -692,6 +696,7 @@ describe('Slack Route - Create Ticket', () => {
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
+                domain_id: domainId,
                 ticket_content
             }).expect(200);
 
@@ -721,6 +726,7 @@ describe('Slack Route - Create Ticket', () => {
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
+                domain_id: domainId,
                 ticket_content
             }).expect(200);
 
@@ -745,6 +751,7 @@ describe('Slack Route - Create Ticket', () => {
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
+                domain_id: domainId,
                 ticket_content
             }).expect(404);
             
@@ -752,24 +759,20 @@ describe('Slack Route - Create Ticket', () => {
     });
 
     test('SLACK_SUITE - Should NOT create a ticket - Return existing one', async () => {
-        const ticket_content = {
-            environment: EnvType.DEFAULT,
-            group: groupConfigDocument.name,
-            switcher: config1Document.key,
-            status: false,
-            observations: 'Should create ticket'
-        };
-
-        // Retrieve existing ticket
-        const { ticket } = await Services.validateTicket(
-            ticket_content, undefined, slack.team_id);
+        const { ticket } = await createTicket(slack.team_id);
 
         const response = await request(app)
             .post('/slack/v1/ticket/create')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
-                ticket_content
+                domain_id: domainId,
+                ticket_content: {
+                    environment: ticket.environment,
+                    group: ticket.group,
+                    switcher: ticket.switcher,
+                    status: ticket.status
+                }
             }).expect(201);
             
         expect(String(response.body.ticket._id)).toBe(String(ticket._id));
@@ -788,6 +791,7 @@ describe('Slack Route - Create Ticket', () => {
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
+                domain_id: domainId,
                 ticket_content
             }).expect(404);
             
@@ -807,6 +811,7 @@ describe('Slack Route - Create Ticket', () => {
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
+                domain_id: domainId,
                 ticket_content
             }).expect(404);
             
@@ -826,10 +831,87 @@ describe('Slack Route - Create Ticket', () => {
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
+                domain_id: domainId,
                 ticket_content
             }).expect(404);
             
         expect(response.body.error).toBe('Environment not found');
+    });
+
+    test('SLACK_SUITE - Should NOT validate a ticket - Invalid Domain Id', async () => {
+        const ticket_content = {
+            environment: EnvType.DEFAULT,
+            group: groupConfigDocument.name,
+            switcher: config1Document.key,
+            status: false
+        };
+
+        //test - invalid domain id
+        await request(app)
+            .post('/slack/v1/ticket/validate')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                domain_id: 'INVALID',
+                ticket_content
+            }).expect(422);
+
+        //test - domain not provided
+        await request(app)
+            .post('/slack/v1/ticket/validate')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_content
+            }).expect(422);
+
+        //test - domain not found
+        await request(app)
+            .post('/slack/v1/ticket/validate')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                domain_id: new mongoose.Types.ObjectId(),
+                ticket_content
+            }).expect(404);
+    });
+
+    test('SLACK_SUITE - Should NOT create a ticket - Invalid Domain Id', async () => {
+        const ticket_content = {
+            environment: EnvType.DEFAULT,
+            group: groupConfigDocument.name,
+            switcher: config1Document.key,
+            status: false
+        };
+
+        //test - invalid domain id
+        await request(app)
+            .post('/slack/v1/ticket/create')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                domain_id: 'INVALID',
+                ticket_content
+            }).expect(422);
+
+        //test - domain not provided
+        await request(app)
+            .post('/slack/v1/ticket/create')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_content
+            }).expect(422);
+
+        //test - domain not found
+        await request(app)
+            .post('/slack/v1/ticket/create')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                domain_id: new mongoose.Types.ObjectId(),
+                ticket_content
+            }).expect(404);
     });
 });
 
@@ -852,6 +934,7 @@ describe('Slack Route - Process Ticket', () => {
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
+                domain_id: domainId,
                 ticket_content
             });
 
@@ -872,6 +955,7 @@ describe('Slack Route - Process Ticket', () => {
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
+                domain_id: domainId,
                 ticket_id: ticket._id,
                 approved: true
             }).expect(200);
@@ -893,6 +977,7 @@ describe('Slack Route - Process Ticket', () => {
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
+                domain_id: domainId,
                 ticket_id: ticket._id,
                 approved: true
             });
@@ -906,7 +991,44 @@ describe('Slack Route - Process Ticket', () => {
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
+                domain_id: domainId,
                 ticket_id: new mongoose.Types.ObjectId(),
+                approved: true
+            }).expect(404);
+    });
+
+    test('SLACK_SUITE - Should NOT process a ticket - Invalid Domain Id', async () => {
+        const { ticket } = await createTicket();
+
+        //test - invalid domain id
+        await request(app)
+            .post('/slack/v1/ticket/process')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                domain_id: 'INVALID',
+                ticket_id: ticket._id,
+                approved: true
+            }).expect(422);
+
+        //test - domain not provided
+        await request(app)
+            .post('/slack/v1/ticket/process')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                ticket_id: ticket._id,
+                approved: true
+            }).expect(422);
+
+        //test - domain not found
+        await request(app)
+            .post('/slack/v1/ticket/process')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send({
+                team_id: slack.team_id,
+                domain_id: new mongoose.Types.ObjectId(),
+                ticket_id: ticket._id,
                 approved: true
             }).expect(404);
     });
@@ -917,6 +1039,7 @@ describe('Slack Route - Process Ticket', () => {
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: 'NOT_FOUND',
+                domain_id: domainId,
                 ticket_id: new mongoose.Types.ObjectId(),
                 approved: true
             }).expect(404);
@@ -936,6 +1059,7 @@ describe('Slack Route - Process Ticket', () => {
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
+                domain_id: domainId,
                 ticket_id: ticket._id,
                 approved: false
             }).expect(200);

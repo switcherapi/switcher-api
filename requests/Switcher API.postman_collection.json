@@ -4842,7 +4842,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"team_id\": \"TEAM_ID\",\r\n    \"ticket_content\": {\r\n        \"environment\": \"default\",\r\n        \"group\": \"Experimental\",\r\n        \"switcher\": \"MY_SWITCHER2\",\r\n        \"status\": true,\r\n        \"observations\": \"Activate\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"team_id\": \"TUW2RH760\",\r\n    \"domain_id\": \"DOMAIN_ID\",\r\n    \"ticket_content\": {\r\n        \"environment\": \"default\",\r\n        \"group\": \"Experimental\",\r\n        \"switcher\": \"MY_SWITCHER2\",\r\n        \"status\": true,\r\n        \"observations\": \"Activate\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4881,7 +4881,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"team_id\": \"TEAM_ID\",\r\n    \"ticket_content\": {\r\n        \"environment\": \"default\",\r\n        \"group\": \"Experimental\",\r\n        \"switcher\": \"MY_SWITCHER2\",\r\n        \"status\": true,\r\n        \"observations\": \"Activate\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"team_id\": \"TEAM_ID\",\r\n    \"domain_id\": \"DOMAIN_ID\",\r\n    \"ticket_content\": {\r\n        \"environment\": \"default\",\r\n        \"group\": \"Experimental\",\r\n        \"switcher\": \"MY_SWITCHER2\",\r\n        \"status\": true,\r\n        \"observations\": \"Activate\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4967,7 +4967,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"team_id\": \"TEAM_ID\",\r\n    \"ticket_id\": \"665aacd9281e9ee4693db7f9\",\r\n    \"approved\": false\r\n}",
+							"raw": "{\r\n    \"team_id\": \"TEAM_ID\",\r\n    \"domain_id\": \"DOMAIN_ID\",\r\n    \"ticket_id\": \"665aacd9281e9ee4693db7f9\",\r\n    \"approved\": false\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
