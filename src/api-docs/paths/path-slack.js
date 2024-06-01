@@ -193,7 +193,7 @@ export default {
         get: {
             tags: ['Switcher Slack App'],
             description: 'Return all domains given a team ID',
-            security: [{ bearerAuth: [] }],
+            security: [{ slackAuth: [] }],
             parameters: [
                 queryParameter('team_id', 'The Slack team ID', true, 'string')
             ],

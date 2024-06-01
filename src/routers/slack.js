@@ -191,7 +191,7 @@ router.get('/slack/v1/installation/:domain', auth, [
     }
 });
 
-router.get('/slack/v1/domains', auth, [
+router.get('/slack/v1/domains', slackAuth, [
     query('team_id').exists()
 ], validate, async (req, res) => {
     try {

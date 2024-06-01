@@ -93,6 +93,13 @@ describe('Slack Installation', () => {
 
     beforeAll(setupDatabase);
 
+    test('SLACK_SUITE - Should generate token', async () => {
+        const token = generateToken('30m');
+        const decoded = jwt.verify(token, process.env.SWITCHER_SLACK_JWT_SECRET);
+        expect(decoded.iss).toBe('Switcher Slack App');
+        expect(decoded.sub).toBe('/resource');
+    });
+
     test('SLACK_SUITE - Should save installation', async () => {
         const response = await request(app)
             .post('/slack/v1/installation')
@@ -512,7 +519,7 @@ describe('Slack Installation', () => {
         //test
         const response = await request(app)
             .get(`/slack/v1/domains?team_id=${teamId}`)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(200);
 
         expect(response.body).toMatchObject([
@@ -524,14 +531,14 @@ describe('Slack Installation', () => {
     test('SLACK_SUITE - Should NOT find Domains by Slack Team Id - Missing param', async () => {
         await request(app)
             .get('/slack/v1/domains')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(422);
     });
 
     test('SLACK_SUITE - Should NOT find Domains by Slack Team Id - Team Id not found', async () => {
         await request(app)
             .get('/slack/v1/domains?team_id=NOT_FOUND')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(404);
     });
 
@@ -543,7 +550,7 @@ describe('Slack Installation', () => {
         //test
         await request(app)
             .get(`/slack/v1/domains?team_id=${teamId}`)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(404);
     });
 });
