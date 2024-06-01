@@ -26,7 +26,6 @@ export const SwitcherKeys = Object.freeze({
     ACCOUNT_IN_NOTIFY: 'ACCOUNT_IN_NOTIFY',
     ACCOUNT_OUT_NOTIFY: 'ACCOUNT_OUT_NOTIFY',
     SLACK_INTEGRATION: 'SLACK_INTEGRATION',
-    SLACK_MULTI_DOMAIN: 'SLACK_MULTI_DOMAIN',
     RATE_LIMIT: 'RATE_LIMIT',
     HTTPS_AGENT: 'HTTPS_AGENT'
 });
@@ -206,16 +205,6 @@ export async function checkSlackIntegration(value) {
         .isItOn();
 
     switcherFlagResult(featureFlag, 'Slack Integration is not available.');
-}
-
-export async function checkSlackMultiDomain(value) {
-    if (process.env.SWITCHER_API_ENABLE != 'true') {
-        return { result: true };
-    }
-    
-    return getFeatureFlag(SwitcherKeys.SLACK_MULTI_DOMAIN)
-        .checkValue(value)
-        .isItOn();
 }
 
 export function notifyAcCreation(adminid) {

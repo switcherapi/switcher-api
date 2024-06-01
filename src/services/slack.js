@@ -14,7 +14,7 @@ import { isQueryValid } from './common.js';
  * Otherwise, validates if ticket content is valid
  */
 async function canCreateTicket(slack, ticket_content) {
-    const slackTickets = await hasSlackTicket(slack._id, ticket_content);
+    const slackTickets = await hasSlackTicket(slack, ticket_content);
         
     if (slackTickets.length) {
         return slackTickets[0];
@@ -24,7 +24,7 @@ async function canCreateTicket(slack, ticket_content) {
     await Promise.all([
         getDomainById(slack.domain),
         getGroupConfig({ domain: slack.domain, name: ticket_content.group }),
-        getEnvironment({ name: ticket_content.environment })
+        getEnvironment({ domain: slack.domain, name: ticket_content.environment })
     ]).then(result => {
         group = result[1];
 
@@ -58,9 +58,10 @@ async function deleteSlackTicketsBySlackId(slackId) {
     return SlackTicket.deleteMany({ slack: slackId });
 }
 
-async function hasSlackTicket(slackId, ticket_content) {
+async function hasSlackTicket(slack, ticket_content) {
     const tickets = await SlackTicket.find({ 
-        slack: slackId, 
+        slack: slack._id,
+        domain: slack.domain,
         ...ticket_content
     });
     
@@ -120,7 +121,8 @@ export async function createSlackInstallation(args) {
     return slackInstallation.save();
 }
 
-export async function authorizeSlackInstallation(domain, team_id, admin) {
+export async function authorizeSlackInstallation(args, admin) {
+    const { domain, team_id } = args;
     const slack = await getSlackOrError({ team_id }, true);
     const _domain = await getDomainById(domain);
 
@@ -138,8 +140,12 @@ export async function authorizeSlackInstallation(domain, team_id, admin) {
     return slack.save();
 }
 
-export async function deleteSlack(enterprise_id, team_id) {
-    const slack = await getSlack({ enterprise_id, team_id });
+/**
+ * @param {*} enterprise_id (optional)
+ */
+export async function deleteSlack(args, enterprise_id) {
+    const { team_id } = args;
+    const slack = await getSlack({ team_id, enterprise_id });
     if (slack) {
         return deleteSlackInstallation(slack);
     }
@@ -171,8 +177,12 @@ export async function updateSettings(domainId, param, request) {
     return slack.save();
 }
 
-export async function resetTicketHistory(enterprise_id, team_id, admin) {
-    const slack = await getSlackOrError({ enterprise_id, team_id });
+/**
+ * @param {*} enterprise_id (optional)
+ */
+export async function resetTicketHistory(args, admin, enterprise_id) {
+    const { team_id } = args;
+    const slack = await getSlackOrError({ team_id, enterprise_id });
     const domain = await getDomainById(slack.domain);
 
     if (String(domain.owner) != String(admin._id)) {
@@ -182,8 +192,12 @@ export async function resetTicketHistory(enterprise_id, team_id, admin) {
     await deleteSlackTicketsBySlackId(slack._id);
 }
 
-export async function validateTicket(ticket_content, enterprise_id, team_id) {
-    const slack = await getSlackOrError({ enterprise_id, team_id });
+/**
+ * @param {*} enterprise_id (optional)
+ */
+export async function validateTicket(ticket_content, args, enterprise_id) {
+    const { team_id, domain_id } = args;
+    const slack = await getSlackOrError({ domain: domain_id, team_id, enterprise_id });
 
     const ticket = await canCreateTicket(slack, ticket_content);
     const { ignored_environments, frozen_environments } = slack.settings;
@@ -200,18 +214,19 @@ export async function validateTicket(ticket_content, enterprise_id, team_id) {
     return { result: TicketValidationType.VALIDATED, ticket};
 }
 
-export async function createTicket(ticket_content, enterprise_id, team_id) {
-    const slack = await getSlackOrError({ enterprise_id, team_id });
+/**
+ * @param {*} enterprise_id (optional)
+ */
+export async function createTicket(ticket_content, args, enterprise_id) {
+    const { team_id, domain_id } = args;
+    const slack = await getSlackOrError({ domain: domain_id, team_id, enterprise_id });
 
     let _ticket = await canCreateTicket(slack, ticket_content);
     if (!_ticket) {
-        const slackTicket = {
-            ...ticket_content
-        };
-    
         _ticket = new SlackTicket({
             slack: slack._id,
-            ...slackTicket
+            domain: slack.domain,
+            ...ticket_content
         });
 
         await _ticket.save();
@@ -224,9 +239,12 @@ export async function createTicket(ticket_content, enterprise_id, team_id) {
     };
 }
 
-export async function processTicket(enterprise_id, team_id, ticket_id, approved) {
-    const slack = await getSlackOrError({ enterprise_id, team_id });
-    await getDomainById(slack.domain);
+/**
+ * @param {*} enterprise_id (optional)
+ */
+export async function processTicket(args, enterprise_id) {
+    const { team_id, domain_id, ticket_id, approved } = args;
+    const slack = await getSlackOrError({ domain: domain_id, team_id, enterprise_id });
     const ticket = slack.slack_ticket.filter(t => String(t.id) === String(ticket_id));
     
     if (!ticket.length) {

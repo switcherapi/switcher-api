@@ -254,6 +254,7 @@ export default {
         type: 'object',
         properties: {
             team_id: installation_payload.properties.team_id,
+            domain_id: domains_payload.properties.id,
             ticket_content
         }
     },
@@ -261,6 +262,7 @@ export default {
         type: 'object',
         properties: {
             team_id: installation_payload.properties.team_id,
+            domain_id: domains_payload.properties.id,
             ticket_id: {
                 type: 'string',
                 description: 'The Slack ticket ID'
