@@ -4803,7 +4803,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"team_id\": \"TEAM_ID\"\r\n}",
+							"raw": "{\r\n    \"team_id\": \"TEAM_ID\",\r\n    \"domain_id\": \"DOMAIN_ID\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

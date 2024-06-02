@@ -79,6 +79,11 @@ export default {
                                 team_id: {
                                     type: 'string',
                                     description: 'The Slack team ID',
+                                },
+                                domain_id: {
+                                    type: 'string',
+                                    description: 'The domain ID',
+                                    format: 'uuid'
                                 }
                             }
                         }
