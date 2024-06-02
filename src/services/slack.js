@@ -62,7 +62,10 @@ async function hasSlackTicket(slack, ticket_content) {
     const tickets = await SlackTicket.find({ 
         slack: slack._id,
         domain: slack.domain,
-        ...ticket_content
+        environment: ticket_content.environment,
+        group: ticket_content.group,
+        switcher: ticket_content.switcher,
+        status: ticket_content.status,
     });
     
     return tickets;
@@ -141,16 +144,21 @@ export async function authorizeSlackInstallation(args, admin) {
 }
 
 /**
+ * Delete non-installed Slack integration
+ * 
  * @param {*} enterprise_id (optional)
  */
 export async function deleteSlack(args, enterprise_id) {
     const { team_id } = args;
-    const slack = await getSlack({ team_id, enterprise_id });
+    const slack = await getSlack({ team_id, enterprise_id }, true);
     if (slack) {
         return deleteSlackInstallation(slack);
     }
 }
 
+/**
+ * Delete installed Slack integration
+ */
 export async function unlinkSlack(domainid, admin) {
     const domain = await getDomainById(domainid);
 
@@ -181,8 +189,8 @@ export async function updateSettings(domainId, param, request) {
  * @param {*} enterprise_id (optional)
  */
 export async function resetTicketHistory(args, admin, enterprise_id) {
-    const { team_id } = args;
-    const slack = await getSlackOrError({ team_id, enterprise_id });
+    const { team_id, domain_id } = args;
+    const slack = await getSlackOrError({ domain: domain_id, team_id, enterprise_id });
     const domain = await getDomainById(slack.domain);
 
     if (String(domain.owner) != String(admin._id)) {

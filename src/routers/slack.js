@@ -74,7 +74,8 @@ router.post('/slack/v1/authorize', auth, [
 });
 
 router.post('/slack/v1/ticket/clear', auth, [
-    check('team_id').exists()
+    check('team_id').exists(),
+    check('domain_id').isMongoId()
 ], validate, async (req, res) => {
     try {
         await Services.resetTicketHistory(req.body, req.admin, req.body.enterprise_id);
@@ -213,7 +214,7 @@ router.delete('/slack/v1/installation/decline', auth, [
 });
 
 router.delete('/slack/v1/installation/unlink', auth, [
-    query('domain').exists()
+    query('domain').isMongoId()
 ], validate, async (req, res) => {
     try {
         await Services.unlinkSlack(req.query.domain, req.admin);

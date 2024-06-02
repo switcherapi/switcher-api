@@ -96,7 +96,6 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should generate token', async () => {
         const token = generateToken('30m');
-        console.log(token);
         const decoded = jwt.verify(token, process.env.SWITCHER_SLACK_JWT_SECRET);
         expect(decoded.iss).toBe('Switcher Slack App');
         expect(decoded.sub).toBe('/resource');
@@ -375,19 +374,9 @@ describe('Slack Installation', () => {
         expect(slackDb).toBe(null);
     });
 
-    test('SLACK_SUITE - Should delete authorized installation', async () => {
+    test('SLACK_SUITE - Should delete NOT authorized installation', async () => {
         //given
         const installation = await buildInstallation('SHOULD_DELETE_AUTHORIZE_INSTALLATION', null);
-        await authorizeInstallation(installation, domainId, adminMasterAccountToken);
-
-        const { ticket } = await createTicket(installation.team_id);
-
-        //verify that
-        let domain = await getDomainById(domainId);
-        expect(domain.integrations.slack).not.toBe(null);
-
-        let slackTickets = await SlackTicket.find({ slack: ticket.slack }).exec();
-        expect(slackTickets.length).toBe(1);
 
         //test
         await request(app)
@@ -396,16 +385,8 @@ describe('Slack Installation', () => {
             .send().expect(200);
 
         //check DB
-        domain = await getDomainById(domainId);
-        expect(domain.integrations.slack).toBe(null);
-
-        const slackDb = await Services.getSlack({
-            team_id: installation.team_id
-        });
+        const slackDb = await Services.getSlack({ team_id: installation.team_id });
         expect(slackDb).toBe(null);
-
-        slackTickets = await SlackTicket.find({ slack: ticket.slack }).exec();
-        expect(slackTickets.length).toBe(0);
     });
 
     test('SLACK_SUITE - Should NOT delete installation - Not found', async () => {
@@ -441,9 +422,7 @@ describe('Slack Installation', () => {
         domain = await getDomainById(domainId);
         expect(domain.integrations.slack).toBe(null);
 
-        const slackDb = await Services.getSlack({
-            team_id: 'SHOULD_UNLINK_INTEGRATION'
-        });
+        const slackDb = await Services.getSlack({ team_id: installation.team_id });
         expect(slackDb).toBe(null);
     });
 
@@ -771,11 +750,13 @@ describe('Slack Route - Create Ticket', () => {
                     environment: ticket.environment,
                     group: ticket.group,
                     switcher: ticket.switcher,
-                    status: ticket.status
+                    status: ticket.status,
+                    observations: 'Should return existing ticket'
                 }
             }).expect(201);
             
         expect(String(response.body.ticket._id)).toBe(String(ticket._id));
+        expect(response.body.ticket.observations).not.toBe('Should return existing ticket');
     });
 
     test('SLACK_SUITE - Should NOT create a ticket - Group not found', async () => {
@@ -1084,7 +1065,8 @@ describe('Slack Route - Process Ticket', () => {
             .post('/slack/v1/ticket/clear')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                team_id: slack.team_id
+                team_id: slack.team_id,
+                domain_id: domainId
             }).expect(200);
 
         slackTickets = await SlackTicket.find({ slack: slack._id }).exec();
@@ -1096,8 +1078,37 @@ describe('Slack Route - Process Ticket', () => {
             .post('/slack/v1/ticket/clear')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
-                team_id: slack.team_id
+                team_id: slack.team_id,
+                domain_id: domainId
             }).expect(403);
+    });
+
+    test('SLACK_SUITE - Should NOT reset installation tickets - Invalid Domain Id', async () => {
+        //test - invalid domain id
+        await request(app)
+            .post('/slack/v1/ticket/clear')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                team_id: slack.team_id,
+                domain_id: 'INVALID'
+            }).expect(422);
+
+        //test - domain not provided
+        await request(app)
+            .post('/slack/v1/ticket/clear')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                team_id: slack.team_id
+            }).expect(422);
+
+        //test - domain not found
+        await request(app)
+            .post('/slack/v1/ticket/clear')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                team_id: slack.team_id,
+                domain_id: new mongoose.Types.ObjectId()
+            }).expect(404);
     });
 
 });
