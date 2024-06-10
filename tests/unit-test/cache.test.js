@@ -94,4 +94,34 @@ describe('Test permissionCache', () => {
         expect(result2).toBeUndefined();
     });
 
+    it('UNIT_CAHCE - Should reload cache - requested router ALL to be removed', () => {
+        const cacheKey = permissionCache.permissionKey(
+            'adminId', 
+            'domainId', 
+            'parentId',
+            [ActionTypes.READ], 
+            RouterTypes.GROUP
+        );
+
+        permissionCache.set(cacheKey, 'value');
+        permissionCache.permissionReset('domainId', ActionTypes.ALL, RouterTypes.ALL);
+        const result = permissionCache.get(cacheKey);
+        expect(result).toBeUndefined();
+    });
+
+    it('UNIT_CAHCE - Should NOT reload cache - requested different action for router ALL', () => {
+        const cacheKey = permissionCache.permissionKey(
+            'adminId', 
+            'domainId', 
+            'parentId',
+            [ActionTypes.READ], 
+            RouterTypes.GROUP
+        );
+
+        permissionCache.set(cacheKey, 'value');
+        permissionCache.permissionReset('domainId', ActionTypes.UPDATE, RouterTypes.ALL);
+        const result = permissionCache.get(cacheKey);
+        expect(result).toEqual('value');
+    });
+
 });

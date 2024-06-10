@@ -1,4 +1,4 @@
-import { ActionTypes } from '../models/permission.js';
+import { ActionTypes, RouterTypes } from '../models/permission.js';
 
 class Cache {
     constructor() {
@@ -50,7 +50,7 @@ class Cache {
         return parsedKey.domainId === String(domainId) && 
             (parentId === undefined || parsedKey.parentId === String(parentId)) &&
             (action === ActionTypes.ALL || parsedKey.actions.includes(action)) && 
-            parsedKey.router === router;
+            (router === RouterTypes.ALL || parsedKey.router === router);
     }
 
     _isPermissionCacheActivated() {
