@@ -509,6 +509,24 @@ describe('Slack Installation', () => {
         ]);
     });
 
+    test('SLACK_SUITE - Should find only authorized Domains by Slack Team Id', async () => {
+        //given
+        const teamId = 'SLACK_INSTALLATION_DOMAINS_NOT_AUTHORIZED';
+        const domainId = await createDomain('Domain 4 (findByTeamId)');
+        await buildInstallation(teamId, domainId); // authorized
+        await buildInstallation(teamId); // not authorized
+
+        //test
+        const response = await request(app)
+            .get(`/slack/v1/domains?team_id=${teamId}`)
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send().expect(200);
+
+        expect(response.body).toMatchObject([
+            { id: String(domainId), name: 'Domain 4 (findByTeamId)' }
+        ]);
+    });
+
     test('SLACK_SUITE - Should NOT find Domains by Slack Team Id - Missing param', async () => {
         await request(app)
             .get('/slack/v1/domains')
@@ -519,18 +537,6 @@ describe('Slack Installation', () => {
     test('SLACK_SUITE - Should NOT find Domains by Slack Team Id - Team Id not found', async () => {
         await request(app)
             .get('/slack/v1/domains?team_id=NOT_FOUND')
-            .set('Authorization', `Bearer ${generateToken('30s')}`)
-            .send().expect(404);
-    });
-
-    test('SLACK_SUITE - Should NOT find Domains by Slack Team Id - Slack Installation not associated with a Domain', async () => {
-        //given
-        const teamId = 'NO_DOMAIN_TEAM_ID';
-        await buildInstallation(teamId, null);
-
-        //test
-        await request(app)
-            .get(`/slack/v1/domains?team_id=${teamId}`)
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(404);
     });
