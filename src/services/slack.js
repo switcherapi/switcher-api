@@ -78,12 +78,14 @@ export async function getDomainsByTeamId(team_id) {
         throw new NotFoundError('Slack installation not found');
     }
 
-    const domains = await Promise.all(slacks.map(async slack => {
-        const domain = await getDomainById(slack.domain);
-        return {
-            id: domain._id,
-            name: domain.name
-        };
+    const domains = await Promise.all(slacks
+        .filter(slack => slack.domain)
+        .map(async slack => {
+            const domain = await getDomainById(slack.domain);
+            return {
+                id: domain._id,
+                name: domain.name
+            };
     }));
 
     return domains;
