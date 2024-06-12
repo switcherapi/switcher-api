@@ -127,8 +127,7 @@ export async function inviteMember(id, email, admin) {
 }
 
 export async function acceptInvite(request_id, admin) {
-    const teamInvite = await getTeamInvite(
-        { _id: request_id });
+    const teamInvite = await getTeamInvite({ _id: request_id });
 
     await teamInvite.populate({
         path: 'team'
@@ -136,14 +135,13 @@ export async function acceptInvite(request_id, admin) {
 
     const team = teamInvite.team;
 
-    if (team.length) {
-        await addMemberToTeam(admin, team[0]);
-        teamInvite.deleteOne();
-    } else {
+    if (!team.length) {
         await teamInvite.deleteOne();
         throw new BadRequestError('Team does not exist anymore');
     }
 
+    await addMemberToTeam(admin, team[0]);
+    await teamInvite.deleteOne();
     return admin;
 }
 
