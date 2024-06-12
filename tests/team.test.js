@@ -313,26 +313,26 @@ describe('Updating team members tests', () => {
 
         expect(response.body.team).toEqual(team1.name);
         expect(response.body.domain).toEqual(domainDocument.name);
+    });
 
-        // Should get invite already made
-        await request(app)
+    test('TEAM_SUITE - Should clean invite request after accepted', async () => {
+        let response = await request(app)
             .post(`/team/member/invite/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
             }).expect(201);
 
-        // Should accept invitation
+        let teamInvite = await TeamInvite.findById(response.body._id).exec();
+        expect(teamInvite).not.toBeNull();
+
         await request(app)
             .post(`/team/member/invite/accept/${teamInvite._id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
-        // Should NOT accept invitation - Already used
-        await request(app)
-            .post(`/team/member/invite/accept/${teamInvite._id}`)
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(400);
+        teamInvite = await TeamInvite.findById(teamInvite._id).exec();
+        expect(teamInvite).toBeNull();
     });
 
     test('TEAM_SUITE - Should NOT create invite request - Invalid Team ID', async () => {
