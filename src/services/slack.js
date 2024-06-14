@@ -120,8 +120,13 @@ export async function getSlack(where, newInstallation = false) {
 
 export async function createSlackInstallation(args) {
     await checkSlackIntegration(args.team_id);
-
-    // Create new slack instance
+    
+    // Purge existing not authorized slack installation
+    const slack = await getSlack({ team_id: args.team_id, enterprise_id: args.enterprise_id }, true);
+    if (slack) {
+        await slack.deleteOne();
+    }
+    
     let slackInstallation = new Slack({...args});
     return slackInstallation.save();
 }

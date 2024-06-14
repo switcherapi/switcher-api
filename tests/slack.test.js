@@ -130,6 +130,27 @@ describe('Slack Installation', () => {
             enterpriseSlack.bot_payload);
     });
 
+    test('SLACK_SUITE - Should purge existing not authorized installation when new one is requested', async () => {
+        //given
+        const installation = await buildInstallation('EXISTING_NOT_AUTHORIZED_INSTALLATION', null);
+
+        //test
+        const response = await request(app)
+            .post('/slack/v1/installation')
+            .set('Authorization', `Bearer ${generateToken('30s')}`)
+            .send(installation).expect(201);
+
+        expect(response.body.team_id).toBe(installation.team_id);
+        expect(response.body.installation_payload).toMatchObject(
+            installation.installation_payload);
+        expect(response.body.bot_payload).toMatchObject(
+            installation.bot_payload);
+
+        //check DB
+        const slackDb = await Slack.find({ team_id: installation.team_id });
+        expect(slackDb.length).toBe(1);
+    });
+
     test('SLACK_SUITE - Should NOT save installation - Slack unavailable', async () => {
         //given
         process.env.SWITCHER_API_ENABLE = true;
