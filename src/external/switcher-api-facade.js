@@ -152,21 +152,15 @@ export async function checkMetrics(config) {
     }
 
     const { owner } = await getDomainById(config.domain);
-    const response = await getFeatureFlag(SwitcherKeys.ELEMENT_CREATION)
+    const featureFlag = await getFeatureFlag(SwitcherKeys.ELEMENT_CREATION)
         .checkPayload(JSON.stringify({
             feature: 'metrics',
             owner
         })).isItOn();
-
-    if (!response.result) {
-        if (!config.disable_metrics) {
-            config.disable_metrics = new Map();
-            config.disable_metrics.set(EnvType.DEFAULT, true);
-        }
-
-        config.activated.forEach((value, key) => {
-            config.disable_metrics.set(key, true);
-        });
+    
+    if (!featureFlag.result) {
+        config.disable_metrics = new Map();
+        config.disable_metrics.set(EnvType.DEFAULT, true);
     }
 }
 

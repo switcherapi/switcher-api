@@ -65,7 +65,9 @@ const configSchema = new mongoose.Schema({
     },
     disable_metrics: {
         type: Map,
-        of: Boolean
+        of: Boolean,
+        required: true,
+        default: new Map().set(EnvType.DEFAULT, false)
     },
     updatedBy: {
         type: String
