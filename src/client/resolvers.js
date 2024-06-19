@@ -202,10 +202,11 @@ async function resolveRelay(config, environment, entry, response) {
 }
 
 function isMetricDisabled(config, environment) {
-    if (config.disable_metrics) {
-        return config.disable_metrics[environment];
+    if (config.disable_metrics[environment] === undefined) {
+        return true;
     }
-    return false;
+    
+    return config.disable_metrics[environment];
 }
 
 function checkFlags(config, group, domain, environment) {
