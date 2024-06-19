@@ -26,6 +26,7 @@ import {
     teamId
 } from './fixtures/db_api';
 import Component from '../src/models/component';
+import { Client } from 'switcher-client';
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -637,6 +638,27 @@ describe('Testing transfer Domain', () => {
                 domain: domainId
             }).expect(404);
     });
+
+    test('DOMAIN_SUITE - Should NOT accept Domain to transfer - Domain quota exceeded', async () => {
+        //given
+        process.env.SWITCHER_API_ENABLE = true;
+        Client.assume('ELEMENT_CREATION').false();
+
+        //test
+        const response = await request(app)
+            .patch('/domain/transfer/accept')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send({
+                domain: domainId
+            }).expect(400);
+
+        expect(response.body.error).toBe('Domain limit has been reached.');
+
+        //teardown
+        process.env.SWITCHER_API_ENABLE = false;
+        Client.forget('ELEMENT_CREATION');
+    });
+
 
     test('DOMAIN_SUITE - Should accept Domain to transfer', async () => {
         //given 'domainId' to be transfered
