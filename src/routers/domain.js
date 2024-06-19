@@ -124,6 +124,7 @@ router.patch('/domain/transfer/accept', auth, [
     check('domain').isMongoId()
 ], validate, async (req, res) => {
     try {
+        await checkDomain(req);
         const domain = await Services.transferDomainAccept(req.body, req.admin);
         res.send(domain);
     } catch (e) {
