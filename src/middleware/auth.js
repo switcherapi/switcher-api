@@ -27,13 +27,17 @@ export async function auth(req, res, next) {
         req.admin = admin;
         next();
     } catch (err) {
+        if (err.name === 'TokenExpiredError') {
+            return res.status(401).send({ error: 'Token expired.' });
+        }
+
         responseExceptionSilent(res, err, 401, 'Please authenticate.');
     }
 }
 
 export async function authRefreshToken(req, res, next) {
     try {
-        const token = req.header('Authorization').replace('Bearer ', '');
+        const token = req.header('Authorization')?.replace('Bearer ', '');
         const refreshToken = req.body.refreshToken;
         
         const decodedRefreshToken = jwt.verify(refreshToken, process.env.JWT_SECRET);

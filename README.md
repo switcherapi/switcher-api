@@ -25,15 +25,15 @@ Switching fast. Adapt everywhere.
 **Switcher API** is a *Feature Flag* API with the main focus on decreasing the friction caused by changes while keeping control of what really matters.
 
 Main features:
-- Control & track more using little effort by sharing switchers among application components.
-- Cross environment. Generate zero impact when manipulating your project features.
-- Customizable environment strategies. Setup switchers using variables per environment.
-- Delegate Switcher analysis to external services with secured Switcher Relay.
-- Create manageable teams to collaborate.
-- Keep track of every modification and features usage.
-- Detailed metrics.
-- SDKs support zero-latency mode for performance improvement.
-- Exclusive Slack App to control and test changes.
+- Easy to setup and seemless integration with your application using our lightweight Client SDKs.
+- Shareable Switchers can be used across multiple applications with high support to observability.
+- Multi-environment support. Create and manage features across different environments.
+- Add extra layer of verification with custom conditions using Strategies.
+- Delegate Switcher criteria decision to external services with Switcher Relay.
+- Support to multiple teams and granular access control.
+- Integrate with Slack usign Switcher Slack App to enable release flow requests.
+- Detailed metrics and logs to help you understand how your features are being used.
+- Open Source and free to use.
  
 
 - **JS Client SDK**: (https://github.com/switcherapi/switcher-client-js)

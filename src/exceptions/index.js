@@ -45,7 +45,7 @@ export function responseException(res, err, code, feature = undefined) {
 }
 
 export function responseExceptionSilent(res, err, code, message) {
-    Logger.httpError(err.constructor.name, err.code, err.message, err);
+    Logger.httpError(err.constructor.name, err.code || code, message, err);
 
     if (err.code) {
         return res.status(err.code).send({ error: message });
