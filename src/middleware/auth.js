@@ -1,11 +1,7 @@
 import basicAuth from 'express-basic-auth';
 import jwt from 'jsonwebtoken';
 import { getAdmin, getAdminById } from '../services/admin.js';
-import { getComponentById } from '../services/component.js';
-import { getEnvironmentByName } from '../services/environment.js';
 import Admin from '../models/admin.js';
-import Component from '../models/component.js';
-import { getRateLimit } from '../external/switcher-api-facade.js';
 import { responseExceptionSilent } from '../exceptions/index.js';
 import { EnvType } from '../models/environment.js';
 
@@ -60,28 +56,6 @@ export async function authRefreshToken(req, res, next) {
     }
 }
 
-export async function componentAuth(req, res, next) {
-    try {
-        const token = req.header('Authorization').replace('Bearer ', '');
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const component = await getComponentById(decoded.component);
-
-        if (component?.apihash.substring(50, component.apihash.length - 1) !== decoded.vc) {
-            throw new Error('Invalid API token');
-        }
-
-        req.token = token;
-        req.domain = component.domain;
-        req.component = component.name;
-        req.componentId = component._id;
-        req.environment = decoded.environment;
-        req.rate_limit = decoded.rate_limit;
-        next();
-    } catch (err) {
-        responseExceptionSilent(res, err, 401, 'Invalid API token.');
-    }
-}
-
 export async function slackAuth(req, res, next) {
     try {
         const token = req.header('Authorization').replace('Bearer ', '');
@@ -113,27 +87,4 @@ export function resourcesAuth() {
         },
         challenge: true,
     });
-}
-
-export async function appGenerateCredentials(req, res, next) {
-    try {
-        const key = req.header('switcher-api-key');
-        const { component, domain } = await Component.findByCredentials(req.body.domain, req.body.component, key);
-        const environment = await getEnvironmentByName(component.domain, req.body.environment);
-
-        if (!environment) {
-            throw new Error('Invalid environment');
-        }
-
-        const rate_limit = await getRateLimit(key, component);
-        const token = await component.generateAuthToken(req.body.environment, rate_limit);
-
-        req.token = token;
-        req.domain = domain;
-        req.environment = req.body.environment;
-        req.rate_limit = rate_limit;
-        next();
-    } catch (err) {
-        responseExceptionSilent(res, err, 401, 'Invalid token request.');
-    }
 }

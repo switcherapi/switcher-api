@@ -8,7 +8,6 @@ import './db/mongoose.js';
 
 import mongoose from 'mongoose';
 import swaggerDocument from './api-docs/swagger-document.js';
-import clientApiRouter from './routers/client-api.js';
 import adminRouter from './routers/admin.js';
 import environment from './routers/environment.js';
 import component from './routers/component.js';
@@ -21,8 +20,8 @@ import teamRouter from './routers/team.js';
 import permissionRouter from './routers/permission.js';
 import slackRouter from './routers/slack.js';
 import schema from './client/schema.js';
-import { componentAuth, auth, resourcesAuth, slackAuth, gitopsAuth } from './middleware/auth.js';
-import { clientLimiter, defaultLimiter } from './middleware/limiter.js';
+import { auth, resourcesAuth, slackAuth, gitopsAuth } from './middleware/auth.js';
+import { DEFAULT_RATE_LIMIT, defaultLimiter } from './middleware/limiter.js';
 import { createServer } from './app-server.js';
 
 const app = express();
@@ -38,7 +37,6 @@ app.disable('x-powered-by');
 /**
  * API Routes
  */
-app.use(clientApiRouter);
 app.use(adminRouter);
 app.use(component);
 app.use(environment);
@@ -58,8 +56,6 @@ app.use(slackRouter);
 const handler = (req, res, next) => 
     createHandler({ schema, context: req })(req, res, next);
 
-// Component: Client API
-app.use('/graphql', componentAuth, clientLimiter, handler);
 // Admin: Client API
 app.use('/adm-graphql', auth, defaultLimiter, handler);
 // Slack: Client API
@@ -98,12 +94,9 @@ app.get('/check', defaultLimiter, (req, res) => {
             relay_bypass_verification: process.env.RELAY_BYPASS_VERIFICATION,
             permission_cache: process.env.PERMISSION_CACHE_ACTIVATED,
             history: process.env.HISTORY_ACTIVATED,
-            metrics: process.env.METRICS_ACTIVATED,
             max_metrics_pages: process.env.METRICS_MAX_PAGE,
             max_stretegy_op: process.env.MAX_STRATEGY_OPERATION,
-            max_rpm: process.env.MAX_REQUEST_PER_MINUTE,
-            regex_max_timeout: process.env.REGEX_MAX_TIMEOUT,
-            regex_max_blacklist: process.env.REGEX_MAX_BLACKLIST
+            max_rpm: process.env.MAX_REQUEST_PER_MINUTE || DEFAULT_RATE_LIMIT
         };
     }
 

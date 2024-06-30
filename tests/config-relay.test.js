@@ -411,7 +411,7 @@ describe('Testing relay association', () => {
 
         // Test
         response = await request(app)
-            .patch(`/config/relay/verify/${configId1}/${EnvType.DEFAULT}?code=${response.body.code}`)
+            .patch(`/config/relay/verify/${configId1}/${EnvType.DEFAULT}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
@@ -458,6 +458,34 @@ describe('Testing relay association', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
+        axiosStub.restore();
+        expect(response.body.status).toBe('failed');
+    });
+
+    test('CONFIG_RELAY_SUITE - Should NOT verify code - Endpoint not reachable', async () => {
+        // Given
+        // Adding relay
+        await request(app)
+            .patch(`/config/updateRelay/${configId1}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                activated: { default: true },
+                endpoint: { default: 'http://localhost:7000/relay' },
+                auth_token: { default: 'abcd' },
+                auth_prefix: 'Bearer'
+            }).expect(200);
+
+        // Relay verification
+        const axiosStub = sinon.stub(axios, 'get');
+        axiosStub.throws(new Error('Endpoint not reachable'));
+
+        // Test
+        const response = await request(app)
+            .patch(`/config/relay/verify/${configId1}/${EnvType.DEFAULT}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        axiosStub.restore();
         expect(response.body.status).toBe('failed');
     });
 

@@ -3,7 +3,6 @@ import { EnvType } from '../models/environment.js';
 import { getDomainById } from '../services/domain.js';
 import { getEnvironments } from '../services/environment.js';
 import { getTeams } from '../services/team.js';
-import Logger from './logger.js';
 import { verifyPermissions, verifyPermissionsCascade } from './permission.js';
 
 const PATTERN_ALPHANUMERIC_SPACE = /^[a-zA-Z0-9_\- ]*$/;
@@ -17,34 +16,6 @@ export async function checkEnvironmentStatusRemoval(domainId, environmentName, s
         
     if (!isValidOperation) {
         throw new BadRequestError('Invalid environment');
-    }
-}
-
-export function payloadReader(payload) {
-    let payloadRead = payload + '' === payload || payload || 0;
-    if (Array.isArray(payloadRead)) {
-        return payloadRead.flatMap(p => payloadReader(p));
-    }
-
-    return Object.keys(payloadRead)
-        .flatMap(field => [field, ...payloadReader(payload[field])
-        .map(nestedField => `${field}.${nestedField}`)])
-        .filter(field => isNaN(Number(field)))
-        .reduce((acc, curr) => {
-            if (!acc.includes(curr)) {
-                acc.push(curr);
-            }
-
-            return acc;
-        }, []);
-}
-
-export function parseJSON(str) {
-    try {
-        return JSON.parse(str);
-    } catch (e) {
-        Logger.debug('parseJSON', e);
-        return undefined;
     }
 }
 

@@ -1,7 +1,6 @@
-import { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLNonNull } from 'graphql';
+import { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean } from 'graphql';
 import { domainType, flatConfigurationType } from './configuration-type.js';
-import { strategyInputType, criteriaType } from './criteria-type.js';
-import { resolveConfigByKey, resolveDomain } from './resolvers.js';
+import { resolveDomain } from './resolvers.js';
 import { resolveConfiguration } from './configuration-resolvers.js';
 import { permissionType } from './permission-type.js';
 import { resolvePermission } from './permission-resolvers.js';
@@ -9,25 +8,6 @@ import { resolvePermission } from './permission-resolvers.js';
 const queryType = new GraphQLObjectType({
     name: 'Query',
     fields: {
-        criteria: {
-            type: criteriaType,
-            args: {
-                key: {
-                    type: new GraphQLNonNull(GraphQLString)
-                },
-                entry: {
-                    type: new GraphQLList(strategyInputType)
-                },
-                bypassMetric: {
-                    type: GraphQLBoolean
-                }
-            },
-            resolve: async (_source, { key, entry, bypassMetric }, context) => {
-                context.entry = entry;
-                context.bypassMetric = bypassMetric;
-                return resolveConfigByKey(context.domain, key);
-            }
-        },
         domain: {
             type: domainType,
             args: {

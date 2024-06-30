@@ -72,36 +72,6 @@ const configStrategy = {
 
 export default {
     ConfigStrategy: configStrategy,
-    ConfigStrategyCriteriaResponse: {
-        type: 'object',
-        properties: {
-            description: {
-                type: 'string',
-                description: 'The description of the config strategy'
-            },
-            activated: {
-                type: 'object',
-                additionalProperties: {
-                    type: 'boolean',
-                    description: 'The environment status'
-                }
-            },
-            strategy: {
-                type: 'string',
-                enum: Object.values(StrategiesType)
-            },
-            values: {
-                type: 'array',
-                items: {
-                    type: 'string'
-                }
-            },
-            operation: {
-                type: 'string',
-                enum: Object.values(OperationsType)
-            }
-        }
-    },
     ConfigStrategyCreateRequest: {
         type: 'object',
         properties: {

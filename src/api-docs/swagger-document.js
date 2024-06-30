@@ -9,7 +9,6 @@ import pathTeam from './paths/path-team.js';
 import pathPermission from './paths/path-permission.js';
 import pathMetric from './paths/path-metric.js';
 import pathSlack from './paths/path-slack.js';
-import pathClient from './paths/path-client.js';
 
 import { commonSchema } from './schemas/common.js';
 import adminSchema from './schemas/admin.js';
@@ -49,15 +48,6 @@ export default {
                 type: 'http',
                 scheme: 'bearer',
                 bearerFormat: 'JWT'
-            },
-            componentAuth: {
-                type: 'http',
-                scheme: 'bearer'
-            },
-            apiKey: {
-                type: 'apiKey',
-                in: 'header',
-                name: 'switcher-api-key'
             }
         },
         schemas: {
@@ -86,7 +76,6 @@ export default {
         ...pathTeam,
         ...pathPermission,
         ...pathMetric,
-        ...pathClient,
         ...pathSlack
     }
 };

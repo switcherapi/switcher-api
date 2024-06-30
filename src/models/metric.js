@@ -58,20 +58,4 @@ metricSchema.options.toJSON = {
     }
 };
 
-export function addMetrics(context, response) {
-    const metric = new Metric({
-        config: context.config_id,
-        component: context.component,
-        entry: context.entry,
-        result: response.result,
-        reason: response.reason,
-        message: response.message,
-        group: response.group.name,
-        environment: context.environment,
-        domain: response.domain._id,
-        date: Date.now()
-    });
-    metric.save();
-}
-
 export const Metric = mongoose.model('Metric', metricSchema);

@@ -26,13 +26,12 @@ export async function getConfigById(id, populateAdmin = false) {
     return response(config, 'Config not found');
 }
 
-export async function getConfig(where, lean = false) {
+export async function getConfig(where) {
     const query = Config.findOne();
 
     if (where.domain) query.where('domain', where.domain);
     if (where.key) query.where('key', where.key);
     if (where.group) query.where('group', where.group);
-    if (lean) query.lean();
     
     return query.exec();
 }
@@ -44,7 +43,6 @@ export async function getConfigs(where, lean = false) {
     if (where.key) query.where('key', where.key);
     if (where.domain) query.where('domain', where.domain);
     if (where.group) query.where('group', where.group);
-    if (where.components) query.where('components', where.components);
     if (lean) query.lean();
 
     return query.exec();
@@ -301,7 +299,10 @@ export async function verifyRelay(id, env, admin) {
         RouterTypes.CONFIG, false, env);
 
     const code = await resolveVerification(config.relay, env);
-    if (!config.relay.verified?.get(env) && Object.is(domain.integrations.relay.verification_code, code)) {
+    if (!config.relay.verified?.get(env) && 
+        domain.integrations.relay.verification_code && code &&
+        Object.is(domain.integrations.relay.verification_code, code)
+    ) {
         config.relay.verified.set(env, true);
         await config.save();
         return 'verified';
@@ -322,17 +323,5 @@ export function isRelayValid(relay) {
     
     if (foundNotHttps.length) {
         throw new BadRequestError('HTTPS required');
-    }
-}
-
-export function isRelayVerified(relay, environment) {
-    const bypass = process.env.RELAY_BYPASS_VERIFICATION === 'true' || false;
-
-    if (bypass) {
-        return;
-    }
-    
-    if (!relay.verified[environment]) {
-        throw new BadRequestError('Relay not verified');
     }
 }

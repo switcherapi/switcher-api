@@ -1,6 +1,5 @@
 import axios from 'axios';
 import https from 'https';
-import { StrategiesToRelayDataType, RelayMethods } from '../../models/config.js';
 import { checkHttpsAgent } from '../../external/switcher-api-facade.js';
 import Logger from '../../helpers/logger.js';
 
@@ -9,94 +8,23 @@ const agent = async (url) => {
     return new https.Agent({ rejectUnauthorized: !(response?.result) });
 };
 
-export async function resolveNotification(relay, entry, environment) {
-    const env = Object.keys(relay.endpoint).find(e => e === environment);
-    const url = relay.endpoint[env];
-    const header = createHeader(relay.auth_prefix, relay.auth_token, env);
-
-    if (relay.method === RelayMethods.GET) {
-        get(url, createParams(entry), header);
-    } else {
-        post(url, createBody(entry), header);
-    }
-}
-
-export async function resolveValidation(relay, entry, environment) {
-    let response;
-    
-    const env = Object.keys(relay.endpoint).find(e => e === environment);
-    const url = relay.endpoint[env];
-    const header = createHeader(relay.auth_prefix, relay.auth_token, env);
-
-    if (relay.method === RelayMethods.GET) {
-        response = await get(url, createParams(entry), header);
-    } else {
-        response = await post(url, createBody(entry), header);
-    }
-
-    return {
-        result: response.data.result,
-        message: response.data.message,
-        metadata: response.data.metadata
-    };
-}
-
 export async function resolveVerification(relay, environment) {
-    const endpoint = relay.endpoint.get(environment)?.replace(/\/$/, '');
-    const url = `${endpoint?.substring(0, endpoint.lastIndexOf('/'))}/verify`;
-    const header = createHeader(relay.auth_prefix, relay.auth_token.get(environment));
-    const response = await get(url, '', header);
-
-    return response.data?.code;
-}
-
-async function post(url, data, headers) {
     try {
-        return await axios.post(url, data, { httpsAgent: await agent(url), headers });
+        const endpoint = relay.endpoint.get(environment)?.replace(/\/$/, '');
+        const url = `${endpoint?.substring(0, endpoint.lastIndexOf('/'))}/verify`;
+        const headers = createHeader(relay.auth_prefix, relay.auth_token.get(environment));
+        const response = await axios.get(url, { httpsAgent: await agent(url), headers });
+
+        return response.data?.code;
     } catch (error) {
-        Logger.debug('post', error);
-        throw new Error(`Failed to reach ${url} via POST`);
+        Logger.debug('resolveVerification', error);
+        return undefined;
     }
 }
 
-async function get(url, data, headers) {
-    try {
-        return await axios.get(`${url}${data}`, { httpsAgent: await agent(url), headers });
-    } catch (error) {
-        Logger.debug('get', error);
-        throw new Error(`Failed to reach ${url} via GET`);
-    }
-}
-
-function createBody(entry) {
-    if (entry) {
-        let body = {};
-        entry.forEach(e => body[StrategiesToRelayDataType[e.strategy]] = e.input);
-        return body;
-    }
-    return null;
-}
-
-function createParams(entry) {
-    if (entry) {
-        const params = entry.map(e => `${StrategiesToRelayDataType[e.strategy]}=${e.input}`);
-        return `?${encodeURI(params.join('&'))}`;
-    }
-    return '';
-}
-
-function createHeader(auth_prefix, auth_token, environment) {
-    let headers = {
-        ['Content-Type']: 'application/json'
+function createHeader(auth_prefix, auth_token) {
+    return {
+        ['Content-Type']: 'application/json',
+        ['Authorization']: `${auth_prefix} ${auth_token}`
     };
-
-    if (environment) {
-        if (auth_token && environment in auth_token && auth_prefix) {
-            headers['Authorization'] = `${auth_prefix} ${auth_token[environment]}`;
-        }
-    } else if (auth_token && auth_prefix) {
-        headers['Authorization'] = `${auth_prefix} ${auth_token}`;
-    }
-
-    return headers;
 }
