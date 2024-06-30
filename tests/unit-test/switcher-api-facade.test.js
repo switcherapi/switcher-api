@@ -28,6 +28,7 @@ import {
     component1Key
 } from '../fixtures/db_api';
 import { Client } from 'switcher-client';
+import { DEFAULT_RATE_LIMIT } from '../../src/middleware/limiter';
 
 afterAll(async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -255,7 +256,7 @@ describe('Testing Switcher API Facade', () => {
             return getRateLimit(component1Key, component1);
         }; 
 
-        await expect(call()).resolves.toBe(parseInt(process.env.MAX_REQUEST_PER_MINUTE));
+        await expect(call()).resolves.toBe(parseInt(DEFAULT_RATE_LIMIT));
     });
 
 });

@@ -1,5 +1,11 @@
-const createInput = input => `${input[0]}: "${input[1]}"`;
-const createStrategyInput = input => `{ strategy: "${input[0]}", input: "${input[1]}" }`;
+const createInput = input => {
+    if (typeof input[1] === 'boolean' || typeof input[1] === 'number') {
+        return `${input[0]}: ${input[1]}`;
+    }
+
+    return `${input[0]}: "${input[1]}"`;
+};
+
 const isActivated = (element) => element ? 'true' : 'false';
 
 export const configurationQuery = (
@@ -42,25 +48,6 @@ export const domainQuery = (where, group, config, strategy) => {
                 }
             }
     `};
-};
-
-export const criteriaQuery = (key, entries) => {
-    return {
-        query: `
-            {
-                criteria(
-                    key: "${key}", 
-                    entry: [${entries}]
-                ) { response { result reason } }
-            }  
-    `};
-};
-
-export const criteriaResult = (result, reason) => `
-    {  "data": { "criteria": { "response": { "result": ${result}, "reason": "${reason}" } } } }`;
-
-export const  buildEntries = (entries) => {
-    return `${entries.map(createStrategyInput)}`;
 };
 
 export const permissionsQuery = (domainId, parentId, actions, router, environment) => {

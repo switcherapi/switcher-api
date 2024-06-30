@@ -5173,659 +5173,257 @@
 			]
 		},
 		{
-			"name": "Client",
+			"name": "GraphQL",
 			"item": [
 				{
-					"name": "Client - Criteria/Auth (REST)",
-					"event": [
+					"name": "Admin",
+					"item": [
 						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    pm.environment.set('authClientToken', pm.response.json().token)",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "apikey",
-							"apikey": [
-								{
-									"key": "value",
-									"value": "{{apiKey}}",
-									"type": "string"
+							"name": "Domain Tree - By Id",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query Domain(\r\n    $_id: String, \r\n    $name: String, \r\n    $activated: Boolean, \r\n    $environment: String, \r\n    $_component: String) {\r\n    domain(\r\n        _id: $_id, \r\n        name: $name, \r\n        activated: $activated, \r\n        environment: $environment,\r\n         _component: $_component\r\n    ) {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        statusByEnv {\r\n            env\r\n            value\r\n        }\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                statusByEnv {\r\n                    env\r\n                    value\r\n                }\r\n                strategies {\r\n                    _id\r\n                    strategy\r\n                    activated\r\n                    statusByEnv {\r\n                        env\r\n                        value\r\n                    }\r\n                    operation\r\n                    values\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"_id\": \"\",\r\n    \"activated\": true,\r\n    \"environment\": \"\",\r\n    \"_component\": \"\"\r\n}"
+									}
 								},
-								{
-									"key": "key",
-									"value": "switcher-api-key",
-									"type": "string"
+								"url": {
+									"raw": "{{url}}/adm-graphql",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"adm-graphql"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"name": "Content-Type",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"domain\": \"Playground\",\n\t\"component\": \"switcher-playground\",\n\t\"environment\": \"default\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/criteria/auth",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"criteria",
-								"auth"
-							],
-							"query": [
-								{
-									"key": "showReason",
-									"value": "true",
-									"disabled": true
-								},
-								{
-									"key": "showStrategy",
-									"value": "true",
-									"disabled": true
-								},
-								{
-									"key": "bypassMetric",
-									"value": "true",
-									"disabled": true
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Criteria (REST) - Input",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{authClientToken}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"name": "Content-Type",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"entry\": [\n\t\t{\n\t\t\t\"strategy\": \"PAYLOAD_VALIDATION\",\n\t\t\t\"input\": \"{ \\\"status\\\": \\\"ready\\\" }\"\n\t\t}]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/criteria?showReason=true&showStrategy=true&key=MY_SWITCHER",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"criteria"
-							],
-							"query": [
-								{
-									"key": "showReason",
-									"value": "true"
-								},
-								{
-									"key": "showStrategy",
-									"value": "true"
-								},
-								{
-									"key": "bypassMetric",
-									"value": "true",
-									"disabled": true
-								},
-								{
-									"key": "key",
-									"value": "MY_SWITCHER"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Criteria (REST)",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{authClientToken}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"name": "Content-Type",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/criteria?key=MY_SWITCHER",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"criteria"
-							],
-							"query": [
-								{
-									"key": "showReason",
-									"value": "true",
-									"disabled": true
-								},
-								{
-									"key": "showStrategy",
-									"value": "true",
-									"disabled": true
-								},
-								{
-									"key": "bypassMetric",
-									"value": "true",
-									"disabled": true
-								},
-								{
-									"key": "key",
-									"value": "MY_SWITCHER"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Check Snapshot",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{authClientToken}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"name": "Content-Type",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/criteria/snapshot_check/:version",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"criteria",
-								"snapshot_check",
-								":version"
-							],
-							"variable": [
-								{
-									"key": "version",
-									"value": "1588557288037"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Check Switcher/Component",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{authClientToken}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"name": "Content-Type",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"switchers\": [\r\n        \"FEATURE2020\",\r\n        \"RELAY_1\"\r\n    ]\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/criteria/switchers_check",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"criteria",
-								"switchers_check"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Criteria (GraphQL)",
-					"event": [
 						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{authClientToken}}",
-									"type": "string"
+							"name": "Domain Tree - By Name",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query Domain(\r\n    $_id: String, \r\n    $name: String, \r\n    $activated: Boolean, \r\n    $environment: String, \r\n    $_component: String) {\r\n    domain(\r\n        _id: $_id, \r\n        name: $name, \r\n        activated: $activated, \r\n        environment: $environment,\r\n         _component: $_component\r\n    ) {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        statusByEnv {\r\n            env\r\n            value\r\n        }\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                statusByEnv {\r\n                    env\r\n                    value\r\n                }\r\n                strategies {\r\n                    _id\r\n                    strategy\r\n                    activated\r\n                    statusByEnv {\r\n                        env\r\n                        value\r\n                    }\r\n                    operation\r\n                    values\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"name\": \"GitOps\",\r\n    \"activated\": true,\r\n    \"environment\": \"\",\r\n    \"_component\": \"\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{url}}/adm-graphql",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"adm-graphql"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "{\r\n  criteria(\r\n      key: \"MY_SWITCHER\",\r\n    #   bypassMetric: false,\r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              }\r\n            ]\r\n        ) {\r\n    key\r\n    activated\r\n    response {\r\n        result\r\n        reason\r\n        domain {\r\n            name\r\n            activated\r\n            description\r\n            group {\r\n                name\r\n                activated\r\n                description\r\n                config {\r\n                    key\r\n                    activated\r\n                    description\r\n                    strategies {\r\n                        strategy\r\n                        activated\r\n                        operation\r\n                        values\r\n                    }\r\n                }\r\n            }\r\n        }\r\n        group {\r\n            name\r\n            activated\r\n            description\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n  }\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "{{url}}/graphql",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Simple Criteria (GraphQL)",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{authClientToken}}",
-									"type": "string"
+						{
+							"name": "Configuration - By Switcher Key",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query Configuration(\r\n    $domain: String!, \r\n    $group: String,\r\n    $group_id: String,\r\n    $key: String,\r\n    $config_id: String,\r\n    $slack_team_id: String,\r\n    $environment: String) {\r\n    configuration(domain: $domain, group: $group, group_id: $group_id, key: $key, config_id: $config_id, slack_team_id: $slack_team_id, environment: $environment) {\r\n        domain {\r\n            id: _id\r\n            name\r\n            owner\r\n            transfer\r\n            activated\r\n            integrations {\r\n                slack\r\n            }\r\n        }\r\n        group {\r\n            _id\r\n            name\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n        }\r\n        config {\r\n            _id\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"domain\": \"\",\r\n    \"group\": \"\",\r\n    \"group_id\": \"\",\r\n    \"key\": \"FEATURE_1\",\r\n    \"config_id\": \"\",\r\n    \"slack_team_id\": \"\",\r\n    \"environment\": \"default\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{url}}/adm-graphql",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"adm-graphql"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "{\r\n  criteria(\r\n      key: \"MY_SWITCHER\", \r\n      entry: [\r\n              {\r\n                  strategy: \"VALUE_VALIDATION\", \r\n                  input: \"Roger\"\r\n              },\r\n              {\r\n                  strategy: \"NETWORK_VALIDATION\", \r\n                  input: \"192.168.0.2\"\r\n              }\r\n            ]\r\n        ) {\r\n    response {\r\n        result\r\n        reason\r\n    }\r\n  }\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "{{url}}/graphql",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Domain Tree (GraphQL)",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{authClientToken}}",
-									"type": "string"
+						{
+							"name": "Configuration - By Group Name",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query Configuration(\r\n    $domain: String!, \r\n    $group: String,\r\n    $group_id: String,\r\n    $key: String,\r\n    $config_id: String,\r\n    $slack_team_id: String,\r\n    $environment: String) {\r\n    configuration(domain: $domain, group: $group, group_id: $group_id, key: $key, config_id: $config_id, slack_team_id: $slack_team_id, environment: $environment) {\r\n        domain {\r\n            id: _id\r\n            name\r\n            owner\r\n            transfer\r\n            activated\r\n            integrations {\r\n                slack\r\n            }\r\n        }\r\n        group {\r\n            _id\r\n            name\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n        }\r\n        config {\r\n            _id\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"domain\": \"\",\r\n    \"group\": \"Group 1\",\r\n    \"group_id\": \"\",\r\n    \"key\": \"\",\r\n    \"config_id\": \"\",\r\n    \"slack_team_id\": \"\",\r\n    \"environment\": \"default\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{url}}/adm-graphql",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"adm-graphql"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "{\r\n    domain(name: \"My Domain\", activated: true) {\r\n        name\r\n        version\r\n        description\r\n        activated\r\n        group(activated: true) {\r\n            name\r\n            description\r\n            activated\r\n            config(activated: true) {\r\n                key\r\n                description\r\n                activated\r\n                strategies(activated: true) {\r\n                    strategy\r\n                    activated\r\n                    operation\r\n                    values\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "{{url}}/graphql",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Domain Tree (Adm-GraphQL)",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "{\r\n    # domain(name: \"Switcher API\") {\r\n    # domain(name: \"My Domain\", environment: \"default\", component: \"InventoryWS\") {\r\n    domain(_id: \"5e44eb76916dd10048d72542\", environment: \"default\", _component: \"switcherapi\") {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        statusByEnv {\r\n            env\r\n            value\r\n        }\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                statusByEnv {\r\n                    env\r\n                    value\r\n                }\r\n                strategies {\r\n                    _id\r\n                    strategy\r\n                    activated\r\n                    statusByEnv {\r\n                        env\r\n                        value\r\n                    }\r\n                    operation\r\n                    values\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "{{url}}/adm-graphql",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"adm-graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Config Tree (Adm-GraphQL)",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "{\r\n    # domain(name: \"Switcher API\") {\r\n    domain(_id: \"5e0ece606f4f994eac9007ae\", environment: \"default\") {\r\n        group {\r\n            config {\r\n                key\r\n            }\r\n        }\r\n    }\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "{{url}}/adm-graphql",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"adm-graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Configuration (GraphQL)",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{authClientToken}}",
-									"type": "string"
+						{
+							"name": "Configuration - By Slack Team Id",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query Configuration(\r\n    $domain: String!, \r\n    $group: String,\r\n    $group_id: String,\r\n    $key: String,\r\n    $config_id: String,\r\n    $slack_team_id: String,\r\n    $environment: String) {\r\n    configuration(domain: $domain, group: $group, group_id: $group_id, key: $key, config_id: $config_id, slack_team_id: $slack_team_id, environment: $environment) {\r\n        domain {\r\n            id: _id\r\n            name\r\n            owner\r\n            transfer\r\n            activated\r\n            integrations {\r\n                slack\r\n            }\r\n        }\r\n        group {\r\n            _id\r\n            name\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n        }\r\n        config {\r\n            _id\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"domain\": \"\",\r\n    \"group\": \"\",\r\n    \"group_id\": \"\",\r\n    \"key\": \"\",\r\n    \"config_id\": \"\",\r\n    \"slack_team_id\": \"T123456789\",\r\n    \"environment\": \"default\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{url}}/adm-graphql",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"adm-graphql"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "{\r\n    # configuration(key: \"FEATURE01\") { #FF3FOR2020\r\n    configuration(group: \"Release 1\") {\r\n        domain {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        group {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        config {\r\n            key\r\n            description\r\n            activated\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "{{url}}/graphql",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Configuration (Adm-GraphQL)",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "{\r\n    # configuration(domain: \"62d47c7555cb4611d17b2b55\") {\r\n    # configuration(domain: \"5e4f9d8966e06b59c8254500\") {\r\n    # configuration(domain: \"5e4f9d8966e06b59c8254500\", config_id: \"6270b2fe68bceea783c450b4\") {\r\n    # configuration(domain: \"5e4f9d8966e06b59c8254500\", group_id: \"6270b2f568bceea783c45081\") {\r\n    # configuration(domain: \"5e4f9d8966e06b59c8254500\", group: \"Test group\") {\r\n    configuration(domain: \"5e0ece606f4f994eac9007ae\", key: \"FEATURE01\", environment: \"default\") {\r\n        domain {\r\n            id: _id\r\n            name\r\n            owner\r\n            transfer\r\n            activated\r\n            integrations {\r\n                slack\r\n            }\r\n        }\r\n        group {\r\n            _id\r\n            name\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n        }\r\n        config {\r\n            _id\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "{{url}}/adm-graphql",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"adm-graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Configuration (Slack-GraphQL) - Env",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "{\r\n    configuration(slack_team_id: \"TEAM_ID\") {\r\n        environments\r\n    }\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "{{url}}/adm-graphql",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"adm-graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Configuration (Slack-GraphQL) - Groups",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "{\r\n    configuration(slack_team_id: \"TEAM_ID\", environment: \"development\") {\r\n        group {\r\n            name\r\n            activated\r\n        }\r\n    }\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "{{url}}/adm-graphql",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"adm-graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Configuration (Slack-GraphQL) - Configs",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "{\r\n    configuration(slack_team_id: \"TEAM_ID\", environment: \"default\", group: \"Release 1\") {\r\n        config {\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "{{url}}/adm-graphql",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"adm-graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Client - Configuration by Group (GraphQL)",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{authClientToken}}",
-									"type": "string"
+						{
+							"name": "Permission - By Router Switcher",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query Permission(\r\n    $domain: String!, $actions: [String]!, $router: String!, \r\n    $parent: String, $environment: String) {\r\n    permission(\r\n        domain: $domain, \r\n        parent: $parent, \r\n        actions: $actions,\r\n        router: $router,\r\n        environment: $environment\r\n    ) {\r\n        id\r\n        name\r\n        permissions {\r\n            action\r\n            result\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"domain\": \"\",\r\n    \"parent\": \"\",\r\n    \"actions\": [\"READ\", \"UPDATE\", \"DELETE\"],\r\n    \"router\": \"SWITCHER\",\r\n    \"environment\": \"\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{url}}/adm-graphql",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"adm-graphql"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "{\r\n    #configuration(group: \"Rollout 2020\") {\r\n    configuration(key: \"FF2FOR2030\") { #FF3FOR2020\r\n        domain {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        group {\r\n            name\r\n            description\r\n            activated\r\n        }\r\n        config {\r\n            key\r\n            description\r\n            activated\r\n            strategies {\r\n                strategy\r\n                values\r\n            }\r\n        }\r\n        strategies {\r\n            strategy\r\n            activated\r\n            operation\r\n            values\r\n        }\r\n    }\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "{{url}}/graphql",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"graphql"
-							]
+						{
+							"name": "Permission - By Router Grroup",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query Permission(\r\n    $domain: String!, $actions: [String]!, $router: String!, \r\n    $parent: String, $environment: String) {\r\n    permission(\r\n        domain: $domain, \r\n        parent: $parent, \r\n        actions: $actions,\r\n        router: $router,\r\n        environment: $environment\r\n    ) {\r\n        id\r\n        name\r\n        permissions {\r\n            action\r\n            result\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"domain\": \"\",\r\n    \"actions\": [\"READ\", \"UPDATE\", \"DELETE\"],\r\n    \"router\": \"GROUP\",\r\n    \"environment\": \"\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{url}}/adm-graphql",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"adm-graphql"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "Client - Permission (Adm-GraphQL)",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "{\r\n    # permission(domain: \"5e0ece606f4f994eac9007ae\", actions: [\"UPDATE\", \"DELETE\"], router: \"GROUP\") {\r\n    permission(\r\n        domain: \"601de9281e38730048dd0988\", \r\n        parent: \"601dea391e38730048dd098a\", \r\n        actions: [\"READ\", \"UPDATE\", \"DELETE\"],\r\n        router: \"SWITCHER\") {\r\n        id\r\n        name\r\n        permissions {\r\n            action\r\n            result\r\n        }\r\n    }\r\n}",
-								"variables": ""
-							}
+					"name": "Slack",
+					"item": [
+						{
+							"name": "Configuration - Env",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query Configuration($slack_team_id: String!) {\r\n    configuration(slack_team_id: $slack_team_id) {\r\n        environments\r\n    }\r\n}",
+										"variables": "{\r\n    \"slack_team_id\": \"TEAM_ID\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{url}}/adm-graphql",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"adm-graphql"
+									]
+								}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "{{url}}/adm-graphql",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"adm-graphql"
-							]
+						{
+							"name": "Configuration - Groups",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query Configuration($slack_team_id: String!, $environment: String) {\r\n    configuration(slack_team_id: $slack_team_id, environment: $environment) {\r\n        group {\r\n            name\r\n            activated\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"slack_team_id\": \"TEAM_ID\",\r\n    \"environment\": \"development\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{url}}/adm-graphql",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"adm-graphql"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Configuration - Configs",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query Configuration($slack_team_id: String!, $environment: String, $group: String) {\r\n    configuration(slack_team_id: $slack_team_id, environment: $environment, group: $group) {\r\n        config {\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"slack_team_id\": \"TEAM_ID\",\r\n    \"group\": \"Group Name\",\r\n    \"environment\": \"default\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{url}}/adm-graphql",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"adm-graphql"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				}
 			]
 		},

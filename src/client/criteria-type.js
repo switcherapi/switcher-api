@@ -1,7 +1,5 @@
 import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLNonNull, GraphQLInputObjectType } from 'graphql';
 import { domainType, groupConfigType, strategyType } from './configuration-type.js';
-import { EnvType } from '../models/environment.js';
-import { resolveCriteria } from './resolvers.js';
 
 export const strategyInputType = new GraphQLInputObjectType({
     name: 'StrategyInput',
@@ -32,28 +30,6 @@ export const responseType = new GraphQLObjectType({
         },
         strategies: {
             type: new GraphQLList(strategyType)
-        }
-    }
-});
-
-export const criteriaType = new GraphQLObjectType({
-    name: 'Criteria',
-    fields: {
-        key: {
-            type: GraphQLString
-        },
-        activated: {
-            type: GraphQLBoolean,
-            resolve: (source, _args, { environment }) => {
-                return source.activated[`${environment}`] === undefined ? 
-                    source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`];
-            }
-        },
-        response: {
-            type: responseType,
-            resolve: (source, _params, context) => {
-                return resolveCriteria(source, context);
-            }
         }
     }
 });

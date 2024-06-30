@@ -1,31 +1,6 @@
 import { validationResult } from 'express-validator';
 import { BadRequestError, responseException } from '../exceptions/index.js';
-import { getConfig } from '../services/config.js';
 import { getEnvironments } from '../services/environment.js';
-
-export async function checkConfig(req, res, next) {
-    const config = await getConfig({ domain: req.domain, key: String(req.query.key) }, true);
-
-    if (!config) {
-        return res.status(404).send({ 
-            error: `Unable to load a key ${String(req.query.key)}` });
-    }
-    
-    req.config = config;
-    next();
-}
-
-export async function checkConfigComponent(req, res, next) {
-    const hasComponent = req.config.components.filter((c) => 
-        c.toString() === req.componentId.toString()).length > 0;
-
-    if (!hasComponent) {
-        return res.status(401).send({ 
-            error: `Component ${req.component} is not registered to ${req.config.key}` });
-    }
-
-    next();
-}
 
 export async function checkEnvironmentStatusChange(args, domain, field) {
     const environment = await getEnvironments({ domain }, ['_id', 'name']);

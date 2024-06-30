@@ -42,11 +42,11 @@ export async function resolvePermission(args, admin) {
 }
 
 const getElements = async (domain, parent, router) => {
-    if (router === RouterTypes.GROUP) {
+    if (domain && router === RouterTypes.GROUP) {
         return getGroupConfigs({ domain }, true);
     }
     
-    if (router === RouterTypes.CONFIG) {
+    if (domain && parent && router === RouterTypes.CONFIG) {
         return getConfigs({ domain, group: parent }, true);
     }
 
