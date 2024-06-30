@@ -42,7 +42,6 @@ jobs:
           MONGODB_URI: mongodb://127.0.0.1:27017/switcher-api-test
           HISTORY_ACTIVATED: true
           JWT_ADMIN_TOKEN_RENEW_INTERVAL: 5m
-          JWT_CLIENT_TOKEN_EXP_TIME: 5m
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           SWITCHER_SLACK_JWT_SECRET: ${{ secrets.SWITCHER_SLACK_JWT_SECRET }}
           SWITCHER_GITOPS_JWT_SECRET: ${{ secrets.SWITCHER_GITOPS_JWT_SECRET }}
