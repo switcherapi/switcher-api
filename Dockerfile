@@ -6,9 +6,9 @@ WORKDIR /app
 # ---------- Builder ----------
 FROM base AS builder
 
-COPY package*.json ./
+COPY npm-shrinkwrap.json package.json ./
 
-RUN npm install
+RUN npm ci
 
 COPY ./src ./src
 
