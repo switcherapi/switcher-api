@@ -25,9 +25,9 @@ jobs:
           node-version: 20.x
 
       - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.10.0
+        uses: supercharge/mongodb-github-action@1.11.0
         with:
-          mongodb-version: 6.0
+          mongodb-version: 7.0
 
       - name: Install dependencies
         run: npm ci
@@ -56,7 +56,7 @@ jobs:
           SWITCHER_API_LOGGER: false
 
       - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v2.0.2
+        uses: sonarsource/sonarcloud-github-action@v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -85,7 +85,7 @@ jobs:
 
       - name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           platforms: linux/amd64,linux/arm64
