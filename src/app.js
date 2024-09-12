@@ -103,8 +103,4 @@ app.get('/check', defaultLimiter, (req, res) => {
     res.status(200).send(response);
 });
 
-app.get('*', (_req, res) => {
-    res.status(404).send({ error: 'Operation not found' });
-});
-
 export default createServer(app);

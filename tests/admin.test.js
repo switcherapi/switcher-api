@@ -489,14 +489,6 @@ describe('Testing Admin insertion', () => {
         expect(response.body.token).not.toBeNull();
     });
 
-    test('ADMIN_SUITE - Should get Operation not found', async () => {
-        const response = await request(app)
-            .get('/fake_uri')
-            .send().expect(404);
-
-        expect(response.body.error).toEqual('Operation not found');
-    });
-
     test('ADMIN_SUITE - Should get API UP with details', async () => {
         const response = await request(app)
             .get('/check?details=1')

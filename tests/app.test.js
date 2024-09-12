@@ -33,6 +33,5 @@ describe('Testing app [REST] ', () => {
       .expect(404);
 
     expect(req.statusCode).toBe(404);
-    expect(req.body.error).toEqual('Operation not found');
   });
 });
