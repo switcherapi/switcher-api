@@ -18,6 +18,8 @@ export async function checkEnvironmentStatusChange(args, domain, field) {
 
 export function verifyInputUpdateParameters(allowedUpdates) {
     return function (req, res, next) {
+        req.body = req.body || {};
+        
         const updates = Object.keys(req.body);
         const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
