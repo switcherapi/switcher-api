@@ -11,7 +11,7 @@ export async function pushChanges(domainId, environment, changes) {
         if (change.action === 'NEW') {
             await processNew(domain, change, environment);
         } else {
-            return errorResponse(`Invalid action [${change.action}]`, domain.lastUpdate);
+            return errorResponse('Request has invalid actions', domain.lastUpdate);
         }
     };
 

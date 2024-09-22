@@ -153,7 +153,7 @@ describe('GitOps - Push Changes', () => {
             .send(requestPayload)
             .expect(400);
 
-        expect(req.body.message).toBe('Invalid action [INVALID]');
+        expect(req.body.message).toBe('Request has invalid actions');
     });
 
     test('GITOPS_SUITE - Should return error when content is malformed', async () => {
