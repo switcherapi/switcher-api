@@ -26,6 +26,7 @@ export const SwitcherKeys = Object.freeze({
     ACCOUNT_IN_NOTIFY: 'ACCOUNT_IN_NOTIFY',
     ACCOUNT_OUT_NOTIFY: 'ACCOUNT_OUT_NOTIFY',
     SLACK_INTEGRATION: 'SLACK_INTEGRATION',
+    GITOPS_INTEGRATION: 'GITOPS_INTEGRATION',
     RATE_LIMIT: 'RATE_LIMIT',
     HTTPS_AGENT: 'HTTPS_AGENT'
 });
@@ -199,6 +200,18 @@ export async function checkSlackIntegration(value) {
         .isItOn();
 
     switcherFlagResult(featureFlag, 'Slack Integration is not available.');
+}
+
+export async function checkGitopsIntegration(value) {
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
+        return;
+    }
+
+    const featureFlag = await getFeatureFlag(SwitcherKeys.GITOPS_INTEGRATION)
+        .checkValue(value)
+        .isItOn();
+
+    switcherFlagResult(featureFlag, 'GitOps Integration is not available.');
 }
 
 export function notifyAcCreation(adminid) {
