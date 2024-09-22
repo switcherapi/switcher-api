@@ -144,7 +144,7 @@ export async function removeDomainStatusEnv(id, env, admin) {
 export async function updateDomainVersion(domainId) {
     const domain = await getDomainById(domainId);
     domain.lastUpdate = Date.now();
-    domain.save();
+    return domain.save();
 }
 
 export async function getRelayVerificationCode(id, admin) {

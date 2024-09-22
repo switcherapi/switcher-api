@@ -19,6 +19,7 @@ import metricRouter from './routers/metric.js';
 import teamRouter from './routers/team.js';
 import permissionRouter from './routers/permission.js';
 import slackRouter from './routers/slack.js';
+import gitOpsRouter from './routers/gitops.js';
 import schema from './client/schema.js';
 import { auth, resourcesAuth, slackAuth, gitopsAuth } from './middleware/auth.js';
 import { DEFAULT_RATE_LIMIT, defaultLimiter } from './middleware/limiter.js';
@@ -48,6 +49,7 @@ app.use(metricRouter);
 app.use(teamRouter);
 app.use(permissionRouter);
 app.use(slackRouter);
+app.use(gitOpsRouter);
 
 /**
  * GraphQL Routes
