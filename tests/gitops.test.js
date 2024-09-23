@@ -288,6 +288,36 @@ describe('GitOps - Push New Changes', () => {
             },
         });
     });
+
+    test('GITOPS_SUITE - Should push changes - New Strategy Value', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'NEW',
+                    diff: 'STRATEGY_VALUE',
+                    path: ['Group Test', 'TEST_CONFIG_KEY', StrategiesType.VALUE],
+                    content: ['USER_4']
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const strategy = await ConfigStrategy.findOne({ config: configId, strategy: StrategiesType.VALUE }).lean().exec();
+        expect(strategy).toMatchObject({
+            operation: OperationsType.EXIST,
+            strategy: StrategiesType.VALUE,
+            values: ['USER_1', 'USER_2', 'USER_3', 'USER_4']
+        });
+    });
 });
 
 describe('GitOps - Push Changes - Errors', () => {
@@ -339,10 +369,36 @@ describe('GitOps - Push Changes - Errors', () => {
                 changes: [{
                     action: 'NEW',
                     diff: 'CONFIG',
+                    path: ['Group Test'],
                 }]
             })
             .expect(500);
 
         expect(req.body.error).not.toBeNull();
     });
+
+    test('GITOPS_SUITE - Should return error when path is not properly defined - For New', async () => {
+        const token = generateToken('30s');
+
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'NEW',
+                    diff: 'CONFIG',
+                    path: [],
+                    content: {
+                        key: 'NEW_SWITCHER',
+                        activated: true
+                    }
+                }]
+            })
+            .expect(400);
+
+        expect(req.body.error).not.toBeNull();
+        expect(req.body.message).toBe('Request has invalid path settings for new element');
+    });
+
 });

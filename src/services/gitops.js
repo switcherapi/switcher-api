@@ -1,8 +1,15 @@
 import { getComponents } from './component.js';
-import { createStrategy } from './config-strategy.js';
+import { createStrategy, getStrategies, updateStrategy } from './config-strategy.js';
 import { createConfig, getConfig } from './config.js';
 import { getDomainById, updateDomainVersion } from './domain.js';
 import { createGroup, getGroupConfig } from './group-config.js';
+
+const PATH_CONSTRAINTS_NEW = {
+    GROUP: 0,
+    CONFIG: 1,
+    STRATEGY: 2,
+    STRATEGY_VALUE: 3
+};
 
 export async function pushChanges(domainId, environment, changes) {
     const validations = validateChanges(changes);
@@ -25,6 +32,7 @@ function validateChanges(changes) {
     try {
         validateActions(changes);
         validateDiff(changes);
+        validatePathForElement(changes);
     } catch (e) {
         return e.message;
     }
@@ -42,11 +50,23 @@ function validateActions(changes) {
 }
 
 function validateDiff(changes) {
-    const validDiff = ['GROUP', 'CONFIG', 'STRATEGY'];
+    const validDiff = ['GROUP', 'CONFIG', 'STRATEGY', 'STRATEGY_VALUE'];
     const hasInvalidDiff = changes.some(change => !validDiff.includes(change.diff));
     
     if (hasInvalidDiff) {
         throw new Error('Request has invalid type of diff');
+    }
+}
+
+function validatePathForElement(changes) {
+    for (const change of changes) {
+        if (change.action === 'NEW') {
+            const path = change.path;
+            const diff = change.diff;
+            if (path.length !== PATH_CONSTRAINTS_NEW[diff]) {
+                throw new Error('Request has invalid path settings for new element');
+            }
+        }
     }
 }
 
@@ -60,6 +80,9 @@ async function processNew(domain, change, environment) {
             break;
         case 'STRATEGY':
             await processNewStrategy(domain, change, environment);
+            break;
+        case 'STRATEGY_VALUE':
+            await processNewStrategyValue(domain, change);
             break;
     }
 }
@@ -131,6 +154,20 @@ async function processNewStrategy(domain, change, environment) {
         config: config._id,
         domain: domain._id,
         owner: domain.owner
+    }, admin);
+}
+
+async function processNewStrategyValue(domain, change) {
+    const path = change.path;
+    const content = change.content;
+    const admin = { _id: domain.owner, email: 'gitops@admin.noreply.switcherapi.com' };
+    const config = await getConfig({ domain: domain._id, key: path[1] });
+
+    const strategies = await getStrategies({ config: config._id });
+    const strategy = strategies.find(strategy => strategy.strategy === path[2]);
+
+    await updateStrategy(strategy._id, {
+        values: [...strategy.values, ...content]
     }, admin);
 }
 
