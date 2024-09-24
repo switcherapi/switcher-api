@@ -318,9 +318,36 @@ describe('GitOps - Push New Changes', () => {
             values: ['USER_1', 'USER_2', 'USER_3', 'USER_4']
         });
     });
+
+    test('GITOPS_SUITE - Should push changes - New Component', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'NEW',
+                    diff: 'COMPONENT',
+                    path: ['Group Test', 'TEST_CONFIG_KEY_PRD_QA'],
+                    content: ['TestApp']
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const config = await Config.findOne({ key: 'TEST_CONFIG_KEY_PRD_QA', domain: domainId }).lean().exec();
+        expect(config).not.toBeNull();
+        expect(config.components).toHaveLength(1);
+    });
 });
 
-describe('GitOps - Push Changes - Errors', () => {
+describe('GitOps - Push Changes - Errors (invalid requests)', () => {
     beforeAll(setupDatabase);
 
     test('GITOPS_SUITE - Should return error when action is invalid', async () => {
@@ -332,12 +359,14 @@ describe('GitOps - Push Changes - Errors', () => {
             .send({
                 environment: EnvType.DEFAULT,
                 changes: [{
-                    action: 'INVALID'
+                    action: 'INVALID',
+                    diff: 'STRATEGY',
+                    path: []
                 }]
             })
-            .expect(400);
+            .expect(422);
 
-        expect(req.body.message).toBe('Request has invalid type of change');
+        expect(req.body.errors[0].msg).toBe('Request has invalid type of action');
     });
 
     test('GITOPS_SUITE - Should return error when change type is invalid', async () => {
@@ -350,15 +379,16 @@ describe('GitOps - Push Changes - Errors', () => {
                 environment: EnvType.DEFAULT,
                 changes: [{
                     action: 'NEW',
-                    diff: 'INVALID'
+                    diff: 'INVALID',
+                    path: []
                 }]
             })
-            .expect(400);
+            .expect(422);
 
-        expect(req.body.message).toBe('Request has invalid type of diff');
+        expect(req.body.errors[0].msg).toBe('Request has invalid type of diff');
     });
 
-    test('GITOPS_SUITE - Should return error when content is malformed', async () => {
+    test('GITOPS_SUITE - Should return error when change content Array-based is not valid', async () => {
         const token = generateToken('30s');
 
         const req = await request(app)
@@ -368,13 +398,36 @@ describe('GitOps - Push Changes - Errors', () => {
                 environment: EnvType.DEFAULT,
                 changes: [{
                     action: 'NEW',
-                    diff: 'CONFIG',
-                    path: ['Group Test'],
+                    diff: 'STRATEGY_VALUE',
+                    path: ['Group Test', 'TEST_CONFIG_KEY', StrategiesType.VALUE],
+                    content: {
+                        value: 'SHOULD_BE_ARRAY'
+                    }
                 }]
             })
-            .expect(500);
+            .expect(422);
 
-        expect(req.body.error).not.toBeNull();
+        expect(req.body.errors[0].msg).toBe('Request has invalid content type [object]');
+    });
+
+    test('GITOPS_SUITE - Should return error when change content Object-based is not valid', async () => {
+        const token = generateToken('30s');
+
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'NEW',
+                    diff: 'STRATEGY',
+                    path: ['Group Test', 'TEST_CONFIG_KEY'],
+                    content: ['SHOULD_BE_OBJECT']
+                }]
+            })
+            .expect(422);
+
+        expect(req.body.errors[0].msg).toBe('Request has invalid content type [array]');
     });
 
     test('GITOPS_SUITE - Should return error when path is not properly defined - For New', async () => {
@@ -395,10 +448,28 @@ describe('GitOps - Push Changes - Errors', () => {
                     }
                 }]
             })
-            .expect(400);
+            .expect(422);
+
+        expect(req.body.errors[0].msg).toBe('Request has invalid path settings for new element');
+    });
+
+    test('GITOPS_SUITE - Should return error when content is malformed', async () => {
+        const token = generateToken('30s');
+
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'NEW',
+                    diff: 'CONFIG',
+                    path: ['Group Test'],
+                }]
+            })
+            .expect(500);
 
         expect(req.body.error).not.toBeNull();
-        expect(req.body.message).toBe('Request has invalid path settings for new element');
     });
 
 });
