@@ -1,4 +1,4 @@
-import { responseException } from '../exceptions.js';
+import { responseException } from '../exceptions/index.js';
 import { checkGitopsIntegration, SwitcherKeys } from '../external/switcher-api-facade.js';
 
 const PATH_CONSTRAINTS_NEW = {
