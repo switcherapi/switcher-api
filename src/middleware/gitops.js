@@ -1,5 +1,5 @@
-import { responseException } from '../exceptions';
-import { checkGitopsIntegration, SwitcherKeys } from '../external/switcher-api-facade';
+import { responseException } from '../exceptions.js';
+import { checkGitopsIntegration, SwitcherKeys } from '../external/switcher-api-facade.js';
 
 const PATH_CONSTRAINTS_NEW = {
     GROUP: 0,
