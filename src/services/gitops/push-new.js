@@ -1,76 +1,10 @@
-import { getComponents } from './component.js';
-import { createStrategy, getStrategies, updateStrategy } from './config-strategy.js';
-import { createConfig, getConfig } from './config.js';
-import { getDomainById, updateDomainVersion } from './domain.js';
-import { createGroup, getGroupConfig } from './group-config.js';
+import { getComponents } from '../component.js';
+import { createStrategy, getStrategies, updateStrategy } from '../config-strategy.js';
+import { addComponent, createConfig, getConfig } from '../config.js';
+import { createGroup, getGroupConfig } from '../group-config.js';
+import { ADMIN_EMAIL } from './index.js';
 
-const PATH_CONSTRAINTS_NEW = {
-    GROUP: 0,
-    CONFIG: 1,
-    STRATEGY: 2,
-    STRATEGY_VALUE: 3
-};
-
-export async function pushChanges(domainId, environment, changes) {
-    const validations = validateChanges(changes);
-    if (validations) {
-        return errorResponse(validations);
-    }
-
-    let domain = await getDomainById(domainId);
-    for (const change of changes) {
-        if (change.action === 'NEW') {
-            await processNew(domain, change, environment);
-        }
-    };
-
-    domain = await updateDomainVersion(domainId);
-    return successResponse('Changes applied successfully', domain.lastUpdate);
-}
-
-function validateChanges(changes) {
-    try {
-        validateActions(changes);
-        validateDiff(changes);
-        validatePathForElement(changes);
-    } catch (e) {
-        return e.message;
-    }
-    
-    return undefined;
-}
-
-function validateActions(changes) {
-    const validActions = ['NEW', 'CHANGED', 'DELETED'];
-    const hasInvalidAction = changes.some(change => !validActions.includes(change.action));
-
-    if (hasInvalidAction) {
-        throw new Error('Request has invalid type of change');
-    }
-}
-
-function validateDiff(changes) {
-    const validDiff = ['GROUP', 'CONFIG', 'STRATEGY', 'STRATEGY_VALUE'];
-    const hasInvalidDiff = changes.some(change => !validDiff.includes(change.diff));
-    
-    if (hasInvalidDiff) {
-        throw new Error('Request has invalid type of diff');
-    }
-}
-
-function validatePathForElement(changes) {
-    for (const change of changes) {
-        if (change.action === 'NEW') {
-            const path = change.path;
-            const diff = change.diff;
-            if (path.length !== PATH_CONSTRAINTS_NEW[diff]) {
-                throw new Error('Request has invalid path settings for new element');
-            }
-        }
-    }
-}
-
-async function processNew(domain, change, environment) {
+export async function processNew(domain, change, environment) {
     switch (change.diff) {
         case 'GROUP':
             await processNewGroup(domain, change, environment);
@@ -83,6 +17,9 @@ async function processNew(domain, change, environment) {
             break;
         case 'STRATEGY_VALUE':
             await processNewStrategyValue(domain, change);
+            break;
+        case 'COMPONENT':
+            await processNewComponent(domain, change);
             break;
     }
 }
@@ -160,7 +97,7 @@ async function processNewStrategy(domain, change, environment) {
 async function processNewStrategyValue(domain, change) {
     const path = change.path;
     const content = change.content;
-    const admin = { _id: domain.owner, email: 'gitops@admin.noreply.switcherapi.com' };
+    const admin = { _id: domain.owner, email: ADMIN_EMAIL };
     const config = await getConfig({ domain: domain._id, key: path[1] });
 
     const strategies = await getStrategies({ config: config._id });
@@ -171,17 +108,18 @@ async function processNewStrategyValue(domain, change) {
     }, admin);
 }
 
-function successResponse(message, version) {
-    return {
-        valid: true,
-        message,
-        version
-    };
-}
+async function processNewComponent(domain, change) {
+    const path = change.path;
+    const content = change.content;
+    const admin = { _id: domain.owner, email: ADMIN_EMAIL };
+    const config = await getConfig({ domain: domain._id, key: path[1] });
 
-function errorResponse(message) {
-    return {
-        valid: false,
-        message
-    };
+    const components = await getComponents({ domain: domain._id, name: { $in: content } });
+    const componentIds = components.map(component => component._id);
+
+    for (const id of componentIds) {
+        if (!config.components.includes(id)) {
+            await addComponent(config._id, { component: id }, admin);
+        }
+    }
 }
