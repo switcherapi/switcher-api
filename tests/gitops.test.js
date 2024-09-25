@@ -84,7 +84,7 @@ describe('GitOps - Feature Toggle', () => {
     });
 });
 
-describe('GitOps - Push New Changes', () => {
+describe('GitOps - Push New', () => {
     beforeAll(setupDatabase);
 
     test('GITOPS_SUITE - Should push changes - New Group', async () => {
@@ -347,6 +347,113 @@ describe('GitOps - Push New Changes', () => {
     });
 });
 
+describe('GitOps - Push Changed', () => {
+    beforeAll(setupDatabase);
+
+    test('GITOPS_SUITE - Should push changes - Changed Group', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'CHANGED',
+                    diff: 'GROUP',
+                    path: ['Group Test'],
+                    content: {
+                        activated: false,
+                        description: 'Changed Group Description'
+                    }
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const group = await GroupConfig.findOne({ name: 'Group Test', domain: domainId }).lean().exec();
+        expect(group).not.toBeNull();
+        expect(group.activated[EnvType.DEFAULT]).toBe(false);
+        expect(group.description).toBe('Changed Group Description');
+    });
+
+    test('GITOPS_SUITE - Should push changes - Changed Switcher', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'CHANGED',
+                    diff: 'CONFIG',
+                    path: ['Group Test', 'TEST_CONFIG_KEY'],
+                    content: {
+                        activated: false,
+                        description: 'Changed Switcher Description'
+                    }
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const config = await Config.findOne({ key: 'TEST_CONFIG_KEY', domain: domainId }).lean().exec();
+        expect(config).not.toBeNull();
+        expect(config.activated[EnvType.DEFAULT]).toBe(false);
+        expect(config.description).toBe('Changed Switcher Description');
+    });
+
+    test('GITOPS_SUITE - Should push changes - Changed Strategy', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'CHANGED',
+                    diff: 'STRATEGY',
+                    path: ['Group Test', 'TEST_CONFIG_KEY', StrategiesType.VALUE],
+                    content: {
+                        activated: false,
+                        description: 'Changed Strategy Description'
+                    }
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const strategy = await ConfigStrategy.findOne({ 
+            config: configId, 
+            strategy: StrategiesType.VALUE,
+            activated: { [EnvType.DEFAULT]: false }
+        }).lean().exec();
+
+        expect(strategy).toMatchObject({
+            description: 'Changed Strategy Description',
+            values: ['USER_1', 'USER_2', 'USER_3'],
+            activated: {
+                [EnvType.DEFAULT]: false
+            },
+        });
+    });
+    
+});
+
 describe('GitOps - Push Changes - Errors (invalid requests)', () => {
     beforeAll(setupDatabase);
 
@@ -451,6 +558,29 @@ describe('GitOps - Push Changes - Errors (invalid requests)', () => {
             .expect(422);
 
         expect(req.body.errors[0].msg).toBe('Request has invalid path settings for new element');
+    });
+
+    test('GITOPS_SUITE - Should return error when path is not properly defined - For Changed', async () => {
+        const token = generateToken('30s');
+
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'CHANGED',
+                    diff: 'CONFIG',
+                    path: [],
+                    content: {
+                        description: 'New Description',
+                        activated: true
+                    }
+                }]
+            })
+            .expect(422);
+
+        expect(req.body.errors[0].msg).toBe('Request has invalid path settings for changed element');
     });
 
     test('GITOPS_SUITE - Should return error when content is malformed', async () => {

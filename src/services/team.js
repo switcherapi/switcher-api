@@ -41,8 +41,8 @@ export async function getTeam(where) {
     return response(team, 'Team not found');
 }
 
-export async function getTeams(where, lean = false) {
-    return lean ? Team.find(where).lean() : Team.find(where);
+export async function getTeams(where) {
+    return Team.find(where);
 }
 
 export async function getTeamsSort(where, projection, skip, limit, sort) {
