@@ -9,6 +9,12 @@ const PATH_CONSTRAINTS_NEW = {
     STRATEGY_VALUE: 3
 };
 
+const PATH_CONSTRAINTS_CHANGED = {
+    GROUP: 1,
+    CONFIG: 2,
+    STRATEGY: 3
+};
+
 export async function featureFlag(req, res, next) {
     try {
         await checkGitopsIntegration(req.domain);
@@ -38,12 +44,20 @@ export function validateChanges(req, res, next) {
 
 function validatePathForElement(changes) {
     for (const change of changes) {
-        if (change.action === 'NEW') {
-            const path = change.path;
-            const diff = change.diff;
-            if (path.length !== PATH_CONSTRAINTS_NEW[diff]) {
-                throw new Error('Request has invalid path settings for new element');
-            }
+        const path = change.path;
+        const diff = change.diff;
+
+        switch (change.action) {
+            case 'NEW':
+                if (path.length !== PATH_CONSTRAINTS_NEW[diff]) {
+                    throw new Error('Request has invalid path settings for new element');
+                }
+                break;
+            case 'CHANGED':
+                if (path.length !== PATH_CONSTRAINTS_CHANGED[diff]) {
+                    throw new Error('Request has invalid path settings for changed element');
+                }
+                break;
         }
     }
 }
