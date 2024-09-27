@@ -454,6 +454,154 @@ describe('GitOps - Push Changed', () => {
     
 });
 
+describe('GitOps - Push Deleted', () => {
+    beforeAll(setupDatabase);
+
+    test('GITOPS_SUITE - Should push changes - Deleted Component', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'DELETED',
+                    diff: 'COMPONENT',
+                    path: ['Group Test', 'TEST_CONFIG_KEY'],
+                    content: ['TestApp']
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const config = await Config.findOne({ key: 'TEST_CONFIG_KEY', domain: domainId }).lean().exec();
+        expect(config).not.toBeNull();
+        expect(config.components).toHaveLength(0);
+    });
+
+    test('GITOPS_SUITE - Should push changes - Deleted Strategy Value', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'DELETED',
+                    diff: 'STRATEGY_VALUE',
+                    path: ['Group Test', 'TEST_CONFIG_KEY', StrategiesType.VALUE],
+                    content: ['USER_2']
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const strategy = await ConfigStrategy.findOne({ 
+            config: configId, 
+            strategy: StrategiesType.VALUE,
+            activated: { [EnvType.DEFAULT]: true }
+        }).lean().exec();
+
+        expect(strategy).toMatchObject({
+            values: ['USER_1', 'USER_3']
+        });
+    });
+
+    test('GITOPS_SUITE - Should push changes - Deleted Strategy', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'DELETED',
+                    diff: 'STRATEGY',
+                    path: ['Group Test', 'TEST_CONFIG_KEY', StrategiesType.VALUE],
+                    content: null
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const strategy = await ConfigStrategy.findOne({ 
+            config: configId, 
+            strategy: StrategiesType.VALUE,
+            activated: { [EnvType.DEFAULT]: true }
+        }).lean().exec();
+
+        expect(strategy).toBeNull();
+    });
+
+    test('GITOPS_SUITE - Should push changes - Deleted Switcher', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'DELETED',
+                    diff: 'CONFIG',
+                    path: ['Group Test', 'TEST_CONFIG_KEY'],
+                    content: null
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const config = await Config.findOne({ key: 'TEST_CONFIG_KEY', domain: domainId }).lean().exec();
+        expect(config).toBeNull();
+    });
+
+    test('GITOPS_SUITE - Should push changes - Deleted Group', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'DELETED',
+                    diff: 'GROUP',
+                    path: ['Group Test'],
+                    content: null
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const group = await GroupConfig.findOne({ name: 'Group Test', domain: domainId }).lean().exec();
+        expect(group).toBeNull();
+    });
+
+});
+
 describe('GitOps - Push Changes - Errors (invalid requests)', () => {
     beforeAll(setupDatabase);
 
@@ -581,6 +729,25 @@ describe('GitOps - Push Changes - Errors (invalid requests)', () => {
             .expect(422);
 
         expect(req.body.errors[0].msg).toBe('Request has invalid path settings for changed element');
+    });
+
+    test('GITOPS_SUITE - Should return error when path is not properly defined - For Deleted', async () => {
+        const token = generateToken('30s');
+
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'DELETED',
+                    diff: 'CONFIG',
+                    path: []
+                }]
+            })
+            .expect(422);
+
+        expect(req.body.errors[0].msg).toBe('Request has invalid path settings for deleted element');
     });
 
     test('GITOPS_SUITE - Should return error when content is malformed', async () => {
