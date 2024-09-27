@@ -23,7 +23,7 @@
         "jsonwebtoken": "^9.0.2",
         "moment": "^2.30.1",
         "mongodb": "^6.9.0",
-        "mongoose": "^8.6.3",
+        "mongoose": "^8.6.4",
         "pino": "^9.4.0",
         "pino-pretty": "^11.2.2",
         "swagger-ui-express": "^5.0.1",
@@ -1366,9 +1366,9 @@
       "dev": true
     },
     "node_modules/@types/node": {
-      "version": "22.6.1",
-      "resolved": "https://registry.npmjs.org/@types/node/-/node-22.6.1.tgz",
-      "integrity": "sha512-V48tCfcKb/e6cVUigLAaJDAILdMP0fUW6BidkPK4GpGjXcfbnoHasCZDwz3N3yVt5we2RHm4XTQCpv0KJz9zqw==",
+      "version": "22.7.3",
+      "resolved": "https://registry.npmjs.org/@types/node/-/node-22.7.3.tgz",
+      "integrity": "sha512-qXKfhXXqGTyBskvWEzJZPUxSslAiLaB6JGP1ic/XTH9ctGgzdgYguuLP1C601aRTSDNlLb0jbKqXjZ48GNraSA==",
       "dev": true,
       "dependencies": {
         "undici-types": "~6.19.2"
@@ -1824,9 +1824,9 @@
       }
     },
     "node_modules/browserslist": {
-      "version": "4.23.3",
-      "resolved": "https://registry.npmjs.org/browserslist/-/browserslist-4.23.3.tgz",
-      "integrity": "sha512-btwCFJVjI4YWDNfau8RhZ+B1Q/VLoUITrm3RlP6y1tYGWIOa+InuYiRGXUBXo8nA1qKmHMyLB/iVQg5TT4eFoA==",
+      "version": "4.24.0",
+      "resolved": "https://registry.npmjs.org/browserslist/-/browserslist-4.24.0.tgz",
+      "integrity": "sha512-Rmb62sR1Zpjql25eSanFGEhAxcFwfA1K0GuQcLoaJBAcENegrQut3hYdhXFF1obQfiDyqIW/cLM5HSJ/9k884A==",
       "dev": true,
       "funding": [
         {
@@ -1843,8 +1843,8 @@
         }
       ],
       "dependencies": {
-        "caniuse-lite": "^1.0.30001646",
-        "electron-to-chromium": "^1.5.4",
+        "caniuse-lite": "^1.0.30001663",
+        "electron-to-chromium": "^1.5.28",
         "node-releases": "^2.0.18",
         "update-browserslist-db": "^1.1.0"
       },
@@ -1951,9 +1951,9 @@
       }
     },
     "node_modules/caniuse-lite": {
-      "version": "1.0.30001663",
-      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001663.tgz",
-      "integrity": "sha512-o9C3X27GLKbLeTYZ6HBOLU1tsAcBZsLis28wrVzddShCS16RujjHp9GDHKZqrB3meE0YjhawvMFsGb/igqiPzA==",
+      "version": "1.0.30001664",
+      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001664.tgz",
+      "integrity": "sha512-AmE7k4dXiNKQipgn7a2xg558IRqPN3jMQY/rOsbxDhrd0tyChwbITBfiwtnqz8bi2M5mIWbxAYBvk7W7QBUS2g==",
       "dev": true,
       "funding": [
         {
@@ -2379,9 +2379,9 @@
       "integrity": "sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow=="
     },
     "node_modules/electron-to-chromium": {
-      "version": "1.5.27",
-      "resolved": "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.27.tgz",
-      "integrity": "sha512-o37j1vZqCoEgBuWWXLHQgTN/KDKe7zwpiY5CPeq2RvUqOyJw9xnrULzZAEVQ5p4h+zjMk7hgtOoPdnLxr7m/jw==",
+      "version": "1.5.29",
+      "resolved": "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.29.tgz",
+      "integrity": "sha512-PF8n2AlIhCKXQ+gTpiJi0VhcHDb69kYX4MtCiivctc2QD3XuNZ/XIOlbGzt7WAjjEev0TtaH6Cu3arZExm5DOw==",
       "dev": true
     },
     "node_modules/emittery": {
@@ -4723,9 +4723,9 @@
       }
     },
     "node_modules/mongoose": {
-      "version": "8.6.3",
-      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-8.6.3.tgz",
-      "integrity": "sha512-++yRmm7hjMbqVA/8WeiygTnEfrFbiy+OBjQi49GFJIvCQuSYE56myyQWo4j5hbpcHjhHQU8NukMNGTwAWFWjIw==",
+      "version": "8.6.4",
+      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-8.6.4.tgz",
+      "integrity": "sha512-trOj6bHS3egVlKlCbQRsnMokaHFDRyQOvwA5wfl/pJx4j4EO5BAESavLf93NOTMpuo4T90/+V8CBk+sH3Ltr3g==",
       "dependencies": {
         "bson": "^6.7.0",
         "kareem": "2.6.3",
@@ -5157,9 +5157,9 @@
       "dev": true
     },
     "node_modules/path-to-regexp": {
-      "version": "8.1.0",
-      "resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-8.1.0.tgz",
-      "integrity": "sha512-Bqn3vc8CMHty6zuD+tG23s6v2kwxslHEhTj4eYaVKGIEB+YX/2wd0/rgXLFD9G9id9KCtbVy/3ZgmvZjpa0UdQ==",
+      "version": "8.2.0",
+      "resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-8.2.0.tgz",
+      "integrity": "sha512-TdrF7fW9Rphjq4RjrW0Kp2AW0Ahwu9sRGTkS6bvDi0SCwZlEZYmcfDbEsTz8RVk0EHIS/Vd1bv3JhG+1xZuAyQ==",
       "engines": {
         "node": ">=16"
       }

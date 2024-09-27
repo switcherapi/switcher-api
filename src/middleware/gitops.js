@@ -15,6 +15,14 @@ const PATH_CONSTRAINTS_CHANGED = {
     STRATEGY: 3
 };
 
+const PATH_CONSTRAINTS_DELETED = {
+    GROUP: 1,
+    CONFIG: 2,
+    STRATEGY: 3,
+    COMPONENT: 2,
+    STRATEGY_VALUE: 3
+};
+
 export async function featureFlag(req, res, next) {
     try {
         await checkGitopsIntegration(req.domain);
@@ -56,6 +64,11 @@ function validatePathForElement(changes) {
             case 'CHANGED':
                 if (path.length !== PATH_CONSTRAINTS_CHANGED[diff]) {
                     throw new Error('Request has invalid path settings for changed element');
+                }
+                break;
+            case 'DELETED':
+                if (path.length !== PATH_CONSTRAINTS_DELETED[diff]) {
+                    throw new Error('Request has invalid path settings for deleted element');
                 }
                 break;
         }
