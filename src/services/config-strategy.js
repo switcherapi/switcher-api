@@ -49,7 +49,7 @@ export async function populateAdmin(configStrategies) {
     }
 }
 
-export async function createStrategy(args, admin) {
+export async function createStrategy(args, admin, status = true) {
     const config = await getConfigById(args.config);
 
     if (!args.env) {
@@ -61,7 +61,7 @@ export async function createStrategy(args, admin) {
 
     let configStrategy = new ConfigStrategy({
         ...args,
-        activated: new Map().set(environment.name, true),
+        activated: new Map().set(environment.name, status),
         domain: config.domain,
         owner: admin._id
     });

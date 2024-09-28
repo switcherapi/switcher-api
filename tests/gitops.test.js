@@ -136,7 +136,7 @@ describe('GitOps - Push New', () => {
                         name: 'New Group and Switcher',
                         description: 'New Group Description',
                         activated: true,
-                        configs: [{
+                        config: [{
                             key: 'NEW_SWITCHER_FROM_GROUP',
                             description: 'New Switcher',
                             activated: false,

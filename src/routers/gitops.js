@@ -8,7 +8,7 @@ import * as Service from '../services/gitops/index.js';
 
 const router = new express.Router();
 
-router.post('/gitops/v1/push', featureFlag, gitopsAuth, [
+router.post('/gitops/v1/push', gitopsAuth, featureFlag, [
     body('environment').isString(),
     body('changes').isArray(),
     body('changes.*.path').isArray({ min: 0, max: 3 }),
