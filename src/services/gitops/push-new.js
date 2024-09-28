@@ -26,16 +26,17 @@ export async function processNew(domain, change, environment) {
 
 async function processNewGroup(domain, change, environment) {
     const admin = { _id: domain.owner };
+    const content = change.content;
     const group = await createGroup({
         domain: domain._id,
-        name: change.content.name,
-        description: change.content.description,
-        activated: new Map().set(environment, change.content.activated),
+        name: content.name,
+        description: getNewValue(content.description, ''),
+        activated: new Map().set(environment, getNewValue(content.activated, true)),
         owner: domain.owner
     }, admin);
 
-    if (change.content.configs?.length) {
-        for (const config of change.content.configs) {
+    if (content.config?.length) {
+        for (const config of content.config) {
             await processNewConfig(domain, {
                 path: [group.name],
                 content: config
@@ -51,8 +52,8 @@ async function processNewConfig(domain, change, environment) {
     const group = await getGroupConfig({ domain: domain._id, name: path[0] });
 
     let componentIds;
-    if (change.content.components?.length) {
-        const components = await getComponents({ domain: domain._id, name: { $in: change.content.components } });
+    if (content.components?.length) {
+        const components = await getComponents({ domain: domain._id, name: { $in: content.components } });
         componentIds = components.map(component => component._id);
     }
 
@@ -60,14 +61,14 @@ async function processNewConfig(domain, change, environment) {
         domain: domain._id,
         group: group._id,
         key: content.key,
-        description: content.description,
-        activated: new Map().set(environment, content.activated),
+        description: getNewValue(content.description, ''),
+        activated: new Map().set(environment, getNewValue(content.activated, true)),
         owner: domain.owner,
         components: componentIds
     }, admin);
 
-    if (change.content.strategies?.length) {
-        for (const strategy of change.content.strategies) {
+    if (content.strategies?.length) {
+        for (const strategy of content.strategies) {
             await processNewStrategy(domain, {
                 path: [group.name, config.key],
                 content: strategy
@@ -84,14 +85,14 @@ async function processNewStrategy(domain, change, environment) {
 
     await createStrategy({
         env: environment,
-        description: content.description,
+        description: getNewValue(content.description, ''),
         strategy: content.strategy,
         values: content.values,
         operation: content.operation,
         config: config._id,
         domain: domain._id,
         owner: domain.owner
-    }, admin);
+    }, admin, getNewValue(content.activated, true));
 }
 
 async function processNewStrategyValue(domain, change) {
@@ -122,4 +123,8 @@ async function processNewComponent(domain, change) {
             await addComponent(config._id, { component: id }, admin);
         }
     }
+}
+
+function getNewValue(newValue, defaultValue) {
+    return newValue !== undefined ? newValue : defaultValue;
 }

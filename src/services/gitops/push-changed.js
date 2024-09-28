@@ -19,11 +19,12 @@ export async function processChanged(domain, change, environment) {
 
 async function processChangedGroup(domain, change, environment) {
     const admin = { _id: domain.owner, email: ADMIN_EMAIL };
+    const content = change.content;
     const group = await getGroupConfig({ domain: domain._id, name: change.path[0] });
 
     await updateGroup(group._id, {
-        description: getChangedValue(change.content.description, group.description),
-        activated: new Map().set(environment, getChangedValue(change.content.activated, group.activated.get(environment)))
+        description: getChangedValue(content.description, group.description),
+        activated: new Map().set(environment, getChangedValue(content.activated, group.activated.get(environment)))
     }, admin);
 }
 
@@ -48,7 +49,7 @@ async function processChangedStrategy(domain, change, environment) {
     const config = await getConfig({ domain: domain._id, group: group._id, key: path[1] });
 
     const strategies = await getStrategies({ config: config._id });
-    const strategy = strategies.find(strategy => strategy.strategy === path[2] && strategy.activated.get(environment));
+    const strategy = strategies.find(strategy => strategy.strategy === path[2] && strategy.activated.has(environment));
 
     await updateStrategy(strategy._id, {
         description: getChangedValue(content.description, group.description),
