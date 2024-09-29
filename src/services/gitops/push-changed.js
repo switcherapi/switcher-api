@@ -29,15 +29,13 @@ async function processChangedGroup(domain, change, environment) {
 }
 
 async function processChangedConfig(domain, change, environment) {
-    const path = change.path;
     const content = change.content;
     const admin = { _id: domain.owner, email: ADMIN_EMAIL };
-    const group = await getGroupConfig({ domain: domain._id, name: path[0] });
-    const config = await getConfig({ domain: domain._id, group: group._id, key: content.key });
+    const config = await getConfig({ domain: domain._id, key: content.key });
 
     await updateConfig(config._id, {
-        description: getChangedValue(content.description, group.description),
-        activated: new Map().set(environment, getChangedValue(content.activated, group.activated.get(environment)))
+        description: getChangedValue(content.description, config.description),
+        activated: new Map().set(environment, getChangedValue(content.activated, config.activated.get(environment)))
     }, admin);
 }
 
@@ -45,16 +43,16 @@ async function processChangedStrategy(domain, change, environment) {
     const path = change.path;
     const content = change.content;
     const admin = { _id: domain.owner, email: ADMIN_EMAIL };
-    const group = await getGroupConfig({ domain: domain._id, name: path[0] });
-    const config = await getConfig({ domain: domain._id, group: group._id, key: path[1] });
+    const config = await getConfig({ domain: domain._id, key: path[1] });
 
     const strategies = await getStrategies({ config: config._id });
     const strategy = strategies.find(strategy => strategy.strategy === path[2] && strategy.activated.has(environment));
 
     await updateStrategy(strategy._id, {
-        description: getChangedValue(content.description, group.description),
+        description: getChangedValue(content.description, strategy.description),
         operation: getChangedValue(content.operation, strategy.operation),
-        activated: new Map().set(environment, getChangedValue(content.activated, group.activated.get(environment)))
+        activated: new Map().set(environment, getChangedValue(content.activated, strategy.activated.get(environment))),
+        values: getChangedValue(content.values, strategy.values)
     }, admin);
 }
 

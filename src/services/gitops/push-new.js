@@ -1,5 +1,5 @@
 import { getComponents } from '../component.js';
-import { createStrategy, getStrategies, updateStrategy } from '../config-strategy.js';
+import { createStrategy } from '../config-strategy.js';
 import { addComponent, createConfig, getConfig } from '../config.js';
 import { createGroup, getGroupConfig } from '../group-config.js';
 import { ADMIN_EMAIL } from './index.js';
@@ -14,9 +14,6 @@ export async function processNew(domain, change, environment) {
             break;
         case 'STRATEGY':
             await processNewStrategy(domain, change, environment);
-            break;
-        case 'STRATEGY_VALUE':
-            await processNewStrategyValue(domain, change);
             break;
         case 'COMPONENT':
             await processNewComponent(domain, change);
@@ -93,20 +90,6 @@ async function processNewStrategy(domain, change, environment) {
         domain: domain._id,
         owner: domain.owner
     }, admin, getNewValue(content.activated, true));
-}
-
-async function processNewStrategyValue(domain, change) {
-    const path = change.path;
-    const content = change.content;
-    const admin = { _id: domain.owner, email: ADMIN_EMAIL };
-    const config = await getConfig({ domain: domain._id, key: path[1] });
-
-    const strategies = await getStrategies({ config: config._id });
-    const strategy = strategies.find(strategy => strategy.strategy === path[2]);
-
-    await updateStrategy(strategy._id, {
-        values: [...strategy.values, ...content]
-    }, admin);
 }
 
 async function processNewComponent(domain, change) {

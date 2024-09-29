@@ -299,10 +299,12 @@ describe('GitOps - Push New', () => {
             .send({
                 environment: EnvType.DEFAULT,
                 changes: [{
-                    action: 'NEW',
-                    diff: 'STRATEGY_VALUE',
+                    action: 'CHANGED',
+                    diff: 'STRATEGY',
                     path: ['Group Test', 'TEST_CONFIG_KEY', StrategiesType.VALUE],
-                    content: ['USER_4']
+                    content: {
+                        values: ['USER_1', 'USER_2', 'USER_3', 'USER_4']
+                    }
                 }]
             })
             .expect(200);
@@ -494,10 +496,12 @@ describe('GitOps - Push Deleted', () => {
             .send({
                 environment: EnvType.DEFAULT,
                 changes: [{
-                    action: 'DELETED',
-                    diff: 'STRATEGY_VALUE',
+                    action: 'CHANGED',
+                    diff: 'STRATEGY',
                     path: ['Group Test', 'TEST_CONFIG_KEY', StrategiesType.VALUE],
-                    content: ['USER_2']
+                    content: {
+                        values: ['USER_1', 'USER_3']
+                    }
                 }]
             })
             .expect(200);
@@ -653,8 +657,8 @@ describe('GitOps - Push Changes - Errors (invalid requests)', () => {
                 environment: EnvType.DEFAULT,
                 changes: [{
                     action: 'NEW',
-                    diff: 'STRATEGY_VALUE',
-                    path: ['Group Test', 'TEST_CONFIG_KEY', StrategiesType.VALUE],
+                    diff: 'COMPONENT',
+                    path: ['Group Test', 'TEST_CONFIG_KEY'],
                     content: {
                         value: 'SHOULD_BE_ARRAY'
                     }

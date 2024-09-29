@@ -16,7 +16,7 @@ router.post('/gitops/v1/push', gitopsAuth, featureFlag, [
         .custom(value => ['NEW', 'CHANGED', 'DELETED'].includes(value))
         .withMessage('Request has invalid type of action'),
     body('changes.*.diff')
-        .custom(value => ['GROUP', 'CONFIG', 'STRATEGY', 'STRATEGY_VALUE', 'COMPONENT'].includes(value))
+        .custom(value => ['GROUP', 'CONFIG', 'STRATEGY', 'COMPONENT'].includes(value))
         .withMessage('Request has invalid type of diff'),
 ], validate, validateChanges, async (req, res) => {
     try {
