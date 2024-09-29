@@ -5,8 +5,7 @@ const PATH_CONSTRAINTS_NEW = {
     GROUP: 0,
     CONFIG: 1,
     STRATEGY: 2,
-    COMPONENT: 2,
-    STRATEGY_VALUE: 3
+    COMPONENT: 2
 };
 
 const PATH_CONSTRAINTS_CHANGED = {
@@ -19,9 +18,10 @@ const PATH_CONSTRAINTS_DELETED = {
     GROUP: 1,
     CONFIG: 2,
     STRATEGY: 3,
-    COMPONENT: 2,
-    STRATEGY_VALUE: 3
+    COMPONENT: 2
 };
+
+const CONTENT_TYPE_ARRAY = ['COMPONENT'];
 
 export async function featureFlag(req, res, next) {
     try {
@@ -77,7 +77,7 @@ function validatePathForElement(changes) {
 
 function validateChangesContent(changes) {
     for (const change of changes) {
-        if (['COMPONENT', 'STRATEGY_VALUE'].includes(change.diff)) {
+        if (CONTENT_TYPE_ARRAY.includes(change.diff)) {
             if (!Array.isArray(change.content)) {
                 throw new Error('Request has invalid content type [object]');
             }
