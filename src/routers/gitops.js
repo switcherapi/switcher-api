@@ -1,12 +1,37 @@
 import express from 'express';
 import { body } from 'express-validator';
 import { responseException } from '../exceptions/index.js';
-import { gitopsAuth } from '../middleware/auth.js';
+import { auth, gitopsAuth } from '../middleware/auth.js';
 import { validate } from '../middleware/validators.js';
 import { featureFlag, validateChanges } from '../middleware/gitops.js';
 import * as Service from '../services/gitops/index.js';
 
 const router = new express.Router();
+const regex = new RegExp(/^\d+[smh]$/);
+
+const windowValidation = (value) => {
+    if (!regex.test(value)) {
+        throw new Error('Invalid window value');
+    }
+
+    if (value.endsWith('s') && parseInt(value) < 30) {
+        throw new Error('Invalid window value (minimum 30s)');
+    }
+
+    return true;
+};
+
+const accountValidators = [
+    body('token').isString().optional(),
+    body('repository').isURL().withMessage('Invalid repository URL'),
+    body('branch').isString().withMessage('Invalid branch name'),
+    body('environment').isString().withMessage('Invalid environment name'),
+    body('domain.id').isMongoId().withMessage('Invalid domain ID'),
+    body('domain.name').isString().withMessage('Invalid domain name'),
+    body('settings.active').isBoolean().withMessage('Invalid active flag'),
+    body('settings.window').isString().custom(windowValidation),
+    body('settings.forceprune').isBoolean().withMessage('Invalid forceprune flag'),
+];
 
 router.post('/gitops/v1/push', gitopsAuth, featureFlag, [
     body('environment').isString(),
@@ -25,6 +50,11 @@ router.post('/gitops/v1/push', gitopsAuth, featureFlag, [
     } catch (e) {
         responseException(res, e, 500);
     }
+});
+
+router.post('/gitops/v1/account/subscribe', auth, accountValidators, validate, 
+    featureFlag, async (req, res) => {
+    res.status(201).send();
 });
 
 export default router;
