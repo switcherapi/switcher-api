@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import app from '../src/app';
 import { Client } from 'switcher-client';
 import { Config } from '../src/models/config';
+import GroupConfig from '../src/models/group-config';
 import { ConfigStrategy, OperationsType, StrategiesType } from '../src/models/config-strategy';
 import { EnvType } from '../src/models/environment';
 import * as graphqlUtils from './graphql-utils';
@@ -12,7 +13,6 @@ import {
     domainId,
     configId
 } from './fixtures/db_client';
-import GroupConfig from '../src/models/group-config';
 
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -64,20 +64,13 @@ describe('GitOps - Feature Toggle', () => {
         process.env.SWITCHER_API_ENABLE = false;
     });
 
-    test('GITOPS_SUITE - Should return error when action is invalid', async () => {
+    test('GITOPS_SUITE - Should return error when feature is disabled', async () => {
         const token = generateToken('30s');
-
-        const requestPayload = {
-            environment: EnvType.DEFAULT,
-            changes: [{
-                action: 'INVALID'
-            }]
-        };
 
         const req = await request(app)
             .post('/gitops/v1/push')
             .set('Authorization', `Bearer ${token}`)
-            .send(requestPayload)
+            .send()
             .expect(400);
 
         expect(req.body.error).toBe('GitOps Integration is not available.');

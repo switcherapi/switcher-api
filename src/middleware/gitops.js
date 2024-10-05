@@ -25,7 +25,8 @@ const CONTENT_TYPE_ARRAY = ['COMPONENT'];
 
 export async function featureFlag(req, res, next) {
     try {
-        await checkGitopsIntegration(req.domain);
+        const domainId = req.domain || req.body.domain.id;
+        await checkGitopsIntegration(domainId);
         next();
     } catch (e) {
         responseException(res, e, 400, SwitcherKeys.GITOPS_INTEGRATION);
