@@ -764,6 +764,31 @@ describe('GitOps - Push Changes - Errors (invalid requests)', () => {
             .expect(500);
 
         expect(req.body.error).not.toBeNull();
+        expect(req.body.error).toBe('One or more changes could not be applied');
+    });
+
+    test('GITOPS_SUITE - Should return error when request has invalid data', async () => {
+        const token = generateToken('30s');
+
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'CHANGED',
+                    diff: 'GROUP',
+                    path: ['Not Existing Group'],
+                    content: {
+                        description: 'New Description',
+                        activated: true
+                    }
+                }]
+            })
+            .expect(500);
+
+        expect(req.body.error).not.toBeNull();
+        expect(req.body.error).toBe('One or more changes could not be applied');
     });
 
 });

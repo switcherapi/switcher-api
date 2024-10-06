@@ -1,6 +1,6 @@
 import express from 'express';
 import { body } from 'express-validator';
-import { responseException } from '../exceptions/index.js';
+import { responseExceptionSilent } from '../exceptions/index.js';
 import { auth, gitopsAuth } from '../middleware/auth.js';
 import { validate } from '../middleware/validators.js';
 import { featureFlag, validateChanges } from '../middleware/gitops.js';
@@ -48,7 +48,7 @@ router.post('/gitops/v1/push', gitopsAuth, featureFlag, [
         const result = await Service.pushChanges(req.domain, req.body.environment, req.body.changes);
         res.status(200).send(result);
     } catch (e) {
-        responseException(res, e, 500);
+        responseExceptionSilent(res, e, 500, 'One or more changes could not be applied');
     }
 });
 
