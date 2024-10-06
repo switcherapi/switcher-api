@@ -4,21 +4,15 @@ import { deleteConfig, getConfig, removeComponent } from '../config.js';
 import { deleteGroup, getGroupConfig } from '../group-config.js';
 import { ADMIN_EMAIL } from './index.js';
 
+const DIFF_PROCESSES = Object.freeze({
+    GROUP: processGroupDeleted,
+    CONFIG: processConfigDeleted,
+    STRATEGY: processStrategyDeleted,
+    COMPONENT: processComponentDeleted
+});
+
 export async function processDeleted(domain, change, environment) {
-    switch (change.diff) {
-        case 'GROUP':
-            await processGroupDeleted(domain, change);
-            break;
-        case 'CONFIG':
-            await processConfigDeleted(domain, change);
-            break;
-        case 'STRATEGY':
-            await processStrategyDeleted(domain, change, environment);
-            break;
-        case 'COMPONENT':
-            await processComponentDeleted(domain, change);
-            break;
-    }
+    await DIFF_PROCESSES[change.diff](domain, change, environment);
 }
 
 async function processGroupDeleted(domain, change) {

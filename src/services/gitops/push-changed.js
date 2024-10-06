@@ -3,18 +3,14 @@ import { getConfig, updateConfig } from '../config.js';
 import { getGroupConfig, updateGroup } from '../group-config.js';
 import { ADMIN_EMAIL } from './index.js';
 
+const DIFF_PROCESSES = Object.freeze({
+    GROUP: processChangedGroup,
+    CONFIG: processChangedConfig,
+    STRATEGY: processChangedStrategy
+});
+
 export async function processChanged(domain, change, environment) {
-    switch (change.diff) {
-        case 'GROUP':
-            await processChangedGroup(domain, change, environment);
-            break;
-        case 'CONFIG':
-            await processChangedConfig(domain, change, environment);
-            break;
-        case 'STRATEGY':
-            await processChangedStrategy(domain, change, environment);
-            break;
-    }
+    await DIFF_PROCESSES[change.diff](domain, change, environment);
 }
 
 async function processChangedGroup(domain, change, environment) {
