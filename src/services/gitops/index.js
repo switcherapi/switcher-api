@@ -3,6 +3,7 @@ import { getDomainById, updateDomainVersion } from '../domain.js';
 import { processChanged } from './push-changed.js';
 import { processDeleted } from './push-deleted.js';
 import { processNew } from './push-new.js';
+import * as GitOpsFacade from '../../external/gitops.js';
 
 const CHANGE_PROCESSES = Object.freeze({
     NEW: processNew,
@@ -26,4 +27,8 @@ export async function pushChanges(domainId, environment, changes) {
         message: 'Changes applied successfully',
         version: domain.lastUpdate
     };
+}
+
+export async function subscribeAccount(account) {
+    return GitOpsFacade.createAccount(account);
 }

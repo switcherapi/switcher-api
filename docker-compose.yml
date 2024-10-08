@@ -76,6 +76,7 @@ services:
 
       - SWITCHER_SLACK_JWT_SECRET=${SWITCHER_SLACK_JWT_SECRET}
       - SWITCHER_GITOPS_JWT_SECRET=${SWITCHER_GITOPS_JWT_SECRET}
+      - SWITCHER_GITOPS_URL=${SWITCHER_GITOPS_URL}
     depends_on:
       - mongodb
     volumes:
