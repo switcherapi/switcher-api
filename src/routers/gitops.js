@@ -54,7 +54,12 @@ router.post('/gitops/v1/push', gitopsAuth, featureFlag, [
 
 router.post('/gitops/v1/account/subscribe', auth, accountValidators, validate, 
     featureFlag, async (req, res) => {
-    res.status(201).send();
+    try {
+        const account = await Service.subscribeAccount(req.body);
+        res.status(201).send(account);
+    } catch (e) {
+        responseExceptionSilent(res, e, 500, 'Account subscription failed');
+    }
 });
 
 export default router;

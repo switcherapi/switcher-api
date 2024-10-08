@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import axios from 'axios';
+import sinon from 'sinon';
 import request from 'supertest';
 import { Client } from 'switcher-client';
 import app from '../src/app';
@@ -56,11 +58,46 @@ describe('GitOps Account - Subscribe', () => {
     beforeAll(setupDatabase);
 
     test('GITOPS_ACCOUNT_SUITE - Should subscribe account', async () => {
-        await request(app)
+        // given
+        const expectedResponse = JSON.parse(JSON.stringify(VALID_SUBSCRIPTION_REQUEST));
+        expectedResponse.token = '...123';
+
+        const postStub = sinon.stub(axios, 'post').resolves({
+            status: 201,
+            data: expectedResponse
+        });
+
+        // test
+        const req = await request(app)
             .post('/gitops/v1/account/subscribe')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(VALID_SUBSCRIPTION_REQUEST)
             .expect(201);
+
+        // assert
+        expect(req.body).toMatchObject(expectedResponse);
+        postStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - error creating account', async () => {
+        // given
+        const postStub = sinon.stub(axios, 'post').resolves({
+            status: 500,
+            data: {
+                error: 'Error creating account'
+            }
+        });
+
+        // test
+        const req = await request(app)
+            .post('/gitops/v1/account/subscribe')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(VALID_SUBSCRIPTION_REQUEST)
+            .expect(500);
+
+        // assert
+        expect(req.body.error).toBe('Account subscription failed');
+        postStub.restore();
     });
 
     test('GITOPS_ACCOUNT_SUITE - Should return error - missing domain.id', async () => {
