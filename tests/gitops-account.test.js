@@ -100,6 +100,27 @@ describe('GitOps Account - Subscribe', () => {
         postStub.restore();
     });
 
+    test('GITOPS_ACCOUNT_SUITE - Should return error - unauthorized', async () => {
+        // given
+        const postStub = sinon.stub(axios, 'post').resolves({
+            status: 401,
+            data: {
+                error: 'Invalid token'
+            }
+        });
+
+        // test
+        const req = await request(app)
+            .post('/gitops/v1/account/subscribe')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(VALID_SUBSCRIPTION_REQUEST)
+            .expect(500);
+
+        // assert
+        expect(req.body.error).toBe('Account subscription failed');
+        postStub.restore();
+    });
+
     test('GITOPS_ACCOUNT_SUITE - Should return error - missing domain.id', async () => {
         const payload = JSON.parse(JSON.stringify(VALID_SUBSCRIPTION_REQUEST));
         delete payload.domain.id;

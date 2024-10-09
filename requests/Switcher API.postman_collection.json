@@ -5173,6 +5173,517 @@
 			]
 		},
 		{
+			"name": "GitOps",
+			"item": [
+				{
+					"name": "Push V1",
+					"item": [
+						{
+							"name": "GitOps Push - Change Group",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{gitopsToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"CHANGED\",\r\n            \"diff\": \"GROUP\",\r\n            \"path\": [\r\n                \"Group Test\"\r\n            ],\r\n            \"content\": {\r\n                \"activated\": false\r\n            }\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/push",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"push"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GitOps Push - Change Switcher",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{gitopsToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"CHANGED\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"Group Test\",\r\n                \"NEW_SWITCHER_2\"\r\n            ],\r\n            \"content\": {\r\n                \"activated\": false\r\n            }\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/push",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"push"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GitOps Push - Change Strategy",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{gitopsToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"CHANGED\",\r\n            \"diff\": \"STRATEGY\",\r\n            \"path\": [\r\n                \"New Group\",\r\n                \"NEW_SWITCHER_STRATEGY\",\r\n                \"VALUE_VALIDATION\"\r\n\r\n            ],\r\n            \"content\": {\r\n                \"values\": [\r\n                    \"A\",\r\n                    \"C\"\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/push",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"push"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GitOps Push - New Group",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{gitopsToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"GROUP\",\r\n            \"path\": [],\r\n            \"content\": {\r\n                \"name\": \"New Group\",\r\n                \"activated\": true\r\n            }\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/push",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"push"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GitOps Push - New Group / Switcher",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{gitopsToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"GROUP\",\r\n            \"path\": [],\r\n            \"content\": {\r\n                \"name\": \"New Group\",\r\n                \"description\": \"New Group Description\",\r\n                \"activated\": true,\r\n                \"config\": [\r\n                    {\r\n                        \"key\": \"NEW_SWITCHER_FROM_GROUP\",\r\n                        \"description\": \"New Switcher\",\r\n                        \"activated\": false,\r\n                        \"components\": [\r\n                            \"switcher-playground\"\r\n                        ]\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/push",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"push"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GitOps Push - New Switcher",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{gitopsToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"New Group\"\r\n            ],\r\n            \"content\": {\r\n                \"key\": \"NEW_SWITCHER_2\",\r\n                \"description\": \"New Switcher #2\",\r\n                \"activated\": true,\r\n                \"components\": [\r\n                    \"switcher-playground\"\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/push",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"push"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GitOps Push - New Switcher / Strategy",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{gitopsToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"New Group\"\r\n            ],\r\n            \"content\": {\r\n                \"key\": \"NEW_SWITCHER_STRATEGY\",\r\n                \"description\": \"New Switcher\",\r\n                \"activated\": true,\r\n                \"strategies\": [\r\n                    {\r\n                        \"strategy\": \"VALUE_VALIDATION\",\r\n                        \"description\": \"Test Strategy\",\r\n                        \"operation\": \"EXIST\",\r\n                        \"activated\": true,\r\n                        \"values\": [\r\n                            \"A\",\r\n                            \"B\"\r\n                        ]\r\n                    }\r\n                ],\r\n                \"components\": [\r\n                    \"switcher-playground\"\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/push",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"push"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GitOps Push - New Strategy",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{gitopsToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"STRATEGY\",\r\n            \"path\": [\r\n                \"New Group\",\r\n                \"NEW_SWITCHER_STRATEGY\"\r\n            ],\r\n            \"content\": {\r\n                \"strategy\": \"NUMERIC_VALIDATION\",\r\n                \"description\": \"Test Strategy\",\r\n                \"operation\": \"EQUAL\",\r\n                \"activated\": true,\r\n                \"values\": [\r\n                    \"100\"\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/push",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"push"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GitOps Push - Delete Group",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{gitopsToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"GROUP\",\r\n            \"path\": [\r\n                \"New Group\"\r\n            ]\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/push",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"push"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GitOps Push - Delete Component",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{gitopsToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"COMPONENT\",\r\n            \"path\": [\r\n                \"New Group\",\r\n                \"NEW_SWITCHER_STRATEGY\"\r\n            ],\r\n            \"content\": [\r\n                \"switcher-playground\"\r\n            ]\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/push",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"push"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GitOps Push - Delete Strategy",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{gitopsToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"STRATEGY\",\r\n            \"path\": [\r\n                \"New Group\",\r\n                \"NEW_SWITCHER_STRATEGY\",\r\n                \"VALUE_VALIDATION\"\r\n            ]\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/push",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"push"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GitOps Push - Delete Switcher",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{gitopsToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"New Group\",\r\n                \"NEW_SWITCHER_STRATEGY\"\r\n            ]\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/push",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"push"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"description": "Push API will apply changes to a Domain using payload generated by GitOps Service"
+				},
+				{
+					"name": "Account V1",
+					"item": [
+						{
+							"name": "GitOps Account - Subscribe",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"repository\": \"{{gitops_github_url}}\",\r\n\t\"token\": \"{{gitops_github_pat}}\",\r\n\t\"branch\": \"staging\",\r\n    \"environment\": \"default\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\",\r\n\t\t\"name\": \"GitOps\"\r\n\t},\r\n\t\"settings\": {\r\n\t\t\"active\": true,\r\n\t\t\"window\": \"30s\",\r\n\t\t\"forceprune\": true\r\n\t}\t\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/account/subscribe",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"account",
+										"subscribe"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
 			"name": "GraphQL",
 			"item": [
 				{
