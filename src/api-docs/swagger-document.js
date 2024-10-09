@@ -9,6 +9,7 @@ import pathTeam from './paths/path-team.js';
 import pathPermission from './paths/path-permission.js';
 import pathMetric from './paths/path-metric.js';
 import pathSlack from './paths/path-slack.js';
+import pathGitOps from './paths/path-gitops.js';
 
 import { commonSchema } from './schemas/common.js';
 import adminSchema from './schemas/admin.js';
@@ -22,6 +23,7 @@ import teamSchema from './schemas/team.js';
 import permissionSchema from './schemas/permission.js';
 import metricSchema from './schemas/metric.js';
 import slackSchema from './schemas/slack.js';
+import gitOpsSchema from './schemas/gitops.js';
 import info from './swagger-info.js';
 
 export default {
@@ -48,6 +50,11 @@ export default {
                 type: 'http',
                 scheme: 'bearer',
                 bearerFormat: 'JWT'
+            },
+            gitopsAuth: {
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT'
             }
         },
         schemas: {
@@ -62,7 +69,8 @@ export default {
             ...teamSchema,
             ...permissionSchema,
             ...metricSchema,
-            ...slackSchema
+            ...slackSchema,
+            ...gitOpsSchema
         }
     },
     paths: {
@@ -76,6 +84,7 @@ export default {
         ...pathTeam,
         ...pathPermission,
         ...pathMetric,
-        ...pathSlack
+        ...pathSlack,
+        ...pathGitOps
     }
 };
