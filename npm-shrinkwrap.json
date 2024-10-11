@@ -23,7 +23,7 @@
         "jsonwebtoken": "^9.0.2",
         "moment": "^2.30.1",
         "mongodb": "^6.9.0",
-        "mongoose": "^8.7.0",
+        "mongoose": "^8.7.1",
         "pino": "^9.4.0",
         "pino-pretty": "^11.2.2",
         "swagger-ui-express": "^5.0.1",
@@ -2366,9 +2366,9 @@
       "integrity": "sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow=="
     },
     "node_modules/electron-to-chromium": {
-      "version": "1.5.33",
-      "resolved": "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.33.tgz",
-      "integrity": "sha512-+cYTcFB1QqD4j4LegwLfpCNxifb6dDFUAwk6RsLusCwIaZI6or2f+q8rs5tTB2YC53HhOlIbEaqHMAAC8IOIwA==",
+      "version": "1.5.35",
+      "resolved": "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.35.tgz",
+      "integrity": "sha512-hOSRInrIDm0Brzp4IHW2F/VM+638qOL2CzE0DgpnGzKW27C95IqqeqgKz/hxHGnvPxvQGpHUGD5qRVC9EZY2+A==",
       "dev": true
     },
     "node_modules/emittery": {
@@ -2966,9 +2966,9 @@
       }
     },
     "node_modules/form-data": {
-      "version": "4.0.0",
-      "resolved": "https://registry.npmjs.org/form-data/-/form-data-4.0.0.tgz",
-      "integrity": "sha512-ETEklSGi5t0QMZuiXoA/Q6vcnxcLQP5vdugSpuAyi6SVGi2clPPp+xgEhuMaHC+zGgn31Kd235W35f7Hykkaww==",
+      "version": "4.0.1",
+      "resolved": "https://registry.npmjs.org/form-data/-/form-data-4.0.1.tgz",
+      "integrity": "sha512-tzN8e4TX8+kkxGPK8D5u0FNmjPUjw3lwC9lSLxxoB/+GtsJG91CO8bSWy73APlgAZzZbXEYZJuxjkHH2w+Ezhw==",
       "dependencies": {
         "asynckit": "^0.4.0",
         "combined-stream": "^1.0.8",
@@ -4690,9 +4690,9 @@
       }
     },
     "node_modules/mongoose": {
-      "version": "8.7.0",
-      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-8.7.0.tgz",
-      "integrity": "sha512-rUCSF1mMYQXjXYdqEQLLlMD3xbcj2j1/hRn+9VnVj7ipzru/UoUZxlj/hWmteKMAh4EFnDZ+BIrmma9l/0Hi1g==",
+      "version": "8.7.1",
+      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-8.7.1.tgz",
+      "integrity": "sha512-RpNMyhyzLVCVbf8xTVbrf/18G3MqQzNw5pJdvOJ60fzbCa3cOZzz9L+8XpqzBXtRlgZGWv0T7MmOtvrT8ocp1Q==",
       "dependencies": {
         "bson": "^6.7.0",
         "kareem": "2.6.3",

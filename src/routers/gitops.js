@@ -62,4 +62,41 @@ router.post('/gitops/v1/account/subscribe', auth, accountValidators, validate,
     }
 });
 
+router.put('/gitops/v1/account', auth, [
+    body('environment').isString(),
+    body('domain.id').isMongoId().withMessage('Invalid domain ID'),
+], validate, featureFlag, async (req, res) => {
+    try {
+        const account = await Service.updateAccount(req.body);
+        res.status(200).send(account);
+    } catch (e) {
+        responseExceptionSilent(res, e, 500, 'Account update failed');
+    }
+});
+
+router.put('/gitops/v1/account/token', auth, [
+    body('environment').isString(),
+    body('token').isString(),
+    body('domain.id').isMongoId().withMessage('Invalid domain ID'),
+], validate, featureFlag, async (req, res) => {
+    try {
+        const account = await Service.updateAccountToken(req.body);
+        res.status(200).send(account);
+    } catch (e) {
+        responseExceptionSilent(res, e, 500, 'Account token update failed');
+    }
+});
+
+router.put('/gitops/v1/account/forcesync', auth, [
+    body('environment').isString(),
+    body('domain.id').isMongoId().withMessage('Invalid domain ID'),
+], validate, featureFlag, async (req, res) => {
+    try {
+        const account = await Service.forceSyncAccount(req.body);
+        res.status(200).send(account);
+    } catch (e) {
+        responseExceptionSilent(res, e, 500, 'Account force sync failed');
+    }
+});
+
 export default router;

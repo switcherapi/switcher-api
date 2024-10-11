@@ -27,6 +27,37 @@ const VALID_SUBSCRIPTION_REQUEST = {
     }	
 };
 
+const VALID_UPDATE_REQUEST = {
+    repository: 'https://github.com/switcherapi/switcher-gitops-fixture',
+    branch: 'main',
+    environment: EnvType.DEFAULT,
+    domain: {
+        id: String(domainId),
+        name: 'Test Domain'
+    },
+    settings: {
+        active: true,
+        window: '30s',
+        forceprune: true
+    }	
+};
+
+const VALID_TOKEN_UPDATE_REQUEST = {
+    environment: EnvType.DEFAULT,
+    token: '123456',
+    domain: {
+        id: String(domainId)
+    }
+};
+
+const VALID_FORCE_SYNC_REQUEST = {
+    environment: EnvType.DEFAULT,
+    domain: {
+        id: String(domainId)
+    }
+};
+
+
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
     await mongoose.disconnect();
@@ -171,5 +202,249 @@ describe('GitOps Account - Subscribe', () => {
             .expect(422);
 
         expect(req.body.errors[0].msg).toBe('Invalid window value');
+    });
+});
+
+describe('GitOps Account - Update', () => {
+    beforeAll(setupDatabase);
+
+    test('GITOPS_ACCOUNT_SUITE - Should update account', async () => {
+        // given
+        const expectedResponse = JSON.parse(JSON.stringify(VALID_UPDATE_REQUEST));
+        expectedResponse.token = '...123';
+
+        const postStub = sinon.stub(axios, 'put').resolves({
+            status: 200,
+            data: expectedResponse
+        });
+
+        // test
+        const req = await request(app)
+            .put('/gitops/v1/account')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(VALID_UPDATE_REQUEST)
+            .expect(200);
+
+        // assert
+        expect(req.body).toMatchObject(expectedResponse);
+        postStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - error updating account', async () => {
+        // given
+        const postStub = sinon.stub(axios, 'put').resolves({
+            status: 500,
+            data: {
+                error: 'Error updating account'
+            }
+        });
+
+        // test
+        const req = await request(app)
+            .put('/gitops/v1/account')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(VALID_UPDATE_REQUEST)
+            .expect(500);
+
+        // assert
+        expect(req.body.error).toBe('Account update failed');
+        postStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - unauthorized', async () => {
+        // given
+        const postStub = sinon.stub(axios, 'put').resolves({
+            status: 401,
+            data: {
+                error: 'Invalid token'
+            }
+        });
+
+        // test
+        const req = await request(app)
+            .put('/gitops/v1/account')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(VALID_UPDATE_REQUEST)
+            .expect(500);
+
+        // assert
+        expect(req.body.error).toBe('Account update failed');
+        postStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - missing domain.id', async () => {
+        const payload = JSON.parse(JSON.stringify(VALID_UPDATE_REQUEST));
+        delete payload.domain.id;
+
+        const req = await request(app)
+            .put('/gitops/v1/account')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(payload)
+            .expect(422);
+
+        expect(req.body.errors[0].msg).toBe('Invalid domain ID');
+    });
+    
+})
+
+describe('GitOps Account - Update Token', () => {
+    beforeAll(setupDatabase);
+
+    test('GITOPS_ACCOUNT_SUITE - Should update account token', async () => {
+        // given
+        const expectedResponse = JSON.parse(JSON.stringify(VALID_UPDATE_REQUEST));
+        expectedResponse.token = '...123';
+
+        const postStub = sinon.stub(axios, 'put').resolves({
+            status: 200,
+            data: expectedResponse
+        });
+
+        // test
+        const req = await request(app)
+            .put('/gitops/v1/account/token')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(VALID_TOKEN_UPDATE_REQUEST)
+            .expect(200);
+
+        // assert
+        expect(req.body).toMatchObject(expectedResponse);
+        postStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - error updating account token', async () => {
+        // given
+        const postStub = sinon.stub(axios, 'put').resolves({
+            status: 500,
+            data: {
+                error: 'Error updating account token'
+            }
+        });
+
+        // test
+        const req = await request(app)
+            .put('/gitops/v1/account/token')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(VALID_TOKEN_UPDATE_REQUEST)
+            .expect(500);
+
+        // assert
+        expect(req.body.error).toBe('Account token update failed');
+        postStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - unauthorized', async () => {
+        // given
+        const postStub = sinon.stub(axios, 'put').resolves({
+            status: 401,
+            data: {
+                error: 'Invalid token'
+            }
+        });
+
+        // test
+        const req = await request(app)
+            .put('/gitops/v1/account/token')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(VALID_TOKEN_UPDATE_REQUEST)
+            .expect(500);
+
+        // assert
+        expect(req.body.error).toBe('Account token update failed');
+        postStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - missing domain.id', async () => {
+        const payload = JSON.parse(JSON.stringify(VALID_TOKEN_UPDATE_REQUEST));
+        delete payload.domain.id;
+
+        const req = await request(app)
+            .put('/gitops/v1/account/token')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(payload)
+            .expect(422);
+
+        expect(req.body.errors[0].msg).toBe('Invalid domain ID');
+    });
+});
+
+describe('GitOps Account - Force sync', () => {
+    beforeAll(setupDatabase);
+
+    test('GITOPS_ACCOUNT_SUITE - Should force sync account', async () => {
+        // given
+        const expectedResponse = JSON.parse(JSON.stringify(VALID_FORCE_SYNC_REQUEST));
+        expectedResponse.token = '...123';
+
+        const postStub = sinon.stub(axios, 'put').resolves({
+            status: 200,
+            data: expectedResponse
+        });
+
+        // test
+        const req = await request(app)
+            .put('/gitops/v1/account/forcesync')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(VALID_FORCE_SYNC_REQUEST)
+            .expect(200);
+
+        // assert
+        expect(req.body).toMatchObject(expectedResponse);
+        postStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - error forcing sync account', async () => {
+        // given
+        const postStub = sinon.stub(axios, 'put').resolves({
+            status: 500,
+            data: {
+                error: 'Error forcing sync account'
+            }
+        });
+
+        // test
+        const req = await request(app)
+            .put('/gitops/v1/account/forcesync')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(VALID_FORCE_SYNC_REQUEST)
+            .expect(500);
+
+        // assert
+        expect(req.body.error).toBe('Account force sync failed');
+        postStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - unauthorized', async () => {
+        // given
+        const postStub = sinon.stub(axios, 'put').resolves({
+            status: 401,
+            data: {
+                error: 'Invalid token'
+            }
+        });
+
+        // test
+        const req = await request(app)
+            .put('/gitops/v1/account/forcesync')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(VALID_FORCE_SYNC_REQUEST)
+            .expect(500);
+
+        // assert
+        expect(req.body.error).toBe('Account force sync failed');
+        postStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - missing domain.id', async () => {
+        const payload = JSON.parse(JSON.stringify(VALID_FORCE_SYNC_REQUEST));
+        delete payload.domain.id;
+
+        const req = await request(app)
+            .put('/gitops/v1/account/forcesync')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(payload)
+            .expect(422);
+
+        expect(req.body.errors[0].msg).toBe('Invalid domain ID');
     });
 });
