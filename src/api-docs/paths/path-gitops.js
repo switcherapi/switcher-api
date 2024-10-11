@@ -73,6 +73,24 @@ export default {
             }
         }
     },
+    '/gitops/v1/account/unsubscribe': {
+        post: {
+            tags: ['Switcher GitOps'],
+            description: 'Unsubscribe an account from receiving gitops changes',
+            requestBody: {
+                content: commonSchemaContent('GitOpsAccountUnsubscribeRequest')
+            },
+            responses: {
+                200: {
+                    description: 'Account unsubscribed successfully'
+                },
+                500: {
+                    description: 'Something went wrong while unsubscribing the account',
+                    content: commonSchemaContent('ErrorResponse')
+                }
+            }
+        }
+    },
     '/gitops/v1/account': {
         put: {
             tags: ['Switcher GitOps'],

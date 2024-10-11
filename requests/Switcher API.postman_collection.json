@@ -5680,6 +5680,45 @@
 							"response": []
 						},
 						{
+							"name": "GitOps Account - Unsubscribe",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\"\r\n\t}\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/account/unsubscribe",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"account",
+										"unsubscribe"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "GitOps Account - Update",
 							"request": {
 								"auth": {

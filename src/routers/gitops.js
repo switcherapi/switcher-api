@@ -62,6 +62,18 @@ router.post('/gitops/v1/account/subscribe', auth, accountValidators, validate,
     }
 });
 
+router.post('/gitops/v1/account/unsubscribe', auth, [
+    body('environment').isString(),
+    body('domain.id').isMongoId().withMessage('Invalid domain ID'),
+], validate, featureFlag, async (req, res) => {
+    try {
+        await Service.unsubscribeAccount(req.body);
+        res.status(200).send();
+    } catch (e) {
+        responseExceptionSilent(res, e, 500, 'Account unsubscription failed');
+    }
+});
+
 router.put('/gitops/v1/account', auth, [
     body('environment').isString(),
     body('domain.id').isMongoId().withMessage('Invalid domain ID'),

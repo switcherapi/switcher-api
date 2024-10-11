@@ -40,6 +40,18 @@ export async function updateAccount(account) {
     return response.data;
 }
 
+export async function deleteAccount(domainId, environment) {
+    const url = `${process.env.SWITCHER_GITOPS_URL}/account/${domainId}/${environment}`;
+    const response = await axios.delete(url, {
+        httpsAgent: agent(url),
+        headers: headers(domainId)
+    });
+
+    if (response.status !== 204) {
+        throw new GitOpsError(`Failed to delete account [${response.status}] ${JSON.stringify(response.data)}`);
+    }
+}
+
 function generateToken(subject) {
     const options = {
         expiresIn: '1m'
