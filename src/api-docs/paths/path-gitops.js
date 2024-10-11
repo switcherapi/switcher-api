@@ -72,5 +72,74 @@ export default {
                 }
             }
         }
+    },
+    '/gitops/v1/account': {
+        put: {
+            tags: ['Switcher GitOps'],
+            description: 'Update an account to receive gitops changes',
+            requestBody: {
+                content: commonSchemaContent('GitOpsAccountUpdateRequest')
+            },
+            responses: {
+                200: {
+                    description: 'Account update successful',
+                    content: commonSchemaContent('GitOpsAccountResponse')
+                },
+                400: {
+                    description: 'Invalid request body',
+                    content: commonSchemaContent('ErrorResponse')
+                },
+                500: {
+                    description: 'Something went wrong while updating the account',
+                    content: commonSchemaContent('ErrorResponse')
+                }
+            }
+        }
+    },
+    '/gitops/v1/account/token': {
+        put: {
+            tags: ['Switcher GitOps'],
+            description: 'Update an account token to receive gitops changes',
+            requestBody: {
+                content: commonSchemaContent('GitOpsAccountTokenUpdateRequest')
+            },
+            responses: {
+                200: {
+                    description: 'Account token update successful',
+                    content: commonSchemaContent('GitOpsAccountResponse')
+                },
+                400: {
+                    description: 'Invalid request body',
+                    content: commonSchemaContent('ErrorResponse')
+                },
+                500: {
+                    description: 'Something went wrong while updating the account token',
+                    content: commonSchemaContent('ErrorResponse')
+                }
+            }
+        }
+    },
+    '/gitops/v1/account/forcesync': {
+        put: {
+            tags: ['Switcher GitOps'],
+            description: 'Force sync an account to receive gitops changes',
+            requestBody: {
+                content: commonSchemaContent('GitOpsAccountForceSyncRequest')
+            },
+            responses: {
+                200: {
+                    description: 'Account force sync successful',
+                    content: commonSchemaContent('GitOpsAccountResponse')
+                },
+                400: {
+                    description: 'Invalid request body',
+                    content: commonSchemaContent('ErrorResponse')
+                },
+                500: {
+                    description: 'Something went wrong while force syncing the account',
+                    content: commonSchemaContent('ErrorResponse')
+                }
+            }
+        }
     }
 };

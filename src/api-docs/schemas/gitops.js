@@ -74,6 +74,29 @@ const accountRequest = {
     }
 };
 
+const accountUpdateRequest = {
+    repository: {
+        type: 'string',
+        description: 'The repository URL'
+    },
+    branch: {
+        type: 'string',
+        description: 'The branch name'
+    },
+    environment: {
+        type: 'string',
+        description: 'The environment name'
+    },
+    domain: {
+        type: 'object',
+        properties: domain
+    },
+    settings: {
+        type: 'object',
+        properties: settings
+    }
+};
+
 const accountResponse = {
     _id: {
         type: 'string',
@@ -149,6 +172,40 @@ export default {
     GitOpsAccountRequest: {
         type: 'object',
         properties: accountRequest
+    },
+    GitOpsAccountUpdateRequest: {
+        type: 'object',
+        properties: accountUpdateRequest
+    },
+    GitOpsAccountTokenUpdateRequest: {
+        type: 'object',
+        properties: {
+            token: {
+                type: 'string',
+                description: 'The Git token'
+            },
+            environment: {
+                type: 'string',
+                description: 'The environment name'
+            },
+            domain: {
+                type: 'object',
+                properties: domain
+            }
+        }
+    },
+    GitOpsAccountForceSyncRequest: {
+        type: 'object',
+        properties: {
+            environment: {
+                type: 'string',
+                description: 'The environment name'
+            },
+            domain: {
+                type: 'object',
+                properties: domain
+            }
+        }
     },
     GitOpsAccountResponse: {
         type: 'object',

@@ -32,3 +32,27 @@ export async function pushChanges(domainId, environment, changes) {
 export async function subscribeAccount(account) {
     return GitOpsFacade.createAccount(account);
 }
+
+export async function updateAccount(account) {
+    return GitOpsFacade.updateAccount(account);
+}
+
+export async function updateAccountToken(account) {
+    return GitOpsFacade.updateAccount({
+        environment: account.environment,
+        token: account.token,
+        domain: {
+            id: account.domain.id
+        }
+    });
+}
+
+export async function forceSyncAccount(account) {
+    return GitOpsFacade.updateAccount({
+        environment: account.environment,
+        lastcommit: 'refresh',
+        domain: {
+            id: account.domain.id
+        }
+    });
+}

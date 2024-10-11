@@ -26,6 +26,20 @@ export async function createAccount(account) {
     return response.data;
 }
 
+export async function updateAccount(account) {
+    const url = `${process.env.SWITCHER_GITOPS_URL}/account`;
+    const response = await axios.put(url, account, {
+        httpsAgent: agent(url),
+        headers: headers(account.domain.id)
+    });
+
+    if (response.status !== 200) {
+        throw new GitOpsError(`Failed to update account [${response.status}] ${JSON.stringify(response.data)}`);
+    }
+
+    return response.data;
+}
+
 function generateToken(subject) {
     const options = {
         expiresIn: '1m'
