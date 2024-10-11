@@ -11,53 +11,6 @@ import {
     adminMasterAccountToken 
 } from './fixtures/db_client';
 
-const VALID_SUBSCRIPTION_REQUEST = {
-    repository: 'https://github.com/switcherapi/switcher-gitops-fixture',
-    token: '{{github_pat}}',
-    branch: 'main',
-    environment: EnvType.DEFAULT,
-    domain: {
-        id: String(domainId),
-        name: 'Test Domain'
-    },
-    settings: {
-        active: true,
-        window: '30s',
-        forceprune: true
-    }	
-};
-
-const VALID_UPDATE_REQUEST = {
-    repository: 'https://github.com/switcherapi/switcher-gitops-fixture',
-    branch: 'main',
-    environment: EnvType.DEFAULT,
-    domain: {
-        id: String(domainId),
-        name: 'Test Domain'
-    },
-    settings: {
-        active: true,
-        window: '30s',
-        forceprune: true
-    }	
-};
-
-const VALID_TOKEN_UPDATE_REQUEST = {
-    environment: EnvType.DEFAULT,
-    token: '123456',
-    domain: {
-        id: String(domainId)
-    }
-};
-
-const VALID_FORCE_SYNC_REQUEST = {
-    environment: EnvType.DEFAULT,
-    domain: {
-        id: String(domainId)
-    }
-};
-
-
 afterAll(async () => { 
     await new Promise(resolve => setTimeout(resolve, 1000));
     await mongoose.disconnect();
@@ -78,7 +31,21 @@ describe('GitOps Account - Feature Toggle', () => {
         const req = await request(app)
             .post('/gitops/v1/account/subscribe')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(VALID_SUBSCRIPTION_REQUEST)
+            .send({
+                repository: 'https://github.com/switcherapi/switcher-gitops-fixture',
+                token: '{{github_pat}}',
+                branch: 'main',
+                environment: EnvType.DEFAULT,
+                domain: {
+                    id: String(domainId),
+                    name: 'Test Domain'
+                },
+                settings: {
+                    active: true,
+                    window: '30s',
+                    forceprune: true
+                }	
+            })
             .expect(400);
 
         expect(req.body.error).toBe('GitOps Integration is not available.');
@@ -87,6 +54,22 @@ describe('GitOps Account - Feature Toggle', () => {
 
 describe('GitOps Account - Subscribe', () => {
     beforeAll(setupDatabase);
+
+    const VALID_SUBSCRIPTION_REQUEST = {
+        repository: 'https://github.com/switcherapi/switcher-gitops-fixture',
+        token: '{{github_pat}}',
+        branch: 'main',
+        environment: EnvType.DEFAULT,
+        domain: {
+            id: String(domainId),
+            name: 'Test Domain'
+        },
+        settings: {
+            active: true,
+            window: '30s',
+            forceprune: true
+        }	
+    };
 
     test('GITOPS_ACCOUNT_SUITE - Should subscribe account', async () => {
         // given
@@ -208,6 +191,21 @@ describe('GitOps Account - Subscribe', () => {
 describe('GitOps Account - Update', () => {
     beforeAll(setupDatabase);
 
+    const VALID_UPDATE_REQUEST = {
+        repository: 'https://github.com/switcherapi/switcher-gitops-fixture',
+        branch: 'main',
+        environment: EnvType.DEFAULT,
+        domain: {
+            id: String(domainId),
+            name: 'Test Domain'
+        },
+        settings: {
+            active: true,
+            window: '30s',
+            forceprune: true
+        }	
+    };
+
     test('GITOPS_ACCOUNT_SUITE - Should update account', async () => {
         // given
         const expectedResponse = JSON.parse(JSON.stringify(VALID_UPDATE_REQUEST));
@@ -290,6 +288,29 @@ describe('GitOps Account - Update', () => {
 describe('GitOps Account - Update Token', () => {
     beforeAll(setupDatabase);
 
+    const VALID_UPDATE_REQUEST = {
+        repository: 'https://github.com/switcherapi/switcher-gitops-fixture',
+        branch: 'main',
+        environment: EnvType.DEFAULT,
+        domain: {
+            id: String(domainId),
+            name: 'Test Domain'
+        },
+        settings: {
+            active: true,
+            window: '30s',
+            forceprune: true
+        }	
+    };
+
+    const VALID_TOKEN_UPDATE_REQUEST = {
+        environment: EnvType.DEFAULT,
+        token: '123456',
+        domain: {
+            id: String(domainId)
+        }
+    };
+
     test('GITOPS_ACCOUNT_SUITE - Should update account token', async () => {
         // given
         const expectedResponse = JSON.parse(JSON.stringify(VALID_UPDATE_REQUEST));
@@ -371,6 +392,13 @@ describe('GitOps Account - Update Token', () => {
 describe('GitOps Account - Force sync', () => {
     beforeAll(setupDatabase);
 
+    const VALID_FORCE_SYNC_REQUEST = {
+        environment: EnvType.DEFAULT,
+        domain: {
+            id: String(domainId)
+        }
+    };
+
     test('GITOPS_ACCOUNT_SUITE - Should force sync account', async () => {
         // given
         const expectedResponse = JSON.parse(JSON.stringify(VALID_FORCE_SYNC_REQUEST));
@@ -447,4 +475,88 @@ describe('GitOps Account - Force sync', () => {
 
         expect(req.body.errors[0].msg).toBe('Invalid domain ID');
     });
+});
+
+describe('GitOps Account - Unsubscribe', () => {
+    beforeAll(setupDatabase);
+
+    const VALID_DELETE_REQUEST = {
+        environment: EnvType.DEFAULT,
+        domain: {
+            id: String(domainId)
+        }
+    };
+
+    test('GITOPS_ACCOUNT_SUITE - Should subscribe account', async () => {
+        // given
+        const postStub = sinon.stub(axios, 'delete').resolves({
+            status: 204,
+            data: null
+        });
+
+        // test
+        await request(app)
+            .post(`/gitops/v1/account/unsubscribe`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(VALID_DELETE_REQUEST)
+            .expect(200);
+
+        postStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - error deleting account', async () => {
+        // given
+        const postStub = sinon.stub(axios, 'delete').resolves({
+            status: 500,
+            data: {
+                error: 'Error deleting account'
+            }
+        });
+
+        // test
+        const req = await request(app)
+            .post('/gitops/v1/account/unsubscribe')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(VALID_DELETE_REQUEST)
+            .expect(500);
+
+        // assert
+        expect(req.body.error).toBe('Account unsubscription failed');
+        postStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - unauthorized', async () => {
+        // given
+        const postStub = sinon.stub(axios, 'delete').resolves({
+            status: 401,
+            data: {
+                error: 'Invalid token'
+            }
+        });
+
+        // test
+        const req = await request(app)
+            .post('/gitops/v1/account/unsubscribe')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(VALID_DELETE_REQUEST)
+            .expect(500);
+
+        // assert
+        expect(req.body.error).toBe('Account unsubscription failed');
+        postStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - missing domain.id', async () => {
+        const payload = JSON.parse(JSON.stringify(VALID_DELETE_REQUEST));
+        delete payload.domain.id;
+
+        const req = await request(app)
+            .post('/gitops/v1/account/unsubscribe')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(payload)
+            .expect(422);
+
+        expect(req.body.errors[0].msg).toBe('Invalid domain ID');
+    });
+
 });

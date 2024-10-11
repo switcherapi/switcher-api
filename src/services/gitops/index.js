@@ -56,3 +56,7 @@ export async function forceSyncAccount(account) {
         }
     });
 }
+
+export async function unsubscribeAccount(account) {
+    return GitOpsFacade.deleteAccount(account.domain.id, account.environment);
+}

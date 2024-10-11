@@ -194,6 +194,19 @@ export default {
             }
         }
     },
+    GitOpsAccountUnsubscribeRequest: {
+        type: 'object',
+        properties: {
+            environment: {
+                type: 'string',
+                description: 'The environment name'
+            },
+            domain: {
+                type: 'object',
+                properties: domain
+            }
+        }
+    },
     GitOpsAccountForceSyncRequest: {
         type: 'object',
         properties: {
