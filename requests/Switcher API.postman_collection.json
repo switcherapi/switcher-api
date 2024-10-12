@@ -5719,6 +5719,67 @@
 							"response": []
 						},
 						{
+							"name": "GitOps Account - Fetch All",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/gitops/v1/account/{{gitops_domain_id}}",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"account",
+										"{{gitops_domain_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GitOps Account - Fetch By Environment",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/gitops/v1/account/{{gitops_domain_id}}/default",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"account",
+										"{{gitops_domain_id}}",
+										"default"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "GitOps Account - Update",
 							"request": {
 								"auth": {

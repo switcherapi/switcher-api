@@ -1,5 +1,5 @@
 import express from 'express';
-import { body } from 'express-validator';
+import { body, check } from 'express-validator';
 import { responseExceptionSilent } from '../exceptions/index.js';
 import { auth, gitopsAuth } from '../middleware/auth.js';
 import { validate } from '../middleware/validators.js';
@@ -108,6 +108,18 @@ router.put('/gitops/v1/account/forcesync', auth, [
         res.status(200).send(account);
     } catch (e) {
         responseExceptionSilent(res, e, 500, 'Account force sync failed');
+    }
+});
+
+router.get('/gitops/v1/account/:domain', auth, [
+    check('domain').isMongoId().withMessage('Invalid domain ID'),
+    check('environment').optional().isString(),
+], validate, featureFlag, async (req, res) => {
+    try {
+        const accounts = await Service.fetchAccounts(req.params.domain, req.query.environment || null);
+        res.status(200).send(accounts);
+    } catch (e) {
+        responseExceptionSilent(res, e, 500, 'Error fetching accounts');
     }
 });
 
