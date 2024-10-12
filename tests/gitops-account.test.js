@@ -27,7 +27,7 @@ describe('GitOps Account - Feature Toggle', () => {
         process.env.SWITCHER_API_ENABLE = false;
     });
 
-    test('GITOPS_ACCOUNT_SUITE - Should return error when feature is disabled', async () => {
+    test('GITOPS_ACCOUNT_SUITE - Should return error when feature is disabled - body domainId', async () => {
         const req = await request(app)
             .post('/gitops/v1/account/subscribe')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -48,6 +48,15 @@ describe('GitOps Account - Feature Toggle', () => {
             })
             .expect(400);
 
+        expect(req.body.error).toBe('GitOps Integration is not available.');
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error when feature is disabled - param domainId', async () => {
+        const req = await request(app)
+            .get(`/gitops/v1/account/${domainId}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .expect(400);
+        
         expect(req.body.error).toBe('GitOps Integration is not available.');
     });
 });
