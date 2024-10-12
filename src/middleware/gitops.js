@@ -26,7 +26,7 @@ const CONTENT_TYPE_ARRAY = ['COMPONENT'];
 export async function featureFlag(req, res, next) {
     try {
         const domainId = req.path === '/gitops/v1/push' ? 
-            req.domain : req.body?.domain.id | req.params.domainId;
+            req.domain : req.body?.domain.id | req.params.domain;
             
         await checkGitopsIntegration(domainId);
         next();
