@@ -159,5 +159,55 @@ export default {
                 }
             }
         }
+    },
+    '/gitops/v1/account/{domain}': {
+        get: {
+            tags: ['Switcher GitOps'],
+            description: 'Fetch accounts for a domain',
+            parameters: [
+                {
+                    name: 'domain',
+                    in: 'path',
+                    description: 'Domain ID',
+                    required: true,
+                    schema: {
+                        type: 'string',
+                        format: 'ObjectId'
+                    }
+                },
+                {
+                    name: 'environment',
+                    in: 'query',
+                    description: 'Environment name',
+                    required: false,
+                    schema: {
+                        type: 'string'
+                    }
+                }
+            ],
+            responses: {
+                200: {
+                    description: 'Accounts fetched successfully',
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'array',
+                                items: {
+                                    $ref: '#/components/schemas/GitOpsAccountResponse'
+                                }
+                            }
+                        }
+                    }
+                },
+                400: {
+                    description: 'Invalid request parameters',
+                    content: commonSchemaContent('ErrorResponse')
+                },
+                500: {
+                    description: 'Something went wrong while fetching the accounts',
+                    content: commonSchemaContent('ErrorResponse')
+                }
+            }
+        }
     }
 };

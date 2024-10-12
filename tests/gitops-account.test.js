@@ -560,3 +560,114 @@ describe('GitOps Account - Unsubscribe', () => {
     });
 
 });
+
+describe('GitOps Account - Fetch Account(s)', () => {
+    beforeAll(setupDatabase);
+
+    const VALID_ACCOUNT_RESPONSE = {
+        repository: 'https://github.com/switcherapi/switcher-gitops-fixture',
+        token: '...123',
+        branch: 'main',
+        environment: EnvType.DEFAULT,
+        domain: {
+            id: String(domainId),
+            name: 'Test Domain',
+            version: 123456789,
+            lastcommit: '123456789',
+            lastupdate: new Date().toISOString(),
+            status: 'Synced',
+            message: 'Synced successfully'
+        },
+        settings: {
+            active: true,
+            window: '30s',
+            forceprune: true
+        }	
+    };
+
+    test('GITOPS_ACCOUNT_SUITE - Should fetch all accounts by Domain ID', async () => {
+        // given
+        const getStub = sinon.stub(axios, 'get').resolves({
+            status: 200,
+            data: [VALID_ACCOUNT_RESPONSE]
+        });
+
+        // test
+        const req = await request(app)
+            .get(`/gitops/v1/account/${domainId}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .expect(200);
+
+        // assert
+        expect(req.body).toMatchObject([VALID_ACCOUNT_RESPONSE]);
+        getStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should fetch single account by Domain ID and Environment', async () => {
+        // given
+        const getStub = sinon.stub(axios, 'get').resolves({
+            status: 200,
+            data: VALID_ACCOUNT_RESPONSE
+        });
+
+        // test
+        const req = await request(app)
+            .get(`/gitops/v1/account/${domainId}?environment=${EnvType.DEFAULT}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .expect(200);
+
+        // assert
+        expect(req.body).toMatchObject([VALID_ACCOUNT_RESPONSE]);
+        getStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - error fetching accounts', async () => {
+        // given
+        const getStub = sinon.stub(axios, 'get').resolves({
+            status: 500,
+            data: {
+                error: 'Error fetching accounts'
+            }
+        });
+
+        // test
+        const req = await request(app)
+            .get(`/gitops/v1/account/${domainId}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .expect(500);
+
+        // assert
+        expect(req.body.error).toBe('Error fetching accounts');
+        getStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - unauthorized', async () => {
+        // given
+        const getStub = sinon.stub(axios, 'get').resolves({
+            status: 401,
+            data: {
+                error: 'Invalid token'
+            }
+        });
+
+        // test
+        const req = await request(app)
+            .get(`/gitops/v1/account/${domainId}`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .expect(500);
+
+        // assert
+        expect(req.body.error).toBe('Error fetching accounts');
+        getStub.restore();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - invalid domain ID', async () => {
+        const req = await request(app)
+            .get('/gitops/v1/account/invalid-id')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .expect(422);
+
+        expect(req.body.errors[0].msg).toBe('Invalid domain ID');
+    });
+
+});

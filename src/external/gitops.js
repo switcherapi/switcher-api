@@ -52,6 +52,23 @@ export async function deleteAccount(domainId, environment) {
     }
 }
 
+export async function fetchAccounts(domainId, environment) {
+    const url = environment ? 
+        `${process.env.SWITCHER_GITOPS_URL}/account/${domainId}/${environment}` : 
+        `${process.env.SWITCHER_GITOPS_URL}/account/${domainId}`;
+        
+    const response = await axios.get(url, {
+        httpsAgent: agent(url),
+        headers: headers(domainId)
+    });
+
+    if (response.status !== 200) {
+        throw new GitOpsError(`Failed to fetch accounts [${response.status}] ${JSON.stringify(response.data)}`);
+    }
+
+    return response.data;
+}
+
 function generateToken(subject) {
     const options = {
         expiresIn: '1m'
