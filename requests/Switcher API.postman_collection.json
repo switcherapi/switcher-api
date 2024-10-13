@@ -5764,7 +5764,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{url}}/gitops/v1/account/{{gitops_domain_id}}/default",
+									"raw": "{{url}}/gitops/v1/account/{{gitops_domain_id}}?environment=default",
 									"host": [
 										"{{url}}"
 									],
@@ -5772,8 +5772,13 @@
 										"gitops",
 										"v1",
 										"account",
-										"{{gitops_domain_id}}",
-										"default"
+										"{{gitops_domain_id}}"
+									],
+									"query": [
+										{
+											"key": "environment",
+											"value": "default"
+										}
 									]
 								}
 							},
