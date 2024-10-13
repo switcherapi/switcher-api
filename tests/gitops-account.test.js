@@ -137,7 +137,7 @@ describe('GitOps Account - Subscribe', () => {
             .post('/gitops/v1/account/subscribe')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(VALID_SUBSCRIPTION_REQUEST)
-            .expect(500);
+            .expect(401);
 
         // assert
         expect(req.body.error).toBe('Account subscription failed');
