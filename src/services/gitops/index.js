@@ -50,9 +50,9 @@ export async function updateAccountToken(account) {
 export async function forceSyncAccount(account) {
     return GitOpsFacade.updateAccount({
         environment: account.environment,
-        lastcommit: 'refresh',
         domain: {
-            id: account.domain.id
+            id: account.domain.id,
+            lastcommit: 'refresh'
         }
     });
 }
