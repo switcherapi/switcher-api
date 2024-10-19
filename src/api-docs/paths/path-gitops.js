@@ -94,7 +94,7 @@ export default {
     '/gitops/v1/account': {
         put: {
             tags: ['Switcher GitOps'],
-            description: 'Update an account to receive gitops changes',
+            description: 'Update an account for gitops repository access',
             requestBody: {
                 content: commonSchemaContent('GitOpsAccountUpdateRequest')
             },
@@ -114,12 +114,12 @@ export default {
             }
         }
     },
-    '/gitops/v1/account/token': {
+    '/gitops/v1/account/tokens': {
         put: {
             tags: ['Switcher GitOps'],
-            description: 'Update an account token to receive gitops changes',
+            description: 'Update account tokens for gitops repository access',
             requestBody: {
-                content: commonSchemaContent('GitOpsAccountTokenUpdateRequest')
+                content: commonSchemaContent('GitOpsAccountTokensUpdateRequest')
             },
             responses: {
                 200: {
@@ -140,7 +140,7 @@ export default {
     '/gitops/v1/account/forcesync': {
         put: {
             tags: ['Switcher GitOps'],
-            description: 'Force sync an account to receive gitops changes',
+            description: 'Force sync an account to lock up for gitops changes',
             requestBody: {
                 content: commonSchemaContent('GitOpsAccountForceSyncRequest')
             },

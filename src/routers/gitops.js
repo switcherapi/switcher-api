@@ -18,6 +18,10 @@ const windowValidation = (value) => {
         throw new Error('Invalid window value (minimum 30s)');
     }
 
+    if (parseInt(value) < 1) {
+        throw new Error('Invalid window value (minimum 1[m/h])');
+    }
+
     return true;
 };
 
@@ -25,6 +29,7 @@ const accountValidators = [
     body('token').isString().optional(),
     body('repository').isURL().withMessage('Invalid repository URL'),
     body('branch').isString().withMessage('Invalid branch name'),
+    body('path').isString().optional().withMessage('Invalid path'),
     body('environment').isString().withMessage('Invalid environment name'),
     body('domain.id').isMongoId().withMessage('Invalid domain ID'),
     body('domain.name').isString().withMessage('Invalid domain name'),
@@ -74,10 +79,8 @@ router.post('/gitops/v1/account/unsubscribe', auth, [
     }
 });
 
-router.put('/gitops/v1/account', auth, [
-    body('environment').isString(),
-    body('domain.id').isMongoId().withMessage('Invalid domain ID'),
-], validate, featureFlag, async (req, res) => {
+router.put('/gitops/v1/account', auth, accountValidators, validate, 
+    featureFlag, async (req, res) => {
     try {
         const account = await Service.updateAccount(req.body);
         res.status(200).send(account);
@@ -86,13 +89,13 @@ router.put('/gitops/v1/account', auth, [
     }
 });
 
-router.put('/gitops/v1/account/token', auth, [
-    body('environment').isString(),
+router.put('/gitops/v1/account/tokens', auth, [
     body('token').isString(),
+    body('environments').isArray(),
     body('domain.id').isMongoId().withMessage('Invalid domain ID'),
 ], validate, featureFlag, async (req, res) => {
     try {
-        const account = await Service.updateAccountToken(req.body);
+        const account = await Service.updateAccountTokens(req.body);
         res.status(200).send(account);
     } catch (e) {
         responseExceptionSilent(res, e, 500, 'Account token update failed');

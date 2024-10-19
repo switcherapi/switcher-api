@@ -46,6 +46,25 @@ export async function updateAccount(account) {
     }
 }
 
+export async function updateAccountTokens(update, domainId) {
+    try {
+        const url = `${process.env.SWITCHER_GITOPS_URL}/account/tokens/${domainId}`;
+        const response = await axios.put(url, update, {
+            httpsAgent: agent(url),
+            headers: headers(domainId)
+        });
+
+        if (response.status !== 200) {
+            throw new GitOpsError(`Failed to update accounts [${response.status}] ${JSON.stringify(response.data)}`, 
+                response.status);
+        }
+
+        return response.data;
+    } catch (e) {
+        throw new GitOpsError(`Failed to update account: ${e.message}`, e.status);
+    }
+}
+
 export async function deleteAccount(domainId, environment) {
     try {
         const url = `${process.env.SWITCHER_GITOPS_URL}/account/${domainId}/${environment}`;
