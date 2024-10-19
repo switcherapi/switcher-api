@@ -183,6 +183,19 @@ describe('GitOps Account - Subscribe', () => {
         expect(req.body.errors[0].msg).toBe('Invalid window value (minimum 30s)');
     });
 
+    test('GITOPS_ACCOUNT_SUITE - Should return error - window cannot be lower than 1(m/h)', async () => {
+        const payload = JSON.parse(JSON.stringify(VALID_SUBSCRIPTION_REQUEST));
+        payload.settings.window = "0m";
+
+        const req = await request(app)
+            .post('/gitops/v1/account/subscribe')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(payload)
+            .expect(422);
+
+        expect(req.body.errors[0].msg).toBe('Invalid window value (minimum 1[m/h])');
+    });
+
     test('GITOPS_ACCOUNT_SUITE - Should return error - window cannot use different units than [s,m,h]', async () => {
         const payload = JSON.parse(JSON.stringify(VALID_SUBSCRIPTION_REQUEST));
         payload.settings.window = '1d';
@@ -204,6 +217,7 @@ describe('GitOps Account - Update', () => {
         repository: 'https://github.com/switcherapi/switcher-gitops-fixture',
         branch: 'main',
         environment: EnvType.DEFAULT,
+        path: 'path/to/file',
         domain: {
             id: String(domainId),
             name: 'Test Domain'
@@ -294,55 +308,42 @@ describe('GitOps Account - Update', () => {
     
 })
 
-describe('GitOps Account - Update Token', () => {
+describe('GitOps Account - Update All Token', () => {
     beforeAll(setupDatabase);
 
-    const VALID_UPDATE_REQUEST = {
-        repository: 'https://github.com/switcherapi/switcher-gitops-fixture',
-        branch: 'main',
-        environment: EnvType.DEFAULT,
-        domain: {
-            id: String(domainId),
-            name: 'Test Domain'
-        },
-        settings: {
-            active: true,
-            window: '30s',
-            forceprune: true
-        }	
-    };
-
     const VALID_TOKEN_UPDATE_REQUEST = {
-        environment: EnvType.DEFAULT,
+        environments: [EnvType.DEFAULT],
         token: '123456',
         domain: {
             id: String(domainId)
         }
     };
 
-    test('GITOPS_ACCOUNT_SUITE - Should update account token', async () => {
-        // given
-        const expectedResponse = JSON.parse(JSON.stringify(VALID_UPDATE_REQUEST));
-        expectedResponse.token = '...123';
-
+    test('GITOPS_ACCOUNT_SUITE - Should update account tokens', async () => {
         const postStub = sinon.stub(axios, 'put').resolves({
             status: 200,
-            data: expectedResponse
+            data: {
+                result: true,
+                message: 'Account tokens updated successfully'
+            }
         });
 
         // test
         const req = await request(app)
-            .put('/gitops/v1/account/token')
+            .put('/gitops/v1/account/tokens')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(VALID_TOKEN_UPDATE_REQUEST)
             .expect(200);
 
         // assert
-        expect(req.body).toMatchObject(expectedResponse);
+        expect(req.body).toMatchObject({
+            result: true,
+            message: 'Account tokens updated successfully'
+        });
         postStub.restore();
     });
 
-    test('GITOPS_ACCOUNT_SUITE - Should return error - error updating account token', async () => {
+    test('GITOPS_ACCOUNT_SUITE - Should return error - error updating account tokens', async () => {
         // given
         const postStub = sinon.stub(axios, 'put').resolves({
             status: 500,
@@ -353,7 +354,7 @@ describe('GitOps Account - Update Token', () => {
 
         // test
         const req = await request(app)
-            .put('/gitops/v1/account/token')
+            .put('/gitops/v1/account/tokens')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(VALID_TOKEN_UPDATE_REQUEST)
             .expect(500);
@@ -374,7 +375,7 @@ describe('GitOps Account - Update Token', () => {
 
         // test
         const req = await request(app)
-            .put('/gitops/v1/account/token')
+            .put('/gitops/v1/account/tokens')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(VALID_TOKEN_UPDATE_REQUEST)
             .expect(500);
@@ -389,7 +390,7 @@ describe('GitOps Account - Update Token', () => {
         delete payload.domain.id;
 
         const req = await request(app)
-            .put('/gitops/v1/account/token')
+            .put('/gitops/v1/account/tokens')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(payload)
             .expect(422);

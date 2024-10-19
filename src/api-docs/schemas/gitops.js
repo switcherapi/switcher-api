@@ -177,16 +177,19 @@ export default {
         type: 'object',
         properties: accountUpdateRequest
     },
-    GitOpsAccountTokenUpdateRequest: {
+    GitOpsAccountTokensUpdateRequest: {
         type: 'object',
         properties: {
             token: {
                 type: 'string',
                 description: 'The Git token'
             },
-            environment: {
-                type: 'string',
-                description: 'The environment name'
+            environments: {
+                type: 'array',
+                items: {
+                    type: 'string'
+                },
+                description: 'The environments to update'
             },
             domain: {
                 type: 'object',

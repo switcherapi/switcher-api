@@ -5657,7 +5657,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n\t\"repository\": \"{{gitops_github_url}}\",\r\n\t\"token\": \"{{gitops_github_pat}}\",\r\n\t\"branch\": \"staging\",\r\n    \"environment\": \"default\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\",\r\n\t\t\"name\": \"GitOps\"\r\n\t},\r\n\t\"settings\": {\r\n\t\t\"active\": true,\r\n\t\t\"window\": \"30s\",\r\n\t\t\"forceprune\": true\r\n\t}\t\r\n}",
+									"raw": "{\r\n\t\"repository\": \"{{gitops_github_url}}\",\r\n\t\"token\": \"{{gitops_github_pat}}\",\r\n\t\"branch\": \"develop\",\r\n    \"path\": \"resources\",\r\n    \"environment\": \"default\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\",\r\n\t\t\"name\": \"GitOps\"\r\n\t},\r\n\t\"settings\": {\r\n\t\t\"active\": true,\r\n\t\t\"window\": \"30s\",\r\n\t\t\"forceprune\": true\r\n\t}\t\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5801,7 +5801,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n\t\"repository\": \"{{gitops_github_url}}\",\r\n\t\"branch\": \"staging\",\r\n    \"environment\": \"default\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\",\r\n\t\t\"name\": \"GitOps\"\r\n\t},\r\n\t\"settings\": {\r\n\t\t\"active\": true,\r\n\t\t\"window\": \"30s\",\r\n\t\t\"forceprune\": true\r\n\t}\t\r\n}",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n\t\"repository\": \"{{gitops_github_url}}\",\r\n\t\"branch\": \"develop\",\r\n    \"token\": \"{{gitops_github_pat}}\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\",\r\n\t\t\"name\": \"GitOps\"\r\n\t},\r\n\t\"settings\": {\r\n\t\t\"active\": true,\r\n\t\t\"window\": \"3m\",\r\n\t\t\"forceprune\": true\r\n\t}\t\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5823,7 +5823,7 @@
 							"response": []
 						},
 						{
-							"name": "GitOps Account - Update Token",
+							"name": "GitOps Account - Update Tokens",
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -5839,7 +5839,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"token\": \"{{gitops_github_pat}}\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\"\r\n\t}\r\n}",
+									"raw": "{\r\n    \"token\": \"{{gitops_github_pat}}\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\"\r\n\t},\r\n    \"environments\": [\r\n        \"default\"\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5847,7 +5847,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{url}}/gitops/v1/account/token",
+									"raw": "{{url}}/gitops/v1/account/tokens",
 									"host": [
 										"{{url}}"
 									],
@@ -5855,7 +5855,7 @@
 										"gitops",
 										"v1",
 										"account",
-										"token"
+										"tokens"
 									]
 								}
 							},

@@ -37,14 +37,11 @@ export async function updateAccount(account) {
     return GitOpsFacade.updateAccount(account);
 }
 
-export async function updateAccountToken(account) {
-    return GitOpsFacade.updateAccount({
-        environment: account.environment,
+export async function updateAccountTokens(account) {
+    return GitOpsFacade.updateAccountTokens({
         token: account.token,
-        domain: {
-            id: account.domain.id
-        }
-    });
+        environments: account.environments
+    }, account.domain.id);
 }
 
 export async function forceSyncAccount(account) {
