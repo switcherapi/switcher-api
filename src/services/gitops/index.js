@@ -30,11 +30,33 @@ export async function pushChanges(domainId, environment, changes) {
 }
 
 export async function subscribeAccount(account) {
-    return GitOpsFacade.createAccount(account);
+    return GitOpsFacade.createAccount({
+        repository: account.repository,
+        environment: account.environment,
+        branch: account.branch,
+        token: account.token,
+        path: account.path,
+        settings: account.settings,
+        domain: {
+            id: account.domain.id,
+            name: account.domain.name
+        }
+    });
 }
 
 export async function updateAccount(account) {
-    return GitOpsFacade.updateAccount(account);
+    return GitOpsFacade.updateAccount({
+        repository: account.repository,
+        environment: account.environment,
+        branch: account.branch,
+        token: account.token,
+        path: account.path,
+        settings: account.settings,
+        domain: {
+            id: account.domain.id,
+            name: account.domain.name
+        }
+    });
 }
 
 export async function updateAccountTokens(account) {
