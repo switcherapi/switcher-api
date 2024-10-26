@@ -272,6 +272,7 @@ describe('GitOps Account - Update', () => {
         repository: 'https://github.com/switcherapi/switcher-gitops-fixture',
         branch: 'main',
         environment: EnvType.DEFAULT,
+        path: 'path/to/file',
         domain: {
             id: String(domainId),
             name: 'Test Domain'
