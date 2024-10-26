@@ -34,14 +34,12 @@ const windowValidation = (value) => {
 };
 
 const pathValidation = (value) => {
-    if (value) {
-        if (value.startsWith('/') || value.endsWith('/') || value.includes('//')) {
-            throw new Error('Invalid path value - cannot start or end with / or contain //');
-        }
+    if (value.startsWith('/') || value.endsWith('/') || value.includes('//')) {
+        throw new Error('Invalid path value - cannot start or end with / or contain //');
+    }
 
-        if (!regexPath.test(value)) {
-            throw new Error('Invalid path value - only alphanumeric characters and / are allowed');
-        }
+    if (!regexPath.test(value)) {
+        throw new Error('Invalid path value - only alphanumeric characters and / are allowed');
     }
 
     return true;
