@@ -27,6 +27,7 @@ export const SwitcherKeys = Object.freeze({
     ACCOUNT_OUT_NOTIFY: 'ACCOUNT_OUT_NOTIFY',
     SLACK_INTEGRATION: 'SLACK_INTEGRATION',
     GITOPS_INTEGRATION: 'GITOPS_INTEGRATION',
+    GITOPS_SUBSCRIPTION: 'GITOPS_SUBSCRIPTION',
     RATE_LIMIT: 'RATE_LIMIT',
     HTTPS_AGENT: 'HTTPS_AGENT'
 });
@@ -212,6 +213,16 @@ export async function checkGitopsIntegration(value) {
         .isItOn();
 
     switcherFlagResult(featureFlag, 'GitOps Integration is not available.');
+}
+
+export function notifyGitopsSubscription(action) {
+    if (process.env.SWITCHER_API_ENABLE != 'true') {
+        return;
+    }
+
+    Client.getSwitcher(SwitcherKeys.GITOPS_SUBSCRIPTION)
+        .checkValue(action)
+        .isItOn();
 }
 
 export function notifyAcCreation(adminid) {

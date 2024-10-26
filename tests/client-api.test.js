@@ -262,6 +262,11 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected111));
     });
+});
+
+describe('Testing domain [Adm-GraphQL] - Permission', () => {
+
+    afterAll(setupDatabase);
 
     test('CLIENT_SUITE - Should return list of Groups permissions', async () => {
         const req = await request(app)
@@ -366,11 +371,6 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).not.toBe(null);
         expect(JSON.parse(req.text).data.permission).toStrictEqual([]);
     });
-});
-
-describe('Testing domain [Adm-GraphQL] - Permission', () => {
-
-    afterAll(setupDatabase);
 
     test('CLIENT_SUITE - Should return domain partial structure based on permission', async () => {
         // Given
@@ -393,7 +393,7 @@ describe('Testing domain [Adm-GraphQL] - Permission', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected1071));
     });
 
-    test('CLIENT_SUITE - Should NOT return complete domain structure - no valid COnfig permission', async () => {
+    test('CLIENT_SUITE - Should NOT return complete domain structure - no valid Config permission', async () => {
         // Given
         const admin = await Admin.findById(adminAccountId).exec();
         await setPermissionsToTeam(admin.teams[0], {

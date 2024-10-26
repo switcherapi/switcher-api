@@ -4,11 +4,14 @@ import sinon from 'sinon';
 import request from 'supertest';
 import { Client } from 'switcher-client';
 import app from '../src/app';
+import { Permission } from '../src/models/permission';
 import { EnvType } from '../src/models/environment';
 import { 
     setupDatabase,
     domainId,
-    adminMasterAccountToken 
+    adminMasterAccountToken, 
+    adminAccountToken,
+    permissionAdminId
 } from './fixtures/db_client';
 
 afterAll(async () => { 
@@ -61,6 +64,50 @@ describe('GitOps Account - Feature Toggle', () => {
     });
 });
 
+describe('GitOps Account - Forbidden', () => {
+    beforeAll(async () => {
+        await setupDatabase();
+
+        // diable team permissions
+        const permission = await Permission.findById(permissionAdminId);
+        permission.active = false;
+        await permission.save();
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should not subscribe account - body.domain', async () => {
+        const req = await request(app)
+            .post('/gitops/v1/account/subscribe')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send({
+                repository: 'https://github.com/switcherapi/switcher-gitops-fixture',
+                token: '{{github_pat}}',
+                branch: 'main',
+                environment: EnvType.DEFAULT,
+                domain: {
+                    id: String(domainId),
+                    name: 'Test Domain'
+                },
+                settings: {
+                    active: true,
+                    window: '30s',
+                    forceprune: true
+                }	
+            })
+            .expect(403);
+
+        expect(req.body.error).toBe('Permission denied');
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should not fetch all accounts by Domain ID - param.domain', async () => {
+        const req = await request(app)
+            .get(`/gitops/v1/account/${domainId}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .expect(403);
+
+        expect(req.body.error).toBe('Permission denied');
+    });
+});
+
 describe('GitOps Account - Subscribe', () => {
     beforeAll(setupDatabase);
 
@@ -81,6 +128,10 @@ describe('GitOps Account - Subscribe', () => {
     };
 
     test('GITOPS_ACCOUNT_SUITE - Should subscribe account', async () => {
+        process.env.SWITCHER_API_ENABLE = true;
+        Client.assume('GITOPS_INTEGRATION').true();
+        Client.assume('GITOPS_SUBSCRIPTION').true();
+
         // given
         const expectedResponse = JSON.parse(JSON.stringify(VALID_SUBSCRIPTION_REQUEST));
         expectedResponse.token = '...123';
@@ -93,13 +144,17 @@ describe('GitOps Account - Subscribe', () => {
         // test
         const req = await request(app)
             .post('/gitops/v1/account/subscribe')
-            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .set('Authorization', `Bearer ${adminAccountToken}`)
             .send(VALID_SUBSCRIPTION_REQUEST)
             .expect(201);
 
         // assert
         expect(req.body).toMatchObject(expectedResponse);
+
         postStub.restore();
+        process.env.SWITCHER_API_ENABLE = false;
+        Client.forget('GITOPS_INTEGRATION');
+        Client.forget('GITOPS_SUBSCRIPTION');
     });
 
     test('GITOPS_ACCOUNT_SUITE - Should return error - error creating account', async () => {
@@ -304,6 +359,49 @@ describe('GitOps Account - Update', () => {
             .expect(422);
 
         expect(req.body.errors[0].msg).toBe('Invalid domain ID');
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - path uses invalid slashes', async () => {
+        const payload = JSON.parse(JSON.stringify(VALID_UPDATE_REQUEST));
+        
+        // start with '/'
+        payload.path = '/path/to/file';
+        await request(app)
+            .put('/gitops/v1/account')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(payload)
+            .expect(422);
+
+        // end with '/'
+        payload.path = 'path/to/file/';
+        await request(app)
+            .put('/gitops/v1/account')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(payload)
+            .expect(422);
+
+        // contains '//'
+        payload.path = 'path//to/file';
+        const req = await request(app)
+            .put('/gitops/v1/account')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(payload)
+            .expect(422);
+
+        expect(req.body.errors[0].msg).toBe('Invalid path value - cannot start or end with / or contain //');
+    });
+
+    test('GITOPS_ACCOUNT_SUITE - Should return error - path contains invalid characters', async () => {
+        const payload = JSON.parse(JSON.stringify(VALID_UPDATE_REQUEST));
+        payload.path = 'path/to/file#';
+
+        const req = await request(app)
+            .put('/gitops/v1/account')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(payload)
+            .expect(422);
+
+        expect(req.body.errors[0].msg).toBe('Invalid path value - only alphanumeric characters and / are allowed');
     });
     
 })
