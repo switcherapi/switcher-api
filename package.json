@@ -1,6 +1,6 @@
 {
   "name": "switcher-api",
-  "version": "1.2.8",
+  "version": "1.3.0",
   "description": "Feature Flag/Toggle API",
   "main": "src/start.js",
   "type": "module",
