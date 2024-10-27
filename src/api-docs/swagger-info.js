@@ -1,6 +1,6 @@
 export default {
     title: 'Switcher API',
-    version: 'v1.2.8',
+    version: 'v1.3.0',
     description: 'Switcher API is a Feature Flag API focused on toggling features over different environments and applications.',
     contact: {
         name: 'Roger Floriano (petruki)',

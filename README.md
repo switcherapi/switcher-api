@@ -22,25 +22,18 @@ Switching fast. Adapt everywhere.
 
 # About  
 
-**Switcher API** is a *Feature Flag* API with the main focus on decreasing the friction caused by changes while keeping control of what really matters.
+**Switcher API** is a *Feature Manager* that allows you to control your application features using feature flags, also known as feature toggles, feature switches, or feature flippers. It is a cloud-based solution that provides a simple and efficient way to manage your features, enabling you to release new features to your users with confidence.
 
 Main features:
-- Easy to setup and seemless integration with your application using our lightweight Client SDKs.
-- Shareable Switchers can be used across multiple applications with high support to observability.
+- Easy to setup and seamless integration with your application using our lightweight Client SDKs.
+- Distributed Switchers can be used across multiple applications allowing you to control features in a centralized fashion.
 - Multi-environment support. Create and manage features across different environments.
 - Add extra layer of verification with custom conditions using Strategies.
-- Delegate Switcher criteria decision to external services with Switcher Relay.
+- Delegate Switcher criteria decision to specialized application with Switcher Relay.
 - Support to multiple teams and granular access control.
-- Integrate with Slack usign Switcher Slack App to enable release flow requests.
-- Detailed metrics and logs to help you understand how your features are being used.
-- Open Source and free to use.
- 
-
-- **JS Client SDK**: (https://github.com/switcherapi/switcher-client-js)
-- **Deno Client SDK**: (https://github.com/switcherapi/switcher-client-deno)
-- **Java Client SDK**: (https://github.com/switcherapi/switcher-client-java)
-- **Switcher Management**: (https://github.com/switcherapi/switcher-management)
-- **Switcher Slack App**: (https://github.com/switcherapi/switcher-slack-app)
+- Integrate with Slack usign Switcher Slack App to enable approval workflows.
+- Integrate with your CI/CD pipeline to automate feature releases and centralize feature management with Switcher GitOps.
+- Detailed metrics and logs to help you to track and monitor your features.
 
 * * *
 
