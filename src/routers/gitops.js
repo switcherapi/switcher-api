@@ -34,6 +34,10 @@ const windowValidation = (value) => {
 };
 
 const pathValidation = (value) => {
+    if (value.length === 0) {
+        return true;
+    }
+    
     if (value.startsWith('/') || value.endsWith('/') || value.includes('//')) {
         throw new Error('Invalid path value - cannot start or end with / or contain //');
     }

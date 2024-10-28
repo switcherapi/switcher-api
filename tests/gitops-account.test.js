@@ -157,6 +157,33 @@ describe('GitOps Account - Subscribe', () => {
         Client.forget('GITOPS_SUBSCRIPTION');
     });
 
+    
+    test('GITOPS_ACCOUNT_SUITE - Should subscribe account - with blank path', async () => {
+        // given
+        const requestPayload = JSON.parse(JSON.stringify(VALID_SUBSCRIPTION_REQUEST));
+        requestPayload.path = '';
+
+        const expectedResponse = JSON.parse(JSON.stringify(requestPayload));
+        expectedResponse.token = '...123';
+
+        const postStub = sinon.stub(axios, 'post').resolves({
+            status: 201,
+            data: expectedResponse
+        });
+
+        // test
+        const req = await request(app)
+            .post('/gitops/v1/account/subscribe')
+            .set('Authorization', `Bearer ${adminAccountToken}`)
+            .send(requestPayload)
+            .expect(201);
+
+        // assert
+        expect(req.body).toMatchObject(expectedResponse);
+
+        postStub.restore();
+    });
+
     test('GITOPS_ACCOUNT_SUITE - Should return error - error creating account', async () => {
         // given
         const postStub = sinon.stub(axios, 'post').resolves({
