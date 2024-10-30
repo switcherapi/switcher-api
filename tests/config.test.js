@@ -15,6 +15,7 @@ import {
     adminMasterAccountToken,
     domainId,
     groupConfigId,
+    groupConfigId2,
     configId1,
     config1Document,
     configId2,
@@ -52,7 +53,7 @@ describe('Testing configuration insertion', () => {
             .post('/config/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                key: 'NEW_CONFIG',
+                key: 'new_config', // case insensitive - it will be converted to uppercase
                 description: 'Description of my new Config',
                 group: groupConfigId
             }).expect(400);
@@ -277,7 +278,7 @@ describe('Testing update info', () => {
         const response = await request(app)
             .patch('/config/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send({ key: 'NEWKEY' }).expect(400);
+            .send({ key: 'newkey' }).expect(400);
 
         expect(response.body.error).toEqual('Config NEWKEY already exists');
     });
@@ -322,6 +323,41 @@ describe('Testing update info', () => {
         const config = await Config.findById(configId1).lean().exec();
         expect(config.activated[EnvType.DEFAULT]).toEqual(false);
     });
+});
+
+describe('Testing moving Config from GroupConfig to another', () => {
+    beforeAll(setupDatabase);
+
+    test('CONFIG_SUITE - Should move Config to a different GroupConfig', async () => {
+        await request(app)
+            .patch('/config/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                group: groupConfigId2
+            }).expect(200);
+        
+        // DB validation - verify flag updated
+        const config = await Config.findById(configId1).lean().exec();
+        expect(config).not.toBeNull();
+        expect(config.group).toEqual(groupConfigId2);
+    });
+
+    test('CONFIG_SUITE - Should NOT move Config to a different GroupConfig - GroupConfig not found', async () => {
+        await request(app)
+            .patch('/config/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                group: new mongoose.Types.ObjectId()
+            }).expect(404);
+
+        await request(app)
+            .patch('/config/' + configId1)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                group: 'INVALID_VALUE_ID'
+            }).expect(422);
+    });
+
 });
 
 describe('Testing Environment status change', () => {

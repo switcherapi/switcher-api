@@ -59,6 +59,8 @@ export async function populateAdmin(configs) {
 }
 
 export async function createConfig(args, admin) {
+    args.key = formatInput(args.key, { toUpper: true, autoUnderscore: true });
+
     // validates account plan permissions
     const group = await getGroupConfigById(args.group);
     await checkSwitcher(group);
@@ -70,7 +72,7 @@ export async function createConfig(args, admin) {
     });
     
     if (config) {
-        throw new BadRequestError(`Config ${args.key} already exists`);
+        throw new BadRequestError(`Config ${config.key} already exists`);
     }
 
     config = new Config({
@@ -78,8 +80,6 @@ export async function createConfig(args, admin) {
         domain: group.domain,
         owner: admin._id
     });
-
-    config.key = formatInput(config.key, { toUpper: true, autoUnderscore: true });
 
     // validates permissions
     config = await verifyOwnership(admin, config, group.domain, ActionTypes.CREATE, RouterTypes.CONFIG);
@@ -112,19 +112,12 @@ export async function updateConfig(id, args, admin) {
 
     // validates existing switcher key 
     if (args.key) {
-        const duplicatedKey = await getConfig({ 
-            key: args.key, 
-            group: config.group,
-            domain: config.domain 
-        });
-        
-        if (duplicatedKey) {
-            throw new BadRequestError(`Config ${args.key} already exists`);
-        }
+        args = await updateConfigKey(args, config);
+    }
 
-        // resets permission cache
-        permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.group);
-        permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.key);
+    // validates existing group
+    if (args.group) {
+        await getGroupConfigById(args.group);
     }
 
     // validates existing environment
@@ -139,11 +132,30 @@ export async function updateConfig(id, args, admin) {
     config.updatedBy = admin.email;
     const updates = Object.keys(args);
     updates.forEach((update) => config[update] = args[update]);
-    config.key = formatInput(config.key, { toUpper: true, autoUnderscore: true });
+    
     await config.save();
     updateDomainVersion(config.domain);
 
     return config;
+}
+
+async function updateConfigKey(args, config) {
+    args.key = formatInput(args.key, { toUpper: true, autoUnderscore: true });
+
+    const duplicatedKey = await getConfig({
+        key: args.key,
+        domain: config.domain
+    });
+
+    if (duplicatedKey) {
+        throw new BadRequestError(`Config ${duplicatedKey.key} already exists`);
+    }
+
+    // resets permission cache
+    permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.group);
+    permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.key);
+
+    return args;
 }
 
 export async function updateConfigRelay(id, args, admin) {

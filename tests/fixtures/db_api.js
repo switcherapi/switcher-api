@@ -122,6 +122,16 @@ export const groupConfigDocument = {
     domain: domainId
 };
 
+export const groupConfigId2 = new mongoose.Types.ObjectId();
+export const groupConfig2Document = {
+    _id: groupConfigId2,
+    name: 'Group Test 2',
+    description: 'Test Group 2',
+    activated: new Map().set(EnvType.DEFAULT, true),
+    owner: adminMasterAccountId,
+    domain: domainId
+};
+
 export const configId1 = new mongoose.Types.ObjectId();
 export const config1Document = {
     _id: configId1,
@@ -265,6 +275,7 @@ export const setupDatabase = async () => {
     await new Environment(environment3).save();
     await new Domain(domainDocument).save();
     await new GroupConfig(groupConfigDocument).save();
+    await new GroupConfig(groupConfig2Document).save();
     await new Config(config1Document).save();
     await new Config(config2Document).save();
     await new ConfigStrategy(configStrategyDocument).save();

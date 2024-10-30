@@ -129,9 +129,11 @@ router.delete('/config/:id', auth, [
 });
 
 router.patch('/config/:id', auth, [
-    check('id').isMongoId()
+    check('id').isMongoId(),
+    check('key').optional().isLength({ min: 3, max: 50 }),
+    check('group').optional().isMongoId(), 
 ], validate, verifyInputUpdateParameters([
-    'key', 'description', 'relay', 'disable_metrics'
+    'key', 'description', 'group', 'relay', 'disable_metrics'
 ]), async (req, res) => {
     try {
         const config = await Services.updateConfig(req.params.id, req.body, req.admin);
