@@ -78,7 +78,8 @@ export async function recordHistory(modifiedField, oldDocument, newDocument, dom
     const diff = { oldValues: new Map(), newValues: new Map() };
     const documents = { oldDocument, newDocument };
 
-    if (!await checkHistory(domainId) || process.env.HISTORY_ACTIVATED !== 'true') {
+    const featureFlag = await checkHistory(domainId);
+    if (!featureFlag.result || process.env.HISTORY_ACTIVATED !== 'true') {
         return undefined;
     }
 
@@ -101,7 +102,7 @@ export async function recordHistory(modifiedField, oldDocument, newDocument, dom
             updatedBy: newDocument.updatedBy,
             date: Date.now()
         });
-
+        
         return history.save();
     }
 
