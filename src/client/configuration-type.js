@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLBoolean, GraphQLFloat } from 'graphql';
-import { resolveConfigStrategy, resolveConfig, resolveGroupConfig, resolveEnvStatus } from './resolvers.js';
+import { resolveConfigStrategy, resolveConfig, resolveGroupConfig, resolveEnvStatus, resolveRelay } from './resolvers.js';
 import { EnvType } from '../models/environment.js';
 import { 
     resolveFlatDomain, 
@@ -53,6 +53,43 @@ export const strategyType = new GraphQLObjectType({
     }
 });
 
+export const relayType = new GraphQLObjectType({
+    name: 'Relay',
+    fields: {
+        relay_type: {
+            type: GraphQLString,
+            resolve: (source) => source.type
+        },
+        relay_method: {
+            type: GraphQLString,
+            resolve: (source) => source.method
+        },
+        relay_endpoint: {
+            type: GraphQLString,
+            resolve: (source, _args, { environment }) => {
+                return source.endpoint[`${environment}`] === undefined ?
+                    source.endpoint[`${EnvType.DEFAULT}`] : source.endpoint[`${environment}`];
+            }
+        },
+        description: {
+            type: GraphQLString
+        },
+        activated: {
+            type: GraphQLBoolean,
+            resolve: (source, _args, { environment }) => {
+                return source.activated[`${environment}`] === undefined ? 
+                    source.activated[`${EnvType.DEFAULT}`] : source.activated[`${environment}`];
+            }
+        },
+        statusByEnv: {
+            type: new GraphQLList(envStatus),
+            resolve: (source) => {
+                return resolveEnvStatus(source);
+            }
+        },
+    }
+});
+
 export const configType = new GraphQLObjectType({
     name: 'Config',
     fields: {
@@ -102,6 +139,12 @@ export const configType = new GraphQLObjectType({
             type: new GraphQLList(GraphQLString),
             resolve: async (source) => {
                 return resolveComponents(source);
+            }
+        },
+        relay: {
+            type: relayType,
+            resolve: (source, _args, context) => {
+                return resolveRelay(source, context);
             }
         }
     }

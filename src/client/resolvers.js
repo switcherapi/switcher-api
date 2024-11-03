@@ -52,6 +52,17 @@ export async function resolveConfigStrategy(source, _id, strategy, operation, ac
     return strategies;
 }
 
+export async function resolveRelay(source, context) {
+    const relay = source.relay;
+    const environment = context.environment ? context.environment : EnvType.DEFAULT;
+
+    if (!relay.type || !relay.activated[environment] || !relay.endpoint[environment]) {
+        return null;
+    }
+
+    return relay;
+}
+
 export async function resolveConfig(source, _id, key, activated, context) {
     const args = {};
 
@@ -62,7 +73,7 @@ export async function resolveConfig(source, _id, key, activated, context) {
     let configs = await Config.find({ group: source._id, ...args }).lean().exec();
     
     if (activated !== undefined) {
-        configs = configs.filter(config => config.activated[context.environment || EnvType.DEFAULT] === activated);
+        configs = configs.filter(config => isElementActive(config, context.environment, activated));
     }
     
     try {
@@ -87,7 +98,7 @@ export async function resolveGroupConfig(source, _id, name, activated, context) 
     let groups = await GroupConfig.find({ domain: source._id, ...args }).lean().exec();
     
     if (activated !== undefined) {
-        groups = groups.filter(group => group.activated[context.environment || EnvType.DEFAULT] === activated);
+        groups = groups.filter(group => isElementActive(group, context.environment, activated));
     }
 
     try {
@@ -119,7 +130,7 @@ export async function resolveDomain(_id, name, activated, context) {
     }
     
     let domain = await Domain.findOne({ ...args }).lean().exec();
-    if (activated !== undefined && domain?.activated[context.environment || EnvType.DEFAULT] !== activated) {
+    if (activated !== undefined && !isElementActive(domain, context.environment, activated)) {
         return null;
     }
 
@@ -133,6 +144,18 @@ export async function resolveDomain(_id, name, activated, context) {
     }
 
     return domain;
+}
+
+/**
+ * Elemeents (Domain, Group, Config) can be activated in different environments.
+ * When the environment is not defined, the default environment activated flag is used.
+ */
+function isElementActive(element, environment, activated) {
+    if (element?.activated[environment || EnvType.DEFAULT] === undefined) {
+        return element?.activated[EnvType.DEFAULT] === activated;
+    }
+
+    return element?.activated[environment || EnvType.DEFAULT] === activated;
 }
 
 /**

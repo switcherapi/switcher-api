@@ -42,6 +42,17 @@ export const domainQuery = (where, group, config, strategy) => {
                             strategies${elementQuery(strategy)} { 
                                 strategy activated operation values statusByEnv { env value }
                             }
+                            relay {
+                                relay_type
+                                relay_method
+                                relay_endpoint
+                                description
+                                activated
+                                statusByEnv {
+                                    env
+                                    value
+                                }
+                            }
                             components
                         }
                     }
@@ -172,7 +183,49 @@ export const expected102 = `
                         "values":[
                             "10.0.0.0/24"
                         ]
-                    }]
+                    }],
+                    "relay": {
+                        "relay_type": "NOTIFICATION",
+                        "relay_method": "POST",
+                        "relay_endpoint": "http://localhost:3000",
+                        "description": "Test Relay",
+                        "activated": true
+                    }
+                }]
+            }]
+        }
+    }
+}`;
+
+export const expectedQA102 = `
+{
+    "data": {
+        "domain": {
+            "name": "Domain",
+            "version": 5,
+            "description": "Test Domain",
+            "activated": true,
+            "group": [{
+                "name": "Group Test",
+                "description": "Test Group",
+                "activated": true,
+                "config": [{
+                    "key": "TEST_CONFIG_KEY",
+                    "description": "Test config 1",
+                    "activated": true,
+                    "strategies": [],
+                    "relay": null,
+                    "components": [
+                        "TestApp"
+                    ]
+                },
+                {
+                    "key": "TEST_CONFIG_KEY_PRD_QA",
+                    "description": "Test config 2 - Off in PRD and ON in QA",
+                    "activated": true,
+                    "strategies": [],
+                    "relay": null,
+                    "components": []
                 }]
             }]
         }

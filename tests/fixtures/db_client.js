@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto';
 import Admin from '../../src/models/admin';
 import Domain from '../../src/models/domain';
 import GroupConfig from '../../src/models/group-config';
-import { Config } from '../../src/models/config';
+import { Config, RelayMethods, RelayTypes } from '../../src/models/config';
 import Component from '../../src/models/component';
 import History from '../../src/models/history';
 import { Metric } from '../../src/models/metric';
@@ -100,7 +100,14 @@ export const configDocument = {
     owner: adminMasterAccountId,
     components: [],
     group: groupConfigId,
-    domain: domainId
+    domain: domainId,
+    relay: {
+        type: RelayTypes.NOTIFICATION,
+        method: RelayMethods.POST,
+        endpoint: new Map().set(EnvType.DEFAULT, 'http://localhost:3000'),
+        description: 'Test Relay',
+        activated: new Map().set(EnvType.DEFAULT, true)
+    }
 };
 
 export const configStrategyUSERId = new mongoose.Types.ObjectId();
