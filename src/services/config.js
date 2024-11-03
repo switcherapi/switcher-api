@@ -331,7 +331,7 @@ export function isRelayValid(relay) {
     }
 
     const foundNotHttps = Object.values(relay.endpoint)
-        .filter(endpoint => !endpoint.toLowerCase().startsWith('https'));
+        .filter(endpoint => !String(endpoint).toLowerCase().startsWith('https'));
     
     if (foundNotHttps.length) {
         throw new BadRequestError('HTTPS required');

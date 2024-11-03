@@ -57,6 +57,16 @@ describe('Testing domain', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected102));
     });
 
+    test('CLIENT_SUITE - Should return the Domain structure for Environment', async () => {
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', 'QA']], true, true, true));
+        
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expectedQA102));
+    });
+
     test('CLIENT_SUITE - Should return 2 switchers when NOT filtered by Component', async () => {
         const req = await request(app)
             .post('/adm-graphql')
