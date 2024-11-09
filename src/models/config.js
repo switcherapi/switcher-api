@@ -167,7 +167,10 @@ function hasRelayEndpointUpdates(config, modifiedField) {
     
     if (hasUpdate.length) {
         const environment = hasUpdate[0].split('.')[2];
-        config.relay.verified.set(environment, false);
+
+        if (config.relay.endpoint.get(environment)) {
+            config.relay.verified.set(environment, false);
+        }
     }
 }
 

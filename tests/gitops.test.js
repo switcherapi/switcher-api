@@ -765,6 +765,32 @@ describe('GitOps - Push Deleted', () => {
         expect(strategy).toBeNull();
     });
 
+    test('GITOPS_SUITE - Should push changes - Deleted Relay', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'DELETED',
+                    diff: 'RELAY',
+                    path: ['Group Test', 'TEST_CONFIG_KEY'],
+                    content: null
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const config = await Config.findOne({ key: 'TEST_CONFIG_KEY', domain: domainId }).lean().exec();
+        expect(config.relay).toBeUndefined();
+    });
+
     test('GITOPS_SUITE - Should push changes - Deleted Switcher', async () => {
         const token = generateToken('30s');
 

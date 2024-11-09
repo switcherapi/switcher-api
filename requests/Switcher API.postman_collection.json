@@ -5673,6 +5673,44 @@
 							"response": []
 						},
 						{
+							"name": "GitOps Push - Delete Relay",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{gitopsToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"RELAY\",\r\n            \"path\": [\r\n                \"New Group\",\r\n                \"NEW_SWITCHER_RELAY\"\r\n            ]\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops/v1/push",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops",
+										"v1",
+										"push"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "GitOps Push - Delete Switcher",
 							"request": {
 								"auth": {
