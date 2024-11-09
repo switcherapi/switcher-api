@@ -1,5 +1,5 @@
 import { getStrategies, updateStrategy } from '../config-strategy.js';
-import { getConfig, updateConfig } from '../config.js';
+import { getConfig, updateConfig, updateConfigRelay } from '../config.js';
 import { getGroupConfig, updateGroup } from '../group-config.js';
 import { ADMIN_EMAIL } from './index.js';
 
@@ -27,12 +27,16 @@ async function processChangedGroup(domain, change, environment) {
 async function processChangedConfig(domain, change, environment) {
     const content = change.content;
     const admin = { _id: domain.owner, email: ADMIN_EMAIL };
-    const config = await getConfig({ domain: domain._id, key: content.key });
+    const config = await getConfig({ domain: domain._id, key: change.path[1] });
 
     await updateConfig(config._id, {
         description: getChangedValue(content.description, config.description),
         activated: new Map().set(environment, getChangedValue(content.activated, config.activated.get(environment)))
     }, admin);
+
+    if (content.relay) {
+        await updateConfigRelay(config._id, processRelay(content.relay, config.relay, environment), admin);
+    }
 }
 
 async function processChangedStrategy(domain, change, environment) {
@@ -50,6 +54,20 @@ async function processChangedStrategy(domain, change, environment) {
         activated: new Map().set(environment, getChangedValue(content.activated, strategy.activated.get(environment))),
         values: getChangedValue(content.values, strategy.values)
     }, admin);
+}
+
+function processRelay(content, configRelay, environment) {
+    return {
+        type: getChangedValue(content.type, configRelay.type),
+        method: getChangedValue(content.method, configRelay.method),
+        description: getChangedValue(content.description, configRelay.description),
+        activated: {
+            [environment]: getChangedValue(content.activated, configRelay.activated?.get(environment))
+        },
+        endpoint: {
+            [environment]: getChangedValue(content.endpoint, configRelay.endpoint?.get(environment))
+        }
+    };
 }
 
 function getChangedValue(changeValue, defaultValue) {

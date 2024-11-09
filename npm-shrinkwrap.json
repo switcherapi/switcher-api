@@ -17,13 +17,13 @@
         "express-rate-limit": "^7.4.1",
         "express-validator": "^7.2.0",
         "graphql": "^16.9.0",
-        "graphql-http": "^1.22.1",
+        "graphql-http": "^1.22.2",
         "graphql-tag": "^2.12.6",
         "helmet": "^8.0.0",
         "jsonwebtoken": "^9.0.2",
         "moment": "^2.30.1",
         "mongodb": "^6.10.0",
-        "mongoose": "^8.8.0",
+        "mongoose": "^8.8.1",
         "pino": "^9.5.0",
         "pino-pretty": "^11.3.0",
         "swagger-ui-express": "^5.0.1",
@@ -679,9 +679,9 @@
       }
     },
     "node_modules/@humanwhocodes/retry": {
-      "version": "0.4.0",
-      "resolved": "https://registry.npmjs.org/@humanwhocodes/retry/-/retry-0.4.0.tgz",
-      "integrity": "sha512-xnRgu9DxZbkWak/te3fcytNyp8MTbuiZIaueg2rgEvBuN55n04nwLYLU9TX/VVlusc9L2ZNXi99nUFNkHXtr5g==",
+      "version": "0.4.1",
+      "resolved": "https://registry.npmjs.org/@humanwhocodes/retry/-/retry-0.4.1.tgz",
+      "integrity": "sha512-c7hNEllBlenFTHBky65mhq8WD2kbN9Q6gk0bTk8lSBvc554jpXSkST1iePudpt7+A/AQvuHs9EMqjHDXMY1lrA==",
       "dev": true,
       "engines": {
         "node": ">=18.18"
@@ -1133,6 +1133,12 @@
         "sparse-bitfield": "^3.0.3"
       }
     },
+    "node_modules/@scarf/scarf": {
+      "version": "1.4.0",
+      "resolved": "https://registry.npmjs.org/@scarf/scarf/-/scarf-1.4.0.tgz",
+      "integrity": "sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ==",
+      "hasInstallScript": true
+    },
     "node_modules/@sinclair/typebox": {
       "version": "0.27.8",
       "resolved": "https://registry.npmjs.org/@sinclair/typebox/-/typebox-0.27.8.tgz",
@@ -1270,9 +1276,9 @@
       "dev": true
     },
     "node_modules/@types/node": {
-      "version": "22.8.7",
-      "resolved": "https://registry.npmjs.org/@types/node/-/node-22.8.7.tgz",
-      "integrity": "sha512-LidcG+2UeYIWcMuMUpBKOnryBWG/rnmOHQR5apjn8myTQcx3rinFRn7DcIFhMnS0PPFSC6OafdIKEad0lj6U0Q==",
+      "version": "22.9.0",
+      "resolved": "https://registry.npmjs.org/@types/node/-/node-22.9.0.tgz",
+      "integrity": "sha512-vuyHg81vvWA1Z1ELfvLko2c8f34gyA0zaic0+Rllc5lbCnbSyuvb2Oxpm6TAUAC/2xZN3QGqxBNggD1nNR2AfQ==",
       "dev": true,
       "dependencies": {
         "undici-types": "~6.19.8"
@@ -1854,9 +1860,9 @@
       }
     },
     "node_modules/caniuse-lite": {
-      "version": "1.0.30001677",
-      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001677.tgz",
-      "integrity": "sha512-fmfjsOlJUpMWu+mAAtZZZHz7UEwsUxIIvu1TJfO1HqFQvB/B+ii0xr9B5HpbZY/mC4XZ8SvjHJqtAY6pDPQEog==",
+      "version": "1.0.30001679",
+      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001679.tgz",
+      "integrity": "sha512-j2YqID/YwpLnKzCmBOS4tlZdWprXm3ZmQLBH9ZBXFOhoxLA46fwyBvx6toCBWBmnuwUY/qB3kEU6gFx8qgCroA==",
       "dev": true,
       "funding": [
         {
@@ -2124,9 +2130,9 @@
       }
     },
     "node_modules/cross-spawn": {
-      "version": "7.0.3",
-      "resolved": "https://registry.npmjs.org/cross-spawn/-/cross-spawn-7.0.3.tgz",
-      "integrity": "sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==",
+      "version": "7.0.5",
+      "resolved": "https://registry.npmjs.org/cross-spawn/-/cross-spawn-7.0.5.tgz",
+      "integrity": "sha512-ZVJrKKYunU38/76t0RMOulHOnUcbU9GbpWKAOZ0mhjr7CX6FVrH+4FrAapSOekrgFQ3f/8gwMEuIft0aKq6Hug==",
       "dev": true,
       "dependencies": {
         "path-key": "^3.1.0",
@@ -2282,9 +2288,9 @@
       "integrity": "sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow=="
     },
     "node_modules/electron-to-chromium": {
-      "version": "1.5.50",
-      "resolved": "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.50.tgz",
-      "integrity": "sha512-eMVObiUQ2LdgeO1F/ySTXsvqvxb6ZH2zPGaMYsWzRDdOddUa77tdmI0ltg+L16UpbWdhPmuF3wIQYyQq65WfZw==",
+      "version": "1.5.55",
+      "resolved": "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.55.tgz",
+      "integrity": "sha512-6maZ2ASDOTBtjt9FhqYPRnbvKU5tjG0IN9SztUOWYw2AzNDNpKJYLJmlK0/En4Hs/aiWnB+JZ+gW19PIGszgKg==",
       "dev": true
     },
     "node_modules/emittery": {
@@ -3099,9 +3105,9 @@
       }
     },
     "node_modules/graphql-http": {
-      "version": "1.22.1",
-      "resolved": "https://registry.npmjs.org/graphql-http/-/graphql-http-1.22.1.tgz",
-      "integrity": "sha512-4Jor+LRbA7SfSaw7dfDUs2UBzvWg3cKrykfHRgKsOIvQaLuf+QOcG2t3Mx5N9GzSNJcuqMqJWz0ta5+BryEmXg==",
+      "version": "1.22.2",
+      "resolved": "https://registry.npmjs.org/graphql-http/-/graphql-http-1.22.2.tgz",
+      "integrity": "sha512-OpUJJoefHlyfYoOyhzIVjKxFPIDylmX34wy2y8M/i9i+DcQTGYmuThLGenuS92tFRzJnAXO2HJYQoz8O9TLcEg==",
       "engines": {
         "node": ">=12"
       },
@@ -4606,9 +4612,9 @@
       }
     },
     "node_modules/mongoose": {
-      "version": "8.8.0",
-      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-8.8.0.tgz",
-      "integrity": "sha512-KluvgwnQB1GPOYZZXUHJRjS1TW6xxwTlf/YgjWExuuNanIe3W7VcR7dDXQVCIRk8L7NYge8EnoTcu2grWtN+XQ==",
+      "version": "8.8.1",
+      "resolved": "https://registry.npmjs.org/mongoose/-/mongoose-8.8.1.tgz",
+      "integrity": "sha512-l7DgeY1szT98+EKU8GYnga5WnyatAu+kOQ2VlVX1Mxif6A0Umt0YkSiksCiyGxzx8SPhGe9a53ND1GD4yVDrPA==",
       "dependencies": {
         "bson": "^6.7.0",
         "kareem": "2.6.3",
@@ -5906,9 +5912,12 @@
       }
     },
     "node_modules/swagger-ui-dist": {
-      "version": "5.17.14",
-      "resolved": "https://registry.npmjs.org/swagger-ui-dist/-/swagger-ui-dist-5.17.14.tgz",
-      "integrity": "sha512-CVbSfaLpstV65OnSjbXfVd6Sta3q3F7Cj/yYuvHMp1P90LztOLs6PfUnKEVAeiIVQt9u2SaPwv0LiH/OyMjHRw=="
+      "version": "5.18.2",
+      "resolved": "https://registry.npmjs.org/swagger-ui-dist/-/swagger-ui-dist-5.18.2.tgz",
+      "integrity": "sha512-J+y4mCw/zXh1FOj5wGJvnAajq6XgHOyywsa9yITmwxIlJbMqITq3gYRZHaeqLVH/eV/HOPphE6NjF+nbSNC5Zw==",
+      "dependencies": {
+        "@scarf/scarf": "=1.4.0"
+      }
     },
     "node_modules/swagger-ui-express": {
       "version": "5.0.1",

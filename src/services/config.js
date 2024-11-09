@@ -29,8 +29,9 @@ export async function getConfigById(id, populateAdmin = false) {
 export async function getConfig(where) {
     const query = Config.findOne();
 
-    if (where.domain) query.where('domain', where.domain);
-    if (where.key) query.where('key', where.key);
+    query.where('key', where.key);
+    query.where('domain', where.domain);
+
     if (where.group) query.where('group', where.group);
     
     return query.exec();
@@ -39,9 +40,10 @@ export async function getConfig(where) {
 export async function getConfigs(where, lean = false) {
     const query = Config.find();
 
+    query.where('domain', where.domain);
+    
     if (where.id) query.where('_id', where.id);
     if (where.key) query.where('key', where.key);
-    if (where.domain) query.where('domain', where.domain);
     if (where.group) query.where('group', where.group);
     if (lean) query.lean();
 
@@ -70,6 +72,9 @@ export async function createConfig(args, admin) {
         key: args.key,
         domain: group.domain 
     });
+
+    // validates relay
+    isRelayValid(args.relay);
     
     if (config) {
         throw new BadRequestError(`Config ${config.key} already exists`);

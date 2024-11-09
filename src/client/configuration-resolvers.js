@@ -97,7 +97,10 @@ export async function resolveFlatConfig(source, context) {
         configs = source.config;
         domainId = configs[0].domain;
     } else if (source.group) {
-        configs = await getConfigs({ group: source.group.map(g => g._id) }, true);
+        configs = await getConfigs({ 
+            domain: source.group[0].domain, 
+            group: source.group.map(g => g._id) 
+        }, true);
         domainId = source.group[0].domain;
     }
 

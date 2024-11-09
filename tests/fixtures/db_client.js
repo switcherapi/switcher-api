@@ -82,7 +82,7 @@ export const configPrdQADocument = {
     key: keyConfigPrdQA,
     description: 'Test config 2 - Off in PRD and ON in QA',
     activated: { 
-        [`${EnvType.DEFAULT}`]: false,
+        [EnvType.DEFAULT]: false,
         QA: true
     },
     owner: adminMasterAccountId,

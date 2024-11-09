@@ -3,7 +3,7 @@ import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import app from '../src/app';
 import { Client } from 'switcher-client';
-import { Config } from '../src/models/config';
+import { Config, RelayMethods, RelayTypes } from '../src/models/config';
 import GroupConfig from '../src/models/group-config';
 import { ConfigStrategy, OperationsType, StrategiesType } from '../src/models/config-strategy';
 import { EnvType } from '../src/models/environment';
@@ -187,6 +187,59 @@ describe('GitOps - Push New', () => {
         expect(config).not.toBeNull();
         expect(config.activated[EnvType.DEFAULT]).toBe(true);
         expect(config.components).toHaveLength(0);
+    });
+
+    test('GITOPS_SUITE - Should push changes - New Switcher and Relay', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'NEW',
+                    diff: 'CONFIG',
+                    path: [
+                        'Group Test'
+                    ],
+                    content: {
+                        key: 'NEW_SWITCHER_RELAY',
+                        activated: true,
+                        relay: {
+                            type: RelayTypes.NOTIFICATION,
+                            method: RelayMethods.POST,
+                            description: 'New Relay',
+                            activated: true,
+                            endpoint: 'https://localhost:3000'
+                        }
+                    }
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const config = await Config.findOne({ key: 'NEW_SWITCHER_RELAY', domain: domainId }).lean().exec();
+        expect(config).not.toBeNull();
+        expect(config.activated[EnvType.DEFAULT]).toBe(true);
+        expect(config.relay).toMatchObject({
+            type: RelayTypes.NOTIFICATION,
+            method: RelayMethods.POST,
+            description: 'New Relay',
+            endpoint: {
+                [EnvType.DEFAULT]: 'https://localhost:3000'
+            },
+            activated: {
+                [EnvType.DEFAULT]: true
+            },
+            verified: {
+                [EnvType.DEFAULT]: false
+            }
+        });
     });
 
     test('GITOPS_SUITE - Should push changes - New Switcher and Strategy', async () => {
@@ -407,6 +460,98 @@ describe('GitOps - Push Changed', () => {
         expect(config.description).toBe('Changed Switcher Description');
     });
 
+    test('GITOPS_SUITE - Should push changes - Changed Switcher Relay (added)', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes: [{
+                    action: 'CHANGED',
+                    diff: 'CONFIG',
+                    path: ['Group Test', 'TEST_CONFIG_KEY_PRD_QA'],
+                    content: {
+                        relay: {
+                            type: RelayTypes.NOTIFICATION,
+                            method: RelayMethods.POST,
+                            description: 'New Relay',
+                            activated: true,
+                            endpoint: 'https://localhost:3000'
+                        }
+                    }
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const config = await Config.findOne({ key: 'TEST_CONFIG_KEY_PRD_QA', domain: domainId }).lean().exec();
+        expect(config).not.toBeNull();
+        expect(config.relay).toMatchObject({
+            type: RelayTypes.NOTIFICATION,
+            method: RelayMethods.POST,
+            description: 'New Relay',
+            activated: {
+                [EnvType.DEFAULT]: true
+            },
+            endpoint: {
+                [EnvType.DEFAULT]: 'https://localhost:3000'
+            },
+            verified: {
+                [EnvType.DEFAULT]: false
+            }
+        });
+    });
+
+    test('GITOPS_SUITE - Should push changes - Changed Switcher Relay environment status/endpoint', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: 'QA',
+                changes: [{
+                    action: 'CHANGED',
+                    diff: 'CONFIG',
+                    path: ['Group Test', 'TEST_CONFIG_KEY'],
+                    content: {
+                        relay: {
+                            endpoint: 'http://localhost:3001',
+                            activated: false
+                        }
+                    }
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const config = await Config.findOne({ key: 'TEST_CONFIG_KEY', domain: domainId }).lean().exec();
+        expect(config).not.toBeNull();
+        expect(config.relay).toMatchObject({
+            type: RelayTypes.NOTIFICATION,
+            method: RelayMethods.POST,
+            description: 'Test Relay',
+            activated: {
+                ['QA']: false,
+                [EnvType.DEFAULT]: true
+            },
+            endpoint: {
+                ['QA']: 'http://localhost:3001',
+                [EnvType.DEFAULT]: 'http://localhost:3000'
+            }
+        });
+    });
+
     test('GITOPS_SUITE - Should push changes - Changed Strategy', async () => {
         const token = generateToken('30s');
 
@@ -444,6 +589,81 @@ describe('GitOps - Push Changed', () => {
             activated: {
                 [EnvType.DEFAULT]: false
             },
+        });
+    });
+
+    test('GITOPS_SUITE - Should push changes - Changed Strategy environment status', async () => {
+        const token = generateToken('30s');
+
+        // given
+        const changes = [{
+            action: 'NEW',
+            diff: 'STRATEGY',
+            path: ['Group Test', 'TEST_CONFIG_KEY'],
+            content: {
+                strategy: StrategiesType.NUMERIC,
+                description: 'Test Strategy',
+                operation: OperationsType.EXIST,
+                activated: true,
+                values: ['100', '200']
+            }
+        }];
+        
+        // default environment
+        await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: EnvType.DEFAULT,
+                changes
+            });
+
+        // QA environment
+        await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: 'QA',
+                changes
+            });
+
+        // test
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: 'QA',
+                changes: [{
+                    action: 'CHANGED',
+                    diff: 'STRATEGY',
+                    path: ['Group Test', 'TEST_CONFIG_KEY', StrategiesType.NUMERIC],
+                    content: {
+                        activated: false
+                    }
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const strategies = await ConfigStrategy.find({ 
+            config: configId, 
+            strategy: StrategiesType.NUMERIC
+        }).lean().exec();
+
+        expect(strategies).toHaveLength(2);
+        expect(strategies[0]).toMatchObject({
+            activated: {
+                [EnvType.DEFAULT]: true
+            }
+        });
+        expect(strategies[1]).toMatchObject({
+            activated: {
+                ['QA']: false
+            }
         });
     });
     
