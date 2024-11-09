@@ -18,6 +18,7 @@ const PATH_CONSTRAINTS_DELETED = {
     GROUP: 1,
     CONFIG: 2,
     STRATEGY: 3,
+    RELAY: 2,
     COMPONENT: 2
 };
 

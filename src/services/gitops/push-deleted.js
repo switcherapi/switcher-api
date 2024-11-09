@@ -1,6 +1,6 @@
 import { getComponents } from '../component.js';
 import { deleteStrategy, getStrategies } from '../config-strategy.js';
-import { deleteConfig, getConfig, removeComponent } from '../config.js';
+import { deleteConfig, getConfig, removeComponent, removeRelay } from '../config.js';
 import { deleteGroup, getGroupConfig } from '../group-config.js';
 import { ADMIN_EMAIL } from './index.js';
 
@@ -8,6 +8,7 @@ const DIFF_PROCESSES = Object.freeze({
     GROUP: processGroupDeleted,
     CONFIG: processConfigDeleted,
     STRATEGY: processStrategyDeleted,
+    RELAY: processRelayDeleted,
     COMPONENT: processComponentDeleted
 });
 
@@ -42,6 +43,15 @@ async function processStrategyDeleted(domain, change, environment) {
     const strategy = strategies.find(strategy => strategy.strategy === path[2] && strategy.activated.get(environment));
 
     await deleteStrategy(strategy._id, admin);
+}
+
+async function processRelayDeleted(domain, change, environment) {
+    const path = change.path;
+    const admin = { _id: domain.owner, email: ADMIN_EMAIL };
+    const group = await getGroupConfig({ domain: domain._id, name: path[0] });
+    const config = await getConfig({ domain: domain._id, group: group._id, key: path[1] });
+
+    await removeRelay(config._id, environment, admin);
 }
 
 async function processComponentDeleted(domain, change) {
