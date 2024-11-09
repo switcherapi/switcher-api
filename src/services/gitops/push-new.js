@@ -42,21 +42,35 @@ async function processNewConfig(domain, change, environment) {
     const admin = { _id: domain.owner };
     const group = await getGroupConfig({ domain: domain._id, name: path[0] });
 
-    let componentIds;
-    if (content.components?.length) {
-        const components = await getComponents({ domain: domain._id, name: { $in: content.components } });
-        componentIds = components.map(component => component._id);
-    }
-
-    const config = await createConfig({
+    const newConfig = {
         domain: domain._id,
         group: group._id,
         key: content.key,
         description: getNewValue(content.description, ''),
         activated: new Map().set(environment, getNewValue(content.activated, true)),
         owner: domain.owner,
-        components: componentIds
-    }, admin);
+    };
+
+    if (content.components?.length) {
+        const components = await getComponents({ domain: domain._id, name: { $in: content.components } });
+        newConfig.components = components.map(component => component._id);
+    }
+
+    if (content.relay) {
+        newConfig.relay = {
+            type: content.relay.type,
+            method: content.relay.method,
+            endpoint: {
+                [environment]: content.relay.endpoint
+            },
+            description: content.relay.description,
+            activated: {
+                [environment]: getNewValue(content.relay.activated, true)
+            }
+        };
+    }
+
+    const config = await createConfig(newConfig, admin);
 
     if (content.strategies?.length) {
         for (const strategy of content.strategies) {
