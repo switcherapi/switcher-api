@@ -5271,7 +5271,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"CHANGED\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"Group Test\",\r\n                \"NEW_SWITCHER_2\"\r\n            ],\r\n            \"content\": {\r\n                \"relay\": {\r\n                    \"type\": \"NOTIFICATION\",\r\n                    \"method\": \"POST\",\r\n                    \"endpoint\": \"https://localhost:3000\",\r\n                    \"description\": \"Push message to log\",\r\n                    \"activated\": true\r\n                }\r\n            }\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"CHANGED\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"Group Test\",\r\n                \"NEW_SWITCHER_2\"\r\n            ],\r\n            \"content\": {\r\n                \"relay\": {\r\n                    \"relay_type\": \"NOTIFICATION\",\r\n                    \"relay_method\": \"POST\",\r\n                    \"relay_endpoint\": \"https://localhost:3000\",\r\n                    \"description\": \"Push message to log\",\r\n                    \"activated\": true\r\n                }\r\n            }\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5461,7 +5461,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"New Group\"\r\n            ],\r\n            \"content\": {\r\n                \"key\": \"NEW_SWITCHER_RELAY\",\r\n                \"description\": \"New Switcher Relay\",\r\n                \"activated\": true,\r\n                \"components\": [\r\n                    \"switcher-playground\"\r\n                ],\r\n                \"relay\": {\r\n                    \"type\": \"NOTIFICATION\",\r\n                    \"method\": \"POST\",\r\n                    \"endpoint\": \"https://localhost:3000\",\r\n                    \"description\": \"Push message to log\",\r\n                    \"activated\": true\r\n                }\r\n            }\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"New Group\"\r\n            ],\r\n            \"content\": {\r\n                \"key\": \"NEW_SWITCHER_RELAY\",\r\n                \"description\": \"New Switcher Relay\",\r\n                \"activated\": true,\r\n                \"components\": [\r\n                    \"switcher-playground\"\r\n                ],\r\n                \"relay\": {\r\n                    \"relay_type\": \"NOTIFICATION\",\r\n                    \"relay_method\": \"POST\",\r\n                    \"relay_endpoint\": \"https://localhost:3000\",\r\n                    \"description\": \"Push message to log\",\r\n                    \"activated\": true\r\n                }\r\n            }\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"

@@ -35,7 +35,13 @@ async function processChangedConfig(domain, change, environment) {
     }, admin);
 
     if (content.relay) {
-        await updateConfigRelay(config._id, processRelay(content.relay, config.relay, environment), admin);
+        await updateConfigRelay(config._id, processRelay({
+            type: content.relay.relay_type,
+            method: content.relay.relay_method,
+            endpoint: content.relay.relay_endpoint,
+            description: content.relay.description,
+            activated: content.relay.activated
+        }, config.relay, environment), admin);
     }
 }
 
