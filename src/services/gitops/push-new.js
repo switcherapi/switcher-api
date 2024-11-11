@@ -58,10 +58,10 @@ async function processNewConfig(domain, change, environment) {
 
     if (content.relay) {
         newConfig.relay = {
-            type: content.relay.type,
-            method: content.relay.method,
+            type: content.relay.relay_type,
+            method: content.relay.relay_method,
             endpoint: {
-                [environment]: content.relay.endpoint
+                [environment]: content.relay.relay_endpoint
             },
             description: content.relay.description,
             activated: {

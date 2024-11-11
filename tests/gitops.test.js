@@ -208,11 +208,11 @@ describe('GitOps - Push New', () => {
                         key: 'NEW_SWITCHER_RELAY',
                         activated: true,
                         relay: {
-                            type: RelayTypes.NOTIFICATION,
-                            method: RelayMethods.POST,
+                            relay_type: RelayTypes.NOTIFICATION,
+                            relay_method: RelayMethods.POST,
+                            relay_endpoint: 'https://localhost:3000',
                             description: 'New Relay',
-                            activated: true,
-                            endpoint: 'https://localhost:3000'
+                            activated: true
                         }
                     }
                 }]
@@ -475,11 +475,11 @@ describe('GitOps - Push Changed', () => {
                     path: ['Group Test', 'TEST_CONFIG_KEY_PRD_QA'],
                     content: {
                         relay: {
-                            type: RelayTypes.NOTIFICATION,
-                            method: RelayMethods.POST,
+                            relay_type: RelayTypes.NOTIFICATION,
+                            relay_method: RelayMethods.POST,
+                            relay_endpoint: 'https://localhost:3000',
                             description: 'New Relay',
-                            activated: true,
-                            endpoint: 'https://localhost:3000'
+                            activated: true
                         }
                     }
                 }]
@@ -523,7 +523,7 @@ describe('GitOps - Push Changed', () => {
                     path: ['Group Test', 'TEST_CONFIG_KEY'],
                     content: {
                         relay: {
-                            endpoint: 'http://localhost:3001',
+                            relay_endpoint: 'http://localhost:3001',
                             activated: false
                         }
                     }
