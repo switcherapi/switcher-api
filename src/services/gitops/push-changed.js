@@ -36,9 +36,9 @@ async function processChangedConfig(domain, change, environment) {
 
     if (content.relay) {
         await updateConfigRelay(config._id, processRelay({
-            type: content.relay.relay_type,
-            method: content.relay.relay_method,
-            endpoint: content.relay.relay_endpoint,
+            type: content.relay.type,
+            method: content.relay.method,
+            endpoint: content.relay.endpoint,
             description: content.relay.description,
             activated: content.relay.activated
         }, config.relay, environment), admin);
