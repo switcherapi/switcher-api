@@ -56,15 +56,13 @@ export const strategyType = new GraphQLObjectType({
 export const relayType = new GraphQLObjectType({
     name: 'Relay',
     fields: {
-        relay_type: {
-            type: GraphQLString,
-            resolve: (source) => source.type
+        type: {
+            type: GraphQLString
         },
-        relay_method: {
-            type: GraphQLString,
-            resolve: (source) => source.method
+        method: {
+            type: GraphQLString
         },
-        relay_endpoint: {
+        endpoint: {
             type: GraphQLString,
             resolve: (source, _args, { environment }) => {
                 return source.endpoint[`${environment}`] === undefined ?
