@@ -29,12 +29,12 @@ afterAll(async () => {
 describe('Testing strategy creation #1', () => {
     beforeAll(setupDatabase);
 
-    test('STRATEGY_SUITE - Should create a new Config Strategy', async () => {
+    test('STRATEGY_SUITE - Should create a new Config Strategy - NETWORK', async () => {
         const response = await request(app)
             .post('/configstrategy/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
-                description: 'Description of my new Config Strategy',
+                description: 'Description of my new Config Strategy - NETWORK',
                 strategy: StrategiesType.NETWORK,
                 operation: OperationsType.EXIST,
                 values: ['192.168.0.1/16'],
@@ -47,7 +47,28 @@ describe('Testing strategy creation #1', () => {
         expect(configStrategy).not.toBeNull();
 
         // Response validation
-        expect(response.body.description).toBe('Description of my new Config Strategy');
+        expect(response.body.description).toBe('Description of my new Config Strategy - NETWORK');
+    });
+
+    test('STRATEGY_SUITE - Should create a new Config Strategy - DATE/TIME', async () => {
+        const response = await request(app)
+            .post('/configstrategy/create')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                description: 'Description of my new Config Strategy - DATE',
+                strategy: StrategiesType.DATE,
+                operation: OperationsType.GREATER,
+                values: ['2019-12-12 00:00'],
+                config: configId2,
+                env: EnvType.DEFAULT
+            }).expect(201);
+
+        // DB validation - document created
+        const configStrategy = await ConfigStrategy.findById(response.body._id).lean().exec();
+        expect(configStrategy).not.toBeNull();
+
+        // Response validation
+        expect(response.body.description).toBe('Description of my new Config Strategy - DATE');
     });
 
     test('STRATEGY_SUITE - Should NOT create a new Config Strategy - Config not found', async () => {
