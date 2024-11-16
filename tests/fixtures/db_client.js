@@ -145,7 +145,7 @@ export const configStrategyTIME_GREATDocument = {
     config: configId,
     operation: OperationsType.GREATER,
     strategy: StrategiesType.DATE,
-    values: ['2019-12-01T13:00'],
+    values: ['2019-12-01 13:00'],
     domain: domainId
 };
 
