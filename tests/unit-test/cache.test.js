@@ -1,6 +1,14 @@
+import mongoose from 'mongoose';
 import { permissionCache } from '../../src/helpers/cache';
 import { EnvType } from '../../src/models/environment';
 import { ActionTypes, RouterTypes } from '../../src/models/permission';
+
+import '../../src/app';
+
+afterAll(async () => { 
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    await mongoose.disconnect();
+});
 
 describe('Test permissionCache', () => {
 
