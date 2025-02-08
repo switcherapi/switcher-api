@@ -1,6 +1,14 @@
+import mongoose from 'mongoose';
 import moment from 'moment';
 import { buildRangeDateFilter } from '../../src/services/metric';
 import { Metric } from '../../src/models/metric';
+
+import '../../src/app';
+
+afterAll(async () => { 
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    await mongoose.disconnect();
+});
 
 describe('Test metric date range filters', () => {
 

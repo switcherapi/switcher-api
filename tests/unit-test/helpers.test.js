@@ -1,4 +1,12 @@
+import mongoose from 'mongoose';
 import { formatInput, containsValue } from '../../src/helpers';
+
+import '../../src/app';
+
+afterAll(async () => { 
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    await mongoose.disconnect();
+});
 
 describe('Test formatInput', () => {
 
