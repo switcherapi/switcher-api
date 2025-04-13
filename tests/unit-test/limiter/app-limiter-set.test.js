@@ -13,7 +13,7 @@ beforeAll(async () => {
   app = (await import('../../../src/app')).default;
 });
 
-describe('When maximum request per minute is postive', () => {
+describe('When maximum request per minute is positive', () => {
   test('LIMITER_SUITE - Should return 429 - Too many requests', async () => {
     await request(app)
       .get('/check')
