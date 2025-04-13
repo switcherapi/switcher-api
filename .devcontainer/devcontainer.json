@@ -1,0 +1,16 @@
+{
+    "name": "Switcher API Dev Container",
+    "dockerComposeFile": [
+        "docker-compose.yml"
+    ],
+    "service": "switcherapi",
+    "workspaceFolder": "/workspace",
+	"customizations":{
+		"vscode": {
+			"extensions": ["dbaeumer.vscode-eslint"],
+			"settings": {
+				"terminal.integrated.shell.linux": "/bin/bash"
+			}
+		}
+	}
+}
