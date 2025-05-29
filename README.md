@@ -77,7 +77,6 @@ Signing up an account to use Switcher API with an email/password or linking it t
 - **Singing up via email** - Admin: /admin/signup [POST]
 - **Singing up via GitHub** - Admin: /admin/github/auth?code= [POST]
 - **Singing up via Bitbucket** - Admin: /admin/bitbucket/auth?code= [POST]
-- **Access confirmation** - Admin: /admin/signup/authorization?code= [POST]
 
 ### Domain
 Domains are responsible for centralizing all settings and configurations.<br>

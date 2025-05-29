@@ -28,7 +28,7 @@ const adminSchema = new mongoose.Schema({
     active: {
         type: Boolean,
         required: true,
-        default: false
+        default: true
     },
     teams: [{
         type: mongoose.Schema.Types.ObjectId,

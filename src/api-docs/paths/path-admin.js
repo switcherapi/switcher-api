@@ -18,21 +18,6 @@ export default {
             }
         }
     },
-    '/admin/signup/authorization': {
-        post: {
-            tags: ['Admin'],
-            description: 'Admin signup authorization',
-            parameters: [
-               queryParameter('code', 'Authorization code', true)
-            ],
-            responses: {
-                '201': {
-                    description: 'Admin signup authorization',
-                    content: commonSchemaContent('AdminLoginResponse')
-                }
-            }
-        }
-    },
     '/admin/github/auth': {
         post: {
             tags: ['Admin'],
