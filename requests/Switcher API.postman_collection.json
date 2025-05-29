@@ -18,7 +18,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -31,13 +32,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"\",\n\t\"email\": \"\",\n\t\"password\": \"\",\n\t\"token\": \"\"\n}",
+							"raw": "{\n\t\"name\": \"{{name}}\",\n\t\"email\": \"{{email}}\",\n\t\"password\": \"{{password}}\",\n\t\"token\": \"{{token}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -58,63 +58,6 @@
 					"response": []
 				},
 				{
-					"name": "Admin - Signup Authorization",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 201) {",
-									"    pm.environment.set('authToken', pm.response.json().jwt.token)",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"name": "Content-Type",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}/admin/signup/authorization?code=",
-							"host": [
-								"{{url}}"
-							],
-							"path": [
-								"admin",
-								"signup",
-								"authorization"
-							],
-							"query": [
-								{
-									"key": "code",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Admin - GitHub Auth",
 					"event": [
 						{
@@ -125,7 +68,8 @@
 									"    pm.environment.set('authToken', pm.response.json().jwt.token)",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -138,7 +82,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -152,7 +95,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/admin/github/auth?code=",
+							"raw": "{{url}}/admin/github/auth?code={{code}}",
 							"host": [
 								"{{url}}"
 							],
@@ -164,7 +107,7 @@
 							"query": [
 								{
 									"key": "code",
-									"value": ""
+									"value": "{{code}}"
 								}
 							]
 						}
@@ -182,7 +125,8 @@
 									"//     pm.environment.set('authToken', pm.response.json().jwt.token)",
 									"// }"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -195,7 +139,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -209,7 +152,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/admin/bitbucket/auth?code=",
+							"raw": "{{url}}/admin/bitbucket/auth?code={{code}}",
 							"host": [
 								"{{url}}"
 							],
@@ -221,7 +164,7 @@
 							"query": [
 								{
 									"key": "code",
-									"value": ""
+									"value": "{{code}}"
 								}
 							]
 						}
@@ -236,13 +179,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"password\": \"12312312312\"\n}",
+							"raw": "{\n\t\"password\": \"{{password}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -274,7 +216,8 @@
 									"    pm.environment.set('refreshToken', pm.response.json().jwt.refreshToken)",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -287,13 +230,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"email\": \"mail@mail.com\",\r\n\t\"password\": \"123123123\"\r\n}",
+							"raw": "{\r\n\t\"email\": \"{{email}}\",\r\n\t\"password\": \"{{password}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -322,7 +264,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -335,13 +278,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"email\": \"mail@mail.com\"\r\n}",
+							"raw": "{\r\n\t\"email\": \"{{email}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -374,7 +316,8 @@
 									"    pm.environment.set('authToken', pm.response.json().jwt.token)\r",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -387,13 +330,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n\t\"code\": \"\",\r\n\t\"password\": \"\",\r\n\t\"token\": \"\"\r\n}",
+							"raw": "{\r\n\t\"code\": \"{{code}}\",\r\n\t\"password\": \"{{password}}\",\r\n\t\"token\": \"{{token}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -511,7 +453,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -526,13 +469,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"domain\": \"5e0ece606f4f994eac9007ae\",\n\t\"action\": [\"READ\", \"UPDATE\"],\n\t\"router\": \"GROUP\",\n\t\"element\": {\n\t\t\"name\": \"Project 2\"\n\t}\n}",
+							"raw": "{\n\t\"domain\": \"{{domain_id}}\",\n\t\"action\": [\"READ\", \"UPDATE\"],\n\t\"router\": \"GROUP\",\n\t\"element\": {\n\t\t\"name\": \"{{element_name}}\"\n\t}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -562,7 +504,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -587,7 +530,7 @@
 							"variable": [
 								{
 									"key": "admin",
-									"value": "5e0ece2b6f4f994eac9007ad"
+									"value": "{{adminid}}"
 								}
 							]
 						}
@@ -686,7 +629,7 @@
 							"variable": [
 								{
 									"key": "domain",
-									"value": "5ed5b45fbcd74972fc55b72e"
+									"value": "{{domainid}}"
 								}
 							]
 						}
@@ -706,13 +649,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"QA\",\n\t\"domain\": \"\"\n}",
+							"raw": "{\n\t\"name\": \"{{name}}\",\n\t\"domain\": \"{{domainid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -740,7 +682,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -766,7 +707,7 @@
 							"variable": [
 								{
 									"key": "env",
-									"value": "5df2a4491bf6792758ba6b82"
+									"value": "{{envid}}"
 								}
 							]
 						}
@@ -798,7 +739,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/environment/?domain=",
+							"raw": "{{url}}/environment/?domain={{domainid}}",
 							"host": [
 								"{{url}}"
 							],
@@ -824,7 +765,7 @@
 								},
 								{
 									"key": "domain",
-									"value": ""
+									"value": "{{domainid}}"
 								}
 							]
 						}
@@ -842,7 +783,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -867,7 +807,7 @@
 							"variable": [
 								{
 									"key": "env",
-									"value": "5deac6bc2d61a41fa0a84789"
+									"value": "{{envid}}"
 								}
 							]
 						}
@@ -891,7 +831,7 @@
 							"variable": [
 								{
 									"key": "env",
-									"value": "5deac77f2d61a41fa0a8478f"
+									"value": "{{envid}}"
 								}
 							]
 						}
@@ -911,13 +851,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"Android\",\n\t\"description\": \"Operational system\",\n\t\"domain\": \"5e0ece606f4f994eac9007ae\"\n}",
+							"raw": "{\n\t\"name\": \"{{name}}\",\n\t\"description\": \"{{description}}\",\n\t\"domain\": \"{{domainid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -945,13 +884,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"description\": \"Mobile OS\"\n}",
+							"raw": "{\n\t\"description\": \"{{description}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -988,7 +926,8 @@
 									"    pm.environment.set('apiKey', pm.response.json().apiKey)",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1001,7 +940,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							},
 							{
@@ -1032,74 +970,12 @@
 							"variable": [
 								{
 									"key": "component",
-									"value": "5edb2330985c4725fcf2146f"
+									"value": "{{componentid}}"
 								}
 							]
 						}
 					},
-					"response": [
-						{
-							"name": "Domain - API Key",
-							"originalRequest": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"name": "Content-Type",
-										"type": "text"
-									},
-									{
-										"key": "",
-										"value": "",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{url}}/domain/generateApiKey/5df166239194d613400a52e7",
-									"host": [
-										"{{url}}"
-									],
-									"path": [
-										"domain",
-										"generateApiKey",
-										"5df166239194d613400a52e7"
-									]
-								}
-							},
-							"status": "Created",
-							"code": 201,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "X-Powered-By",
-									"value": "Express"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Content-Length",
-									"value": "73"
-								},
-								{
-									"key": "ETag",
-									"value": "W/\"49-UUQ0fKZ1ks2v9yj6/x/6QT0U2MU\""
-								},
-								{
-									"key": "Date",
-									"value": "Thu, 12 Dec 2019 04:22:10 GMT"
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"apiKey\": \"$2b$08$ukaPxVKYA9mIt1Xym.73SefuYU8Cne8PRprDlSxgOjaEvz3iP.a6S\"\n}"
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Component - Read",
@@ -1112,7 +988,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -1126,7 +1001,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/component/?domain=5e0ece606f4f994eac9007ae",
+							"raw": "{{url}}/component/?domain={{domainid}}",
 							"host": [
 								"{{url}}"
 							],
@@ -1152,7 +1027,7 @@
 								},
 								{
 									"key": "domain",
-									"value": "5e0ece606f4f994eac9007ae"
+									"value": "{{domainid}}"
 								}
 							]
 						}
@@ -1170,7 +1045,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -1195,7 +1069,7 @@
 							"variable": [
 								{
 									"key": "component",
-									"value": "5deca4d3ed149e3f804aecb9"
+									"value": "{{componentid}}"
 								}
 							]
 						}
@@ -1219,7 +1093,7 @@
 							"variable": [
 								{
 									"key": "component",
-									"value": "5deca63a9323870448544f2d"
+									"value": "{{componentid}}"
 								}
 							]
 						}
@@ -1240,7 +1114,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1250,13 +1125,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"My Team 2\",\n\t\"domain\": \"5e0bbe269ad3100658ae2229\"\n}",
+							"raw": "{\n\t\"name\": \"{{name}}\",\n\t\"domain\": \"{{domainid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1294,7 +1168,8 @@
 									"    pm.environment.set('apiKey', pm.response.json().apiKey)",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1307,7 +1182,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -1321,7 +1195,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/team/?domain=5e0bbe0d9ad3100658ae2228",
+							"raw": "{{url}}/team/?domain={{domainid}}",
 							"host": [
 								"{{url}}"
 							],
@@ -1332,7 +1206,7 @@
 							"query": [
 								{
 									"key": "domain",
-									"value": "5e0bbe0d9ad3100658ae2228"
+									"value": "{{domainid}}"
 								}
 							]
 						}
@@ -1350,7 +1224,8 @@
 									"    pm.environment.set('apiKey', pm.response.json().apiKey)",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1363,7 +1238,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -1394,7 +1268,7 @@
 							"variable": [
 								{
 									"key": "team",
-									"value": "5e10eda73a649463a8ef3751"
+									"value": "{{teamid}}"
 								}
 							]
 						}
@@ -1410,7 +1284,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1420,7 +1295,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -1445,7 +1319,7 @@
 							"variable": [
 								{
 									"key": "team",
-									"value": "5e0bc0e1ac22583584aeb849"
+									"value": "{{teamid}}"
 								}
 							]
 						}
@@ -1461,7 +1335,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1471,7 +1346,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -1496,7 +1370,7 @@
 							"variable": [
 								{
 									"key": "team",
-									"value": "5e0d10c21078a209b4215b7f"
+									"value": "{{teamid}}"
 								}
 							]
 						}
@@ -1512,7 +1386,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1522,13 +1397,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"email\": \"roger.petruki@gmail.com\"\n}",
+							"raw": "{\n\t\"email\": \"{{email}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1549,7 +1423,7 @@
 							"variable": [
 								{
 									"key": "team",
-									"value": "5e10eda73a649463a8ef3751"
+									"value": "{{teamid}}"
 								}
 							]
 						}
@@ -1565,7 +1439,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1575,7 +1450,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -1603,7 +1477,7 @@
 							"variable": [
 								{
 									"key": "team",
-									"value": "5ed404eabe178984d812f61e"
+									"value": "{{teamid}}"
 								}
 							]
 						}
@@ -1619,7 +1493,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1629,7 +1504,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -1658,11 +1532,11 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5e10eda73a649463a8ef3751"
+									"value": "{{teamid}}"
 								},
 								{
 									"key": "request_id",
-									"value": "5f30448867be1453684853fc"
+									"value": "{{requestid}}"
 								}
 							]
 						}
@@ -1678,7 +1552,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1691,7 +1566,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -1718,7 +1592,7 @@
 							"variable": [
 								{
 									"key": "team",
-									"value": "5ed80055ada7c13b4cfd6a63"
+									"value": "{{teamid}}"
 								}
 							]
 						}
@@ -1734,7 +1608,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1747,7 +1622,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -1775,7 +1649,7 @@
 							"variable": [
 								{
 									"key": "team",
-									"value": "5e10eda73a649463a8ef3751"
+									"value": "{{teamid}}"
 								}
 							]
 						}
@@ -1793,7 +1667,8 @@
 									"    pm.environment.set('apiKey', pm.response.json().apiKey)",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1803,13 +1678,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"member\": \"5e35d5820cceed52b012ef26\"\n}",
+							"raw": "{\n\t\"member\": \"{{userid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1830,7 +1704,7 @@
 							"query": [
 								{
 									"key": "id",
-									"value": "5e0bbe0d9ad3100658ae2228",
+									"value": "{{teamid}}",
 									"disabled": true
 								}
 							]
@@ -1849,7 +1723,8 @@
 									"    pm.environment.set('apiKey', pm.response.json().apiKey)",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1859,13 +1734,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"member\": \"5e0bbe0d9ad3100658ae2228\"\n}",
+							"raw": "{\n\t\"member\": \"{{userid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1873,7 +1747,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/team/member/remove/5e0bf0bab2ced93fb0b9111a",
+							"raw": "{{url}}/team/member/remove/:teamid",
 							"host": [
 								"{{url}}"
 							],
@@ -1881,7 +1755,13 @@
 								"team",
 								"member",
 								"remove",
-								"5e0bf0bab2ced93fb0b9111a"
+								":teamid"
+							],
+							"variable": [
+								{
+									"key": "teamid",
+									"value": "{{teamid}}"
+								}
 							]
 						}
 					},
@@ -1898,7 +1778,8 @@
 									"    pm.environment.set('apiKey', pm.response.json().apiKey)",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1908,13 +1789,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"permission\": \"5e35cb6bd5027a30749ecd28\"\n}",
+							"raw": "{\n\t\"permission\": \"{{permissionid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1922,7 +1802,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/team/permission/add/5e35d60f0cceed52b012ef28",
+							"raw": "{{url}}/team/permission/add/:teamid",
 							"host": [
 								"{{url}}"
 							],
@@ -1930,13 +1810,12 @@
 								"team",
 								"permission",
 								"add",
-								"5e35d60f0cceed52b012ef28"
+								":teamid"
 							],
-							"query": [
+							"variable": [
 								{
-									"key": "id",
-									"value": "5e0bbe0d9ad3100658ae2228",
-									"disabled": true
+									"key": "teamid",
+									"value": "{{teamid}}"
 								}
 							]
 						}
@@ -1952,7 +1831,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -1962,13 +1842,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"permission\": \"5e0bf2a097f71351a0007ab7\"\n}",
+							"raw": "{\n\t\"permission\": \"{{permissionid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1976,7 +1855,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/team/permission/remove/5e0bf0bab2ced93fb0b9111a",
+							"raw": "{{url}}/team/permission/remove/:teamid",
 							"host": [
 								"{{url}}"
 							],
@@ -1984,13 +1863,12 @@
 								"team",
 								"permission",
 								"remove",
-								"5e0bf0bab2ced93fb0b9111a"
+								":teamid"
 							],
-							"query": [
+							"variable": [
 								{
-									"key": "id",
-									"value": "5e0bbe0d9ad3100658ae2228",
-									"disabled": true
+									"key": "teamid",
+									"value": "{{teamid}}"
 								}
 							]
 						}
@@ -2011,7 +1889,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -2021,13 +1900,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"action\": \"READ\",\n\t\"router\": \"SWITCHER\",\n\t\"identifiedBy\": \"key\",\n\t\"values\": [\"TEST\", \"TEST2\"]\n}",
+							"raw": "{\n\t\"action\": \"{{action}}\",\n\t\"router\": \"{{router}}\",\n\t\"identifiedBy\": \"{{identifiedBy}}\",\n\t\"values\": [\"TEST\", \"TEST2\"]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2035,19 +1913,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/permission/create/:team",
+							"raw": "{{url}}/permission/create/:teamid",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"permission",
 								"create",
-								":team"
+								":teamid"
 							],
 							"variable": [
 								{
-									"key": "team",
-									"value": "5e35d60f0cceed52b012ef28"
+									"key": "teamid",
+									"value": "{{teamid}}"
 								}
 							]
 						}
@@ -2065,7 +1943,8 @@
 									"    pm.environment.set('apiKey', pm.response.json().apiKey)",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -2075,13 +1954,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"active\": \"true\"\n}",
+							"raw": "{\n\t\"active\": \"{{active}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2100,7 +1978,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5e0bf4a3a5753d65c0794af4"
+									"value": "{{permissionid}}"
 								}
 							]
 						}
@@ -2116,7 +1994,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -2129,7 +2008,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -2143,7 +2021,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/permission/?team=5e10eda73a649463a8ef3751",
+							"raw": "{{url}}/permission/?team={{teamid}}",
 							"host": [
 								"{{url}}"
 							],
@@ -2154,7 +2032,7 @@
 							"query": [
 								{
 									"key": "team",
-									"value": "5e10eda73a649463a8ef3751"
+									"value": "{{teamid}}"
 								}
 							]
 						}
@@ -2170,7 +2048,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -2183,7 +2062,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -2208,7 +2086,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5e0bf449a5753d65c0794af3"
+									"value": "{{permissionid}}"
 								}
 							]
 						}
@@ -2370,7 +2248,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -2380,7 +2259,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -2405,7 +2283,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5e0bf4b5a5753d65c0794af6"
+									"value": "{{permissionid}}"
 								}
 							]
 						}
@@ -2423,7 +2301,8 @@
 									"    pm.environment.set('apiKey', pm.response.json().apiKey)",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -2433,13 +2312,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"value\": \"123\"\n}",
+							"raw": "{\n\t\"value\": \"{{value}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2467,7 +2345,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5e0bf449a5753d65c0794af3"
+									"value": "{{permissionid}}"
 								}
 							]
 						}
@@ -2485,7 +2363,8 @@
 									"    pm.environment.set('apiKey', pm.response.json().apiKey)",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -2495,13 +2374,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"value\": \"123\"\n}",
+							"raw": "{\n\t\"value\": \"{{value}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2522,7 +2400,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5e0bf449a5753d65c0794af3"
+									"value": "{{permissionid}}"
 								}
 							]
 						}
@@ -2545,7 +2423,8 @@
 									"    pm.environment.set('apiKey', pm.response.json().apiKey)",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -2555,13 +2434,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"My Domain\",\n\t\"description\": \"Doamin description\"\n}",
+							"raw": "{\n\t\"name\": \"{{name}}\",\n\t\"description\": \"{{description}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2589,13 +2467,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"description\": \"Technology solutions - Test 1\"\n}",
+							"raw": "{\n\t\"description\": \"{{description}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2614,7 +2491,7 @@
 							"variable": [
 								{
 									"key": "domain",
-									"value": "5e0ece606f4f994eac9007ae"
+									"value": "{{domainid}}"
 								}
 							]
 						}
@@ -2629,13 +2506,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"domain\": \"5e4f9d8966e06b59c8254500\"\n}",
+							"raw": "{\n\t\"domain\": \"{{domainid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2664,13 +2540,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"domain\": \"5e4f9d8966e06b59c8254500\"\n}",
+							"raw": "{\n\t\"domain\": \"{{domainid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2699,13 +2574,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"default\": true\n}",
+							"raw": "{\n\t\"default\": {{acrive}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2725,7 +2599,7 @@
 							"variable": [
 								{
 									"key": "domain",
-									"value": "5de9babb40778d3b5c82a07b"
+									"value": "{{domainid}}"
 								}
 							]
 						}
@@ -2740,13 +2614,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"env\": \"QA\"\n}",
+							"raw": "{\n\t\"env\": \"{{env_name}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2766,7 +2639,7 @@
 							"variable": [
 								{
 									"key": "domain",
-									"value": "5de9babb40778d3b5c82a07b"
+									"value": "{{domainid}}"
 								}
 							]
 						}
@@ -2853,7 +2726,7 @@
 							"variable": [
 								{
 									"key": "domain",
-									"value": "5e0bbe269ad3100658ae2229"
+									"value": "{{domainid}}"
 								}
 							]
 						}
@@ -2898,7 +2771,7 @@
 							"variable": [
 								{
 									"key": "domain",
-									"value": "5e0ece606f4f994eac9007ae"
+									"value": "{{domainid}}"
 								}
 							]
 						}
@@ -2923,7 +2796,7 @@
 							"variable": [
 								{
 									"key": "domain",
-									"value": "5e0ece606f4f994eac9007ae"
+									"value": "{{domainid}}"
 								}
 							]
 						}
@@ -2947,7 +2820,7 @@
 							"variable": [
 								{
 									"key": "domain",
-									"value": "5dd36ab857445636ccdeb520"
+									"value": "{{domainid}}"
 								}
 							]
 						}
@@ -2967,13 +2840,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"Project 2\",\n\t\"description\": \"Project #2 description\",\n\t\"domain\": \"5e0ece606f4f994eac9007ae\"\n}",
+							"raw": "{\n\t\"name\": \"{{name}}\",\n\t\"description\": \"{{description}}\",\n\t\"domain\": \"{{domainid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3001,13 +2873,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\": \"Rollout 2020\",\n\t\"description\": \"Changes that will be applied during the rollout\"\n}",
+							"raw": "{\n\t\"name\": \"{{name}}\",\n\t\"description\": \"{{description}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3026,7 +2897,7 @@
 							"variable": [
 								{
 									"key": "groupconfig",
-									"value": "5dd231391f11a7307c164531"
+									"value": "{{groupid}}"
 								}
 							]
 						}
@@ -3041,13 +2912,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"default\": true,\n\t\"QA\": true\n}",
+							"raw": "{\n\t\"default\": {{active_default}},\n\t\"QA\": {{active_qa}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3067,7 +2937,7 @@
 							"variable": [
 								{
 									"key": "groupconfig",
-									"value": "5df166359194d613400a52e9"
+									"value": "{{groupid}}"
 								}
 							]
 						}
@@ -3082,13 +2952,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"env\": \"default\"\n}",
+							"raw": "{\n\t\"env\": \"{{env_name}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3108,7 +2977,7 @@
 							"variable": [
 								{
 									"key": "groupconfig",
-									"value": "5de9c927248192258cd1c3f0"
+									"value": "{{groupid}}"
 								}
 							]
 						}
@@ -3121,7 +2990,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/groupconfig?domain=5e0ece606f4f994eac9007ae",
+							"raw": "{{url}}/groupconfig?domain={{domainid}}",
 							"host": [
 								"{{url}}"
 							],
@@ -3151,7 +3020,7 @@
 								},
 								{
 									"key": "domain",
-									"value": "5e0ece606f4f994eac9007ae"
+									"value": "{{domainid}}"
 								}
 							]
 						}
@@ -3172,22 +3041,10 @@
 								"groupconfig",
 								":groupconfig"
 							],
-							"query": [
-								{
-									"key": "key",
-									"value": "5dd06217fd3f1e403806db30",
-									"disabled": true
-								},
-								{
-									"key": "skip",
-									"value": "2",
-									"disabled": true
-								}
-							],
 							"variable": [
 								{
 									"key": "groupconfig",
-									"value": "5de9fc74279fa52e0c9cf499"
+									"value": "{{groupid}}"
 								}
 							]
 						}
@@ -3234,7 +3091,7 @@
 							"variable": [
 								{
 									"key": "groupconfig",
-									"value": "5df1664d9194d613400a52eb"
+									"value": "{{groupid}}"
 								}
 							]
 						}
@@ -3259,7 +3116,7 @@
 							"variable": [
 								{
 									"key": "groupconfig",
-									"value": "5df1664d9194d613400a52eb"
+									"value": "{{groupid}}"
 								}
 							]
 						}
@@ -3283,7 +3140,7 @@
 							"variable": [
 								{
 									"key": "groupconfig",
-									"value": "5dd230a81f11a7307c16452b"
+									"value": "{{groupid}}"
 								}
 							]
 						}
@@ -3335,7 +3192,7 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5df1664d9194d613400a52eb"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -3360,7 +3217,7 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5df1664d9194d613400a52eb"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -3375,13 +3232,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"key\": \"RELAY_1\",\n\t\"description\": \"Feature which contains a relay\",\n\t\"group\": \"5e0ece9e6f4f994eac9007b1\"\n}",
+							"raw": "{\n\t\"key\": \"{{key}}\",\n\t\"description\": \"{{description}}\",\n\t\"group\": \"{{groupid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3409,13 +3265,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"key\": \"FF2FOR2021\",\n\t\"description\": \"Feature Flag\"\n}",
+							"raw": "{\n\t\"key\": \"{{key}}\",\n\t\"description\": \"{{description}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3434,7 +3289,7 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5dd232241f11a7307c164535"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -3449,13 +3304,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"type\": \"VALIDATION\",\n\t\"description\": \"Validate input via external API\",\n\t\"activated\": {\n\t\t\"default\": true\n\t},\n\t\"endpoint\": {\n\t\t\"default\": \"http://localhost:3001\"\n\t},\n\t\"method\": \"GET\",\n\t\"auth_prefix\": \"Bearer\",\n\t\"auth_token\": {\n\t\t\"default\": \"123\"\n\t}\n}",
+							"raw": "{\n\t\"type\": \"VALIDATION\",\n\t\"description\": \"{{description}}\",\n\t\"activated\": {\n\t\t\"default\": {{activated_default}}\n\t},\n\t\"endpoint\": {\n\t\t\"default\": \"{{endpoint_default}}\"\n\t},\n\t\"method\": \"GET\",\n\t\"auth_prefix\": \"{{auth_prefix}}\",\n\t\"auth_token\": {\n\t\t\"default\": \"{{auth_token_default}}\"\n\t}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3475,7 +3329,7 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5f45ca87b196cd151c6ec8bf"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -3490,13 +3344,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"activated\": {\n\t\t\"development\": true\n\t},\n\t\"endpoint\": {\n\t\t\"development\": \"http://localhost:3000\"\n\t}\n}",
+							"raw": "{\n\t\"activated\": {\n\t\t\"development\": {{activated_development_env}}\n\t},\n\t\"endpoint\": {\n\t\t\"development\": \"{{endpoint_development_env}}\"\n\t}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3516,7 +3369,7 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5f4588335a311b4848e51f2e"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -3531,13 +3384,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"default\": true,\n\t\"QA\": true\n}",
+							"raw": "{\n\t\"default\": {{active_default}},\n\t\"QA\": {{active_qa}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3557,7 +3409,7 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5df1664d9194d613400a52eb"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -3572,13 +3424,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"env\": \"default\"\n}",
+							"raw": "{\n\t\"env\": \"{{env_name}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3598,7 +3449,7 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5de9c927248192258cd1c3f0"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -3613,13 +3464,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"component\": \"5e0ecf7d6f4f994eac9007b6\"\n}",
+							"raw": "{\n\t\"component\": \"{{componentid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3639,7 +3489,7 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5e0eceb66f4f994eac9007b2"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -3654,13 +3504,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"components\": [\n\t\t\"5e0ecf7d6f4f994eac9007b6\",\n\t\t\"5e30f18d8db9c44460d22771\"\n\t]\n}",
+							"raw": "{\n\t\"components\": [\n\t\t\"{{componentid}}\"\n\t]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3680,7 +3529,7 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5e0eceb66f4f994eac9007b2"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -3695,13 +3544,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"component\": \"5e0eceb66f4f994eac9007b2\"\n}",
+							"raw": "{\n\t\"component\": \"{{componentid}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3721,7 +3569,7 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5deac6e42d61a41fa0a8478b"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -3736,7 +3584,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -3762,7 +3609,7 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5f458a38388f1a389892780a"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -3777,7 +3624,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -3804,7 +3650,7 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5f504cc2aaea6121c4a35bfc"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -3819,7 +3665,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -3847,11 +3692,11 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5f504cc2aaea6121c4a35bfc"
+									"value": "{{configid}}"
 								},
 								{
 									"key": "environment",
-									"value": "default"
+									"value": "{{env_name}}"
 								}
 							]
 						}
@@ -3900,7 +3745,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/config?group=groupid",
+							"raw": "{{url}}/config?group={{groupid}}",
 							"host": [
 								"{{url}}"
 							],
@@ -3910,7 +3755,7 @@
 							"query": [
 								{
 									"key": "group",
-									"value": "groupid"
+									"value": "{{groupid}}"
 								},
 								{
 									"key": "fields",
@@ -3943,7 +3788,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/config/:config?resolveComponents=true",
+							"raw": "{{url}}/config/:config?resolveComponents={{resolve_components_true_false}}",
 							"host": [
 								"{{url}}"
 							],
@@ -3954,13 +3799,13 @@
 							"query": [
 								{
 									"key": "resolveComponents",
-									"value": "true"
+									"value": "{{resolve_components_true_false}}"
 								}
 							],
 							"variable": [
 								{
 									"key": "config",
-									"value": "5e0eceb66f4f994eac9007b2"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -3984,7 +3829,7 @@
 							"variable": [
 								{
 									"key": "config",
-									"value": "5dd230b31f11a7307c16452c"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -4004,13 +3849,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"description\": \"Allowed IP address\",\n    \"strategy\": \"NETWORK_VALIDATION\",\n    \"values\": [\"10.0.0.3/24\"],\n    \"operation\": \"EXIST\",\n    \"config\": \"5e0ecebe6f4f994eac9007b3\",\n    \"env\": \"default\"\n}",
+							"raw": "{\n    \"description\": \"{{description}}\",\n    \"strategy\": \"NETWORK_VALIDATION\",\n    \"values\": [\"{{value1}}\"],\n    \"operation\": \"EXIST\",\n    \"config\": \"{{configid}}\",\n    \"env\": \"{{env_name}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4038,13 +3882,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"description\": \"Rollout countries\",\n    \"strategy\": \"VALUE_VALIDATION\",\n    \"values\": [\"USA\", \"Canada\", \"Australia\", \"Africa\"],\n    \"operation\": \"NOT_EXIST\",\n    \"config\": \"5df1664d9194d613400a52eb\",\n    \"env\": \"default\"\n}",
+							"raw": "{\n    \"description\": \"{{description}}\",\n    \"strategy\": \"VALUE_VALIDATION\",\n    \"values\": [\"USA\", \"Canada\", \"Australia\", \"Africa\"],\n    \"operation\": \"NOT_EXIST\",\n    \"config\": \"{{configid}}\",\n    \"env\": \"{{env_name}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4072,13 +3915,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"description\": \"Changed\",\n\t\"operation\": \"NOT_EXIST\"\n}",
+							"raw": "{\n\t\"description\": \"{{description}}\",\n\t\"operation\": \"NOT_EXIST\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4097,7 +3939,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5df1668d9194d613400a52ee"
+									"value": "{{stratetegyid}}"
 								}
 							]
 						}
@@ -4112,13 +3954,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"value\": \"Canada\"\n}",
+							"raw": "{\n\t\"value\": \"{{value}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4138,7 +3979,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5df1668d9194d613400a52ee"
+									"value": "{{stratetegyid}}"
 								}
 							]
 						}
@@ -4153,13 +3994,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"oldvalue\": \"192.168.0.1\",\n\t\"newvalue\": \"192.168.0.2\"\n}",
+							"raw": "{\n\t\"oldvalue\": \"{{old_value}}\",\n\t\"newvalue\": \"{{new_value}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4179,7 +4019,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5df1668d9194d613400a52ee"
+									"value": "{{stratetegyid}}"
 								}
 							]
 						}
@@ -4194,13 +4034,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"value\": \"Canada\"\n}",
+							"raw": "{\n\t\"value\": \"{{value}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4220,7 +4059,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5df1668d9194d613400a52ee"
+									"value": "{{stratetegyid}}"
 								}
 							]
 						}
@@ -4235,13 +4074,12 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"default\": false\n}",
+							"raw": "{\n\t\"default\": {{active}}\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4261,7 +4099,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5e2b7f09b91d810cd037424b"
+									"value": "{{stratetegyid}}"
 								}
 							]
 						}
@@ -4274,7 +4112,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/configstrategy?env=QA&config=5e0ecebe6f4f994eac9007b3",
+							"raw": "{{url}}/configstrategy?env={{env_name}}&config={{configid}}",
 							"host": [
 								"{{url}}"
 							],
@@ -4289,7 +4127,7 @@
 								},
 								{
 									"key": "env",
-									"value": "QA"
+									"value": "{{env_name}}"
 								},
 								{
 									"key": "limit",
@@ -4303,7 +4141,7 @@
 								},
 								{
 									"key": "config",
-									"value": "5e0ecebe6f4f994eac9007b3"
+									"value": "{{configid}}"
 								}
 							]
 						}
@@ -4334,7 +4172,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5deac6fc2d61a41fa0a8478d"
+									"value": "{{stratetegyid}}"
 								}
 							]
 						}
@@ -4376,7 +4214,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5de1e309d3162634b832e8a7"
+									"value": "{{stratetegyid}}"
 								}
 							]
 						}
@@ -4462,7 +4300,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5df1668d9194d613400a52ee"
+									"value": "{{stratetegyid}}"
 								}
 							]
 						}
@@ -4487,7 +4325,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5df1668d9194d613400a52ee"
+									"value": "{{stratetegyid}}"
 								}
 							]
 						}
@@ -4511,7 +4349,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5de1e309d3162634b832e8a7"
+									"value": "{{stratetegyid}}"
 								}
 							]
 						}
@@ -4534,7 +4372,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -4548,7 +4385,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/metric/data?domainid=5e0ece606f4f994eac9007ae&page=1",
+							"raw": "{{url}}/metric/data?domainid={{domainid}}&page=1",
 							"host": [
 								"{{url}}"
 							],
@@ -4559,7 +4396,7 @@
 							"query": [
 								{
 									"key": "domainid",
-									"value": "5e0ece606f4f994eac9007ae",
+									"value": "{{domainid}}",
 									"description": "required"
 								},
 								{
@@ -4569,7 +4406,7 @@
 								},
 								{
 									"key": "key",
-									"value": "FEATURE01",
+									"value": "{{switcher_key}}",
 									"disabled": true
 								},
 								{
@@ -4579,7 +4416,7 @@
 								},
 								{
 									"key": "component",
-									"value": "Android",
+									"value": "{{component_name}}",
 									"disabled": true
 								},
 								{
@@ -4589,27 +4426,27 @@
 								},
 								{
 									"key": "group",
-									"value": "Rollout 2030",
+									"value": "{{group_name}}",
 									"disabled": true
 								},
 								{
 									"key": "environment",
-									"value": "QA",
+									"value": "{{env_name}}",
 									"disabled": true
 								},
 								{
 									"key": "dateAfter",
-									"value": "2020-07-30 23:20:00",
+									"value": "{{date_after_YYYY-MM-DD HH24:mm:ss}}",
 									"disabled": true
 								},
 								{
 									"key": "dateBefore",
-									"value": "2020-07-30 23:22:27",
+									"value": "{{date_before_YYYY-MM-DD HH24:mm:ss}}",
 									"disabled": true
 								},
 								{
 									"key": "sortBy",
-									"value": "result",
+									"value": "{{sort_by}}",
 									"description": "Can add params separated by ;",
 									"disabled": true
 								}
@@ -4629,7 +4466,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -4643,7 +4479,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/metric/statistics?domainid=5e0ece606f4f994eac9007ae&statistics=all",
+							"raw": "{{url}}/metric/statistics?domainid={{domainid}}&statistics=all",
 							"host": [
 								"{{url}}"
 							],
@@ -4654,7 +4490,7 @@
 							"query": [
 								{
 									"key": "domainid",
-									"value": "5e0ece606f4f994eac9007ae",
+									"value": "{{domainid}}",
 									"description": "required"
 								},
 								{
@@ -4664,7 +4500,7 @@
 								},
 								{
 									"key": "key",
-									"value": "FEATURE01",
+									"value": "{{switcher_key}}",
 									"disabled": true
 								},
 								{
@@ -4674,7 +4510,7 @@
 								},
 								{
 									"key": "component",
-									"value": "InventoryWS",
+									"value": "{{component_name}}",
 									"disabled": true
 								},
 								{
@@ -4684,12 +4520,12 @@
 								},
 								{
 									"key": "group",
-									"value": "Release 1",
+									"value": "{{group_name}}",
 									"disabled": true
 								},
 								{
 									"key": "environment",
-									"value": "QA",
+									"value": "{{env_name",
 									"disabled": true
 								},
 								{
@@ -4719,7 +4555,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/metric/?domainid=5e0eced36f4f994eac9007b4&key=SWITCHER_KEY",
+							"raw": "{{url}}/metric/?domainid={{domainid}}&key={{key}}",
 							"host": [
 								"{{url}}"
 							],
@@ -4730,12 +4566,12 @@
 							"query": [
 								{
 									"key": "domainid",
-									"value": "5e0eced36f4f994eac9007b4",
+									"value": "{{domainid}}",
 									"description": "required"
 								},
 								{
 									"key": "key",
-									"value": "SWITCHER_KEY",
+									"value": "{{key}}",
 									"description": "required"
 								}
 							]
@@ -4779,7 +4615,7 @@
 							"variable": [
 								{
 									"key": "domain",
-									"value": ""
+									"value": "{{domainid}}"
 								}
 							]
 						}
@@ -4803,7 +4639,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"team_id\": \"TEAM_ID\",\r\n    \"domain_id\": \"DOMAIN_ID\"\r\n}",
+							"raw": "{\r\n    \"team_id\": \"{{slack_teamid}}\",\r\n    \"domain_id\": \"{{domainid}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4842,7 +4678,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"team_id\": \"TUW2RH760\",\r\n    \"domain_id\": \"DOMAIN_ID\",\r\n    \"ticket_content\": {\r\n        \"environment\": \"default\",\r\n        \"group\": \"Experimental\",\r\n        \"switcher\": \"MY_SWITCHER2\",\r\n        \"status\": true,\r\n        \"observations\": \"Activate\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"team_id\": \"{{slack_teamid}}}}\",\r\n    \"domain_id\": \"{{domainid}}\",\r\n    \"ticket_content\": {\r\n        \"environment\": \"{{env_name}}\",\r\n        \"group\": \"{{group_name}}\",\r\n        \"switcher\": \"{{switcher_key}}\",\r\n        \"status\": {{status}},\r\n        \"observations\": \"{{observations}}\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4881,7 +4717,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"team_id\": \"TEAM_ID\",\r\n    \"domain_id\": \"DOMAIN_ID\",\r\n    \"ticket_content\": {\r\n        \"environment\": \"default\",\r\n        \"group\": \"Experimental\",\r\n        \"switcher\": \"MY_SWITCHER2\",\r\n        \"status\": true,\r\n        \"observations\": \"Activate\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"team_id\": \"{{slack_teamid}}\",\r\n    \"domain_id\": \"{{domainid}}\",\r\n    \"ticket_content\": {\r\n        \"environment\": \"{{env_name}}\",\r\n        \"group\": \"{{group_name}}\",\r\n        \"switcher\": \"{{switcher_key}}\",\r\n        \"status\": {{status}},\r\n        \"observations\": \"{{observations}}\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -4931,7 +4767,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/slack/v1/domains?team_id=TEAM_ID",
+							"raw": "{{url}}/slack/v1/domains?team_id={{slack_teamid}}",
 							"host": [
 								"{{url}}"
 							],
@@ -4943,7 +4779,7 @@
 							"query": [
 								{
 									"key": "team_id",
-									"value": "TEAM_ID"
+									"value": "{{slack_teamid}}"
 								}
 							]
 						}
@@ -4967,7 +4803,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"team_id\": \"TEAM_ID\",\r\n    \"domain_id\": \"DOMAIN_ID\",\r\n    \"ticket_id\": \"665aacd9281e9ee4693db7f9\",\r\n    \"approved\": false\r\n}",
+							"raw": "{\r\n    \"team_id\": \"{{slack_teamid}}\",\r\n    \"domain_id\": \"{{domainid}}\",\r\n    \"ticket_id\": \"{{ticketid}}\",\r\n    \"approved\": {{true_false}}\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -5163,7 +4999,7 @@
 								},
 								{
 									"key": "domain",
-									"value": "5e0ece606f4f994eac9007ae"
+									"value": "{{domainid}}"
 								}
 							]
 						}
@@ -5195,7 +5031,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"CHANGED\",\r\n            \"diff\": \"GROUP\",\r\n            \"path\": [\r\n                \"Group Test\"\r\n            ],\r\n            \"content\": {\r\n                \"activated\": false\r\n            }\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"CHANGED\",\r\n            \"diff\": \"GROUP\",\r\n            \"path\": [\r\n                \"{{group_name}}\"\r\n            ],\r\n            \"content\": {\r\n                \"activated\": {{true_false}}\r\n            }\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5233,7 +5069,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"CHANGED\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"Group Test\",\r\n                \"NEW_SWITCHER_2\"\r\n            ],\r\n            \"content\": {\r\n                \"activated\": false\r\n            }\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"CHANGED\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"{{group_name}}\",\r\n                \"{{switcher_key}}\"\r\n            ],\r\n            \"content\": {\r\n                \"activated\": {{true_false}}\r\n            }\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5271,7 +5107,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"CHANGED\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"Group Test\",\r\n                \"NEW_SWITCHER_2\"\r\n            ],\r\n            \"content\": {\r\n                \"relay\": {\r\n                    \"type\": \"NOTIFICATION\",\r\n                    \"method\": \"POST\",\r\n                    \"endpoint\": \"https://localhost:3000\",\r\n                    \"description\": \"Push message to log\",\r\n                    \"activated\": true\r\n                }\r\n            }\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"CHANGED\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"{{group_name}}\",\r\n                \"{{switcher_key}}\"\r\n            ],\r\n            \"content\": {\r\n                \"relay\": {\r\n                    \"type\": \"NOTIFICATION\",\r\n                    \"method\": \"POST\",\r\n                    \"endpoint\": \"{{endpoint}}\",\r\n                    \"description\": \"{{description}}\",\r\n                    \"activated\": {{true_false}}\r\n                }\r\n            }\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5309,7 +5145,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"CHANGED\",\r\n            \"diff\": \"STRATEGY\",\r\n            \"path\": [\r\n                \"New Group\",\r\n                \"NEW_SWITCHER_STRATEGY\",\r\n                \"VALUE_VALIDATION\"\r\n\r\n            ],\r\n            \"content\": {\r\n                \"values\": [\r\n                    \"A\",\r\n                    \"C\"\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"CHANGED\",\r\n            \"diff\": \"STRATEGY\",\r\n            \"path\": [\r\n                \"{{group_name}}\",\r\n                \"{{switcher_key}}\",\r\n                \"VALUE_VALIDATION\"\r\n\r\n            ],\r\n            \"content\": {\r\n                \"values\": [\r\n                    \"A\",\r\n                    \"C\"\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5347,7 +5183,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"GROUP\",\r\n            \"path\": [],\r\n            \"content\": {\r\n                \"name\": \"New Group\",\r\n                \"activated\": true\r\n            }\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"GROUP\",\r\n            \"path\": [],\r\n            \"content\": {\r\n                \"name\": \"{{group_name}}\",\r\n                \"activated\": {{true_false}}\r\n            }\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5385,7 +5221,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"GROUP\",\r\n            \"path\": [],\r\n            \"content\": {\r\n                \"name\": \"New Group\",\r\n                \"description\": \"New Group Description\",\r\n                \"activated\": true,\r\n                \"config\": [\r\n                    {\r\n                        \"key\": \"NEW_SWITCHER_FROM_GROUP\",\r\n                        \"description\": \"New Switcher\",\r\n                        \"activated\": false,\r\n                        \"components\": [\r\n                            \"switcher-playground\"\r\n                        ]\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"GROUP\",\r\n            \"path\": [],\r\n            \"content\": {\r\n                \"name\": \"{{group_name}}\",\r\n                \"description\": \"{{description}}\",\r\n                \"activated\": {{group_activated}},\r\n                \"config\": [\r\n                    {\r\n                        \"key\": \"{{switcher_key}}\",\r\n                        \"description\": \"{{switcher_description}}\",\r\n                        \"activated\": {{switcher_activated}},\r\n                        \"components\": [\r\n                            \"{{component_name}}\"\r\n                        ]\r\n                    }\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5423,7 +5259,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"New Group\"\r\n            ],\r\n            \"content\": {\r\n                \"key\": \"NEW_SWITCHER_2\",\r\n                \"description\": \"New Switcher #2\",\r\n                \"activated\": true,\r\n                \"components\": [\r\n                    \"switcher-playground\"\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"{{group_name}}\"\r\n            ],\r\n            \"content\": {\r\n                \"key\": \"{{switcher_key}}\",\r\n                \"description\": \"{{switcher_description}}\",\r\n                \"activated\": {{switcher_activated}},\r\n                \"components\": [\r\n                    \"{{component_name}}\"\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5461,7 +5297,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"New Group\"\r\n            ],\r\n            \"content\": {\r\n                \"key\": \"NEW_SWITCHER_RELAY\",\r\n                \"description\": \"New Switcher Relay\",\r\n                \"activated\": true,\r\n                \"components\": [\r\n                    \"switcher-playground\"\r\n                ],\r\n                \"relay\": {\r\n                    \"type\": \"NOTIFICATION\",\r\n                    \"method\": \"POST\",\r\n                    \"endpoint\": \"https://localhost:3000\",\r\n                    \"description\": \"Push message to log\",\r\n                    \"activated\": true\r\n                }\r\n            }\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"{{group_name}}\"\r\n            ],\r\n            \"content\": {\r\n                \"key\": \"{{switcher_key}}\",\r\n                \"description\": \"{{switcher_description}}\",\r\n                \"activated\": {{switcher_activated}},\r\n                \"components\": [\r\n                    \"{{component_name}}\"\r\n                ],\r\n                \"relay\": {\r\n                    \"type\": \"NOTIFICATION\",\r\n                    \"method\": \"POST\",\r\n                    \"endpoint\": \"{{relay_endpoint}}\",\r\n                    \"description\": \"{{relay_description}}\",\r\n                    \"activated\": {{relay_activated}}\r\n                }\r\n            }\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5499,7 +5335,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"New Group\"\r\n            ],\r\n            \"content\": {\r\n                \"key\": \"NEW_SWITCHER_STRATEGY\",\r\n                \"description\": \"New Switcher\",\r\n                \"activated\": true,\r\n                \"strategies\": [\r\n                    {\r\n                        \"strategy\": \"VALUE_VALIDATION\",\r\n                        \"description\": \"Test Strategy\",\r\n                        \"operation\": \"EXIST\",\r\n                        \"activated\": true,\r\n                        \"values\": [\r\n                            \"A\",\r\n                            \"B\"\r\n                        ]\r\n                    }\r\n                ],\r\n                \"components\": [\r\n                    \"switcher-playground\"\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"{{group_name}}\"\r\n            ],\r\n            \"content\": {\r\n                \"key\": \"{{switcher_key}}\",\r\n                \"description\": \"{{switcher_description}}\",\r\n                \"activated\": {{switcher_activated}},\r\n                \"strategies\": [\r\n                    {\r\n                        \"strategy\": \"VALUE_VALIDATION\",\r\n                        \"description\": \"{{startegy_description}}\",\r\n                        \"operation\": \"EXIST\",\r\n                        \"activated\": true,\r\n                        \"values\": [\r\n                            \"A\",\r\n                            \"B\"\r\n                        ]\r\n                    }\r\n                ],\r\n                \"components\": [\r\n                    \"{{component_name}}\"\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5537,7 +5373,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"STRATEGY\",\r\n            \"path\": [\r\n                \"New Group\",\r\n                \"NEW_SWITCHER_STRATEGY\"\r\n            ],\r\n            \"content\": {\r\n                \"strategy\": \"NUMERIC_VALIDATION\",\r\n                \"description\": \"Test Strategy\",\r\n                \"operation\": \"EQUAL\",\r\n                \"activated\": true,\r\n                \"values\": [\r\n                    \"100\"\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"NEW\",\r\n            \"diff\": \"STRATEGY\",\r\n            \"path\": [\r\n                \"{{group_name}}\",\r\n                \"{{switcher_key}}\"\r\n            ],\r\n            \"content\": {\r\n                \"strategy\": \"NUMERIC_VALIDATION\",\r\n                \"description\": \"{{strategy_description}}\",\r\n                \"operation\": \"EQUAL\",\r\n                \"activated\": true,\r\n                \"values\": [\r\n                    \"100\"\r\n                ]\r\n            }\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5575,7 +5411,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"GROUP\",\r\n            \"path\": [\r\n                \"New Group\"\r\n            ]\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"GROUP\",\r\n            \"path\": [\r\n                \"{{group_name}}\"\r\n            ]\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5613,7 +5449,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"COMPONENT\",\r\n            \"path\": [\r\n                \"New Group\",\r\n                \"NEW_SWITCHER_STRATEGY\"\r\n            ],\r\n            \"content\": [\r\n                \"switcher-playground\"\r\n            ]\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"COMPONENT\",\r\n            \"path\": [\r\n                \"{{group_name}}\",\r\n                \"{{switcher_key}}\"\r\n            ],\r\n            \"content\": [\r\n                \"{{component_name}}\"\r\n            ]\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5651,7 +5487,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"STRATEGY\",\r\n            \"path\": [\r\n                \"New Group\",\r\n                \"NEW_SWITCHER_STRATEGY\",\r\n                \"VALUE_VALIDATION\"\r\n            ]\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"STRATEGY\",\r\n            \"path\": [\r\n                \"{{group_name}}\",\r\n                \"{{switcher_key}}\",\r\n                \"VALUE_VALIDATION\"\r\n            ]\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5689,7 +5525,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"RELAY\",\r\n            \"path\": [\r\n                \"New Group\",\r\n                \"NEW_SWITCHER_RELAY\"\r\n            ]\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"RELAY\",\r\n            \"path\": [\r\n                \"{{group_name}}\",\r\n                \"{{switcher_key}}\"\r\n            ]\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5727,7 +5563,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"New Group\",\r\n                \"NEW_SWITCHER_STRATEGY\"\r\n            ]\r\n        }\r\n    ]\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n    \"changes\": [\r\n        {\r\n            \"action\": \"DELETED\",\r\n            \"diff\": \"CONFIG\",\r\n            \"path\": [\r\n                \"{{group_name}}\",\r\n                \"{{switcher_key}}\"\r\n            ]\r\n        }\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5771,7 +5607,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n\t\"repository\": \"{{gitops_github_url}}\",\r\n\t\"token\": \"{{gitops_github_pat}}\",\r\n\t\"branch\": \"develop\",\r\n    \"path\": \"resources\",\r\n    \"environment\": \"default\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\",\r\n\t\t\"name\": \"GitOps\"\r\n\t},\r\n\t\"settings\": {\r\n\t\t\"active\": true,\r\n\t\t\"window\": \"30s\",\r\n\t\t\"forceprune\": true\r\n\t}\t\r\n}",
+									"raw": "{\r\n\t\"repository\": \"{{gitops_github_url}}\",\r\n\t\"token\": \"{{gitops_github_pat}}\",\r\n\t\"branch\": \"{{branch_name}}\",\r\n    \"path\": \"{{path}}\",\r\n    \"environment\": \"{{env_name}}\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\",\r\n\t\t\"name\": \"{{gitops_domain_name}}\"\r\n\t},\r\n\t\"settings\": {\r\n\t\t\"active\": {{active}},\r\n\t\t\"window\": \"30s\",\r\n\t\t\"forceprune\": {{force_prune}}\r\n\t}\t\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5810,7 +5646,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\"\r\n\t}\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\"\r\n\t}\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5878,7 +5714,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{url}}/gitops/v1/account/{{gitops_domain_id}}?environment=default",
+									"raw": "{{url}}/gitops/v1/account/{{gitops_domain_id}}?environment={{env_name}}",
 									"host": [
 										"{{url}}"
 									],
@@ -5891,7 +5727,7 @@
 									"query": [
 										{
 											"key": "environment",
-											"value": "default"
+											"value": "{{env_name}}"
 										}
 									]
 								}
@@ -5915,7 +5751,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n\t\"repository\": \"{{gitops_github_url}}\",\r\n\t\"branch\": \"develop\",\r\n    \"token\": \"{{gitops_github_pat}}\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\",\r\n\t\t\"name\": \"GitOps\"\r\n\t},\r\n\t\"settings\": {\r\n\t\t\"active\": true,\r\n\t\t\"window\": \"3m\",\r\n\t\t\"forceprune\": true\r\n\t}\t\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n\t\"repository\": \"{{gitops_github_url}}\",\r\n\t\"branch\": \"{{branch}}\",\r\n    \"token\": \"{{gitops_github_pat}}\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\",\r\n\t\t\"name\": \"{{gitops_domain_name}}\"\r\n\t},\r\n\t\"settings\": {\r\n\t\t\"active\": {{active}},\r\n\t\t\"window\": \"3m\",\r\n\t\t\"forceprune\": true\r\n\t}\t\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5953,7 +5789,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"token\": \"{{gitops_github_pat}}\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\"\r\n\t},\r\n    \"environments\": [\r\n        \"default\"\r\n    ]\r\n}",
+									"raw": "{\r\n    \"token\": \"{{gitops_github_pat}}\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\"\r\n\t},\r\n    \"environments\": [\r\n        \"{{env_name}}\"\r\n    ]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5992,7 +5828,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"environment\": \"default\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\"\r\n\t}\r\n}",
+									"raw": "{\r\n    \"environment\": \"{{env_name}}\",\r\n\t\"domain\": {\r\n\t\t\"id\": \"{{gitops_domain_id}}\"\r\n\t}\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -6033,7 +5869,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "query Domain(\r\n    $_id: String, \r\n    $name: String, \r\n    $activated: Boolean, \r\n    $environment: String, \r\n    $_component: String) {\r\n    domain(\r\n        _id: $_id, \r\n        name: $name, \r\n        activated: $activated, \r\n        environment: $environment,\r\n         _component: $_component\r\n    ) {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        statusByEnv {\r\n            env\r\n            value\r\n        }\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                statusByEnv {\r\n                    env\r\n                    value\r\n                }\r\n                strategies {\r\n                    _id\r\n                    strategy\r\n                    activated\r\n                    statusByEnv {\r\n                        env\r\n                        value\r\n                    }\r\n                    operation\r\n                    values\r\n                }\r\n                relay {\r\n                    type\r\n                    method\r\n                    endpoint\r\n                    description\r\n                    activated\r\n                    statusByEnv {\r\n                        env\r\n                        value\r\n                    }\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
-										"variables": "{\r\n    \"_id\": \"5e44eb76916dd10048d72542\",\r\n    \"activated\": true,\r\n    \"environment\": \"\",\r\n    \"_component\": \"\"\r\n}"
+										"variables": "{\r\n    \"_id\": \"{{domainid}}\",\r\n    \"activated\": {{activated}},\r\n    \"environment\": \"{{env_name}}\",\r\n    \"_component\": \"{{component_name}}\"\r\n}"
 									}
 								},
 								"url": {
@@ -6057,7 +5893,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "query Domain(\r\n    $_id: String, \r\n    $name: String, \r\n    $activated: Boolean, \r\n    $environment: String, \r\n    $_component: String) {\r\n    domain(\r\n        _id: $_id, \r\n        name: $name, \r\n        activated: $activated, \r\n        environment: $environment,\r\n         _component: $_component\r\n    ) {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        statusByEnv {\r\n            env\r\n            value\r\n        }\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                statusByEnv {\r\n                    env\r\n                    value\r\n                }\r\n                strategies {\r\n                    _id\r\n                    strategy\r\n                    activated\r\n                    statusByEnv {\r\n                        env\r\n                        value\r\n                    }\r\n                    operation\r\n                    values\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
-										"variables": "{\r\n    \"name\": \"GitOps\",\r\n    \"activated\": true,\r\n    \"environment\": \"\",\r\n    \"_component\": \"\"\r\n}"
+										"variables": "{\r\n    \"name\": \"{{domain_name}}\",\r\n    \"activated\": {{activated}},\r\n    \"environment\": \"{{env_name}}\",\r\n    \"_component\": \"{{component_name}}\"\r\n}"
 									}
 								},
 								"url": {
@@ -6081,7 +5917,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "query Configuration(\r\n    $domain: String!, \r\n    $group: String,\r\n    $group_id: String,\r\n    $key: String,\r\n    $config_id: String,\r\n    $slack_team_id: String,\r\n    $environment: String) {\r\n    configuration(domain: $domain, group: $group, group_id: $group_id, key: $key, config_id: $config_id, slack_team_id: $slack_team_id, environment: $environment) {\r\n        domain {\r\n            id: _id\r\n            name\r\n            owner\r\n            transfer\r\n            activated\r\n            integrations {\r\n                slack\r\n            }\r\n        }\r\n        group {\r\n            _id\r\n            name\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n        }\r\n        config {\r\n            _id\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
-										"variables": "{\r\n    \"domain\": \"\",\r\n    \"group\": \"\",\r\n    \"group_id\": \"\",\r\n    \"key\": \"FEATURE_1\",\r\n    \"config_id\": \"\",\r\n    \"slack_team_id\": \"\",\r\n    \"environment\": \"default\"\r\n}"
+										"variables": "{\r\n    \"domain\": \"{{doaminid}}\",\r\n    \"key\": \"{{switcher_key}}\"\r\n}"
 									}
 								},
 								"url": {
@@ -6105,7 +5941,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "query Configuration(\r\n    $domain: String!, \r\n    $group: String,\r\n    $group_id: String,\r\n    $key: String,\r\n    $config_id: String,\r\n    $slack_team_id: String,\r\n    $environment: String) {\r\n    configuration(domain: $domain, group: $group, group_id: $group_id, key: $key, config_id: $config_id, slack_team_id: $slack_team_id, environment: $environment) {\r\n        domain {\r\n            id: _id\r\n            name\r\n            owner\r\n            transfer\r\n            activated\r\n            integrations {\r\n                slack\r\n            }\r\n        }\r\n        group {\r\n            _id\r\n            name\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n        }\r\n        config {\r\n            _id\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
-										"variables": "{\r\n    \"domain\": \"\",\r\n    \"group\": \"Group 1\",\r\n    \"group_id\": \"\",\r\n    \"key\": \"\",\r\n    \"config_id\": \"\",\r\n    \"slack_team_id\": \"\",\r\n    \"environment\": \"default\"\r\n}"
+										"variables": "{\r\n    \"domain\": \"{{domainid}}\",\r\n    \"group\": \"{{group_name}}\"\r\n}"
 									}
 								},
 								"url": {
@@ -6129,7 +5965,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "query Configuration(\r\n    $domain: String!, \r\n    $group: String,\r\n    $group_id: String,\r\n    $key: String,\r\n    $config_id: String,\r\n    $slack_team_id: String,\r\n    $environment: String) {\r\n    configuration(domain: $domain, group: $group, group_id: $group_id, key: $key, config_id: $config_id, slack_team_id: $slack_team_id, environment: $environment) {\r\n        domain {\r\n            id: _id\r\n            name\r\n            owner\r\n            transfer\r\n            activated\r\n            integrations {\r\n                slack\r\n            }\r\n        }\r\n        group {\r\n            _id\r\n            name\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n        }\r\n        config {\r\n            _id\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
-										"variables": "{\r\n    \"domain\": \"\",\r\n    \"group\": \"\",\r\n    \"group_id\": \"\",\r\n    \"key\": \"\",\r\n    \"config_id\": \"\",\r\n    \"slack_team_id\": \"T123456789\",\r\n    \"environment\": \"default\"\r\n}"
+										"variables": "{\r\n    \"domain\": \"{{domainid}}\",\r\n    \"slack_team_id\": \"{{slack_team_id}}\"\r\n}"
 									}
 								},
 								"url": {
@@ -6153,7 +5989,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "query Permission(\r\n    $domain: String!, $actions: [String]!, $router: String!, \r\n    $parent: String, $environment: String) {\r\n    permission(\r\n        domain: $domain, \r\n        parent: $parent, \r\n        actions: $actions,\r\n        router: $router,\r\n        environment: $environment\r\n    ) {\r\n        id\r\n        name\r\n        permissions {\r\n            action\r\n            result\r\n        }\r\n    }\r\n}",
-										"variables": "{\r\n    \"domain\": \"\",\r\n    \"parent\": \"\",\r\n    \"actions\": [\"READ\", \"UPDATE\", \"DELETE\"],\r\n    \"router\": \"SWITCHER\",\r\n    \"environment\": \"\"\r\n}"
+										"variables": "{\r\n    \"domain\": \"{{domainid}}\",\r\n    \"parent\": \"{{groupid}}\",\r\n    \"actions\": [\"READ\", \"UPDATE\", \"DELETE\"],\r\n    \"router\": \"SWITCHER\",\r\n    \"environment\": \"\"\r\n}"
 									}
 								},
 								"url": {
@@ -6177,7 +6013,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "query Permission(\r\n    $domain: String!, $actions: [String]!, $router: String!, \r\n    $parent: String, $environment: String) {\r\n    permission(\r\n        domain: $domain, \r\n        parent: $parent, \r\n        actions: $actions,\r\n        router: $router,\r\n        environment: $environment\r\n    ) {\r\n        id\r\n        name\r\n        permissions {\r\n            action\r\n            result\r\n        }\r\n    }\r\n}",
-										"variables": "{\r\n    \"domain\": \"\",\r\n    \"actions\": [\"READ\", \"UPDATE\", \"DELETE\"],\r\n    \"router\": \"GROUP\",\r\n    \"environment\": \"\"\r\n}"
+										"variables": "{\r\n    \"domain\": \"{{domainid}}\",\r\n    \"actions\": [\"READ\", \"UPDATE\", \"DELETE\"],\r\n    \"router\": \"GROUP\",\r\n    \"environment\": \"{{env_name}}\"\r\n}"
 									}
 								},
 								"url": {
@@ -6206,7 +6042,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "query Configuration($slack_team_id: String!) {\r\n    configuration(slack_team_id: $slack_team_id) {\r\n        environments\r\n    }\r\n}",
-										"variables": "{\r\n    \"slack_team_id\": \"TEAM_ID\"\r\n}"
+										"variables": "{\r\n    \"slack_team_id\": \"{{slack_team_id}}\"\r\n}"
 									}
 								},
 								"url": {
@@ -6230,7 +6066,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "query Configuration($slack_team_id: String!, $environment: String) {\r\n    configuration(slack_team_id: $slack_team_id, environment: $environment) {\r\n        group {\r\n            name\r\n            activated\r\n        }\r\n    }\r\n}",
-										"variables": "{\r\n    \"slack_team_id\": \"TEAM_ID\",\r\n    \"environment\": \"development\"\r\n}"
+										"variables": "{\r\n    \"slack_team_id\": \"{{slack_team_id}}\",\r\n    \"environment\": \"{{env_name}}\"\r\n}"
 									}
 								},
 								"url": {
@@ -6254,7 +6090,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "query Configuration($slack_team_id: String!, $environment: String, $group: String) {\r\n    configuration(slack_team_id: $slack_team_id, environment: $environment, group: $group) {\r\n        config {\r\n            key\r\n            activated\r\n        }\r\n    }\r\n}",
-										"variables": "{\r\n    \"slack_team_id\": \"TEAM_ID\",\r\n    \"group\": \"Group Name\",\r\n    \"environment\": \"default\"\r\n}"
+										"variables": "{\r\n    \"slack_team_id\": \"{{slack_team_id}}\",\r\n    \"group\": \"{{group_name}}\",\r\n    \"environment\": \"{{env_name}}\"\r\n}"
 									}
 								},
 								"url": {

@@ -2,7 +2,6 @@ import { BadRequestError, NotFoundError } from '../exceptions/index.js';
 import { validate_token } from '../external/google-recaptcha.js';
 import { getBitBucketToken, getBitBucketUserInfo } from '../external/oauth-bitbucket.js';
 import { getGitToken, getGitUserInfo } from '../external/oauth-git.js';
-import { sendAccountRecoveryCode, sendAuthCode } from '../external/sendgrid.js';
 import { checkAdmin } from '../external/switcher-api-facade.js';
 import Admin from '../models/admin.js';
 import Domain from '../models/domain.js';
@@ -27,32 +26,9 @@ export async function getAdmin(where) {
 export async function signUp(args, remoteAddress) {
     await checkAdmin(args.email);
     await validate_token(args.token, remoteAddress);
+
     const admin = new Admin(args);
-    const code = await admin.generateAuthCode();
-
-    if (process.env.GOOGLE_SKIP_AUTH == 'true') {
-        admin.active = true;
-    }
-    
-    await admin.save();
-
-    sendAuthCode(admin.email, admin.name, code);
-    return admin;
-}
-
-export async function signUpAuth(code) {
-    let admin = await Admin.findUserByAuthCode(code, false);
-
-    if (!admin) {
-        throw new NotFoundError('Account not found');
-    }
-
-    admin.active = true;
-    admin.code = null;
-    const jwt = await admin.generateAuthToken();
-
-    await admin.save();
-    return { admin, jwt };
+    return admin.save();
 }
 
 export async function signUpGitHub(code) {
@@ -88,9 +64,8 @@ export async function signIn(email, password) {
 export async function loginRequestRecovery(email) {
     const admin = await getAdmin({ email });
     if (admin) {
-        const code = await admin.generateAuthCode();
+        await admin.generateAuthCode();
         admin.save();
-        sendAccountRecoveryCode(admin.email, admin.name, code);
     }
 }
 

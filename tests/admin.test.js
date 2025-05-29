@@ -64,7 +64,7 @@ describe('Testing Admin insertion', () => {
             admin: {
                 name: 'New Admin',
                 email: 'new_admin@mail.com',
-                active: false
+                active: true
             }
         });
 
@@ -97,52 +97,6 @@ describe('Testing Admin insertion', () => {
         axiosPostStub.restore();
     });
 
-    test('ADMIN_SUITE - Should NOT login before access confirmation sent via Email', async () => {
-        // given
-        let admin = await Admin.findById(signedupUser).lean().exec();
-        expect(admin).not.toBeNull();
-        expect(admin.active).toEqual(false);
-
-        // test
-        await request(app)
-            .post('/admin/login')
-            .send({
-                email: admin.email,
-                password: '12312312312'
-            }).expect(401);
-    });
-
-    test('ADMIN_SUITE - Should confirm access to a new Admin', async () => {
-        // given
-        let admin = await Admin.findById(signedupUser).lean().exec();
-        expect(admin).not.toBeNull();
-        expect(admin.active).toEqual(false);
-
-        // test
-        await request(app)
-            .post(`/admin/signup/authorization?code=${admin.code}`)
-            .send().expect(201);
-
-        // DB validation - document updated
-        admin = await Admin.findById(signedupUser).lean().exec();
-        expect(admin.active).toEqual(true);
-    });
-
-    test('ADMIN_SUITE - Should login after access confirmation', async () => {
-        // given
-        let admin = await Admin.findById(signedupUser).lean().exec();
-        expect(admin).not.toBeNull();
-        expect(admin.active).toEqual(true);
-
-        // test
-        await request(app)
-            .post('/admin/login')
-            .send({
-                email: admin.email,
-                password: '12312312312'
-            }).expect(200);
-    });
-
     test('ADMIN_SUITE - Should NOT access routes - Admin not active', async () => {
         // given
         let admin = await Admin.findById(signedupUser).exec();
@@ -167,12 +121,6 @@ describe('Testing Admin insertion', () => {
         // teardown - restore admin
         admin.active = true;
         await admin.save();
-    });
-
-    test('ADMIN_SUITE - Should NOT confirm access to a new Admin - Invalid access code', async () => {
-        await request(app)
-            .post('/admin/signup/authorization?code=INVALID_CODE')
-            .send().expect(404);
     });
 
     test('ADMIN_SUITE - Should request password recovery', async () => {
@@ -1036,7 +984,6 @@ describe('Testing Admin collaboration endpoint - Reading permissions', () => {
         expect(read[0].result).toEqual('nok');
     });
 });
-
 
 describe('Testing Admin collaboration endpoint', () => {
     beforeAll(setupDatabase);

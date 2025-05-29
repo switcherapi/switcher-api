@@ -27,15 +27,6 @@ router.post('/admin/signup', [
     }
 });
 
-router.post('/admin/signup/authorization', async (req, res) => {
-    try {
-        const { admin, jwt } = await Services.signUpAuth(req.query.code);
-        res.status(201).send({ admin, jwt });
-    } catch (e) {
-        responseException(res, e, 400);
-    }
-});
-
 router.post('/admin/github/auth', async (req, res) => {
     try {
         const { admin, jwt } = await Services.signUpGitHub(req.query.code);
