@@ -10,18 +10,17 @@ import Logger from '../helpers/logger.js';
 
 export const resolveConfigByKey = async (domain, key) => Config.findOne({ domain, key }, null, { lean: true });
 
-export function resolveEnvStatus(source) {
-    const key = Object.keys(source.activated);
-    const arrStatus = [];
+export function resolveEnvValue(source, field, keys) {
+    const arrValue = [];
 
-    key.forEach(k => {
-        arrStatus.push({
+    keys.forEach(k => {
+        arrValue.push({
             env: k,
-            value: source.activated[k]
+            value: source[field][k]
         });
     });
-
-    return arrStatus;
+    
+    return arrValue;
 }
 
 export async function resolveConfigStrategy(source, _id, strategy, operation, activated, context) {
@@ -32,7 +31,7 @@ export async function resolveConfigStrategy(source, _id, strategy, operation, ac
     if (operation) { args.operation = operation; }
     
     let strategies = await ConfigStrategy.find({ config: source._id, ...args }).lean().exec();
-    const environment = context.environment ? context.environment : EnvType.DEFAULT;
+    const environment = context.environment;
 
     strategies = strategies.filter(s => s.activated[environment] !== undefined);
     if (activated !== undefined) {
@@ -53,14 +52,14 @@ export async function resolveConfigStrategy(source, _id, strategy, operation, ac
 }
 
 export async function resolveRelay(source, context) {
-    const relay = source.relay;
-    const environment = context.environment ? context.environment : EnvType.DEFAULT;
+    const { relay } = source;
+    const env = context.environment;
 
-    if (!relay.type || !relay.activated[environment] || !relay.endpoint[environment]) {
-        return null;
+    if (relay?.type && relay.endpoint?.[env]) {
+        return relay;
     }
 
-    return relay;
+    return null;
 }
 
 export async function resolveConfig(source, _id, key, activated, context) {

@@ -18,7 +18,7 @@ export const configurationQuery = (
                     ${domain ? 'domain { name description activated statusByEnv { env value } }' : ''}
                     ${group ? 'group { name description activated statusByEnv { env value } }' : ''}
                     ${config ? 'config { key description activated statusByEnv { env value } }' : ''}
-                    ${strategy ? 'strategies { strategy activated operation values statusByEnv { env value } }' : ''}
+                    ${strategy ? 'strategies { strategy activated operation values }' : ''}
                     ${env ? 'environments' : ''}
                 }
             }  
@@ -35,12 +35,12 @@ export const domainQuery = (where, group, config, strategy) => {
             {
                 domain(${query}) { 
                     name version description activated statusByEnv { env value }
-                    group${elementQuery(group)} { 
+                    group${group !== undefined ? elementQuery(group) : ''} { 
                         name description activated statusByEnv { env value }
-                        config${elementQuery(config)} { 
+                        config${config !== undefined ? elementQuery(config) : ''} { 
                             key description activated statusByEnv { env value }
-                            strategies${elementQuery(strategy)} { 
-                                strategy activated operation values statusByEnv { env value }
+                            strategies${strategy !== undefined ? elementQuery(strategy) : ''} { 
+                                strategy activated operation values
                             }
                             relay {
                                 type
@@ -48,10 +48,6 @@ export const domainQuery = (where, group, config, strategy) => {
                                 endpoint
                                 description
                                 activated
-                                statusByEnv {
-                                    env
-                                    value
-                                }
                             }
                             components
                         }
@@ -153,6 +149,55 @@ export const expected101 = `
 }`;
 
 export const expected102 = `
+{
+    "data":{
+        "domain": {
+            "name":"Domain",
+            "description":"Test Domain",
+            "activated": true,
+            "statusByEnv": [{
+                "env": "default",
+                "value": true
+            }],
+            "group":[{
+                "name":"Group Test",
+                "description":"Test Group",
+                "config":[{
+                    "key":"TEST_CONFIG_KEY",
+                    "description":"Test config 1",
+                    "activated": true,
+                    "statusByEnv": [{
+                        "env": "default",
+                        "value": true
+                    }],
+                    "statusByEnv": [ {
+                        "env": "default",
+                        "value": true
+                    }],
+                    "components": ["TestApp"],
+                    "strategies": [],
+                    "relay": null
+                }, {
+                    "key":"TEST_CONFIG_KEY_PRD_QA",
+                    "description":"Test config 2 - Off in PRD and ON in QA",
+                    "activated": false,
+                    "statusByEnv": [ {
+                        "env": "default",
+                        "value": false
+                    }, {
+                        "env": "QA",
+                        "value": true
+                    }],
+                    "components": [],
+                    "strategies": [],
+                    "relay": null
+                }]
+            }]
+        }
+    }
+}`;
+
+export const expected102Default = `
 {
     "data":{
         "domain": {
@@ -312,10 +357,10 @@ export const expected106 = `
         "config":[
             {"key":"TEST_CONFIG_KEY","description":"Test config 1","statusByEnv":[{"env":"default","value":true}],
             "strategies":[
-                {"strategy":"VALUE_VALIDATION","statusByEnv":[{"env":"default","value":true}],"operation":"EXIST","values":["USER_1","USER_2","USER_3"]},
-                {"strategy":"NETWORK_VALIDATION","statusByEnv":[{"env":"default","value":true}],"operation":"EXIST","values":["10.0.0.0/24"]},
-                {"strategy":"TIME_VALIDATION","statusByEnv":[{"env":"default","value":false}],"operation":"BETWEEN","values":["13:00","14:00"]},
-                {"strategy":"DATE_VALIDATION","statusByEnv":[{"env":"default","value":false}],"operation":"GREATER","values":["2019-12-01 13:00"]}]},
+                {"strategy":"VALUE_VALIDATION","activated":true,"operation":"EXIST","values":["USER_1","USER_2","USER_3"]},
+                {"strategy":"NETWORK_VALIDATION","activated":true,"operation":"EXIST","values":["10.0.0.0/24"]},
+                {"strategy":"TIME_VALIDATION","activated":false,"operation":"BETWEEN","values":["13:00","14:00"]},
+                {"strategy":"DATE_VALIDATION","activated":false,"operation":"GREATER","values":["2019-12-01 13:00"]}]},
             {"key":"TEST_CONFIG_KEY_PRD_QA","description":"Test config 2 - Off in PRD and ON in QA","statusByEnv":[{"env":"default","value":false},{"env":"QA","value":true}],
             "strategies":[]}]}]}}}`;
 
@@ -361,10 +406,10 @@ export const expected108 = `
         "config":[
             {"key":"TEST_CONFIG_KEY","description":"Test config 1","statusByEnv":[{"env":"default","value":true}]}],
                 "strategies":[
-                    {"strategy":"VALUE_VALIDATION","operation":"EXIST","values":["USER_1","USER_2","USER_3"],"statusByEnv":[{"env":"default","value":true}]},
-                    {"strategy":"NETWORK_VALIDATION","operation":"EXIST","values":["10.0.0.0/24"],"statusByEnv":[{"env":"default","value":true}]},
-                    {"strategy":"TIME_VALIDATION","operation":"BETWEEN","values":["13:00","14:00"],"statusByEnv":[{"env":"default","value":false}]},
-                    {"strategy":"DATE_VALIDATION","operation":"GREATER","values":["2019-12-01 13:00"],"statusByEnv":[{"env":"default","value":false}]}]}}}`;
+                    {"strategy":"VALUE_VALIDATION","operation":"EXIST","values":["USER_1","USER_2","USER_3"],"activated":true},
+                    {"strategy":"NETWORK_VALIDATION","operation":"EXIST","values":["10.0.0.0/24"],"activated":true},
+                    {"strategy":"TIME_VALIDATION","operation":"BETWEEN","values":["13:00","14:00"],"activated":false},
+                    {"strategy":"DATE_VALIDATION","operation":"GREATER","values":["2019-12-01 13:00"],"activated":false}]}}}`;
 
 export const expected109 = `
     {"data":

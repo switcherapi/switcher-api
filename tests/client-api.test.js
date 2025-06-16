@@ -51,13 +51,23 @@ describe('Testing domain', () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(graphqlUtils.domainQuery([['_id', domainId]], true, true, true));
+            .send(graphqlUtils.domainQuery([['_id', domainId]]));
         
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected102));
     });
 
-    test('CLIENT_SUITE - Should return the Domain structure for Environment', async () => {
+    test('CLIENT_SUITE - Should return the Domain structure for Environment (default)', async () => {
+        const req = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]], true, true, true));
+        
+        expect(req.statusCode).toBe(200);
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected102Default));
+    });
+
+    test('CLIENT_SUITE - Should return the Domain structure for Environment (QA)', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -100,7 +110,7 @@ describe('Testing domain', () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(graphqlUtils.domainQuery([['_id', domainId]], true, true, false));
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]], true, true, false));
     
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected103));
@@ -110,7 +120,7 @@ describe('Testing domain', () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(graphqlUtils.domainQuery([['_id', domainId]], false, false, false));
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]], false, false, false));
          
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected104));
@@ -120,7 +130,7 @@ describe('Testing domain', () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(graphqlUtils.domainQuery([['_id', domainId]], true, false, false));
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]], true, false, false));
 
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected105(keyConfigPrdQA)));
@@ -135,7 +145,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(graphqlUtils.domainQuery([['name', 'Domain']]));
+            .send(graphqlUtils.domainQuery([['name', 'Domain'], ['environment', EnvType.DEFAULT]]));
 
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected106));
@@ -179,7 +189,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(graphqlUtils.configurationQuery([['domain', domainId], ['key', keyConfig]]));
+            .send(graphqlUtils.configurationQuery([['domain', domainId], ['key', keyConfig], ['environment', EnvType.DEFAULT]]));
 
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected108));
@@ -189,7 +199,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send(graphqlUtils.configurationQuery([['domain', domainId], ['config_id', configId]]));
+            .send(graphqlUtils.configurationQuery([['domain', domainId], ['config_id', configId], ['environment', EnvType.DEFAULT]]));
 
         expect(req.statusCode).toBe(200);
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected108));

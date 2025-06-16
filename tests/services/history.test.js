@@ -57,7 +57,7 @@ describe('Testing history services', () => {
             });
         }; 
 
-        await expect(call()).rejects.toThrowError('Invalid paging args');
+        await expect(call()).rejects.toThrow('Invalid paging args');
     });
 
     test('HISTORY_SERVICE - Should NOT get history - invalid paging args - limit not number', async () => {
@@ -67,7 +67,7 @@ describe('Testing history services', () => {
             });
         }; 
 
-        await expect(call()).rejects.toThrowError('Invalid paging args');
+        await expect(call()).rejects.toThrow('Invalid paging args');
     });
 
     test('HISTORY_SERVICE - Should NOT get history - invalid paging args - skip', async () => {
@@ -77,7 +77,7 @@ describe('Testing history services', () => {
             });
         }; 
 
-        await expect(call()).rejects.toThrowError('Invalid paging args');
+        await expect(call()).rejects.toThrow('Invalid paging args');
     });
 
     test('HISTORY_SERVICE - Should NOT get history - invalid paging args - skip not number', async () => {
@@ -87,7 +87,7 @@ describe('Testing history services', () => {
             });
         }; 
 
-        await expect(call()).rejects.toThrowError('Invalid paging args');
+        await expect(call()).rejects.toThrow('Invalid paging args');
     });
 
     test('HISTORY_SERVICE - Should get history - skip first entry', async () => {
@@ -125,7 +125,7 @@ describe('Testing history services', () => {
             });
         }; 
 
-        await expect(call()).rejects.toThrowError('Invalid paging args');
+        await expect(call()).rejects.toThrow('Invalid paging args');
     });
 
     test('HISTORY_SERVICE - Should NOT get history entries sorted - invalid sortBy query spec #2', async () => {
@@ -135,7 +135,7 @@ describe('Testing history services', () => {
             });
         }; 
 
-        await expect(call()).rejects.toThrowError('Invalid paging args');
+        await expect(call()).rejects.toThrow('Invalid paging args');
     });
 
     test('HISTORY_SERVICE - Should NOT get history entries sorted - invalid sortBy query argument', async () => {
@@ -151,7 +151,7 @@ describe('Testing history services', () => {
             });
         }; 
 
-        await expect(call()).rejects.toThrowError('Invalid paging args');
+        await expect(call()).rejects.toThrow('Invalid paging args');
     });
 
     test('HISTORY_SERVICE - Should get history entries sorted by desc', async () => {
