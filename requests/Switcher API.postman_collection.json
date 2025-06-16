@@ -725,7 +725,6 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json",
-								"name": "Content-Type",
 								"type": "text"
 							}
 						],
@@ -5868,8 +5867,80 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "query Domain(\r\n    $_id: String, \r\n    $name: String, \r\n    $activated: Boolean, \r\n    $environment: String, \r\n    $_component: String) {\r\n    domain(\r\n        _id: $_id, \r\n        name: $name, \r\n        activated: $activated, \r\n        environment: $environment,\r\n         _component: $_component\r\n    ) {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        statusByEnv {\r\n            env\r\n            value\r\n        }\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                statusByEnv {\r\n                    env\r\n                    value\r\n                }\r\n                strategies {\r\n                    _id\r\n                    strategy\r\n                    activated\r\n                    statusByEnv {\r\n                        env\r\n                        value\r\n                    }\r\n                    operation\r\n                    values\r\n                }\r\n                relay {\r\n                    type\r\n                    method\r\n                    endpoint\r\n                    description\r\n                    activated\r\n                    statusByEnv {\r\n                        env\r\n                        value\r\n                    }\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
-										"variables": "{\r\n    \"_id\": \"{{domainid}}\",\r\n    \"activated\": {{activated}},\r\n    \"environment\": \"{{env_name}}\",\r\n    \"_component\": \"{{component_name}}\"\r\n}"
+										"query": "query Domain(\r\n    $_id: String\r\n    ) {\r\n    domain(\r\n        _id: $_id\r\n    ) {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        statusByEnv {\r\n            env\r\n            value\r\n        }\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                statusByEnv {\r\n                    env\r\n                    value\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"_id\": \"{{domainid}}\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{url}}/adm-graphql",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"adm-graphql"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Domain Tree - By Id, Env",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query Domain(\r\n    $_id: String,\r\n    $environment: String\r\n    ) {\r\n    domain(\r\n        _id: $_id,\r\n        environment: $environment\r\n    ) {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                strategies {\r\n                    _id\r\n                    strategy\r\n                    activated\r\n                    operation\r\n                    values\r\n                }\r\n                relay {\r\n                    type\r\n                    method\r\n                    endpoint\r\n                    description\r\n                    activated\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"_id\": \"{{domainid}}\",\r\n    \"environment\": \"{{env_name}}\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{url}}/adm-graphql",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"adm-graphql"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Domain Tree - By Name, Env (only owner)",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query Domain(\r\n    $name: String, \r\n    $environment: String\r\n    ) {\r\n    domain(\r\n        name: $name, \r\n        environment: $environment\r\n    ) {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                strategies {\r\n                    _id\r\n                    strategy\r\n                    activated\r\n                    operation\r\n                    values\r\n                }\r\n                relay {\r\n                    type\r\n                    method\r\n                    endpoint\r\n                    description\r\n                    activated\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"name\": \"{{name}}\",\r\n    \"environment\": \"{{env_name}}\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{url}}/adm-graphql",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"adm-graphql"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Domain Tree - By Id, Env, Component",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query Domain(\r\n    $_id: String, \r\n    $environment: String, \r\n    $_component: String\r\n    ) {\r\n    domain(\r\n        _id: $_id, \r\n        environment: $environment,\r\n         _component: $_component\r\n    ) {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                strategies {\r\n                    _id\r\n                    strategy\r\n                    activated\r\n                    operation\r\n                    values\r\n                }\r\n                relay {\r\n                    type\r\n                    method\r\n                    endpoint\r\n                    description\r\n                    activated\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"_id\": \"{{domainid}}\",\r\n    \"environment\": \"{{env_name}}\",\r\n    \"_component\": \"{{component_name}}\"\r\n}"
 									}
 								},
 								"url": {
@@ -5892,8 +5963,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "query Domain(\r\n    $_id: String, \r\n    $name: String, \r\n    $activated: Boolean, \r\n    $environment: String, \r\n    $_component: String) {\r\n    domain(\r\n        _id: $_id, \r\n        name: $name, \r\n        activated: $activated, \r\n        environment: $environment,\r\n         _component: $_component\r\n    ) {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        statusByEnv {\r\n            env\r\n            value\r\n        }\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                statusByEnv {\r\n                    env\r\n                    value\r\n                }\r\n                strategies {\r\n                    _id\r\n                    strategy\r\n                    activated\r\n                    statusByEnv {\r\n                        env\r\n                        value\r\n                    }\r\n                    operation\r\n                    values\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
-										"variables": "{\r\n    \"name\": \"{{domain_name}}\",\r\n    \"activated\": {{activated}},\r\n    \"environment\": \"{{env_name}}\",\r\n    \"_component\": \"{{component_name}}\"\r\n}"
+										"query": "query Domain(\r\n    $name: String\r\n    ) {\r\n    domain(\r\n        name: $name\r\n    ) {\r\n        _id\r\n        name\r\n        version\r\n        description\r\n        statusByEnv {\r\n            env\r\n            value\r\n        }\r\n        activated\r\n        group {\r\n            _id\r\n            name\r\n            description\r\n            activated\r\n            statusByEnv {\r\n                env\r\n                value\r\n            }\r\n            config {\r\n                _id\r\n                key\r\n                description\r\n                activated\r\n                statusByEnv {\r\n                    env\r\n                    value\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"name\": \"{{domain_name}}\"\r\n}"
 									}
 								},
 								"url": {

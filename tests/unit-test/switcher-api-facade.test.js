@@ -66,7 +66,7 @@ describe('Testing Switcher API Facade', () => {
             await checkDomain(req);
         }; 
 
-        await expect(call()).rejects.toThrowError('Domain limit has been reached.');
+        await expect(call()).rejects.toThrow('Domain limit has been reached.');
     });
 
     test('UNIT_API_FACADE - Should enable feature - Create Group', async () => {
@@ -84,7 +84,7 @@ describe('Testing Switcher API Facade', () => {
             await checkGroup(domainDocument);
         }; 
 
-        await expect(call()).rejects.toThrowError('Group limit has been reached.');
+        await expect(call()).rejects.toThrow('Group limit has been reached.');
     });
 
     test('UNIT_API_FACADE - Should enable feature - Create Switcher', async () => {
@@ -102,7 +102,7 @@ describe('Testing Switcher API Facade', () => {
             await checkSwitcher(groupConfigDocument);
         }; 
 
-        await expect(call()).rejects.toThrowError('Switcher limit has been reached.');
+        await expect(call()).rejects.toThrow('Switcher limit has been reached.');
     });
 
     test('UNIT_API_FACADE - Should enable feature - Create Component', async () => {
@@ -120,7 +120,7 @@ describe('Testing Switcher API Facade', () => {
             await checkComponent(domainId);
         }; 
 
-        await expect(call()).rejects.toThrowError('Component limit has been reached.');
+        await expect(call()).rejects.toThrow('Component limit has been reached.');
     });
 
     test('UNIT_API_FACADE - Should enable feature - Create Environment', async () => {
@@ -138,7 +138,7 @@ describe('Testing Switcher API Facade', () => {
             await checkEnvironment(domainId);
         }; 
 
-        await expect(call()).rejects.toThrowError('Environment limit has been reached.');
+        await expect(call()).rejects.toThrow('Environment limit has been reached.');
     });
 
     test('UNIT_API_FACADE - Should enable feature - Create Team', async () => {
@@ -156,7 +156,7 @@ describe('Testing Switcher API Facade', () => {
             await checkTeam(domainId);
         }; 
 
-        await expect(call()).rejects.toThrowError('Team limit has been reached.');
+        await expect(call()).rejects.toThrow('Team limit has been reached.');
     });
 
     test('UNIT_API_FACADE - Should enable feature - Metrics', async () => {
@@ -210,7 +210,7 @@ describe('Testing Switcher API Facade', () => {
             await checkAdmin('dev@dev.com');
         }; 
 
-        await expect(call()).rejects.toThrowError('Account not released to use the API.');
+        await expect(call()).rejects.toThrow('Account not released to use the API.');
     });
 
     test('UNIT_API_FACADE - Should notify external service - Account being registered', async () => {
@@ -238,7 +238,7 @@ describe('Testing Switcher API Facade', () => {
             await checkSlackIntegration('admin_id');
         }; 
 
-        await expect(call()).rejects.toThrowError('Slack Integration is not available.');
+        await expect(call()).rejects.toThrow('Slack Integration is not available.');
     });
 
     test('UNIT_API_FACADE - Should read rate limit - 100 Request Per Minute', async () => {

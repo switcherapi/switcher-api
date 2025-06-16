@@ -37,10 +37,10 @@ describe('GitOps - GraphQL', () => {
         const req = await request(app)
             .post('/gitops-graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send(graphqlUtils.domainQuery([['_id', domainId]], true, true, true));
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]], true, true, true));
 
         expect(req.statusCode).toBe(200);
-        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected102));
+        expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected102Default));
     });
 
     test('GITOPS_SUITE - Should return error when token is expired', async () => {
@@ -48,7 +48,7 @@ describe('GitOps - GraphQL', () => {
         const req = await request(app)
             .post('/gitops-graphql')
             .set('Authorization', `Bearer ${token}`)
-            .send(graphqlUtils.domainQuery([['_id', domainId]], true, true, true));
+            .send(graphqlUtils.domainQuery([['_id', domainId], ['environment', EnvType.DEFAULT]], true, true, true));
 
         expect(req.statusCode).toBe(401);
     });
