@@ -105,10 +105,3 @@ Switchers are the main entities to control features.
 Customize the behavior of the Switcher by including strategy rules to your Switchers.
 
 - **New Strategy** - ConfigStrategy: /configstrategy/create [POST]
-
-## API usage
-In order to use Switcher API, you need to authenticate the component before using it.<br>
-See also our SDKs to integrate Switcher API with your application.
-
-- **Auth** - Client API: /criteria/auth [POST]
-- **Executing** -  Client API: /criteria?key=SWITCHER_KEY [POST]

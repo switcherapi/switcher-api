@@ -1,7 +1,7 @@
 import axios from 'axios';
 import https from 'https';
-import { checkHttpsAgent } from '../../external/switcher-api-facade.js';
-import Logger from '../../helpers/logger.js';
+import { checkHttpsAgent } from '../external/switcher-api-facade.js';
+import Logger from '../helpers/logger.js';
 
 const agent = async (url) => {
     const response = await checkHttpsAgent(url);

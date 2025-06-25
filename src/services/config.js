@@ -8,7 +8,7 @@ import { checkSwitcher } from '../external/switcher-api-facade.js';
 import { BadRequestError, NotFoundError } from '../exceptions/index.js';
 import { checkEnvironmentStatusChange } from '../middleware/validators.js';
 import { getComponentById, getComponents } from './component.js';
-import { resolveVerification } from '../client/relay/index.js';
+import { resolveVerification } from './relay.js';
 import { permissionCache } from '../helpers/cache.js';
 
 async function verifyAddComponentInput(configId, admin) {

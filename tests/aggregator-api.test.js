@@ -47,7 +47,7 @@ describe('Testing domain', () => {
 
     afterAll(setupDatabase);
 
-    test('CLIENT_SUITE - Should return the Domain structure', async () => {
+    test('AGGREGATOR_SUITE - Should return the Domain structure', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -57,7 +57,7 @@ describe('Testing domain', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected102));
     });
 
-    test('CLIENT_SUITE - Should return the Domain structure for Environment (default)', async () => {
+    test('AGGREGATOR_SUITE - Should return the Domain structure for Environment (default)', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -67,7 +67,7 @@ describe('Testing domain', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected102Default));
     });
 
-    test('CLIENT_SUITE - Should return the Domain structure for Environment (QA)', async () => {
+    test('AGGREGATOR_SUITE - Should return the Domain structure for Environment (QA)', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -77,7 +77,7 @@ describe('Testing domain', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expectedQA102));
     });
 
-    test('CLIENT_SUITE - Should return 2 switchers when NOT filtered by Component', async () => {
+    test('AGGREGATOR_SUITE - Should return 2 switchers when NOT filtered by Component', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -91,7 +91,7 @@ describe('Testing domain', () => {
         expect(result.data.domain.group[0].config.length).toBe(2);
     });
 
-    test('CLIENT_SUITE - Should return 1 switcher when filtered by Component', async () => {
+    test('AGGREGATOR_SUITE - Should return 1 switcher when filtered by Component', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -106,7 +106,7 @@ describe('Testing domain', () => {
         expect(result.data.domain.group[0].config.length).toBe(1);
     });
 
-    test('CLIENT_SUITE - Should return the Domain structure - Disabling strategies (resolver test)', async () => {
+    test('AGGREGATOR_SUITE - Should return the Domain structure - Disabling strategies (resolver test)', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -116,7 +116,7 @@ describe('Testing domain', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected103));
     });
 
-    test('CLIENT_SUITE - Should return the Domain structure - Disabling group config (resolver test)', async () => {
+    test('AGGREGATOR_SUITE - Should return the Domain structure - Disabling group config (resolver test)', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -126,7 +126,7 @@ describe('Testing domain', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected104));
     });
 
-    test('CLIENT_SUITE - Should return the Domain structure - Disabling config (resolver test)', async () => {
+    test('AGGREGATOR_SUITE - Should return the Domain structure - Disabling config (resolver test)', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -141,7 +141,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
 
     afterAll(setupDatabase);
 
-    test('CLIENT_SUITE - Should return domain structure', async () => {
+    test('AGGREGATOR_SUITE - Should return domain structure', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -151,7 +151,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected106));
     });
 
-    test('CLIENT_SUITE - Should NOT return domain structure - Filtered by disabled Domain', async () => {
+    test('AGGREGATOR_SUITE - Should NOT return domain structure - Filtered by disabled Domain', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -164,7 +164,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
     });
 
-    test('CLIENT_SUITE - Should return domain structure for a team member', async () => {
+    test('AGGREGATOR_SUITE - Should return domain structure for a team member', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
@@ -174,7 +174,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected107));
     });
 
-    test('CLIENT_SUITE - Should NOT return domain structure - Missing query params', async () => {
+    test('AGGREGATOR_SUITE - Should NOT return domain structure - Missing query params', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
@@ -185,7 +185,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
     });
 
-    test('CLIENT_SUITE - Should return domain Flat-structure - By Switcher Key', async () => {
+    test('AGGREGATOR_SUITE - Should return domain Flat-structure - By Switcher Key', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -195,7 +195,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected108));
     });
 
-    test('CLIENT_SUITE - Should return domain Flat-structure - By Switcher Id', async () => {
+    test('AGGREGATOR_SUITE - Should return domain Flat-structure - By Switcher Id', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -205,7 +205,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected108));
     });
 
-    test('CLIENT_SUITE - Should return partial domain Flat-structure - By NOT_FOUND Switcher Key', async () => {
+    test('AGGREGATOR_SUITE - Should return partial domain Flat-structure - By NOT_FOUND Switcher Key', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -215,7 +215,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected112));
     });
 
-    test('CLIENT_SUITE - Should return domain Flat-structure - By Group', async () => {
+    test('AGGREGATOR_SUITE - Should return domain Flat-structure - By Group', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -226,7 +226,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(result.data.configuration.group[0].name).toEqual('Group Test');
     });
 
-    test('CLIENT_SUITE - Should return domain Flat-structure - By Group Id', async () => {
+    test('AGGREGATOR_SUITE - Should return domain Flat-structure - By Group Id', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -237,7 +237,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(result.data.configuration.group[0].name).toEqual('Group Test');
     });
 
-    test('CLIENT_SUITE - Should return partial domain Flat-structure - By NOT_FOUND Group', async () => {
+    test('AGGREGATOR_SUITE - Should return partial domain Flat-structure - By NOT_FOUND Group', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -247,7 +247,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected112));
     });
 
-    test('CLIENT_SUITE - Should return domain Flat-structure for a team member', async () => {
+    test('AGGREGATOR_SUITE - Should return domain Flat-structure for a team member', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
@@ -260,7 +260,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected109));
     });
 
-    test('CLIENT_SUITE - Should return domain Flat-structure - By domain',  async () => {
+    test('AGGREGATOR_SUITE - Should return domain Flat-structure - By domain',  async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
@@ -271,7 +271,7 @@ describe('Testing domain [Adm-GraphQL] ', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected110));
     });
 
-    test('CLIENT_SUITE - Should return environments Flat-structure - By Slack Team ID and Domain ID', async () => {
+    test('AGGREGATOR_SUITE - Should return environments Flat-structure - By Slack Team ID and Domain ID', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
@@ -288,7 +288,7 @@ describe('Testing domain [Adm-GraphQL] - Permission', () => {
 
     afterAll(setupDatabase);
 
-    test('CLIENT_SUITE - Should return list of Groups permissions', async () => {
+    test('AGGREGATOR_SUITE - Should return list of Groups permissions', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -301,7 +301,7 @@ describe('Testing domain [Adm-GraphQL] - Permission', () => {
         expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
     });
 
-    test('CLIENT_SUITE - Should return list of Groups permissions - from cache', async () => {
+    test('AGGREGATOR_SUITE - Should return list of Groups permissions - from cache', async () => {
         const cacheSpy = sinon.spy(permissionCache, 'get');
         permissionCache.permissionReset(domainId, ActionTypes.UPDATE, RouterTypes.GROUP);
 
@@ -325,7 +325,7 @@ describe('Testing domain [Adm-GraphQL] - Permission', () => {
         expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
     });
 
-    test('CLIENT_SUITE - Should return list of Groups permissions - by environment', async () => {
+    test('AGGREGATOR_SUITE - Should return list of Groups permissions - by environment', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
@@ -338,7 +338,7 @@ describe('Testing domain [Adm-GraphQL] - Permission', () => {
         expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
     });
 
-    test('CLIENT_SUITE - Should return list of Groups permissions - Unauthorized access', async () => {
+    test('AGGREGATOR_SUITE - Should return list of Groups permissions - Unauthorized access', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
@@ -351,7 +351,7 @@ describe('Testing domain [Adm-GraphQL] - Permission', () => {
         expect(JSON.parse(req.text).data.permission[0].permissions).toMatchObject(JSON.parse(exptected));
     });
 
-    test('CLIENT_SUITE - Should return list of Configs permissions', async () => {
+    test('AGGREGATOR_SUITE - Should return list of Configs permissions', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -366,7 +366,7 @@ describe('Testing domain [Adm-GraphQL] - Permission', () => {
         expect(JSON.parse(req.text).data.permission[1].permissions).toMatchObject(JSON.parse(exptected));
     });
 
-    test('CLIENT_SUITE - Should return list of Configs permissions - Unauthorized access', async () => {
+    test('AGGREGATOR_SUITE - Should return list of Configs permissions - Unauthorized access', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
@@ -381,7 +381,7 @@ describe('Testing domain [Adm-GraphQL] - Permission', () => {
         expect(JSON.parse(req.text).data.permission[1].permissions).toMatchObject(JSON.parse(exptected));
     });
 
-    test('CLIENT_SUITE - Should NOT return list of permissions - Invalid router', async () => {
+    test('AGGREGATOR_SUITE - Should NOT return list of permissions - Invalid router', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)
@@ -392,7 +392,7 @@ describe('Testing domain [Adm-GraphQL] - Permission', () => {
         expect(JSON.parse(req.text).data.permission).toStrictEqual([]);
     });
 
-    test('CLIENT_SUITE - Should return domain partial structure based on permission', async () => {
+    test('AGGREGATOR_SUITE - Should return domain partial structure based on permission', async () => {
         // Given
         const admin = await Admin.findById(adminAccountId).exec();
         await setPermissionsToTeam(admin.teams[0], {
@@ -413,7 +413,7 @@ describe('Testing domain [Adm-GraphQL] - Permission', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected1071));
     });
 
-    test('CLIENT_SUITE - Should NOT return complete domain structure - no valid Config permission', async () => {
+    test('AGGREGATOR_SUITE - Should NOT return complete domain structure - no valid Config permission', async () => {
         // Given
         const admin = await Admin.findById(adminAccountId).exec();
         await setPermissionsToTeam(admin.teams[0], {
@@ -432,7 +432,7 @@ describe('Testing domain [Adm-GraphQL] - Permission', () => {
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(graphqlUtils.expected1072));
     });
 
-    test('CLIENT_SUITE - Should NOT return complete domain structure - no valid Group permission', async () => {
+    test('AGGREGATOR_SUITE - Should NOT return complete domain structure - no valid Group permission', async () => {
         // Given
         const admin = await Admin.findById(adminAccountId).exec();
         await setPermissionsToTeam(admin.teams[0], {
@@ -456,7 +456,7 @@ describe('Testing domain/configuration [Adm-GraphQL] - Excluded team member ', (
 
     afterAll(setupDatabase);
 
-    test('CLIENT_SUITE - Should NOT return domain structure for an excluded team member', async () => {
+    test('AGGREGATOR_SUITE - Should NOT return domain structure for an excluded team member', async () => {
         // Given
         const admin = await Admin.findById(adminAccountId).exec();
         admin.teams = [];
@@ -472,7 +472,7 @@ describe('Testing domain/configuration [Adm-GraphQL] - Excluded team member ', (
         expect(JSON.parse(req.text)).toMatchObject(JSON.parse(expected));
     });
 
-    test('CLIENT_SUITE - Should NOT return domain Flat-structure for an excluded team member', async () => {
+    test('AGGREGATOR_SUITE - Should NOT return domain Flat-structure for an excluded team member', async () => {
         const req = await request(app)
             .post('/adm-graphql')
             .set('Authorization', `Bearer ${adminAccountToken}`)

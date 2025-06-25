@@ -5854,7 +5854,7 @@
 			]
 		},
 		{
-			"name": "GraphQL",
+			"name": "Aggregator API (GraphQL)",
 			"item": [
 				{
 					"name": "Admin",
