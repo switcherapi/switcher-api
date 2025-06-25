@@ -20,7 +20,7 @@ import teamRouter from './routers/team.js';
 import permissionRouter from './routers/permission.js';
 import slackRouter from './routers/slack.js';
 import gitOpsRouter from './routers/gitops.js';
-import schema from './client/schema.js';
+import schema from './aggregator/schema.js';
 import { auth, resourcesAuth, slackAuth, gitopsAuth } from './middleware/auth.js';
 import { DEFAULT_RATE_LIMIT, defaultLimiter } from './middleware/limiter.js';
 import { createServer } from './app-server.js';
@@ -58,11 +58,11 @@ app.use(gitOpsRouter);
 const handler = (req, res, next) => 
     createHandler({ schema, context: req })(req, res, next);
 
-// Admin: Client API
+// Admin: Aggregator API
 app.use('/adm-graphql', auth, defaultLimiter, handler);
-// Slack: Client API
+// Slack: Aggregator API
 app.use('/slack-graphql', slackAuth, handler);
-// GitOps: Client API
+// GitOps: Aggregator API
 app.use('/gitops-graphql', gitopsAuth, handler);
 
 /**
