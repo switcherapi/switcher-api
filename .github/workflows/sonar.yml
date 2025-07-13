@@ -1,0 +1,78 @@
+name: Manual SonarCloud Analysis
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_id:
+        description: 'Pull Request ID to analyze'
+        required: true
+        type: string
+
+jobs:
+  sonar-analysis:
+    name: SonarCloud Analysis for PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get PR details
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: ${{ inputs.pr_id }}
+            });
+            core.setOutput('head_ref', pr.data.head.ref);
+            core.setOutput('base_ref', pr.data.base.ref);
+            core.setOutput('head_sha', pr.data.head.sha);
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.head_sha }}
+          fetch-depth: 0
+
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.12.0
+        with:
+          mongodb-version: 8.0
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_OPTIONS: "--experimental-vm-modules"
+          MONGODB_URI: mongodb://127.0.0.1:27017/switcher-api-test
+          HISTORY_ACTIVATED: true
+          JWT_ADMIN_TOKEN_RENEW_INTERVAL: 5m
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SWITCHER_SLACK_JWT_SECRET: ${{ secrets.SWITCHER_SLACK_JWT_SECRET }}
+          SWITCHER_GITOPS_JWT_SECRET: ${{ secrets.SWITCHER_GITOPS_JWT_SECRET }}
+          GOOGLE_RECAPTCHA_SECRET: ${{ secrets.GOOGLE_RECAPTCHA_SECRET }}
+          GOOGLE_SKIP_AUTH: false
+          MAX_STRATEGY_OPERATION: 100
+          RELAY_BYPASS_HTTPS: true
+          RELAY_BYPASS_VERIFICATION: true
+          PERMISSION_CACHE_ACTIVATED: true
+          METRICS_MAX_PAGE: 50
+          SWITCHER_API_ENABLE: false
+          SWITCHER_API_LOGGER: false
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarqube-scan-action@v5.2.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: env.SONAR_TOKEN != ''
+        with:
+          args: >
+            -Dsonar.pullrequest.key=${{ inputs.pr_id }}
+            -Dsonar.pullrequest.branch=${{ steps.pr.outputs.head_ref }}
+            -Dsonar.pullrequest.base=${{ steps.pr.outputs.base_ref }}

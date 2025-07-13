@@ -10,7 +10,6 @@ jobs:
   build-test:
     name: Build & Test
     runs-on: ubuntu-latest
-    if: "! contains(toJSON(github.event.commits.*.message), '[skip ci]')"
     concurrency: ci-${{ github.ref }}
 
     steps:
@@ -59,6 +58,7 @@ jobs:
         uses: sonarsource/sonarqube-scan-action@v5.2.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: env.SONAR_TOKEN != ''
 
   docker:
     name: Publish Docker Image
