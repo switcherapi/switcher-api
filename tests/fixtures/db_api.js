@@ -226,7 +226,7 @@ export const teamInviteNoTeam = {
 
 export const slack = {
     _id: new mongoose.Types.ObjectId(),
-    team_id: 'TEAM_ID',
+    team_id: 'T00NZ',
     user_id: 'USER_ID',
     domain: domainId,
     settings: {

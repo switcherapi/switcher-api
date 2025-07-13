@@ -189,7 +189,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should authorize installation', async () => {
         //given
-        const installation = await buildInstallation('SHOULD_AUTHORIZE_DOMAIN', null);
+        const installation = await buildInstallation('T11NZ', null);
 
         //test
         const response = await request(app)
@@ -257,7 +257,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should NOT authorize installation - Admin is not owner', async () => {
         //given
-        const installation = await buildInstallation('SHOULD_NOT_AUTHORIZE_DOMAIN', null);
+        const installation = await buildInstallation('T01Y', null);
 
         //test
         await request(app)
@@ -285,7 +285,7 @@ describe('Slack Installation', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 domain: new mongoose.Types.ObjectId(),
-                team_id: 'team_id'
+                team_id: 'T04Y'
             }).expect(404);
     });
 
@@ -301,7 +301,7 @@ describe('Slack Installation', () => {
     test('SLACK_SUITE - Should find bot', async () => {
         //given
         const installation = { ...mock1_slack_installation };
-        installation.team_id = 'T_FIND_BOT';
+        installation.team_id = 'T14NZ';
         installation.bot_payload.app_id = 'TEST_FIND_BOT1';
         await Services.createSlackInstallation(installation);
 
@@ -316,7 +316,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should NOT find bot - Not found', async () => {
         await request(app)
-            .get('/slack/v1/findbot?enterprise_id=&team_id=NOT_FOUND')
+            .get('/slack/v1/findbot?enterprise_id=&team_id=T15NZ')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(404);
     });
@@ -331,7 +331,7 @@ describe('Slack Installation', () => {
     test('SLACK_SUITE - Should find installation', async () => {
         //given
         const installation = { ...mock1_slack_installation };
-        installation.team_id = 'T_FIND_INSTALL';
+        installation.team_id = 'T13NZ';
         installation.installation_payload.app_id = 'TEST_FIND_INSTALLATION1';
         await Services.createSlackInstallation(installation);
 
@@ -346,7 +346,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should NOT find installation - Not found', async () => {
         await request(app)
-            .get('/slack/v1/findinstallation?enterprise_id=&team_id=NOT_FOUND')
+            .get('/slack/v1/findinstallation?enterprise_id=&team_id=T12NZ')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(404);
     });
@@ -361,7 +361,7 @@ describe('Slack Installation', () => {
     test('SLACK_SUITE - Should find installation (Admin)', async () => {
         //given
         const installation = { ...mock1_slack_installation };
-        installation.team_id = 'T_FIND_INSTALL_ADMIN';
+        installation.team_id = 'T10NZ';
         installation.installation_payload.app_id = 'TEST_FIND_INSTALLATION2';
         await Services.createSlackInstallation(installation);
 
@@ -377,7 +377,7 @@ describe('Slack Installation', () => {
     test('SLACK_SUITE - Should delete not authorized installation', async () => {
         //given
         const installation = { ...mock1_slack_installation };
-        installation.team_id = 'T_DELETE_INSTALL';
+        installation.team_id = 'T04NZ';
         installation.installation_payload.app_id = 'TEST_DELETE_INSTALLATION1';
         await Services.createSlackInstallation(installation);
 
@@ -397,7 +397,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should delete NOT authorized installation', async () => {
         //given
-        const installation = await buildInstallation('SHOULD_DELETE_AUTHORIZE_INSTALLATION', null);
+        const installation = await buildInstallation('T05NZ', null);
 
         //test
         await request(app)
@@ -412,7 +412,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should NOT delete installation - Not found', async () => {
         await request(app)
-            .delete('/slack/v1/installation?enterprise_id=&team_id=NOT_FOUND')
+            .delete('/slack/v1/installation?enterprise_id=&team_id=T06NZ')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(404);
     });
@@ -426,7 +426,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should unlink installation', async () => {
         //given
-        const installation = await buildInstallation('SHOULD_UNLINK_INTEGRATION', null);
+        const installation = await buildInstallation('T02Y', null);
         await authorizeInstallation(installation, domainId, adminMasterAccountToken);
 
         //verify that
@@ -449,12 +449,12 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should unlink single installation from Multi Slack Installation', async () => {
         //given - installation/authorization for Domain 1
-        const installation = await buildInstallation('MULTI_DOMAIN_TEAM_ID', null);
+        const installation = await buildInstallation('T03Y', null);
         await authorizeInstallation(installation, domainId, adminMasterAccountToken);
 
         //given - installation/authorization for Domain 2
         const domainId2 = await createDomain('Domain 2');
-        const installation2 = await buildInstallation('MULTI_DOMAIN_TEAM_ID', null);
+        const installation2 = await buildInstallation('T03Y', null);
         await request(app)
             .post('/slack/v1/authorize')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -495,7 +495,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should decline installation', async () => {
         //given
-        const installation = await buildInstallation('SHOULD_DECLINE_INTEGRATION', null);
+        const installation = await buildInstallation('T09NZ', null);
 
         //test
         await request(app)
@@ -511,7 +511,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should find Domains by Slack Team Id', async () => {
         //given
-        const teamId = 'SLACK_INSTALLATION_DOMAINS';
+        const teamId = 'T01NZ';
         const domainId2 = await createDomain('Domain 2 (findByTeamId)');
         await buildInstallation(teamId, domainId2);
 
@@ -532,7 +532,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should find only authorized Domains by Slack Team Id', async () => {
         //given
-        const teamId = 'SLACK_INSTALLATION_DOMAINS_NOT_AUTHORIZED';
+        const teamId = 'T02NZ';
         const domainId = await createDomain('Domain 4 (findByTeamId)');
         await buildInstallation(teamId, domainId); // authorized
         await buildInstallation(teamId); // not authorized
@@ -557,7 +557,7 @@ describe('Slack Installation', () => {
 
     test('SLACK_SUITE - Should NOT find Domains by Slack Team Id - Team Id not found', async () => {
         await request(app)
-            .get('/slack/v1/domains?team_id=NOT_FOUND')
+            .get('/slack/v1/domains?team_id=T03NZ')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(404);
     });
@@ -1046,7 +1046,7 @@ describe('Slack Route - Process Ticket', () => {
             .post('/slack/v1/ticket/process')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
-                team_id: 'NOT_FOUND',
+                team_id: 'N0000NZ',
                 domain_id: domainId,
                 ticket_id: new mongoose.Types.ObjectId(),
                 approved: true

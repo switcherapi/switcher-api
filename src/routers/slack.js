@@ -62,7 +62,8 @@ router.post('/slack/v1/installation', slackAuth, [
 
 router.post('/slack/v1/authorize', auth, [
     check('domain').isMongoId(),
-    check('team_id').exists()
+    check('team_id').exists(),
+    check('team_id').isAlphanumeric()
 ], validate, auth, async (req, res) => {
     try {
         await Services.authorizeSlackInstallation(req.body, req.admin);
@@ -75,6 +76,7 @@ router.post('/slack/v1/authorize', auth, [
 
 router.post('/slack/v1/ticket/clear', auth, [
     check('team_id').exists(),
+    check('team_id').isAlphanumeric(),
     check('domain_id').isMongoId()
 ], validate, async (req, res) => {
     try {
@@ -88,6 +90,7 @@ router.post('/slack/v1/ticket/clear', auth, [
 
 router.post('/slack/v1/ticket/validate', slackAuth, [
     check('team_id').exists(),
+    check('team_id').isAlphanumeric(),
     check('domain_id').isMongoId(),
     check('ticket_content.environment').exists(),
     check('ticket_content.group').exists(),
@@ -107,6 +110,7 @@ router.post('/slack/v1/ticket/validate', slackAuth, [
 
 router.post('/slack/v1/ticket/create', slackAuth, [
     check('team_id').exists(),
+    check('team_id').isAlphanumeric(),
     check('domain_id').isMongoId(),
     check('ticket_content.environment').exists(),
     check('ticket_content.group').exists(),
@@ -127,6 +131,7 @@ router.post('/slack/v1/ticket/create', slackAuth, [
 
 router.post('/slack/v1/ticket/process', slackAuth, [
     check('team_id').exists(),
+    check('team_id').isAlphanumeric(),
     check('domain_id').isMongoId(),
     check('ticket_id').isMongoId(),
     check('approved').isBoolean()
@@ -140,7 +145,8 @@ router.post('/slack/v1/ticket/process', slackAuth, [
 });
 
 router.get('/slack/v1/findbot', slackAuth, [
-    query('team_id').exists()
+    query('team_id').exists(),
+    query('team_id').isAlphanumeric()
 ], validate, async (req, res) => {
     try {
         const slack = await Services.getSlack({
@@ -156,13 +162,15 @@ router.get('/slack/v1/findbot', slackAuth, [
 });
 
 router.get('/slack/v1/findinstallation', slackAuth, [
-    query('team_id').exists()
+    query('team_id').exists(),
+    query('team_id').isAlphanumeric()
 ], validate, async (req, res) => {
     await findInstallation(req, res);
 });
 
 router.get('/slack/v1/installation/find', auth, [
-    query('team_id').exists()
+    query('team_id').exists(),
+    query('team_id').isAlphanumeric()
 ], validate, async (req, res) => {
     await findInstallation(req, res, true);
 });
@@ -191,7 +199,8 @@ router.get('/slack/v1/installation/:domain', auth, [
 });
 
 router.get('/slack/v1/domains', slackAuth, [
-    query('team_id').exists()
+    query('team_id').exists(),
+    query('team_id').isAlphanumeric()
 ], validate, async (req, res) => {
     try {
         const domains = await Services.getDomainsByTeamId(req.query.team_id);
@@ -202,13 +211,15 @@ router.get('/slack/v1/domains', slackAuth, [
 });
 
 router.delete('/slack/v1/installation', slackAuth, [
-    query('team_id').exists()
+    query('team_id').exists(),
+    query('team_id').isAlphanumeric()
 ], validate, async (req, res) => {
     await deleteInstallation(req, res);
 });
 
 router.delete('/slack/v1/installation/decline', auth, [
-    query('team_id').exists()
+    query('team_id').exists(),
+    query('team_id').isAlphanumeric()
 ], validate, async (req, res) => {
     await deleteInstallation(req, res);
 });

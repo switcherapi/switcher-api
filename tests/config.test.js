@@ -679,7 +679,7 @@ describe('Testing component association', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 components: [
-                    responseComponent1.body._id,
+                    responseComponent1.body.component._id,
                     new mongoose.Types.ObjectId()
                 ]
             }).expect(404);
