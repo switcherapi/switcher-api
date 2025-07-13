@@ -1,5 +1,5 @@
 import express from 'express';
-import { check, query } from 'express-validator';
+import { body, check, query } from 'express-validator';
 import { relayOptions } from '../models/config.js';
 import { auth } from '../middleware/auth.js';
 import { ActionTypes, RouterTypes } from '../models/permission.js';
@@ -201,7 +201,9 @@ router.patch('/config/removeComponent/:id', auth, [
 });
 
 router.patch('/config/updateComponents/:id', auth, [
-    check('id').isMongoId()
+    check('id').isMongoId(),
+    body('components').isArray(),
+    body('components.*').isMongoId()
 ], validate, async (req, res) => {
     try {
         const config = await Services.updateComponent(req.params.id, req.body, req.admin);
