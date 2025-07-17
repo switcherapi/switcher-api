@@ -17,10 +17,13 @@ async function processChangedGroup(domain, change, environment) {
     const admin = { _id: domain.owner, email: ADMIN_EMAIL };
     const content = change.content;
     const group = await getGroupConfig({ domain: domain._id, name: change.path[0] });
+    
+    const updatedActivated = new Map(group.activated);
+    updatedActivated.set(environment, getChangedValue(content.activated, group.activated.get(environment)));
 
     await updateGroup(group._id, {
         description: getChangedValue(content.description, group.description),
-        activated: new Map().set(environment, getChangedValue(content.activated, group.activated.get(environment)))
+        activated: updatedActivated
     }, admin);
 }
 
@@ -29,9 +32,12 @@ async function processChangedConfig(domain, change, environment) {
     const admin = { _id: domain.owner, email: ADMIN_EMAIL };
     const config = await getConfig({ domain: domain._id, key: change.path[1] });
 
+    const updatedActivated = new Map(config.activated);
+    updatedActivated.set(environment, getChangedValue(content.activated, config.activated.get(environment)));
+
     await updateConfig(config._id, {
         description: getChangedValue(content.description, config.description),
-        activated: new Map().set(environment, getChangedValue(content.activated, config.activated.get(environment)))
+        activated: updatedActivated
     }, admin);
 
     if (content.relay) {
