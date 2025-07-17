@@ -1,3 +1,4 @@
+import { EnvType } from '../../models/environment.js';
 import { getComponents } from '../component.js';
 import { createStrategy } from '../config-strategy.js';
 import { addComponent, createConfig, getConfig } from '../config.js';
@@ -18,11 +19,15 @@ export async function processNew(domain, change, environment) {
 async function processNewGroup(domain, change, environment) {
     const admin = { _id: domain.owner };
     const content = change.content;
+
+    const activated = new Map().set(EnvType.DEFAULT, false);
+    activated.set(environment, getNewValue(content.activated, true));
+
     const group = await createGroup({
         domain: domain._id,
         name: content.name,
         description: getNewValue(content.description, ''),
-        activated: new Map().set(environment, getNewValue(content.activated, true)),
+        activated,
         owner: domain.owner
     }, admin);
 
@@ -42,12 +47,15 @@ async function processNewConfig(domain, change, environment) {
     const admin = { _id: domain.owner };
     const group = await getGroupConfig({ domain: domain._id, name: path[0] });
 
+    const activated = new Map().set(EnvType.DEFAULT, false);
+    activated.set(environment, getNewValue(content.activated, true));
+
     const newConfig = {
         domain: domain._id,
         group: group._id,
         key: content.key,
         description: getNewValue(content.description, ''),
-        activated: new Map().set(environment, getNewValue(content.activated, true)),
+        activated,
         owner: domain.owner,
     };
 
