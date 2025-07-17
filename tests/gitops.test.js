@@ -429,6 +429,38 @@ describe('GitOps - Push Changed', () => {
         expect(group.description).toBe('Changed Group Description');
     });
 
+    test('GITOPS_SUITE - Should push changes - Changed Group while keeping default', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: 'staging',
+                changes: [{
+                    action: 'CHANGED',
+                    diff: 'GROUP',
+                    path: ['Group Test'],
+                    content: {
+                        activated: true,
+                        description: 'Changed Group Description'
+                    }
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const group = await GroupConfig.findOne({ name: 'Group Test', domain: domainId }).lean().exec();
+        expect(group).not.toBeNull();
+        expect(group.activated['staging']).toBe(true);
+        expect(group.activated[EnvType.DEFAULT]).toBeDefined();
+        expect(group.description).toBe('Changed Group Description');
+    });
+
     test('GITOPS_SUITE - Should push changes - Changed Switcher', async () => {
         const token = generateToken('30s');
 
@@ -457,6 +489,38 @@ describe('GitOps - Push Changed', () => {
         const config = await Config.findOne({ key: 'TEST_CONFIG_KEY', domain: domainId }).lean().exec();
         expect(config).not.toBeNull();
         expect(config.activated[EnvType.DEFAULT]).toBe(false);
+        expect(config.description).toBe('Changed Switcher Description');
+    });
+
+    test('GITOPS_SUITE - Should push changes - Changed Switcher while keeping default', async () => {
+        const token = generateToken('30s');
+
+        const lastUpdate = Date.now();
+        const req = await request(app)
+            .post('/gitops/v1/push')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                environment: 'staging',
+                changes: [{
+                    action: 'CHANGED',
+                    diff: 'CONFIG',
+                    path: ['Group Test', 'TEST_CONFIG_KEY'],
+                    content: {
+                        activated: true,
+                        description: 'Changed Switcher Description'
+                    }
+                }]
+            })
+            .expect(200);
+
+        expect(req.body.message).toBe('Changes applied successfully');
+        expect(req.body.version).toBeGreaterThan(lastUpdate);
+
+        // Check if the changes were applied
+        const config = await Config.findOne({ key: 'TEST_CONFIG_KEY', domain: domainId }).lean().exec();
+        expect(config).not.toBeNull();
+        expect(config.activated['staging']).toBe(true);
+        expect(config.activated[EnvType.DEFAULT]).toBeDefined();
         expect(config.description).toBe('Changed Switcher Description');
     });
 
