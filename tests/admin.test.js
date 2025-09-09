@@ -39,7 +39,7 @@ describe('Testing Admin insertion', () => {
         axiosPostStub = sinon.stub(axios, 'post');
 
         // given
-        const mockedRecaptchaResponse = { data: { success: true } };
+        const mockedRecaptchaResponse = { data: { success: true, score: 0.9 } };
         axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
 
         // test
@@ -78,7 +78,7 @@ describe('Testing Admin insertion', () => {
         axiosPostStub = sinon.stub(axios, 'post');
 
         // given
-        const mockedRecaptchaResponse = { data: { success: true } };
+        const mockedRecaptchaResponse = { data: { success: true, score: 0.9 } };
         axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
 
         // test
@@ -128,7 +128,7 @@ describe('Testing Admin insertion', () => {
         axiosPostStub = sinon.stub(axios, 'post');
 
         // given
-        const mockedRecaptchaResponse = { data: { success: true } };
+        const mockedRecaptchaResponse = { data: { success: true, score: 0.9 } };
         axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
 
         // test
@@ -156,7 +156,7 @@ describe('Testing Admin insertion', () => {
         axiosPostStub = sinon.stub(axios, 'post');
 
         // given
-        const mockedRecaptchaResponse = { data: { success: true } };
+        const mockedRecaptchaResponse = { data: { success: true, score: 0.9 } };
         axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
 
         // test
@@ -203,7 +203,7 @@ describe('Testing Admin insertion', () => {
         axiosPostStub = sinon.stub(axios, 'post');
 
         // given
-        const mockedRecaptchaResponse = { data: { success: true } };
+        const mockedRecaptchaResponse = { data: { success: true, score: 0.9 } };
         axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
 
         // test
@@ -224,7 +224,7 @@ describe('Testing Admin insertion', () => {
         axiosPostStub = sinon.stub(axios, 'post');
 
         // given
-        const mockedRecaptchaResponse = { data: { success: false } };
+        const mockedRecaptchaResponse = { data: { success: false, score: 0.1 } };
         axiosPostStub.returns(Promise.resolve(mockedRecaptchaResponse));
 
         // test
