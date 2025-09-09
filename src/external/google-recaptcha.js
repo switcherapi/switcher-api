@@ -19,7 +19,7 @@ export async function validate_token(token, remoteAddress) {
             }
         });
         
-    if (!response.data.success) {
+    if (!response.data.success || response.data.score < 0.8) {
         throw new GoogleRecaptchaError('Failed to validate recaptcha');
     }
 }
