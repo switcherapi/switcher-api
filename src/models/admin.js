@@ -40,6 +40,11 @@ const adminSchema = new mongoose.Schema({
     code: {
         type: String
     },
+    auth_provider: {
+        type: String,
+        enum: ['email', 'github', 'bitbucket'],
+        default: 'email'
+    },
     _gitid: {
         type: String
     },
@@ -176,6 +181,7 @@ adminSchema.statics.createThirdPartyAccount = async (
         admin = new Admin({
             name: userInfo.name,
             email: userInfo.email,
+            auth_provider: platform,
             [`${attributeIdName}`]: userInfo.id,
             _avatar: userInfo.avatar,
             password: hash
