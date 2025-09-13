@@ -17,6 +17,11 @@ export const admin = {
             type: 'boolean',
             description: 'Whether the admin is active or not'
         },
+        auth_provider: {
+            type: 'string',
+            enum: ['email', 'github', 'bitbucket'],
+            description: 'Authentication provider used'
+        },
         teams: {
             type: 'array',
             items: {

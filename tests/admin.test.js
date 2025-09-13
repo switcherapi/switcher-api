@@ -55,6 +55,7 @@ describe('Testing Admin insertion', () => {
         // DB validation - document created
         const admin = await Admin.findById(response.body.admin._id).lean().exec();
         expect(admin).not.toBeNull();
+        expect(admin.auth_provider).toBe('email');
 
         //used at: ADMIN_SUITE - Should confirm access to a new Admin
         signedupUser = response.body.admin._id; 
@@ -282,6 +283,7 @@ describe('Testing Admin insertion', () => {
         const admin = await Admin.findById(response.body.admin._id).lean().exec();
         expect(admin).not.toBeNull();
         expect(admin._gitid).toEqual('123456789');
+        expect(admin.auth_provider).toBe('github');
 
         // restore
         axiosPostStub.restore();
@@ -320,6 +322,7 @@ describe('Testing Admin insertion', () => {
         const admin = await Admin.findById(response.body.admin._id).lean().exec();
         expect(admin).not.toBeNull();
         expect(admin._bitbucketid).toEqual('123456789');
+        expect(admin.auth_provider).toBe('bitbucket');
 
         // restore
         axiosPostStub.restore();
