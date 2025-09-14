@@ -51,6 +51,11 @@ jobs:
           RELAY_BYPASS_VERIFICATION: true
           PERMISSION_CACHE_ACTIVATED: true
           METRICS_MAX_PAGE: 50
+          SAML_ENTRY_POINT: http://localhost:3000/sso/saml
+          SAML_CALLBACK_ENDPOINT_URL: http://localhost:3000
+          SAML_REDIRECT_ENDPOINT_URL: http://localhost:4200
+          SAML_CERT: SAML_CERT
+          SESSION_SECRET: SESSION_SECRET
           SWITCHER_API_ENABLE: false
           SWITCHER_API_LOGGER: false
 

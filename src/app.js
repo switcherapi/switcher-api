@@ -1,4 +1,6 @@
 import express from 'express';
+import session from 'express-session';
+import passport from 'passport';
 import swaggerUi from 'swagger-ui-express';
 import { createHandler } from 'graphql-http/lib/use/express';
 import cors from 'cors';
@@ -9,6 +11,7 @@ import './db/mongoose.js';
 import mongoose from 'mongoose';
 import swaggerDocument from './api-docs/swagger-document.js';
 import adminRouter from './routers/admin.js';
+import adminSamlRouter from './routers/admin-saml.js';
 import environment from './routers/environment.js';
 import component from './routers/component.js';
 import domainRouter from './routers/domain.js';
@@ -27,6 +30,7 @@ import { createServer } from './app-server.js';
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 /**
  * Cors configuration
@@ -36,9 +40,24 @@ app.use(helmet());
 app.disable('x-powered-by');
 
 /**
+ * Session configuration for SAML
+ */
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'switcher-api-session',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+        secure: process.env.NODE_ENV === 'prod',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+app.use(passport.initialize());
+
+/**
  * API Routes
  */
 app.use(adminRouter);
+app.use(adminSamlRouter);
 app.use(component);
 app.use(environment);
 app.use(domainRouter);

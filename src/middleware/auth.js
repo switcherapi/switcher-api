@@ -41,7 +41,7 @@ export async function authRefreshToken(req, res, next) {
             throw new Error('Refresh code does not match');
         }
 
-        const decoded = await jwt.decode(token);
+        const decoded = jwt.decode(token);
         const admin = await getAdmin({ _id: decoded._id, token: decodedRefreshToken.subject });
         
         if (!admin?.active) {

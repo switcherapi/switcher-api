@@ -642,6 +642,25 @@ describe('Testing Admin login and fetch', () => {
                 password: 'wrongpassword'
             }).expect(401);
     });
+    
+    test('ADMIN_SUITE - Should not login non-active admin', async () => {
+        // given - deactivate admin
+        const admin = await Admin.findById(adminAccountId).exec();
+        admin.active = false;
+        await admin.save();
+
+        // test
+        await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminAccount.email,
+                password: adminAccount.password
+            }).expect(401);
+
+        // teardown - reactivate admin
+        admin.active = true;
+        await admin.save();
+    });
 
     test('ADMIN_SUITE - Should not login with wrong email format', async () => {
         await request(app)

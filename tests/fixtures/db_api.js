@@ -40,6 +40,18 @@ export const adminAccount = {
     active: true
 };
 
+export const adminSamlAccountId = new mongoose.Types.ObjectId();
+export const adminSamlAccountToken = jwt.sign({ _id: adminSamlAccountId }, process.env.JWT_SECRET);
+export const adminSamlAccount = {
+    _id: adminSamlAccountId,
+    name: 'Admin Saml',
+    email: 'admin.saml@mail.com',
+    password: 'asdasdasdasd',
+    _samlid: 'admin.saml@mail.com',
+    auth_provider: 'saml',
+    active: true
+};
+
 export const memberAccountId = new mongoose.Types.ObjectId();
 export const memberAccountToken = jwt.sign({ _id: memberAccountId }, process.env.JWT_SECRET);
 export const memberAccount = {
@@ -263,6 +275,9 @@ export const setupDatabase = async () => {
 
     adminAccount.token = Admin.extractTokenPart(adminAccountToken);
     await new Admin(adminAccount).save();
+
+    adminSamlAccount.token = Admin.extractTokenPart(adminSamlAccountToken);
+    await new Admin(adminSamlAccount).save();
 
     memberAccount.token = Admin.extractTokenPart(memberAccountToken);
     await new Admin(memberAccount).save();

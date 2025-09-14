@@ -44,9 +44,7 @@ Main features:
 
 ### Auth Providers
 
-Switcher API supports multiple auth providers such as email/password-based authentication or GitHub, Bitbucket OAuth.
-
-Follow the steps below to set up your OAuth App in GitHub and Bitbucket.
+Switcher API supports multiple auth providers such as email/password-based authentication, SAML 2.0 for Single Sign-On (SSO), or GitHub/Bitbucket OAuth.
 
 #### GitHub OAuth App setup
 
@@ -78,6 +76,29 @@ Follow the steps below to set up your OAuth App in GitHub and Bitbucket.
    - BIT_OAUTH_CLIENT_ID=your_client_id
    - BIT_OAUTH_CLIENT_SECRET=your_client_secret
 8. Update Switcher Management BITBUCKET_CLIENTID environment variable with your_client_id
+
+#### SSO with SAML 2.0 setup
+
+1. Obtain the following information from your Identity Provider (IdP):
+   - Entry Point URL
+   - X.509 Certificate
+   - (Optional) Private Key
+
+2. Update your .env-cmdrc file or ConfigMap/Secret in Kubernetes with the following variables:
+   - SAML_ENTRY_POINT=your_idp_entry_point_url
+   - SAML_ISSUER=your_issuer
+   - SAML_CALLBACK_ENDPOINT_URL=service_provider_callback_endpoint_url
+   - SAML_REDIRECT_ENDPOINT_URL=web_app_redirect_endpoint_url
+   - SAML_CERT=your_x509_certificate_base64_encoded
+   - SAML_PRIVATE_KEY=your_private_key_base64_encoded (if applicable)
+   - SAML_IDENTIFIER_FORMAT=urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+   - SAML_ACCEPTED_CLOCK_SKEW_MS=5000
+   - SESSION_SECRET=SESSION_SECRET
+
+3. Enable SAML authentication in Switcher Management by setting the environment variable SAML_ENABLE=true
+
+* `service_provider` refers to Switcher API
+* `web_app` refers to Switcher Management
 
 ### Running Switcher API from Docker Composer manifest file
 
