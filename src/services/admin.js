@@ -55,6 +55,14 @@ export async function signUpBitbucket(code) {
     return { admin, jwt };
 }
 
+export async function signUpSaml(userInfo) {
+    let admin = await Admin.findUserBySamlId(userInfo.id);
+    admin = await Admin.createThirdPartyAccount(
+        admin, userInfo, 'saml', '_samlid', checkAdmin);
+    const jwt = await admin.generateAuthToken();
+    return { admin, jwt };
+}
+
 export async function signIn(email, password) {
     const admin = await Admin.findByCredentials(email, password);
     const jwt = await admin.generateAuthToken();

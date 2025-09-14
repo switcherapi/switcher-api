@@ -42,14 +42,23 @@ const adminSchema = new mongoose.Schema({
     },
     auth_provider: {
         type: String,
-        enum: ['email', 'github', 'bitbucket'],
+        enum: ['email', 'github', 'bitbucket', 'saml'],
         default: 'email'
     },
     _gitid: {
-        type: String
+        type: String,
+        unique: true,
+        sparse: true
     },
     _bitbucketid: {
-        type: String
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    _samlid: {
+        type: String,
+        unique: true,
+        sparse: true
     },
     _avatar: {
         type: String
@@ -141,7 +150,7 @@ adminSchema.methods.generateAuthCode = async function () {
 };
 
 adminSchema.statics.findByCredentials = async (email, password) => {
-    const admin = await Admin.findOne({ email, active: true }).exec();
+    const admin = await Admin.findOneBy({ email, active: true });
 
     if (!admin) {
         throw new Error('Unable to login - account not found or not active.');
@@ -156,16 +165,30 @@ adminSchema.statics.findByCredentials = async (email, password) => {
     return admin;
 };
 
+adminSchema.statics.findOneBy = async (criteria) => {
+    for (const key in criteria) {
+        if (criteria[key] === undefined) {
+            return null;
+        }
+    }
+    
+    return Admin.findOne(criteria).exec();
+};
+
 adminSchema.statics.findUserByAuthCode = async (code, active) => {
-    return Admin.findOne({ code, active });
+    return Admin.findOneBy({ code, active });
 };
 
 adminSchema.statics.findUserByGitId = async (_gitid) => {
-    return Admin.findOne({ _gitid });
+    return Admin.findOneBy({ _gitid });
 };
 
 adminSchema.statics.findUserByBitBucketId = async (_bitbucketid) => {
-    return Admin.findOne({ _bitbucketid });
+    return Admin.findOneBy({ _bitbucketid });
+};
+
+adminSchema.statics.findUserBySamlId = async (_samlid) => {
+    return Admin.findOneBy({ _samlid });
 };
 
 adminSchema.statics.createThirdPartyAccount = async (
@@ -190,7 +213,6 @@ adminSchema.statics.createThirdPartyAccount = async (
         await admin.save();
     }
     
-    admin.name = userInfo.name;
     admin._avatar = userInfo.avatar;
     return admin;
 };

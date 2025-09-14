@@ -1,4 +1,5 @@
 import pathAdmin from './paths/path-admin.js';
+import pathAdminSaml from './paths/path-admin-saml.js';
 import pathDomain from './paths/path-domain.js';
 import pathGroup from './paths/path-group-config.js';
 import pathConfig from './paths/path-config.js';
@@ -75,6 +76,7 @@ export default {
     },
     paths: {
         ...pathAdmin,
+        ...pathAdminSaml,
         ...pathDomain,
         ...pathGroup,
         ...pathConfig,
