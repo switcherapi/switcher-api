@@ -42,7 +42,8 @@ router.get('/admin/saml/metadata', (_, res) => {
     const metadata = generateServiceProviderMetadata({
         issuer: process.env.SAML_ISSUER,
         callbackUrl: process.env.SAML_CALLBACK_URL,
-        publicCerts: process.env.SAML_CERT
+        publicCerts: Buffer.from(process.env.SAML_CERT, 'base64').toString('utf8'),
+        privateKey: process.env.SAML_PRIVATE_KEY ? Buffer.from(process.env.SAML_PRIVATE_KEY, 'base64').toString('utf8') : undefined
     });
     
     res.set('Content-Type', 'application/xml');

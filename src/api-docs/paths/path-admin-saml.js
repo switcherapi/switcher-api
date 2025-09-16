@@ -8,6 +8,9 @@ export default {
             responses: {
                 '302': {
                     description: 'Redirect to SAML Identity Provider'
+                },
+                '404': {
+                    description: 'SAML not configured'
                 }
             }
         }
@@ -37,6 +40,9 @@ export default {
                 },
                 '401': {
                     description: 'SAML authentication failed'
+                },
+                '404': {
+                    description: 'SAML not configured'
                 }
             }
         }
@@ -52,6 +58,12 @@ export default {
                 '200': {
                     description: 'Success',
                     content: commonSchemaContent('AdminLoginResponse')
+                },
+                '401': {
+                    description: 'Authentication failed'
+                },
+                '404': {
+                    description: 'SAML not configured'
                 }
             }
         }
@@ -71,6 +83,9 @@ export default {
                             }
                         }
                     }
+                },
+                '404': {
+                    description: 'SAML not configured'
                 }
             }
         }
