@@ -59,6 +59,7 @@ export async function signUpSaml(userInfo) {
     let admin = await Admin.findUserBySamlId(userInfo.id);
     admin = await Admin.createThirdPartyAccount(
         admin, userInfo, 'saml', '_samlid', checkAdmin);
+
     const jwt = await admin.generateAuthToken();
     return { admin, jwt };
 }

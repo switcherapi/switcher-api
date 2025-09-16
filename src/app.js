@@ -11,7 +11,6 @@ import './db/mongoose.js';
 import mongoose from 'mongoose';
 import swaggerDocument from './api-docs/swagger-document.js';
 import adminRouter from './routers/admin.js';
-import adminSamlRouter from './routers/admin-saml.js';
 import environment from './routers/environment.js';
 import component from './routers/component.js';
 import domainRouter from './routers/domain.js';
@@ -42,22 +41,23 @@ app.disable('x-powered-by');
 /**
  * Session configuration for SAML
  */
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'switcher-api-session',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { 
-        secure: process.env.NODE_ENV === 'prod',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
-}));
-app.use(passport.initialize());
+if (isSamlAvailable()) {
+    app.use(session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: { 
+            secure: true,
+            maxAge: 5 * 60 * 1000 // 5 minutes
+        }
+    }));
+    app.use(passport.initialize());
+}
 
 /**
  * API Routes
  */
 app.use(adminRouter);
-app.use(adminSamlRouter);
 app.use(component);
 app.use(environment);
 app.use(domainRouter);
@@ -69,6 +69,14 @@ app.use(teamRouter);
 app.use(permissionRouter);
 app.use(slackRouter);
 app.use(gitOpsRouter);
+
+/**
+ * SAML Routes
+ */
+if (isSamlAvailable()) {
+    const adminSamlRouter = await import('./routers/admin-saml.js');
+    app.use(adminSamlRouter.default);
+}
 
 /**
  * GraphQL Routes
@@ -109,19 +117,38 @@ app.get('/check', defaultLimiter, (req, res) => {
             release_time: process.env.RELEASE_TIME,
             env: process.env.ENV,
             db_state: mongoose.connection.readyState,
-            switcherapi: process.env.SWITCHER_API_ENABLE,
-            switcherapi_logger: process.env.SWITCHER_API_LOGGER,
-            relay_bypass_https: process.env.RELAY_BYPASS_HTTPS,
-            relay_bypass_verification: process.env.RELAY_BYPASS_VERIFICATION,
-            permission_cache: process.env.PERMISSION_CACHE_ACTIVATED,
-            history: process.env.HISTORY_ACTIVATED,
+            switcherapi: isEnabled('SWITCHER_API_ENABLE'),
+            switcherapi_logger: isEnabled('SWITCHER_API_LOGGER'),
+            relay_bypass_https: isEnabled('RELAY_BYPASS_HTTPS'),
+            relay_bypass_verification: isEnabled('RELAY_BYPASS_VERIFICATION'),
+            permission_cache: isEnabled('PERMISSION_CACHE_ACTIVATED'),
+            history: isEnabled('HISTORY_ACTIVATED'),
             max_metrics_pages: process.env.METRICS_MAX_PAGE,
             max_stretegy_op: process.env.MAX_STRATEGY_OPERATION,
-            max_rpm: process.env.MAX_REQUEST_PER_MINUTE || DEFAULT_RATE_LIMIT
+            max_rpm: process.env.MAX_REQUEST_PER_MINUTE || DEFAULT_RATE_LIMIT,
+            auth_providers: {
+                saml: isSamlAvailable(),
+                github: isOauthAvailableFor('GIT_OAUTH_CLIENT_ID', 'GIT_OAUTH_SECRET'),
+                bitbucket: isOauthAvailableFor('BITBUCKET_OAUTH_CLIENT_ID', 'BITBUCKET_OAUTH_SECRET'),
+            }
         };
     }
 
     res.status(200).send(response);
 });
+
+function isSamlAvailable() {
+    return (process.env.SAML_ENTRY_POINT && 
+        process.env.SAML_CALLBACK_ENDPOINT_URL && 
+        process.env.SAML_CERT)?.length > 0;
+}
+
+function isOauthAvailableFor(clientId, secret) {
+    return (process.env[clientId] && process.env[secret])?.length > 0;
+}
+
+function isEnabled(feature) {
+    return process.env[feature] && process.env[feature].toLowerCase() === 'true';
+}
 
 export default createServer(app);
