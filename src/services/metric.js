@@ -15,11 +15,11 @@ export async function getData(req, page) {
         args.config = config._id;
     }
 
-    const skip = parseInt((process.env.METRICS_MAX_PAGE * parseInt(page)) - process.env.METRICS_MAX_PAGE);
+    const skip = Number.parseInt((process.env.METRICS_MAX_PAGE * Number.parseInt(page)) - process.env.METRICS_MAX_PAGE);
     return Metric.find({ ...args }, 
         'config component entry result reason message group environment date -_id', {
             skip,
-            limit: parseInt(process.env.METRICS_MAX_PAGE)
+            limit: Number.parseInt(process.env.METRICS_MAX_PAGE)
         }).sort(req.query.sortBy ? String(req.query.sortBy).replace(';', ' ') : 'date')
         .populate({ path: 'config', select: 'key -_id' }).exec();
 }
@@ -45,11 +45,11 @@ export async function getStatistics(req) {
     let result = {};
     const options = String(req.query.statistics);
     await Promise.all([
-        RegExp(/(switchers)|(all)/).exec(options) ?
+        new RegExp(/(switchers)|(all)/).exec(options) ?
             aggregateSwitchers(switcher.aggregate, dateGroupPattern, result) : Promise.resolve(),
-        RegExp(/(components)|(all)/).exec(options) ?
+        new RegExp(/(components)|(all)/).exec(options) ?
             aggregateComponents(components.aggregate, dateGroupPattern, result) : Promise.resolve(),
-        RegExp(/(reasons)|(all)/).exec(options) ?
+        new RegExp(/(reasons)|(all)/).exec(options) ?
             aggreagateReasons(reasons.aggregate, result) : Promise.resolve()
     ]);
 
@@ -220,18 +220,18 @@ function buildMetricsFilter(req) {
 export function buildStatistics(aggregatedData, dataKey, timeframe = false) {
     let compiledData = [];
 
-    aggregatedData.forEach(data => {
+    for (const data of aggregatedData) {
         const entry = compiledData.filter(dataEntry => dataEntry[`${dataKey}`] === data[`${dataKey}`]);
         const result = data.result ? 'positive' : 'negative';
 
         if (entry.length) {
             entry[0][`${result}`] += data.total;
-            entry[0].total = entry[0][`${result}`] + entry[0][`${!data.result ? 'positive' : 'negative'}`];
+            entry[0].total = entry[0][`${result}`] + entry[0][`${data.result ? 'negative' : 'positive'}`];
         } else {
             const newEntry = {
                 [`${dataKey}`]: data[`${dataKey}`],
                 [`${result}`]: data.total,
-                [`${!data.result ? 'positive' : 'negative'}`]: 0,
+                [`${data.result ? 'negative' : 'positive'}`]: 0,
                 total: data.total
             };
             if (!timeframe) {
@@ -244,7 +244,7 @@ export function buildStatistics(aggregatedData, dataKey, timeframe = false) {
             }
             compiledData.push(newEntry);
         }
-    });
+    }
     return compiledData;
 }
 

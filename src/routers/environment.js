@@ -29,8 +29,8 @@ router.get('/environment', auth, [
         let environments = await Services.getEnvironments({ domain: req.query.domain },
             ['_id', 'name'],
             {
-                skip: parseInt(req.query.skip || 0),
-                limit: parseInt(req.query.limit || 10),
+                skip: Number.parseInt(req.query.skip || 0),
+                limit: Number.parseInt(req.query.limit || 10),
                 sort: {
                     name: req.query.sort === 'desc' ? -1 : 1
                 }

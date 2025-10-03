@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
 import bcryptjs from 'bcryptjs';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import { Team } from './team.js';
 import { notifyAcCreation, notifyAcDeletion } from '../external/switcher-api-facade.js';
@@ -120,22 +120,20 @@ adminSchema.options.toJSON = {
 };
 
 adminSchema.methods.generateAuthToken = async function () {
-    const admin = this;
-
     const options = {
         expiresIn: process.env.JWT_ADMIN_TOKEN_RENEW_INTERVAL,
         issuer: 'switcher-api'
     };
 
-    const token = jwt.sign(({ _id: admin.id.toString(), issued: Date.now() }), process.env.JWT_SECRET, options);
+    const token = jwt.sign(({ _id: this.id.toString(), issued: Date.now() }), process.env.JWT_SECRET, options);
     const refreshToken = jwt.sign(({ 
         subject: Admin.extractTokenPart(token)
     }), process.env.JWT_SECRET);
 
-    admin.code = null;
-    admin.active = true;
-    admin.token = Admin.extractTokenPart(token);
-    await admin.save();
+    this.code = null;
+    this.active = true;
+    this.token = Admin.extractTokenPart(token);
+    await this.save();
     
     return {
         token,
@@ -144,9 +142,8 @@ adminSchema.methods.generateAuthToken = async function () {
 };
 
 adminSchema.methods.generateAuthCode = async function () {
-    const admin = this;
-    admin.code = Math.random().toString(36).slice(-8);
-    return admin.code;
+    this.code = Math.random().toString(36).slice(-8);
+    return this.code;
 };
 
 adminSchema.statics.findByCredentials = async (email, password) => {
@@ -222,11 +219,9 @@ adminSchema.statics.extractTokenPart = (token) => {
 };
 
 adminSchema.pre('save', async function (next) {
-    const admin = this;
-
-    if (admin.isModified('password')) {
-        admin.password = await bcryptjs.hash(admin.password, EncryptionSalts.ADMIN);
-        notifyAcCreation(admin._id);
+    if (this.isModified('password')) {
+        this.password = await bcryptjs.hash(this.password, EncryptionSalts.ADMIN);
+        notifyAcCreation(this._id);
     }
     
     next();
@@ -241,15 +236,14 @@ adminSchema.post('save', function(error, _doc, next) {
 });
 
 adminSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    const admin = this;
-    const teams = await Team.find({ members: admin._id }).exec();
+    const teams = await Team.find({ members: this._id }).exec();
     for (const team of teams) {
-        let indexMmeber = team.members.indexOf(admin._id);
+        let indexMmeber = team.members.indexOf(this._id);
         team.members.splice(indexMmeber, 1);
         await team.save();
     }
 
-    notifyAcDeletion(admin._id);
+    notifyAcDeletion(this._id);
     next();
 });
 

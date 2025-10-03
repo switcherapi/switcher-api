@@ -31,7 +31,7 @@ const StrategyRequirementDefinition = [
         strategy: StrategiesType.NETWORK,
         operations: [OperationsType.EXIST, OperationsType.NOT_EXIST],
         format: '10.0.0.0/24 (CIDR) or 10.0.0.1 (IPv4 address)',
-        validator: '^([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/([0-9]|[1-2][0-9]|3[0-2]))?$'
+        validator: String.raw`^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$`
     },
     {
         strategy: StrategiesType.VALUE,
@@ -42,7 +42,7 @@ const StrategyRequirementDefinition = [
         operations: [OperationsType.EXIST, OperationsType.NOT_EXIST, OperationsType.EQUAL, OperationsType.NOT_EQUAL,
             OperationsType.BETWEEN, OperationsType.LOWER, OperationsType.GREATER],
         format: 'Numeric values (positive/negative or with decimal)',
-        validator: '^((-[0-9]{1,})|([0-9]{1,}))(\\.[0-9]{1,})?$'
+        validator: String.raw`^((-[0-9]{1,})|([0-9]{1,}))(\.[0-9]{1,})?$`
     },
     {
         strategy: StrategiesType.TIME,
@@ -59,7 +59,7 @@ const StrategyRequirementDefinition = [
     {
         strategy: StrategiesType.REGEX,
         operations: [OperationsType.EXIST, OperationsType.NOT_EXIST, OperationsType.EQUAL, OperationsType.NOT_EQUAL],
-        format: 'Hint: NOT/EQUAL forces \\b (delimiter) flag'
+        format:  String.raw`Hint: NOT/EQUAL forces \b (delimiter) flag`
     },
     {
         strategy: StrategiesType.PAYLOAD,
@@ -116,10 +116,10 @@ const OperationValuesValidation = [
 ];
 
 export function validateStrategyValue(strategy, value) {
-    const strategyRules = StrategyRequirementDefinition.filter(element => element.strategy === strategy);
+    const strategyRules = StrategyRequirementDefinition.find(element => element.strategy === strategy);
 
-    if (!value.match(strategyRules[0].validator)) {
-        throw new Error(`Value does not match with the requirements for this Strategy. Please, try using: ${strategyRules[0].format}`);
+    if (!value.match(strategyRules.validator)) {
+        throw new Error(`Value does not match with the requirements for this Strategy. Please, try using: ${strategyRules.format}`);
     }
     return true;
 }
@@ -134,9 +134,9 @@ export function strategyRequirements(strategy) {
     const operationsAvailable = StrategyRequirementDefinition.find(element => element.strategy === foundStrategy);
 
     let operationRequirements = [];
-    operationsAvailable.operations.forEach((o) => {
+    for (const o of operationsAvailable.operations) {
         operationRequirements.push(OperationValuesValidation.find(element => element.operation === o));
-    });
+    }
 
     return {
         strategy: foundStrategy,
@@ -238,49 +238,48 @@ configStrategySchema.options.toJSON = {
 };
 
 configStrategySchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    const strategyConfig = this;
-    await History.deleteMany({ domainId: strategyConfig.domain, 
-        elementId: strategyConfig._id }).exec();
+    await History.deleteMany({ domainId: this.domain, 
+        elementId: this._id }).exec();
         
     next();
 });
 
 configStrategySchema.pre('save', async function (next) {
-    const strategyConfig = this;
-
-    const strategy = strategyConfig.strategy;
-    const operationStrategy = strategyConfig.operation;
-    const { min, max } = OperationValuesValidation.filter(element => element.operation === operationStrategy)[0];
+    const strategy = this.strategy;
+    const operationStrategy = this.operation;
+    const { min, max } = OperationValuesValidation.find(element => element.operation === operationStrategy);
 
     // Verify if strategy already exists
-    if (await existStrategy(strategyConfig)) {
+    if (await existStrategy(this)) {
         const err = new Error(`Unable to complete the operation. Strategy '${strategy}' already exists for this configuration and environment`);
         return next(err);
     }
 
     // Verify strategy value quantity
-    if (!strategyConfig.values || strategyConfig.values.length < min || strategyConfig.values.length > max) {
+    if (!this.values || this.values.length < min || this.values.length > max) {
         const err =  new Error(`Unable to complete the operation. The number of values for the operation '${operationStrategy}', are min: ${min} and max: ${max} values`);
         return next(err);
     }
 
     const operations = StrategyRequirementDefinition.find(element => element.strategy === strategy).operations;
-    const foundOperation = operations.filter((element) => element === operationStrategy);
+    const foundOperation = operations.find((element) => element === operationStrategy);
     
     // Verify strategy operation requirements
-    if (!foundOperation.length) {
+    if (!foundOperation) {
         const err =  new Error(`Unable to complete the operation. The strategy '${strategy}' needs ${operations} as operation`);
         return next(err);
     }
 
     // Verify strategy values format
     try {
-        strategyConfig.values.forEach(value => validateStrategyValue(strategy, value));
+        for (const value of this.values) {
+            validateStrategyValue(strategy, value);
+        }
     } catch (err) {
         return next(err);
     }
 
-    await recordStrategyHistory(strategyConfig, this.modifiedPaths());
+    await recordStrategyHistory(this, this.modifiedPaths());
 
     next();
 });

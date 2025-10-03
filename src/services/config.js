@@ -179,7 +179,7 @@ export async function updateConfigRelay(id, args, admin) {
     config.updatedBy = admin.email;
 
     for (const update of Object.keys(args)) {
-        if (config.relay[update] && 'activated endpoint auth_token'.indexOf(update) >= 0) {
+        if (config.relay[update] && 'activated endpoint auth_token'.includes(update)) {
             await checkEnvironmentStatusChange(args, config.domain, args[update]);
             Object.keys(args[update]).forEach((map) =>
                 config.relay[update].set(map, args[update][map]));

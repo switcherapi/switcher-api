@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import bcryptjs from 'bcryptjs';
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 import { Metric } from '../../src/models/metric';
 import Admin from '../../src/models/admin';
 import { EnvType } from '../../src/models/environment';

@@ -1,6 +1,6 @@
-import https from 'https';
-import http from 'http';
-import fs from 'fs';
+import https from 'node:https';
+import http from 'node:http';
+import fs from 'node:fs';
 import Logger from './helpers/logger.js';
 
 export const createServer = (app) => {

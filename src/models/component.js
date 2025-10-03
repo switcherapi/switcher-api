@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
 import bcryptjs from 'bcryptjs';
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 import { Config } from './config.js';
 import { EncryptionSalts } from './common/index.js';
 
@@ -52,12 +52,10 @@ componentSchema.options.toJSON = {
 };
 
 componentSchema.methods.generateApiKey = async function () {
-    const component = this;
-
     const apiKey = randomUUID();
     const hash = await bcryptjs.hash(apiKey, EncryptionSalts.COMPONENT);
-    component.apihash = hash;
-    await component.save();
+    this.apihash = hash;
+    await this.save();
     
     return apiKey;
 };
@@ -71,11 +69,9 @@ const existComponent = async ({ domain, name, __v }) => {
 };
 
 componentSchema.pre('validate', async function (next) {
-    const component = this;
-
     // Verify if component already exists
-    if (await existComponent(component)) {
-        const err = new Error(`Unable to complete the operation. Component '${component.name}' already exists for this Domain`);
+    if (await existComponent(this)) {
+        const err = new Error(`Unable to complete the operation. Component '${this.name}' already exists for this Domain`);
         next(err);
     }
 
@@ -83,14 +79,12 @@ componentSchema.pre('validate', async function (next) {
 });
 
 componentSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    const component = this;
-    
-    const configsToRemoveFrom = await Config.find({ components: { $in: [component._id] } }).exec();
-    configsToRemoveFrom.forEach(config => {
-        const indexValue = config.components.indexOf(component._id);
+    const configsToRemoveFrom = await Config.find({ components: { $in: [this._id] } }).exec();
+    for (const config of configsToRemoveFrom) {
+        const indexValue = config.components.indexOf(this._id);
         config.components.splice(indexValue, 1);
         config.save();
-    });
+    }
 
     next();
 });

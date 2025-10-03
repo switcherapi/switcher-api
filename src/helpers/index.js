@@ -10,9 +10,9 @@ const PATTERN_ALPHANUMERIC = /^[a-zA-Z0-9_-]*$/;
 
 export async function checkEnvironmentStatusRemoval(domainId, environmentName, strategy = false) {
     const environment = await getEnvironments({ domain: domainId }, ['_id', 'name']);
-    const isValidOperation = environment.filter((e) => 
+    const isValidOperation = environment.some((e) => 
         e.name === environmentName && 
-        !strategy ? environmentName !== EnvType.DEFAULT : strategy).length > 0;
+        !strategy ? environmentName !== EnvType.DEFAULT : strategy);
         
     if (!isValidOperation) {
         throw new BadRequestError('Invalid environment');
@@ -32,18 +32,18 @@ export function containsValue(arr, value) {
 }
 
 export function formatInput(input, 
-    options = { 
-        toUpper: false, 
-        toLower: false, 
-        autoUnderscore: false, 
-        allowSpace: false 
-    }) {
+    {
+        toUpper = false,
+        toLower = false,
+        autoUnderscore = false,
+        allowSpace = false
+    } = {}) {
 
     let regexStr;
-    if (options.autoUnderscore) {
+    if (autoUnderscore) {
         regexStr = PATTERN_ALPHANUMERIC_SPACE;
     } else {
-        regexStr = options.allowSpace ? PATTERN_ALPHANUMERIC_SPACE : PATTERN_ALPHANUMERIC;
+        regexStr = allowSpace ? PATTERN_ALPHANUMERIC_SPACE : PATTERN_ALPHANUMERIC;
     }
 
     const regex = new RegExp(regexStr);
@@ -51,14 +51,14 @@ export function formatInput(input,
         throw new Error('Invalid input format. Use only alphanumeric digits.');
     }
     
-    if (options.toUpper) {
+    if (toUpper) {
         input = input.toUpperCase();
-    } else if (options.toLower) {
+    } else if (toLower) {
         input = input.toLowerCase();
     }
 
-    if (options.autoUnderscore) {
-        input = input.replace(/\s/g, '_');
+    if (autoUnderscore) {
+        input = input.replaceAll(' ', '_');
     }
 
     return input.trim();
@@ -76,11 +76,11 @@ export function sortBy(args) {
 }
 
 export function validatePagingArgs(args) {
-    if (args.limit && !Number.isInteger(parseInt(args.limit)) || parseInt(args.limit) < 1) {
+    if (args.limit && !Number.isInteger(Number.parseInt(args.limit)) || Number.parseInt(args.limit) < 1) {
         return false;
     }
      
-    if (args.skip && !Number.isInteger(parseInt(args.skip)) || parseInt(args.skip) < 0) {
+    if (args.skip && !Number.isInteger(Number.parseInt(args.skip)) || Number.parseInt(args.skip) < 0) {
         return false;
     }
 

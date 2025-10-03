@@ -83,10 +83,10 @@ function validateChangesContent(changes) {
     for (const change of changes) {
         if (CONTENT_TYPE_ARRAY.includes(change.diff)) {
             if (!Array.isArray(change.content)) {
-                throw new Error('Request has invalid content type [object]');
+                throw new TypeError('Request has invalid content type [object]');
             }
         } else if (Array.isArray(change.content)) {
-            throw new Error('Request has invalid content type [array]');
+            throw new TypeError('Request has invalid content type [array]');
         }
     }
 }

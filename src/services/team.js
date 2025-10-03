@@ -48,8 +48,8 @@ export async function getTeams(where) {
 export async function getTeamsSort(where, projection, skip, limit, sort) {
     return Team.find(where, projection,
         {
-            skip: parseInt(skip || 0),
-            limit: parseInt(limit || 10),
+            skip: Number.parseInt(skip || 0),
+            limit: Number.parseInt(limit || 10),
             sort: {
                 name: sort === 'desc' ? -1 : 1
             }

@@ -45,8 +45,8 @@ router.get('/config', auth, [
         await groupConfig.populate({
             path: 'config',
             options: {
-                limit: parseInt(req.query.limit || 10),
-                skip: parseInt(req.query.skip || 0),
+                limit: Number.parseInt(req.query.limit || 10),
+                skip: Number.parseInt(req.query.skip || 0),
                 sort: sortBy(req.query)
             }
         });

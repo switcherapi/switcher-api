@@ -10,8 +10,8 @@ export async function getHistory(query, domainId, elementId, pagingArgs = {}) {
     return History.find({ domainId, elementId })
             .select(query)
             .sort(sortBy(pagingArgs))
-            .limit(parseInt(pagingArgs.limit || 10))
-            .skip(parseInt(pagingArgs.skip || 0))
+            .limit(Number.parseInt(pagingArgs.limit || 10))
+            .skip(Number.parseInt(pagingArgs.skip || 0))
             .exec();
 }
 

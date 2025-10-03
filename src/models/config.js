@@ -163,7 +163,7 @@ async function recordConfigHistory(config, modifiedField) {
 }
 
 function hasRelayEndpointUpdates(config, modifiedField) {
-    const hasUpdate = modifiedField.filter(field => field.indexOf('relay.endpoint.') >= 0);
+    const hasUpdate = modifiedField.filter(field => field.includes('relay.endpoint.'));
     
     if (hasUpdate.length) {
         const environment = hasUpdate[0].split('.')[2];
@@ -181,25 +181,23 @@ configSchema.virtual('configStrategy', {
 });
 
 configSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    const config = this;
-    
-    const strategies = await ConfigStrategy.find({ config: config._id }).exec();
+    const strategies = await ConfigStrategy.find({ config: this._id }).exec();
     if (strategies) {
         for (const strategy of strategies) {
             await Promise.resolve(strategy.deleteOne());
         }
     }
-    
-    await History.deleteMany({ domainId: config.domain, elementId: config._id }).exec();
+
+    await History.deleteMany({ domainId: this.domain, elementId: this._id }).exec();
     next();
 });
 
 configSchema.pre('save', async function (next) {
-    const config = this;
-    await config.populate({ path: 'component_list' });
-    await recordConfigHistory(config.toJSON(), this.modifiedPaths());
-    await checkMetrics(config);
-    hasRelayEndpointUpdates(config, this.modifiedPaths());
+    await this.populate({ path: 'component_list' });
+    await this.populate({ path: 'component_list' });
+    await recordConfigHistory(this.toJSON(), this.modifiedPaths());
+    await checkMetrics(this);
+    hasRelayEndpointUpdates(this, this.modifiedPaths());
 
     next();
 });

@@ -22,11 +22,11 @@ const windowValidation = (value) => {
         throw new Error('Invalid window value');
     }
 
-    if (value.endsWith('s') && parseInt(value) < 30) {
+    if (value.endsWith('s') && Number.parseInt(value) < 30) {
         throw new Error('Invalid window value (minimum 30s)');
     }
 
-    if (parseInt(value) < 1) {
+    if (Number.parseInt(value) < 1) {
         throw new Error('Invalid window value (minimum 1[m/h])');
     }
 

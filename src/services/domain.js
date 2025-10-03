@@ -1,4 +1,4 @@
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 import { checkEnvironmentStatusChange } from '../middleware/validators.js';
 import Component from '../models/component.js';
 import { Config } from '../models/config.js';

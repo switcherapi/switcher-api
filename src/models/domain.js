@@ -109,16 +109,15 @@ domainSchema.options.toJSON = {
 };
 
 domainSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    const domain = this;
-    const groups = await GroupConfig.find({ domain: domain._id }).exec();
-    
+    const groups = await GroupConfig.find({ domain: this._id }).exec();
+
     if (groups) {
         for (const group of groups) {
             await Promise.resolve(group.deleteOne());
         }
     }
 
-    const teams = await Team.find({ domain: domain._id }).exec();
+    const teams = await Team.find({ domain: this._id }).exec();
     if (teams) {
         for (const team of teams) {
             await Promise.resolve(team.deleteOne());
@@ -126,10 +125,10 @@ domainSchema.pre('deleteOne', { document: true, query: false }, async function (
     }
 
     await Promise.all([
-        Component.deleteMany({ domain: domain._id }),
-        Environment.deleteMany({ domain: domain._id }), 
-        History.deleteMany({ domainId: domain._id }), 
-        Metric.deleteMany({ domain: domain._id })
+        Component.deleteMany({ domain: this._id }),
+        Environment.deleteMany({ domain: this._id }), 
+        History.deleteMany({ domainId: this._id }), 
+        Metric.deleteMany({ domain: this._id })
     ]);
 
     next();
@@ -143,8 +142,7 @@ async function recordDomainHistory(domain, modifiedField) {
 }
 
 domainSchema.pre('save', async function (next) {
-    const domain = this;
-    await recordDomainHistory(domain, this.modifiedPaths());
+    await recordDomainHistory(this, this.modifiedPaths());
     next();
 });
 

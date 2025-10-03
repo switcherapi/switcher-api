@@ -6,7 +6,7 @@ export async function checkEnvironmentStatusChange(args, domain, field) {
     const environment = await getEnvironments({ domain }, ['_id', 'name']);
     const updates = Object.keys(field || args);
     const isValidOperation = updates.every((update) => {
-        return environment.filter((e) => e.name === update).length > 0;
+        return environment.some((e) => e.name === update);
     });
 
     if (!isValidOperation) {

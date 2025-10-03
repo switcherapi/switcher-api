@@ -26,10 +26,10 @@ export async function resolvePermission(args, admin) {
         for (const action_perm of args.actions) {
             try {
                 await verifyOwnership(admin, element, args.domain, action_perm, args.router, false, args.environment);
-                result[result.length - 1].permissions.push({ action: action_perm.toString(), result: 'ok' });
+                result.at(-1).permissions.push({ action: action_perm.toString(), result: 'ok' });
             } catch (e) {
                 Logger.debug('resolvePermission', e);
-                result[result.length - 1].permissions.push({ action: action_perm.toString(), result: 'nok' });
+                result.at(-1).permissions.push({ action: action_perm.toString(), result: 'nok' });
             }
         }
     }
@@ -50,5 +50,5 @@ const getElements = async (domain, parent, router) => {
         return getConfigs({ domain, group: parent }, true);
     }
 
-    return Promise.resolve([]);
+    return [];
 };

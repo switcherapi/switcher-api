@@ -678,7 +678,7 @@ describe('Testing update strategies #1', () => {
                 value: 'USER_4'
             }).expect(200);
 
-        expect(response.body.values[response.body.values.length - 1]).toEqual('USER_4');
+        expect(response.body.values.at(-1)).toEqual('USER_4');
 
         // DB validation
         const configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId }).lean().exec();
@@ -765,7 +765,7 @@ describe('Testing update strategies #1', () => {
                 newvalue: 'USER_THREE'
             }).expect(200);
 
-        expect(response.body.values[response.body.values.length - 1]).toEqual('USER_THREE');
+        expect(response.body.values.at(-1)).toEqual('USER_THREE');
 
         // DB validation
         const configStrategy = await ConfigStrategy.findOne({ _id: configStrategyId }).lean().exec();

@@ -90,7 +90,7 @@ export async function recordHistory(modifiedField, oldDocument, newDocument, dom
     modifiedField.forEach(keys => {
         const keyArr = keys.split('.');
         checkDifference(diff, documents, defaultIgnoredFields, 
-            keyArr, keys.replace(/\./g, '/'), 0);
+            keyArr, keys.replaceAll('.', '/'), 0);
     });
     
     if (diff.newValues.size > 0) {
