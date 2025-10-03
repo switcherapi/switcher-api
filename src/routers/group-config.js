@@ -37,8 +37,8 @@ router.get('/groupconfig', auth, [
         await domain.populate({
             path: 'groupConfig',
             options: {
-                limit: parseInt(req.query.limit || 10),
-                skip: parseInt(req.query.skip || 0),
+                limit: Number.parseInt(req.query.limit || 10),
+                skip: Number.parseInt(req.query.skip || 0),
                 sort: sortBy(req.query)
             }
         });

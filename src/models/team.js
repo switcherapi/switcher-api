@@ -67,11 +67,9 @@ const existTeam = async (team) => {
 };
 
 teamSchema.pre('validate', async function (next) {
-    const team = this;
-
     // Verify if team already exists
-    if (await existTeam(team)) {
-        const err = new Error(`Unable to complete the operation. Team '${team.name}' already exists for this Domain`);
+    if (await existTeam(this)) {
+        const err = new Error(`Unable to complete the operation. Team '${this.name}' already exists for this Domain`);
         next(err);
     }
 
@@ -79,15 +77,14 @@ teamSchema.pre('validate', async function (next) {
 });
 
 teamSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    const team = this;
-    await Permission.deleteMany({ _id: { $in: team.permissions } }).exec();
+    await Permission.deleteMany({ _id: { $in: this.permissions } }).exec();
 
-    const membersToRemve = await Admin.find({ teams: team._id }).exec();
-    membersToRemve.forEach(member => {
-        const indexValue = member.teams.indexOf(team._id);
+    const membersToRemve = await Admin.find({ teams: this._id }).exec();
+    for (const member of membersToRemve) {
+        const indexValue = member.teams.indexOf(this._id);
         member.teams.splice(indexValue, 1);
         member.save();
-    });
+    }
 
     next();
 });

@@ -7,7 +7,7 @@ const ERROR_MESSAGE = {
 
 const getMaxRate = (rate_limit) => {
 	if (rate_limit === 0) {
-		return parseInt(DEFAULT_RATE_LIMIT);
+		return Number.parseInt(DEFAULT_RATE_LIMIT);
 	}
 
 	return rate_limit;
@@ -17,7 +17,7 @@ export const DEFAULT_RATE_LIMIT = 1000;
 
 export const defaultLimiter = rateLimit({
 	windowMs: DEFAULT_WINDOWMS,
-	limit: getMaxRate(parseInt(process.env.MAX_REQUEST_PER_MINUTE)),
+	limit: getMaxRate(Number.parseInt(process.env.MAX_REQUEST_PER_MINUTE)),
 	skip: (request) => request.rate_limit === 0,
 	standardHeaders: 'draft-7',
 	legacyHeaders: false,

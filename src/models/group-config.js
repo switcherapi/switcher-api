@@ -75,8 +75,7 @@ groupConfigSchema.virtual('config', {
 });
 
 groupConfigSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    const group = this;
-    const configs = await Config.find({ group: group._id }).exec();
+    const configs = await Config.find({ group: this._id }).exec();
 
     if (configs) {
         for (const config of configs) {
@@ -84,13 +83,12 @@ groupConfigSchema.pre('deleteOne', { document: true, query: false }, async funct
         }
     }
 
-    await History.deleteMany({ domainId: group.domain, elementId: group._id }).exec();
+    await History.deleteMany({ domainId: this.domain, elementId: this._id }).exec();
     next();
 });
 
 groupConfigSchema.pre('save', async function (next) {
-    const group = this;
-    await recordGroupHistory(group, this.modifiedPaths());
+    await recordGroupHistory(this, this.modifiedPaths());
     next();
 });
 

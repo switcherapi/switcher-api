@@ -21,7 +21,7 @@ router.get('/metric/data/', auth, [
     try {
         const page = String(req.query.page);
         if (isNaN(page)) {
-            throw new Error('Page value should be a number');
+            throw new TypeError('Page value should be a number');
         }
 
         const data = await getData(req, page);

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import bcryptjs from 'bcryptjs';
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import Admin from '../../src/models/admin';
 import Domain from '../../src/models/domain';

@@ -59,8 +59,7 @@ slackSchema.options.toJSON = {
 };
 
 slackSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    const slack = this;
-    await SlackTicket.deleteMany({ slack: slack._id }).exec();
+    await SlackTicket.deleteMany({ slack: this._id }).exec();
     next();
 });
 

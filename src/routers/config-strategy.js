@@ -37,8 +37,8 @@ router.get('/configstrategy', auth, [
         await config.populate({
             path: 'configStrategy',
             options: {
-                limit: parseInt(req.query.limit || 10),
-                skip: parseInt(req.query.skip || 0),
+                limit: Number.parseInt(req.query.limit || 10),
+                skip: Number.parseInt(req.query.skip || 0),
                 sort: sortBy(req.query)
             }
         });

@@ -1,7 +1,7 @@
 export function getFields(elements, fields) {
     return elements.map(element => {
         const newElement = {};
-        fields.split(',').forEach(field => {
+        for (const field of fields.split(',')) {
             if (field.includes('.')) {
                 const nestedFields = field.split('.');
                 const nextNestedFields = field.substring(field.indexOf('.') + 1);
@@ -11,7 +11,7 @@ export function getFields(elements, fields) {
             } else {
                 newElement[field] = getElement(element, field);
             }
-        });
+        }
         return newElement;
     });
 }
