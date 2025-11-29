@@ -180,7 +180,7 @@ configSchema.virtual('configStrategy', {
     foreignField: 'config'
 });
 
-configSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+configSchema.pre('deleteOne', { document: true, query: false }, async function () {
     const strategies = await ConfigStrategy.find({ config: this._id }).exec();
     if (strategies) {
         for (const strategy of strategies) {
@@ -189,17 +189,14 @@ configSchema.pre('deleteOne', { document: true, query: false }, async function (
     }
 
     await History.deleteMany({ domainId: this.domain, elementId: this._id }).exec();
-    next();
 });
 
-configSchema.pre('save', async function (next) {
+configSchema.pre('save', async function () {
     await this.populate({ path: 'component_list' });
     await this.populate({ path: 'component_list' });
     await recordConfigHistory(this.toJSON(), this.modifiedPaths());
     await checkMetrics(this);
     hasRelayEndpointUpdates(this, this.modifiedPaths());
-
-    next();
 });
 
 export const Config = mongoose.model('Config', configSchema);

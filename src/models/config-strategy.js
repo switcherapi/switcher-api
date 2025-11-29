@@ -237,28 +237,25 @@ configStrategySchema.options.toJSON = {
     }
 };
 
-configStrategySchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+configStrategySchema.pre('deleteOne', { document: true, query: false }, async function () {
     await History.deleteMany({ domainId: this.domain, 
         elementId: this._id }).exec();
-        
-    next();
 });
 
-configStrategySchema.pre('save', async function (next) {
+configStrategySchema.pre('save', async function () {
     const strategy = this.strategy;
     const operationStrategy = this.operation;
     const { min, max } = OperationValuesValidation.find(element => element.operation === operationStrategy);
 
     // Verify if strategy already exists
     if (await existStrategy(this)) {
-        const err = new Error(`Unable to complete the operation. Strategy '${strategy}' already exists for this configuration and environment`);
-        return next(err);
+        throw new Error(`Unable to complete the operation. Strategy '${strategy}' already exists for this configuration and environment`);
     }
 
     // Verify strategy value quantity
     if (!this.values || this.values.length < min || this.values.length > max) {
         const err =  new Error(`Unable to complete the operation. The number of values for the operation '${operationStrategy}', are min: ${min} and max: ${max} values`);
-        return next(err);
+        throw err;
     }
 
     const operations = StrategyRequirementDefinition.find(element => element.strategy === strategy).operations;
@@ -267,21 +264,15 @@ configStrategySchema.pre('save', async function (next) {
     // Verify strategy operation requirements
     if (!foundOperation) {
         const err =  new Error(`Unable to complete the operation. The strategy '${strategy}' needs ${operations} as operation`);
-        return next(err);
+        throw err;
     }
 
     // Verify strategy values format
-    try {
-        for (const value of this.values) {
-            validateStrategyValue(strategy, value);
-        }
-    } catch (err) {
-        return next(err);
+    for (const value of this.values) {
+        validateStrategyValue(strategy, value);
     }
 
     await recordStrategyHistory(this, this.modifiedPaths());
-
-    next();
 });
 
 Object.assign(configStrategySchema.statics, { StrategiesType, OperationsType });

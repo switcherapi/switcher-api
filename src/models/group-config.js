@@ -74,7 +74,7 @@ groupConfigSchema.virtual('config', {
     foreignField: 'group'
 });
 
-groupConfigSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+groupConfigSchema.pre('deleteOne', { document: true, query: false }, async function () {
     const configs = await Config.find({ group: this._id }).exec();
 
     if (configs) {
@@ -84,12 +84,10 @@ groupConfigSchema.pre('deleteOne', { document: true, query: false }, async funct
     }
 
     await History.deleteMany({ domainId: this.domain, elementId: this._id }).exec();
-    next();
 });
 
-groupConfigSchema.pre('save', async function (next) {
+groupConfigSchema.pre('save', async function () {
     await recordGroupHistory(this, this.modifiedPaths());
-    next();
 });
 
 const GroupConfig = mongoose.model('GroupConfig', groupConfigSchema);

@@ -218,24 +218,14 @@ adminSchema.statics.extractTokenPart = (token) => {
     return token.substring(token.length - 8, token.length);
 };
 
-adminSchema.pre('save', async function (next) {
+adminSchema.pre('save', async function () {
     if (this.isModified('password')) {
         this.password = await bcryptjs.hash(this.password, EncryptionSalts.ADMIN);
         notifyAcCreation(this._id);
     }
-    
-    next();
 });
 
-adminSchema.post('save', function(error, _doc, next) {
-    if (error.name === 'MongoServerError' && error.code === 11000) {
-        return next(new Error('Account is already registered.'));
-    }
-    
-    next(error);
-});
-
-adminSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+adminSchema.pre('deleteOne', { document: true, query: false }, async function () {
     const teams = await Team.find({ members: this._id }).exec();
     for (const team of teams) {
         let indexMmeber = team.members.indexOf(this._id);
@@ -244,7 +234,6 @@ adminSchema.pre('deleteOne', { document: true, query: false }, async function (n
     }
 
     notifyAcDeletion(this._id);
-    next();
 });
 
 const Admin = mongoose.model('Admin', adminSchema);

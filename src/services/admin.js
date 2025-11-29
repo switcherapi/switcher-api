@@ -3,6 +3,7 @@ import { validate_token } from '../external/google-recaptcha.js';
 import { getBitBucketToken, getBitBucketUserInfo } from '../external/oauth-bitbucket.js';
 import { getGitToken, getGitUserInfo } from '../external/oauth-git.js';
 import { checkAdmin } from '../external/switcher-api-facade.js';
+import Logger from '../helpers/logger.js';
 import Admin from '../models/admin.js';
 import Domain from '../models/domain.js';
 import { response } from './common.js';
@@ -28,7 +29,7 @@ export async function signUp(args, remoteAddress) {
     await validate_token(args.token, remoteAddress);
 
     const admin = new Admin(args);
-    return admin.save();
+    return saveAdmin(admin);
 }
 
 export async function signUpGitHub(code) {
@@ -36,7 +37,7 @@ export async function signUpGitHub(code) {
     const userInfo = await getGitUserInfo(token);
 
     let admin = await Admin.findUserByGitId(userInfo.id);
-    admin = await Admin.createThirdPartyAccount(
+    admin = await createThirdPartyAccount(
         admin, userInfo, 'github', '_gitid', checkAdmin);
 
     const jwt = await admin.generateAuthToken();
@@ -48,7 +49,7 @@ export async function signUpBitbucket(code) {
     const userInfo = await getBitBucketUserInfo(token);
 
     let admin = await Admin.findUserByBitBucketId(userInfo.id);
-    admin = await Admin.createThirdPartyAccount(
+    admin = await createThirdPartyAccount(
         admin, userInfo, 'bitbucket', '_bitbucketid', checkAdmin);
 
     const jwt = await admin.generateAuthToken();
@@ -57,7 +58,7 @@ export async function signUpBitbucket(code) {
 
 export async function signUpSaml(userInfo) {
     let admin = await Admin.findUserBySamlId(userInfo.id);
-    admin = await Admin.createThirdPartyAccount(
+    admin = await createThirdPartyAccount(
         admin, userInfo, 'saml', '_samlid', checkAdmin);
 
     const jwt = await admin.generateAuthToken();
@@ -74,7 +75,7 @@ export async function loginRequestRecovery(email) {
     const admin = await getAdmin({ email });
     if (admin) {
         await admin.generateAuthCode();
-        admin.save();
+        await saveAdmin(admin);
     }
 }
 
@@ -94,13 +95,13 @@ export async function loginRecovery(args, remoteAddress) {
 
 export async function logout(admin) {
     admin.token = null;
-    await admin.save();
+    await saveAdmin(admin);
 }
 
 export async function updateAccount(args, admin) {
     const updates = Object.keys(args);
     updates.forEach((update) => admin[update] = args[update]);
-    return admin.save();
+    return saveAdmin(admin);
 }
 
 export async function leaveDomain(domainid, admin) {
@@ -117,7 +118,7 @@ export async function leaveDomain(domainid, admin) {
 
         let indexTeam = admin.teams.indexOf(admin_team._id);
         admin.teams.splice(indexTeam, 1);
-        await admin.save();
+        await saveAdmin(admin);
     }
 
     return admin;
@@ -131,4 +132,27 @@ export async function deleteAccount(admin) {
     }
 
     return admin.deleteOne();
+}
+
+async function saveAdmin(admin) {
+    try {
+        return await admin.save();
+    } catch (e) {
+        Logger.error('saveAdmin', e);
+        if (e.name === 'MongoServerError' && e.code === 11000) {
+            throw new BadRequestError('Account is already registered.');
+        }
+
+        throw e;
+    }
+}
+
+async function createThirdPartyAccount(admin, userInfo, platform, attributeIdName, checkAdmin) {
+    try {
+        return await Admin.createThirdPartyAccount(
+            admin, userInfo, platform, attributeIdName, checkAdmin);
+    } catch (e) {
+        Logger.error(`createThirdPartyAccount - ${platform}`, e);
+        throw new Error('Unable to create account - account may already be registered.');
+    }
 }

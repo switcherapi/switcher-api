@@ -66,17 +66,14 @@ const existTeam = async (team) => {
     return false;
 };
 
-teamSchema.pre('validate', async function (next) {
+teamSchema.pre('validate', async function () {
     // Verify if team already exists
     if (await existTeam(this)) {
-        const err = new Error(`Unable to complete the operation. Team '${this.name}' already exists for this Domain`);
-        next(err);
+        throw new Error(`Unable to complete the operation. Team '${this.name}' already exists for this Domain`);
     }
-
-    next();
 });
 
-teamSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+teamSchema.pre('deleteOne', { document: true, query: false }, async function () {
     await Permission.deleteMany({ _id: { $in: this.permissions } }).exec();
 
     const membersToRemve = await Admin.find({ teams: this._id }).exec();
@@ -85,8 +82,6 @@ teamSchema.pre('deleteOne', { document: true, query: false }, async function (ne
         member.teams.splice(indexValue, 1);
         member.save();
     }
-
-    next();
 });
 
 export const Team = mongoose.model('Team', teamSchema);
