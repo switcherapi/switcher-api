@@ -11,12 +11,14 @@ import { ActionTypes, RouterTypes } from '../models/permission.js';
 import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers/index.js';
 import { permissionCache } from '../helpers/cache.js';
 import { response } from './common.js';
+import Logger from '../helpers/logger.js';
+import { BadRequestError } from '../exceptions/index.js';
 
 export async function removeDomainStatus(domain, environmentName) {
     try {
         await checkEnvironmentStatusRemoval(domain._id, environmentName);
         domain.activated.delete(environmentName);
-        return await domain.save();
+        return await saveDomain(domain);
     } catch (e) {
         throw new Error(e.message);
     }
@@ -60,7 +62,7 @@ export async function createDomain(args, admin) {
     });
 
     environment.save();
-    return domain.save();
+    return saveDomain(domain);
 }
 
 export async function deleteDomainHistory(id, admin) {
@@ -84,7 +86,7 @@ export async function transferDomain(args, admin) {
 
     domain.updatedBy = admin.email;
     domain.transfer = domain.transfer ? null : true;
-    return domain.save();
+    return saveDomain(domain);
 }
 
 export async function transferDomainAccept(args, admin) {
@@ -98,7 +100,7 @@ export async function transferDomainAccept(args, admin) {
         ConfigStrategy.updateMany({ domain: domain._id }, { owner: admin._id }),
         Component.updateMany({ domain: domain._id }, { owner: admin._id }),
         Environment.updateMany({ domain: domain._id }, { owner: admin._id }),
-        domain.save()
+        saveDomain(domain)
     ]);
 
     return domain;
@@ -113,7 +115,7 @@ export async function updateDomain(id, args, admin) {
     
     const updates = Object.keys(args);
     updates.forEach((update) => domain[update] = args[update]);
-    return domain.save();
+    return saveDomain(domain);
 }
 
 export async function updateDomainStatus(id, args, admin) {
@@ -127,7 +129,7 @@ export async function updateDomainStatus(id, args, admin) {
     const updates = await checkEnvironmentStatusChange(args, id);
 
     updates.forEach((update) => domain.activated.set(update, args[update]));
-    return domain.save();
+    return saveDomain(domain);
 }
 
 export async function removeDomainStatusEnv(id, env, admin) {
@@ -144,7 +146,7 @@ export async function removeDomainStatusEnv(id, env, admin) {
 export async function updateDomainVersion(domainId) {
     const domain = await getDomainById(domainId);
     domain.lastUpdate = Date.now();
-    return domain.save();
+    return saveDomain(domain);
 }
 
 export async function getRelayVerificationCode(id, admin) {
@@ -155,8 +157,21 @@ export async function getRelayVerificationCode(id, admin) {
     
     if (!domain.integrations.relay.verification_code) {
         domain.integrations.relay.verification_code = randomUUID();
-        await domain.save();
+        await saveDomain(domain);
     }
 
     return domain.integrations.relay.verification_code;
+}
+
+async function saveDomain(domain) {
+    try {
+        return await domain.save();
+    } catch (e) {
+        Logger.error('saveDomain', e);
+        if (e.name === 'MongoServerError' && e.code === 11000) {
+            throw new BadRequestError('The domain name is already in use.');
+        }
+
+        throw e;
+    }
 }

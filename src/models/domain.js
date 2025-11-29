@@ -108,7 +108,7 @@ domainSchema.options.toJSON = {
     }
 };
 
-domainSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+domainSchema.pre('deleteOne', { document: true, query: false }, async function () {
     const groups = await GroupConfig.find({ domain: this._id }).exec();
 
     if (groups) {
@@ -130,8 +130,6 @@ domainSchema.pre('deleteOne', { document: true, query: false }, async function (
         History.deleteMany({ domainId: this._id }), 
         Metric.deleteMany({ domain: this._id })
     ]);
-
-    next();
 });
 
 async function recordDomainHistory(domain, modifiedField) {
@@ -141,17 +139,8 @@ async function recordDomainHistory(domain, modifiedField) {
     }
 }
 
-domainSchema.pre('save', async function (next) {
+domainSchema.pre('save', async function () {
     await recordDomainHistory(this, this.modifiedPaths());
-    next();
-});
-
-domainSchema.post('save', function(error, _doc, next) {
-    if (error.name === 'MongoServerError' && error.code === 11000) {
-        return next(new Error('The domain name is already in use.'));
-    }
-
-    next(error);
 });
 
 const Domain = mongoose.model('Domain', domainSchema);

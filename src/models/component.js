@@ -68,25 +68,20 @@ const existComponent = async ({ domain, name, __v }) => {
     return false;
 };
 
-componentSchema.pre('validate', async function (next) {
+componentSchema.pre('validate', async function () {
     // Verify if component already exists
     if (await existComponent(this)) {
-        const err = new Error(`Unable to complete the operation. Component '${this.name}' already exists for this Domain`);
-        next(err);
+        throw new Error(`Unable to complete the operation. Component '${this.name}' already exists for this Domain`);
     }
-
-    next();
 });
 
-componentSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+componentSchema.pre('deleteOne', { document: true, query: false }, async function () {
     const configsToRemoveFrom = await Config.find({ components: { $in: [this._id] } }).exec();
     for (const config of configsToRemoveFrom) {
         const indexValue = config.components.indexOf(this._id);
         config.components.splice(indexValue, 1);
         config.save();
     }
-
-    next();
 });
 
 const Component = mongoose.model('Component', componentSchema);

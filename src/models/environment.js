@@ -41,16 +41,13 @@ environmentSchema.options.toJSON = {
     }
 };
 
-environmentSchema.pre('validate', async function (next) {
+environmentSchema.pre('validate', async function () {
     const { name, domain } = this;
     const existEnv = await Environment.findOne({ name, domain }).exec();
     
     if (existEnv) {
-        const err = new Error(`Unable to complete the operation. Environment '${name}' already exists for this Domain`);
-        next(err);
+        throw new Error(`Unable to complete the operation. Environment '${name}' already exists for this Domain`);
     }
-
-    next();
 });
 
 export const Environment = mongoose.model('Environment', environmentSchema);

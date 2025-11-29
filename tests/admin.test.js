@@ -941,12 +941,12 @@ describe('Testing Admin collaboration endpoint - Reading permissions', () => {
 
         expect(response.body.length > 0).toEqual(true);
 
-        const read = response.body.filter(permission => permission.action === 'READ');
-        expect(read[0].result).toEqual('ok');
-        const update = response.body.filter(permission => permission.action === 'UPDATE');
-        expect(update[0].result).toEqual('nok');
-        const create = response.body.filter(permission => permission.action === 'CREATE');
-        expect(create[0].result).toEqual('nok');
+        const read = response.body.find(permission => permission.action === 'READ');
+        expect(read.result).toEqual('ok');
+        const update = response.body.find(permission => permission.action === 'UPDATE');
+        expect(update.result).toEqual('nok');
+        const create = response.body.find(permission => permission.action === 'CREATE');
+        expect(create.result).toEqual('nok');
     });
 
     test('ADMIN_SUITE - Should read permissions given request - Group - From Cache', async () => {
@@ -980,12 +980,12 @@ describe('Testing Admin collaboration endpoint - Reading permissions', () => {
         expect(response.body.length > 0).toEqual(true);
         expect(cacheSpy.callCount).toBe(1);
 
-        const read = response.body.filter(permission => permission.action === 'READ');
-        expect(read[0].result).toEqual('ok');
-        const update = response.body.filter(permission => permission.action === 'UPDATE');
-        expect(update[0].result).toEqual('nok');
-        const create = response.body.filter(permission => permission.action === 'CREATE');
-        expect(create[0].result).toEqual('nok');
+        const read = response.body.find(permission => permission.action === 'READ');
+        expect(read.result).toEqual('ok');
+        const update = response.body.find(permission => permission.action === 'UPDATE');
+        expect(update.result).toEqual('nok');
+        const create = response.body.find(permission => permission.action === 'CREATE');
+        expect(create.result).toEqual('nok');
     });
 
     test('ADMIN_SUITE - Should read permissions given request - Access forbidden for staging', async () => {
@@ -1002,8 +1002,8 @@ describe('Testing Admin collaboration endpoint - Reading permissions', () => {
 
         expect(response.body.length > 0).toEqual(true);
 
-        const read = response.body.filter(permission => permission.action === 'READ');
-        expect(read[0].result).toEqual('nok');
+        const read = response.body.find(permission => permission.action === 'READ');
+        expect(read.result).toEqual('nok');
     });
 });
 
