@@ -17,6 +17,7 @@ import {
     team1Id,
     permission1Id,
     permission11Id,
+    permission12Id,
     permission2Id,
     permission21Id,
     permission22Id,
@@ -28,6 +29,7 @@ import { PermissionError } from '../../src/exceptions';
 const disableAllPermissions = async () => {
     await changePermissionStatus(permission1Id, false);
     await changePermissionStatus(permission11Id, false);
+    await changePermissionStatus(permission12Id, false);
     await changePermissionStatus(permission2Id, false);
     await changePermissionStatus(permission21Id, false);
     await changePermissionStatus(permission22Id, false);
@@ -112,6 +114,28 @@ describe('Success tests', () => {
                 RouterTypes.CONFIG,
                 false,
                 'dev');
+
+            expect(element).toMatchObject(configDocument);
+        } catch (e) {
+            expect(e).toBeNull();
+        }
+    });
+
+    test('UNIT_TEAM_PERMISSION_SUITE - Should allow access - Member has permission to environment (default)', async () => {
+        //given
+        //enabled Read - Switcher (read only in default environment)
+        await changePermissionStatus(permission12Id, true);
+
+        //test
+        try {
+            const element = await verifyOwnership(
+                adminAccount, 
+                configDocument, 
+                domainDocument, 
+                ActionTypes.READ, 
+                RouterTypes.CONFIG,
+                false);
+                // default environment omitted
 
             expect(element).toMatchObject(configDocument);
         } catch (e) {

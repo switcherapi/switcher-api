@@ -1,3 +1,4 @@
+import { EnvType } from '../models/environment.js';
 import { ActionTypes, RouterTypes } from '../models/permission.js';
 import { getPermission, getPermissions } from '../services/permission.js';
 
@@ -80,9 +81,9 @@ function verifyIdentifiers(permission, element) {
     return undefined;
 }
 
-function verifyEnvironment(permission, environment) {
+function verifyEnvironment(permission, environment = EnvType.DEFAULT) {
     if (permission.environments?.length) {
-        return environment && permission.environments.includes(environment);
+        return permission.environments.includes(environment);
     }
     
     return true;

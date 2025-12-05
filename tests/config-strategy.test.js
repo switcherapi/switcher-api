@@ -169,7 +169,7 @@ describe('Testing strategy creation #2', () => {
         
         // VALUE
         let requirements = strategyRequirements(StrategiesType.VALUE);
-        let { max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.EQUAL)[0];
+        let { max, min } = requirements.operationRequirements.find(element => element.operation === OperationsType.EQUAL);
 
         let response = await request(app)
             .post('/configstrategy/create')
@@ -186,7 +186,7 @@ describe('Testing strategy creation #2', () => {
         expect(response.body.error)
             .toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.EQUAL}', are min: ${min} and max: ${max} values`);
 
-        ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.EXIST)[0]);
+        ({ max, min } = requirements.operationRequirements.find(element => element.operation === OperationsType.EXIST));
         response = await request(app)
             .post('/configstrategy/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
@@ -204,7 +204,7 @@ describe('Testing strategy creation #2', () => {
         
         // NETWORK
         requirements = strategyRequirements(StrategiesType.NETWORK);
-        ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.EXIST)[0]);
+        ({ max, min } = requirements.operationRequirements.find(element => element.operation === OperationsType.EXIST));
 
         response = await request(app)
             .post('/configstrategy/create')
@@ -223,7 +223,7 @@ describe('Testing strategy creation #2', () => {
         
         // TIME
         requirements = strategyRequirements(StrategiesType.TIME);
-        ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.GREATER)[0]);
+        ({ max, min } = requirements.operationRequirements.find(element => element.operation === OperationsType.GREATER));
 
         response = await request(app)
             .post('/configstrategy/create')
@@ -240,7 +240,7 @@ describe('Testing strategy creation #2', () => {
         expect(response.body.error)
             .toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.GREATER}', are min: ${min} and max: ${max} values`);
         
-        ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.LOWER)[0]);
+        ({ max, min } = requirements.operationRequirements.find(element => element.operation === OperationsType.LOWER));
 
         response = await request(app)
             .post('/configstrategy/create')
@@ -257,7 +257,7 @@ describe('Testing strategy creation #2', () => {
         expect(response.body.error)
             .toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.LOWER}', are min: ${min} and max: ${max} values`);
         
-        ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.BETWEEN)[0]);
+        ({ max, min } = requirements.operationRequirements.find(element => element.operation === OperationsType.BETWEEN));
 
         response = await request(app)
             .post('/configstrategy/create')
@@ -276,7 +276,7 @@ describe('Testing strategy creation #2', () => {
 
         // DATE
         requirements = strategyRequirements(StrategiesType.DATE);
-        ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.GREATER)[0]);
+        ({ max, min } = requirements.operationRequirements.find(element => element.operation === OperationsType.GREATER));
 
         response = await request(app)
             .post('/configstrategy/create')
@@ -293,7 +293,7 @@ describe('Testing strategy creation #2', () => {
         expect(response.body.error)
             .toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.GREATER}', are min: ${min} and max: ${max} values`);
         
-        ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.LOWER)[0]);
+        ({ max, min } = requirements.operationRequirements.find(element => element.operation === OperationsType.LOWER));
 
         response = await request(app)
             .post('/configstrategy/create')
@@ -310,7 +310,7 @@ describe('Testing strategy creation #2', () => {
         expect(response.body.error)
             .toBe(`Unable to complete the operation. The number of values for the operation '${OperationsType.LOWER}', are min: ${min} and max: ${max} values`);
         
-        ({ max, min } = requirements.operationRequirements.filter(element => element.operation === OperationsType.BETWEEN)[0]);
+        ({ max, min } = requirements.operationRequirements.find(element => element.operation === OperationsType.BETWEEN));
 
         response = await request(app)
             .post('/configstrategy/create')

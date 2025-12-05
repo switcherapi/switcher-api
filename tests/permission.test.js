@@ -124,8 +124,8 @@ describe('Reading tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
-        const foundPermission = response.body.filter(permission => permission.action === ActionTypes.DELETE);
-        expect(foundPermission[0].action).toBe(ActionTypes.DELETE);
+        const foundPermission = response.body.find(permission => permission.action === ActionTypes.DELETE);
+        expect(foundPermission.action).toBe(ActionTypes.DELETE);
     });
 
     test('PERMISSION_SUITE - Should NOT read all Permissions from a Domain - Invalid team Id', async () => {
