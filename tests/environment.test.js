@@ -82,8 +82,8 @@ describe('Reading tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
 
-        const defaultEnv = response.body.filter(env => env.name === EnvType.DEFAULT);
-        expect(defaultEnv[0].name).toBe(EnvType.DEFAULT);
+        const defaultEnv = response.body.find(env => env.name === EnvType.DEFAULT);
+        expect(defaultEnv.name).toBe(EnvType.DEFAULT);
     });
 
     test('ENV_SUITE - Should read one single Environment', async () => {

@@ -133,7 +133,7 @@ describe('GitOps Account - Subscribe', () => {
         Client.assume('GITOPS_SUBSCRIPTION').true();
 
         // given
-        const expectedResponse = JSON.parse(JSON.stringify(VALID_SUBSCRIPTION_REQUEST));
+        const expectedResponse = structuredClone(VALID_SUBSCRIPTION_REQUEST);
         expectedResponse.token = '...123';
 
         const postStub = sinon.stub(axios, 'post').resolves({
@@ -160,10 +160,10 @@ describe('GitOps Account - Subscribe', () => {
     
     test('GITOPS_ACCOUNT_SUITE - Should subscribe account - with blank path', async () => {
         // given
-        const requestPayload = JSON.parse(JSON.stringify(VALID_SUBSCRIPTION_REQUEST));
+        const requestPayload = structuredClone(VALID_SUBSCRIPTION_REQUEST);
         requestPayload.path = '';
 
-        const expectedResponse = JSON.parse(JSON.stringify(requestPayload));
+        const expectedResponse = structuredClone(requestPayload);
         expectedResponse.token = '...123';
 
         const postStub = sinon.stub(axios, 'post').resolves({
@@ -227,7 +227,7 @@ describe('GitOps Account - Subscribe', () => {
     });
 
     test('GITOPS_ACCOUNT_SUITE - Should return error - missing domain.id', async () => {
-        const payload = JSON.parse(JSON.stringify(VALID_SUBSCRIPTION_REQUEST));
+        const payload = structuredClone(VALID_SUBSCRIPTION_REQUEST);
         delete payload.domain.id;
 
         const req = await request(app)
@@ -240,7 +240,7 @@ describe('GitOps Account - Subscribe', () => {
     });
 
     test('GITOPS_ACCOUNT_SUITE - Should return error - respository is not a valid URL', async () => {
-        const payload = JSON.parse(JSON.stringify(VALID_SUBSCRIPTION_REQUEST));
+        const payload = structuredClone(VALID_SUBSCRIPTION_REQUEST);
         payload.repository = "invalid-url";
 
         const req = await request(app)
@@ -253,7 +253,7 @@ describe('GitOps Account - Subscribe', () => {
     });
 
     test('GITOPS_ACCOUNT_SUITE - Should return error - window cannot be lower than 30s', async () => {
-        const payload = JSON.parse(JSON.stringify(VALID_SUBSCRIPTION_REQUEST));
+        const payload = structuredClone(VALID_SUBSCRIPTION_REQUEST);
         payload.settings.window = "1s";
 
         const req = await request(app)
@@ -266,7 +266,7 @@ describe('GitOps Account - Subscribe', () => {
     });
 
     test('GITOPS_ACCOUNT_SUITE - Should return error - window cannot be lower than 1(m/h)', async () => {
-        const payload = JSON.parse(JSON.stringify(VALID_SUBSCRIPTION_REQUEST));
+        const payload = structuredClone(VALID_SUBSCRIPTION_REQUEST);
         payload.settings.window = "0m";
 
         const req = await request(app)
@@ -279,7 +279,7 @@ describe('GitOps Account - Subscribe', () => {
     });
 
     test('GITOPS_ACCOUNT_SUITE - Should return error - window cannot use different units than [s,m,h]', async () => {
-        const payload = JSON.parse(JSON.stringify(VALID_SUBSCRIPTION_REQUEST));
+        const payload = structuredClone(VALID_SUBSCRIPTION_REQUEST);
         payload.settings.window = '1d';
 
         const req = await request(app)
@@ -313,7 +313,7 @@ describe('GitOps Account - Update', () => {
 
     test('GITOPS_ACCOUNT_SUITE - Should update account', async () => {
         // given
-        const expectedResponse = JSON.parse(JSON.stringify(VALID_UPDATE_REQUEST));
+        const expectedResponse = structuredClone(VALID_UPDATE_REQUEST);
         expectedResponse.token = '...123';
 
         const postStub = sinon.stub(axios, 'put').resolves({
@@ -376,7 +376,7 @@ describe('GitOps Account - Update', () => {
     });
 
     test('GITOPS_ACCOUNT_SUITE - Should return error - missing domain.id', async () => {
-        const payload = JSON.parse(JSON.stringify(VALID_UPDATE_REQUEST));
+        const payload = structuredClone(VALID_UPDATE_REQUEST);
         delete payload.domain.id;
 
         const req = await request(app)
@@ -419,7 +419,7 @@ describe('GitOps Account - Update', () => {
     });
 
     test('GITOPS_ACCOUNT_SUITE - Should return error - path contains invalid characters', async () => {
-        const payload = JSON.parse(JSON.stringify(VALID_UPDATE_REQUEST));
+        const payload = structuredClone(VALID_UPDATE_REQUEST);
         payload.path = 'path/to/file#';
 
         const req = await request(app)
@@ -511,7 +511,7 @@ describe('GitOps Account - Update All Token', () => {
     });
 
     test('GITOPS_ACCOUNT_SUITE - Should return error - missing domain.id', async () => {
-        const payload = JSON.parse(JSON.stringify(VALID_TOKEN_UPDATE_REQUEST));
+        const payload = structuredClone(VALID_TOKEN_UPDATE_REQUEST);
         delete payload.domain.id;
 
         const req = await request(app)
@@ -536,7 +536,7 @@ describe('GitOps Account - Force sync', () => {
 
     test('GITOPS_ACCOUNT_SUITE - Should force sync account', async () => {
         // given
-        const expectedResponse = JSON.parse(JSON.stringify(VALID_FORCE_SYNC_REQUEST));
+        const expectedResponse = structuredClone(VALID_FORCE_SYNC_REQUEST);
         expectedResponse.token = '...123';
 
         const postStub = sinon.stub(axios, 'put').resolves({
@@ -599,7 +599,7 @@ describe('GitOps Account - Force sync', () => {
     });
 
     test('GITOPS_ACCOUNT_SUITE - Should return error - missing domain.id', async () => {
-        const payload = JSON.parse(JSON.stringify(VALID_FORCE_SYNC_REQUEST));
+        const payload = structuredClone(VALID_FORCE_SYNC_REQUEST);
         delete payload.domain.id;
 
         const req = await request(app)
@@ -682,7 +682,7 @@ describe('GitOps Account - Unsubscribe', () => {
     });
 
     test('GITOPS_ACCOUNT_SUITE - Should return error - missing domain.id', async () => {
-        const payload = JSON.parse(JSON.stringify(VALID_DELETE_REQUEST));
+        const payload = structuredClone(VALID_DELETE_REQUEST);
         delete payload.domain.id;
 
         const req = await request(app)
