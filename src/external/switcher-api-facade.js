@@ -53,7 +53,7 @@ export async function checkDomain(req) {
     }
 
     const total = await getTotalDomainsByOwner(req.admin._id);
-    const featureFlag = switcherSettings()
+    const featureFlag = await switcherSettings()
         .checkPayload(JSON.stringify({
             feature: 'domain',
             owner: req.admin._id,
@@ -69,7 +69,7 @@ export async function checkGroup(domain) {
     }
 
     const total = await getTotalGroupsByDomainId(domain._id);
-    const featureFlag = switcherSettings()
+    const featureFlag = await switcherSettings()
         .checkPayload(JSON.stringify({
             feature: 'group',
             owner: domain.owner,
@@ -86,7 +86,7 @@ export async function checkSwitcher(group) {
 
     const total = await getTotalConfigsByDomainId(group.domain);
     const { owner } = await getDomainById(group.domain);
-    const featureFlag = switcherSettings()
+    const featureFlag = await switcherSettings()
         .checkPayload(JSON.stringify({
             feature: 'switcher',
             owner,
@@ -103,7 +103,7 @@ export async function checkComponent(domain) {
 
     const total = await getTotalComponentsByDomainId(domain);
     const { owner } = await getDomainById(domain);
-    const featureFlag = switcherSettings()
+    const featureFlag = await switcherSettings()
         .checkPayload(JSON.stringify({
             feature: 'component',
             owner,
@@ -120,7 +120,7 @@ export async function checkEnvironment(domain) {
 
     const total = await getTotalEnvByDomainId(domain);
     const { owner } = await getDomainById(domain);
-    const featureFlag = switcherSettings()
+    const featureFlag = await switcherSettings()
         .checkPayload(JSON.stringify({
             feature: 'environment',
             owner,
@@ -137,7 +137,7 @@ export async function checkTeam(domain) {
 
     const total = await getTotalTeamsByDomainId(domain);
     const { owner } = await getDomainById(domain);
-    const featureFlag = switcherSettings()
+    const featureFlag = await switcherSettings()
         .checkPayload(JSON.stringify({
             feature: 'team',
             owner,
@@ -153,7 +153,7 @@ export async function checkMetrics(config) {
     }
 
     const { owner } = await getDomainById(config.domain);
-    const featureFlag = switcherSettings()
+    const featureFlag = await switcherSettings()
         .checkPayload(JSON.stringify({
             feature: 'metrics',
             owner
@@ -171,7 +171,7 @@ export async function checkHistory(domain) {
     }
 
     const { owner } = await getDomainById(domain);
-    return switcherSettings()
+    return await switcherSettings()
         .checkPayload(JSON.stringify({
             feature: 'history',
             owner
@@ -183,7 +183,7 @@ export async function checkAdmin(login) {
         return;
     }
 
-    const featureFlag = switcherSettings()
+    const featureFlag = await switcherSettings()
         .checkValue(login)
         .isItOn(SwitcherKeys.ACCOUNT_CREATION);
 
@@ -195,7 +195,7 @@ export async function checkSlackIntegration(value) {
         return;
     }
 
-    const featureFlag = switcherSettings()
+    const featureFlag = await switcherSettings()
         .checkValue(value)
         .isItOn(SwitcherKeys.SLACK_INTEGRATION);
 
@@ -207,7 +207,7 @@ export async function checkGitopsIntegration(value) {
         return;
     }
 
-    const featureFlag = switcherSettings()
+    const featureFlag = await switcherSettings()
         .checkValue(value)
         .isItOn(SwitcherKeys.GITOPS_INTEGRATION);
 
@@ -247,7 +247,7 @@ export function notifyAcDeletion(adminid) {
 export async function getRateLimit(key, component) {
     if (process.env.SWITCHER_API_ENABLE === 'true' && key !== process.env.SWITCHER_API_KEY) {
         const domain = await getDomainById(component.domain);
-        const featureFlag = switcherSettings()
+        const featureFlag = await switcherSettings()
             .checkValue(String(domain.owner))
             .isItOn(SwitcherKeys.RATE_LIMIT);
 
@@ -264,7 +264,7 @@ export async function checkHttpsAgent(value) {
         return { result: true };
     }
 
-    return switcherSettings()
+    return await switcherSettings()
         .checkRegex(value)
         .isItOn(SwitcherKeys.HTTPS_AGENT);
 }
