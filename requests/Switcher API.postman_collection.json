@@ -6177,6 +6177,45 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "GitOps",
+					"item": [
+						{
+							"name": "Domain Tree - By Id and Environment",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{bearerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query Domain(\r\n    $_id: String\r\n    $environment: String\r\n    ) {\r\n    domain(\r\n        _id: $_id\r\n        environment: $environment\r\n    ) {\r\n        name\r\n        version\r\n        group {\r\n            name\r\n            description\r\n            activated\r\n            config {\r\n                key\r\n                description\r\n                activated\r\n                strategies {\r\n                    strategy\r\n                    activated\r\n                    operation\r\n                    values\r\n                }\r\n                relay {\r\n                    type\r\n                    method\r\n                    endpoint\r\n                    description\r\n                    activated\r\n                }\r\n                components\r\n            }\r\n        }\r\n    }\r\n}",
+										"variables": "{\r\n    \"_id\": \"{{domainid}}\",\r\n    \"environment\": \"{{environment}}\"\r\n}"
+									}
+								},
+								"url": {
+									"raw": "{{url}}/gitops-graphql",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"gitops-graphql"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		},
