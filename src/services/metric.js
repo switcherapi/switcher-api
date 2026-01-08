@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { NotFoundError } from '../exceptions/index.js';
-import { verifyOwnership } from '../helpers/index.js';
+import { verifyOwnership, formatInput } from '../helpers/index.js';
 import { EnvType } from '../models/environment.js';
 import { Metric } from '../models/metric.js';
 import { ActionTypes, RouterTypes } from '../models/permission.js';
@@ -182,26 +182,29 @@ function buildMetricsFilter(req) {
     aggregate.match({ $expr: { $eq: [{ $toString: '$domain' }, args.domain] } });
 
     if (req.query.environment) {
-        args.environment = req.query.environment;
-        aggregate.match({ environment: String(req.query.environment) });
+        const environment = formatInput(String(req.query.environment));
+        args.environment = environment;
+        aggregate.match({ environment: environment });
     } else { 
         args.environment = EnvType.DEFAULT;
         aggregate.match({ environment: EnvType.DEFAULT });
     }
 
     if (req.query.result) { 
-        args.result = req.query.result;
+        args.result = Boolean(req.query.result);
         aggregate.match({ result: String(req.query.result) === 'true' });
     }
 
     if (req.query.component) { 
-        args.component = req.query.component;
-        aggregate.match({ component: String(req.query.component) });
+        const component = formatInput(String(req.query.component));
+        args.component = component;
+        aggregate.match({ component: component });
     }
     
     if (req.query.group) { 
-        args.group = req.query.group;
-        aggregate.match({ group: String(req.query.group) });
+        const group = formatInput(String(req.query.group), { allowSpace: true });
+        args.group = group;
+        aggregate.match({ group: group });
     }
 
     if (req.query.dateBefore && !req.query.dateAfter) { 
