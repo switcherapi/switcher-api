@@ -148,7 +148,7 @@ function isOauthAvailableFor(clientId, secret) {
 }
 
 function isEnabled(feature) {
-    return process.env[feature] && process.env[feature].toLowerCase() === 'true';
+    return process.env[feature]?.toLowerCase() === 'true';
 }
 
 export default createServer(app);
