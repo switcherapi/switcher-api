@@ -1,10 +1,11 @@
+import { Types } from 'mongoose';
 import { EnvType } from '../models/environment.js';
 import Domain from '../models/domain.js';
 import GroupConfig from '../models/group-config.js';
 import { Config } from '../models/config.js';
-import { ConfigStrategy } from '../models/config-strategy.js';
+import { ConfigStrategy, OperationsType, StrategiesType } from '../models/config-strategy.js';
 import { ActionTypes, RouterTypes } from '../models/permission.js';
-import { verifyOwnership } from '../helpers/index.js';
+import { formatInput, verifyOwnership } from '../helpers/index.js';
 import Component from '../models/component.js';
 import Logger from '../helpers/logger.js';
 
@@ -26,9 +27,9 @@ export function resolveEnvValue(source, field, keys) {
 export async function resolveConfigStrategy(source, _id, strategy, operation, activated, context) {
     const args = {};
 
-    if (_id) { args._id = _id; }
-    if (strategy) { args.strategy = strategy; }
-    if (operation) { args.operation = operation; }
+    if (_id) { args._id = new Types.ObjectId(_id); }
+    if (strategy) { args.strategy = Object.values(StrategiesType).find(t => t === strategy); }
+    if (operation) { args.operation = Object.values(OperationsType).find(t => t === operation); }
     
     let strategies = await ConfigStrategy.find({ config: source._id, ...args }).lean().exec();
     const environment = context.environment;
@@ -65,8 +66,8 @@ export async function resolveRelay(source, context) {
 export async function resolveConfig(source, _id, key, activated, context) {
     const args = {};
 
-    if (_id) { args._id = _id; }
-    if (key) { args.key = key; }
+    if (_id) { args._id = new Types.ObjectId(_id); }
+    if (key) { args.key = formatInput(key, { toUpper: true, autoUnderscore: true }); }
     if (context._component) { args.components = context._component; }
     
     let configs = await Config.find({ group: source._id, ...args }).lean().exec();
@@ -91,8 +92,8 @@ export async function resolveConfig(source, _id, key, activated, context) {
 export async function resolveGroupConfig(source, _id, name, activated, context) {
     const args = {};
 
-    if (_id) { args._id = _id; }
-    if (name) { args.name = name; }
+    if (_id) { args._id = new Types.ObjectId(_id); }
+    if (name) { args.name = formatInput(name, { allowSpace: true }); }
 
     let groups = await GroupConfig.find({ domain: source._id, ...args }).lean().exec();
     
@@ -118,14 +119,14 @@ export async function resolveDomain(_id, name, activated, context) {
     // When Admin
     if (context.admin) {
         if (name) {
-            args.name = name;
-            args.owner = context.admin._id;
+            args.name = formatInput(name, { allowSpace: true });
+            args.owner = new Types.ObjectId(context.admin._id);
         } else {
-            args._id = _id;
+            args._id = new Types.ObjectId(_id);
         }
     // When Component / GitOps
     } else if (context.domain) {
-        args._id = context.domain;
+        args._id = new Types.ObjectId(context.domain);
     }
     
     let domain = await Domain.findOne({ ...args }).lean().exec();
