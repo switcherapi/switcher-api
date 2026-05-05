@@ -39,7 +39,6 @@ services:
       - NODE_ENV=development
       - PORT=3000
       - ENV=${ENV}
-      - SERVER_PROTOCOL=${SERVER_PROTOCOL:-auto}
       - SSL_KEY=${SSL_KEY}
       - SSL_CERT=${SSL_CERT}
 

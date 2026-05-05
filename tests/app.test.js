@@ -25,12 +25,6 @@ describe('Testing app [REST] ', () => {
     expect(req.statusCode).toBe(200);
     expect(req.body.status).toEqual('UP');
     expect(req.body.attributes).toBeDefined();
-    expect(req.body.attributes.server).toEqual({
-      protocol_mode: 'auto',
-      protocol: 'http/1.1',
-      tls: false,
-      allow_http1_fallback: false
-    });
   });
 
   test('APP_SUITE - Should return 404 - Operation not found', async () => {
