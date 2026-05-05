@@ -761,6 +761,23 @@ describe('Testing Admin login and fetch', () => {
             .expect(401);
     });
 
+    test('ADMIN_SUITE - Should not uddate/me admin fields - malicious name input', async () => {
+        const responseLogin = await request(app)
+            .post('/admin/login')
+            .send({
+                email: adminMasterAccount.email,
+                password: adminMasterAccount.password
+            }).expect(200);
+
+        await request(app)
+            .patch('/admin/me')
+            .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
+            .send({
+                name: '<script>alert("XSS")</script>'
+            })
+            .expect(422);
+    });
+
     test('ADMIN_SUITE - Should update/me valid admin field', async () => {
         let responseLogin = await request(app)
             .post('/admin/login')
