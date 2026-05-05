@@ -126,6 +126,12 @@ app.get('/check', defaultLimiter, (req, res) => {
             max_metrics_pages: process.env.METRICS_MAX_PAGE,
             max_stretegy_op: process.env.MAX_STRATEGY_OPERATION,
             max_rpm: process.env.MAX_REQUEST_PER_MINUTE || DEFAULT_RATE_LIMIT,
+            server: {
+                protocol_mode: server.switcherProtocolMode,
+                protocol: server.switcherProtocol,
+                tls: server.switcherTlsEnabled,
+                allow_http1_fallback: server.switcherAllowHttp1Fallback
+            },
             auth_providers: {
                 saml: isSamlAvailable(),
                 github: isOauthAvailableFor('GIT_OAUTH_CLIENT_ID', 'GIT_OAUTH_SECRET'),
@@ -151,4 +157,6 @@ function isEnabled(feature) {
     return process.env[feature]?.toLowerCase() === 'true';
 }
 
-export default createServer(app);
+const server = createServer(app);
+
+export default server;

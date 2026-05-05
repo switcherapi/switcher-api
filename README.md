@@ -41,6 +41,16 @@ Main features:
 2. Add .env-cmdrc file into the project directory (use '.env-cmdrc-template')
 3. Replace values such as secret keys and URLs
 
+### HTTP/2 and TLS
+
+Switcher API can negotiate HTTP/2 directly from the Node.js server when TLS certificates are available.
+
+- `SERVER_PROTOCOL=auto` (default): uses HTTP/2 when `SSL_KEY` and `SSL_CERT` are configured; otherwise uses cleartext HTTP/1.1.
+- `SERVER_PROTOCOL=http1`: forces HTTP/1.1. If TLS certificates are configured, the server stays on HTTPS over HTTP/1.1.
+- `SERVER_PROTOCOL=http2`: requires `SSL_KEY` and `SSL_CERT`; startup fails fast when they are missing.
+- The HTTP/2 server is created with HTTP/1.1 fallback enabled, so TLS clients without HTTP/2 support can still connect.
+- `GET /check?details=1` reports the active server mode and negotiated protocol configuration.
+
 ### Auth Providers
 
 Switcher API supports multiple auth providers such as email/password-based authentication, SAML 2.0 for Single Sign-On (SSO), or GitHub/Bitbucket OAuth.
