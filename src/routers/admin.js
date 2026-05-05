@@ -2,7 +2,7 @@ import express from 'express';
 import { check } from 'express-validator';
 import { auth, authRefreshToken } from '../middleware/auth.js';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators.js';
-import { verifyOwnership } from '../helpers/index.js';
+import { formatInput, verifyOwnership } from '../helpers/index.js';
 import { permissionCache } from '../helpers/cache.js';
 import { responseException } from '../exceptions/index.js';
 import * as Services from '../services/admin.js';
@@ -13,7 +13,8 @@ import Logger from '../helpers/logger.js';
 const router = new express.Router();
 
 router.post('/admin/signup', [
-    check('name').isLength({ min: 2 }),
+    check('name').isLength({ min: 2 })
+        .custom(value => formatInput(value, { allowSpace: true })),
     check('email').isEmail(),
     check('password').isLength({ min: 5 })
 ], validate, async (req, res) => {
@@ -161,7 +162,12 @@ router.delete('/admin/me', auth, async (req, res) => {
 
 router.patch('/admin/me', auth, verifyInputUpdateParameters([
     'name', 'email', 'password'
-]), async (req, res) => {
+]), [
+    check('name').isLength({ min: 2 })
+        .custom(value => formatInput(value, { allowSpace: true })).optional(),
+    check('email').isEmail().optional(),
+    check('password').isLength({ min: 5 }).optional()
+], validate, async (req, res) => {
     const admin = await Services.updateAccount(req.body, req.admin);
     res.send(admin);
 });
