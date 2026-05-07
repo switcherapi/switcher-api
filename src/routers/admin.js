@@ -3,7 +3,7 @@ import { check } from 'express-validator';
 import { auth, authRefreshToken } from '../middleware/auth.js';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators.js';
 import { formatInput, verifyOwnership } from '../helpers/index.js';
-import { permissionCache } from '../helpers/cache.js';
+import { permissionCache } from '../helpers/permission-cache.js';
 import { responseException } from '../exceptions/index.js';
 import * as Services from '../services/admin.js';
 import { SwitcherKeys } from '../external/switcher-api-facade.js';

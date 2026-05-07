@@ -9,7 +9,7 @@ import GroupConfig from '../models/group-config.js';
 import History from '../models/history.js';
 import { ActionTypes, RouterTypes } from '../models/permission.js';
 import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers/index.js';
-import { permissionCache } from '../helpers/cache.js';
+import { permissionCache } from '../helpers/permission-cache.js';
 import { response } from './common.js';
 import Logger from '../helpers/logger.js';
 import { BadRequestError } from '../exceptions/index.js';

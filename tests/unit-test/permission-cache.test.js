@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { permissionCache } from '../../src/helpers/cache';
+import { permissionCache } from '../../src/helpers/permission-cache';
 import { EnvType } from '../../src/models/environment';
 import { ActionTypes, RouterTypes } from '../../src/models/permission';
 
@@ -16,7 +16,7 @@ describe('Test permissionCache', () => {
         permissionCache.cache.clear();
     });
 
-    it('UNIT_CACHE - Should set and get cache', () => {
+    it('UNIT_PERMISSION_CACHE - Should set and get cache', () => {
         const cacheKey = permissionCache.permissionKey(
             'adminId', 
             'domainId', 
@@ -31,7 +31,7 @@ describe('Test permissionCache', () => {
         expect(result).toEqual('value');
     });
 
-    it('UNIT_CACHE - Should reload cache', () => {
+    it('UNIT_PERMISSION_CACHE - Should reload cache', () => {
         const cacheKey = permissionCache.permissionKey(
             'adminId', 
             'domainId', 
@@ -46,7 +46,7 @@ describe('Test permissionCache', () => {
         expect(result).toBeUndefined();
     });
 
-    it('UNIT_CACHE - Should NOT reload cache', () => {
+    it('UNIT_PERMISSION_CACHE - Should NOT reload cache', () => {
         const cacheKey = permissionCache.permissionKey(
             'adminId', 
             'domainId', 
@@ -61,7 +61,7 @@ describe('Test permissionCache', () => {
         expect(result).toEqual('value');
     });
 
-    it('UNIT_CACHE - Should NOT reload cache - empty router/action', () => {
+    it('UNIT_PERMISSION_CACHE - Should NOT reload cache - empty router/action', () => {
         const cacheKey = permissionCache.permissionKey(
             'adminId', 
             'domainId', 
@@ -76,7 +76,7 @@ describe('Test permissionCache', () => {
         expect(result).toEqual('value');
     });
 
-    it('UNIT_CACHE - Should NOT get from cache - different environment', () => {
+    it('UNIT_PERMISSION_CACHE - Should NOT get from cache - different environment', () => {
         const cacheKey = permissionCache.permissionKey(
             'adminId', 
             'domainId', 

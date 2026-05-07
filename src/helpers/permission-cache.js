@@ -1,6 +1,6 @@
 import { ActionTypes, RouterTypes } from '../models/permission.js';
 
-class Cache {
+class PermissionCache {
     constructor() {
         this.cache = new Map();
     }
@@ -58,6 +58,6 @@ class Cache {
     }
 }
 
-const permissionCache = new Cache();
+const permissionCache = new PermissionCache();
 
 export { permissionCache };

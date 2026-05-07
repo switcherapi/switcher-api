@@ -7,7 +7,7 @@ import app from '../src/app';
 import Admin from '../src/models/admin';
 import { Team } from '../src/models/team';
 import { EnvType } from '../src/models/environment';
-import { permissionCache } from '../src/helpers/cache';
+import { permissionCache } from '../src/helpers/permission-cache';
 import { ActionTypes, RouterTypes } from '../src/models/permission';
 import swaggerDocument from '../src/api-docs/swagger-document';
 import { 
