@@ -6,7 +6,7 @@ import { checkGroup } from '../external/switcher-api-facade.js';
 import { ActionTypes, RouterTypes } from '../models/permission.js';
 import { getDomainById, updateDomainVersion } from './domain.js';
 import { checkEnvironmentStatusChange } from '../middleware/validators.js';
-import { permissionCache } from '../helpers/cache.js';
+import { permissionCache } from '../helpers/permission-cache.js';
 
 export async function getGroupConfigById(id, lean = false, populateAdmin = false) {
     let group = await GroupConfig.findById(id, null, { lean }).exec();

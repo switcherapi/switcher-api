@@ -2,7 +2,7 @@ import { verifyOwnership } from '../helpers/index.js';
 import { RouterTypes } from '../models/permission.js';
 import { getConfigs } from '../services/config.js';
 import { getGroupConfigs } from '../services/group-config.js';
-import { permissionCache } from '../helpers/cache.js';
+import { permissionCache } from '../helpers/permission-cache.js';
 import Logger from '../helpers/logger.js';
 
 export async function resolvePermission(args, admin) {

@@ -4,7 +4,7 @@ import { ConfigStrategy } from '../models/config-strategy.js';
 import { Environment, EnvType } from '../models/environment.js';
 import { ActionTypes, RouterTypes } from '../models/permission.js';
 import { formatInput, verifyOwnership } from '../helpers/index.js';
-import { permissionCache } from '../helpers/cache.js';
+import { permissionCache } from '../helpers/permission-cache.js';
 import { response } from './common.js';
 import { getConfigs, removeConfigStatus } from './config.js';
 import { getDomainById, removeDomainStatus } from './domain.js';

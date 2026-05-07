@@ -3,7 +3,7 @@ import { ActionTypes, Permission, RouterTypes } from '../models/permission.js';
 import { verifyOwnership } from '../helpers/index.js';
 import { response } from './common.js';
 import { getTeam, getTeams, verifyRequestedTeam } from './team.js';
-import { permissionCache } from '../helpers/cache.js';
+import { permissionCache } from '../helpers/permission-cache.js';
 
 async function verifyRequestedTeamByPermission(permissionId, admin, action) {
     let team = await getTeam({ permissions: permissionId });

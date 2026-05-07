@@ -2,7 +2,7 @@ import { response } from './common.js';
 import { ConfigStrategy } from '../models/config-strategy.js';
 import { ActionTypes, RouterTypes } from '../models/permission.js';
 import { verifyOwnership } from '../helpers/index.js';
-import { permissionCache } from '../helpers/cache.js';
+import { permissionCache } from '../helpers/permission-cache.js';
 import { updateDomainVersion } from './domain.js';
 import { getConfigById } from './config.js';
 import { BadRequestError } from '../exceptions/index.js';

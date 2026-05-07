@@ -3,7 +3,7 @@ import request from 'supertest';
 import sinon from 'sinon';
 import app from '../src/app';
 import { ActionTypes, Permission, RouterTypes } from '../src/models/permission';
-import { permissionCache } from '../src/helpers/cache';
+import { permissionCache } from '../src/helpers/permission-cache';
 import { Team } from '../src/models/team';
 import { EnvType } from '../src/models/environment';
 import Admin from '../src/models/admin';
