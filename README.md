@@ -162,3 +162,9 @@ Switchers are the entry point to control features in your application.<br>
 Customize the Switcher behavior by including strategy rules to your Switchers.
 
 - **New Strategy** - ConfigStrategy: /configstrategy/create [POST]
+
+# AI Disclaimer
+
+This project's core foundation was built and maintained by a human from day one. However, we have leveraged AI tools to assist in various aspects of the development process, such as troubleshooting, code optimization, and documentation. We have thoroughly reviewed and tested all AI-generated contributions to ensure they meet our quality standards and align with our project's goals. We are committed to transparency about our use of AI and will continue to disclose any significant AI contributions in the future. 
+
+External contributions from the community are **equally valued and will be reviewed with the same standards, regardless of whether they were assisted by AI or not**. We encourage all contributors to disclose their use of AI tools in their contributions to maintain transparency and foster trust within our community.
