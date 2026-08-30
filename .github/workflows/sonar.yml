@@ -28,13 +28,13 @@ jobs:
             core.setOutput('base_ref', pr.data.base.ref);
             core.setOutput('head_sha', pr.data.head.sha);
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ steps.pr.outputs.head_sha }}
           fetch-depth: 0
 
       - name: Use Node.js 24.x
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 24.x
 
@@ -75,7 +75,7 @@ jobs:
           SWITCHER_API_LOGGER: false
 
       - name: SonarCloud Scan
-        uses: sonarsource/sonarqube-scan-action@v8.1.0
+        uses: sonarsource/sonarqube-scan-action@v8.2.1
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: env.SONAR_TOKEN != ''
