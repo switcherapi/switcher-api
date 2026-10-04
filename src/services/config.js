@@ -90,7 +90,7 @@ export async function getTotalConfigsByDomainId(domain) {
 }
 
 export async function populateAdmin(configs) {
-    for (const config of configs) {
+    for await (const config of configs) {
         await config.populate({ path: 'admin', select: 'name' });
     }
 }
@@ -126,7 +126,7 @@ export async function createConfig(args, admin) {
 
     // creates config
     await config.save();
-    updateDomainVersion(config.domain);
+    await updateDomainVersion(config.domain);
     
     // resets permission cache
     permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.group);
@@ -139,7 +139,7 @@ export async function deleteConfig(id, admin) {
     config = await verifyOwnership(admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG);
 
     await config.deleteOne();
-    updateDomainVersion(config.domain);
+    await updateDomainVersion(config.domain);
 
     // resets permission cache
     permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.group);
@@ -174,7 +174,7 @@ export async function updateConfig(id, args, admin) {
     updates.forEach((update) => config[update] = args[update]);
     
     await config.save();
-    updateDomainVersion(config.domain);
+    await updateDomainVersion(config.domain);
 
     return config;
 }
@@ -213,9 +213,13 @@ export async function updateConfigRelay(id, args, admin) {
         RouterTypes.CONFIG, false, Object.keys(args.activated)[0]);
     config.updatedBy = admin.email;
 
-    for (const update of Object.keys(args)) {
+    const updates = Object.keys(args);
+    await Promise.all(updates
+        .filter((update) => config.relay[update] && 'activated endpoint auth_token'.includes(update))
+        .map((update) => checkEnvironmentStatusChange(args, config.domain, args[update])));
+
+    for (const update of updates) {
         if (config.relay[update] && 'activated endpoint auth_token'.includes(update)) {
-            await checkEnvironmentStatusChange(args, config.domain, args[update]);
             Object.keys(args[update]).forEach((map) =>
                 config.relay[update].set(map, args[update][map]));
         } else {
@@ -224,7 +228,7 @@ export async function updateConfigRelay(id, args, admin) {
     }
     
     await config.save();
-    updateDomainVersion(config.domain);
+    await updateDomainVersion(config.domain);
 
     return config;
 }
@@ -239,7 +243,7 @@ export async function updateConfigStatus(id, args, admin) {
     
     updates.forEach((update) => config.activated.set(update, args[update]));
     await config.save();
-    updateDomainVersion(config.domain);
+    await updateDomainVersion(config.domain);
 
     return config;
 }
@@ -250,7 +254,7 @@ export async function removeConfigStatusEnv(id, env, admin) {
         RouterTypes.CONFIG, false, env);
     config.updatedBy = admin.email;
 
-    updateDomainVersion(config.domain);
+    await updateDomainVersion(config.domain);
     return removeConfigStatus(config, env);
 }
 
@@ -287,7 +291,7 @@ export async function addComponent(id, args, admin) {
     config.updatedBy = admin.email;
     config.components.push(component._id);
     await config.save();
-    updateDomainVersion(config.domain);
+    await updateDomainVersion(config.domain);
 
     return config;
 }
@@ -300,7 +304,7 @@ export async function removeComponent(id, args, admin) {
     const indexComponent = config.components.indexOf(args.component);
     config.components.splice(indexComponent, 1);
     await config.save();
-    updateDomainVersion(config.domain);
+    await updateDomainVersion(config.domain);
 
     return config;
 }
@@ -316,7 +320,7 @@ export async function updateComponent(id, args, admin) {
     config.updatedBy = admin.email;
     config.components = args.components;
     await config.save();
-    updateDomainVersion(config.domain);
+    await updateDomainVersion(config.domain);
 
     return config;
 }
@@ -338,7 +342,7 @@ export async function removeRelay(id, env, admin) {
         }
 
         await config.save();
-        updateDomainVersion(config.domain);
+        await updateDomainVersion(config.domain);
     }
 
     return config;
