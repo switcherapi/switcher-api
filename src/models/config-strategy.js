@@ -259,7 +259,7 @@ configStrategySchema.pre('save', async function () {
     }
 
     const operations = StrategyRequirementDefinition.find(element => element.strategy === strategy).operations;
-    const foundOperation = operations.find((element) => element === operationStrategy);
+    const foundOperation = operations.includes(operationStrategy);
     
     // Verify strategy operation requirements
     if (!foundOperation) {

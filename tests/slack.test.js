@@ -169,10 +169,12 @@ describe('Slack Installation', () => {
     });
 
     test('SLACK_SUITE - Should NOT save installation - Token expired', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/slack/v1/installation')
             .set('Authorization', `Bearer ${generateToken('0ms')}`)
             .send(mock1_slack_installation).expect(401);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should NOT save installation - Missing installation payload', async () => {
@@ -181,10 +183,12 @@ describe('Slack Installation', () => {
         delete slack_install.installation_payload;
         
         //test
-        await request(app)
+        const response = await request(app)
             .post('/slack/v1/installation')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send(slack_install).expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should authorize installation', async () => {
@@ -242,17 +246,21 @@ describe('Slack Installation', () => {
     });
 
     test('SLACK_SUITE - Should NOT query installation by Domain - Domain not found', async () => {
-        await request(app)
+        const response = await request(app)
             .get(`/slack/v1/installation/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should NOT query installation by Domain - Invalid Domain', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/slack/v1/installation/INVALID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should NOT authorize installation - Admin is not owner', async () => {
@@ -260,42 +268,50 @@ describe('Slack Installation', () => {
         const installation = await buildInstallation('T01Y', null);
 
         //test
-        await request(app)
+        const response = await request(app)
             .post('/slack/v1/authorize')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 domain: domainId,
                 team_id: installation.team_id
             }).expect(403);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should NOT authorize installation - Invalid Domain Id', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/slack/v1/authorize')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 domain: 'INVALID_DOMAIN',
                 team_id: 'team_id'
             }).expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should NOT authorize installation - Domain Id not found', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/slack/v1/authorize')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 domain: new mongoose.Types.ObjectId(),
                 team_id: 'T04Y'
             }).expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should NOT authorize installation - Team Id is missing', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/slack/v1/authorize')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 domain: domainId
             }).expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should find bot', async () => {
@@ -315,17 +331,21 @@ describe('Slack Installation', () => {
     });
 
     test('SLACK_SUITE - Should NOT find bot - Not found', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/slack/v1/findbot?enterprise_id=&team_id=T15NZ')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should NOT find bot - Missing param', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/slack/v1/findbot')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should find installation', async () => {
@@ -345,17 +365,21 @@ describe('Slack Installation', () => {
     });
 
     test('SLACK_SUITE - Should NOT find installation - Not found', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/slack/v1/findinstallation?enterprise_id=&team_id=T12NZ')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should NOT find installation - Missing param', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/slack/v1/findinstallation')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should find installation (Admin)', async () => {
@@ -382,10 +406,12 @@ describe('Slack Installation', () => {
         await Services.createSlackInstallation(installation);
 
         //test
-        await request(app)
+        const response = await request(app)
             .delete(`/slack/v1/installation?enterprise_id=&team_id=${installation.team_id}`)
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(200);
+
+        expect(response.body).toBeDefined();
 
         //check DB
         const slackDb = await Services.getSlack({
@@ -400,10 +426,12 @@ describe('Slack Installation', () => {
         const installation = await buildInstallation('T05NZ', null);
 
         //test
-        await request(app)
+        const response = await request(app)
             .delete(`/slack/v1/installation?team_id=${installation.team_id}`)
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(200);
+
+        expect(response.body).toBeDefined();
 
         //check DB
         const slackDb = await Services.getSlack({ team_id: installation.team_id });
@@ -411,17 +439,21 @@ describe('Slack Installation', () => {
     });
 
     test('SLACK_SUITE - Should NOT delete installation - Not found', async () => {
-        await request(app)
+        const response = await request(app)
             .delete('/slack/v1/installation?enterprise_id=&team_id=T06NZ')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should NOT delete installation - Missing param', async () => {
-        await request(app)
+        const response = await request(app)
             .delete('/slack/v1/installation')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should unlink installation', async () => {
@@ -487,10 +519,12 @@ describe('Slack Installation', () => {
     });
 
     test('SLACK_SUITE - Should NOT unlink installation - Domain Id not provided', async () => {
-        await request(app)
+        const response = await request(app)
             .delete('/slack/v1/installation/unlink')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should decline installation', async () => {
@@ -549,17 +583,21 @@ describe('Slack Installation', () => {
     });
 
     test('SLACK_SUITE - Should NOT find Domains by Slack Team Id - Missing param', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/slack/v1/domains')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should NOT find Domains by Slack Team Id - Team Id not found', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/slack/v1/domains?team_id=T03NZ')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send().expect(404);
+
+        expect(response.body).toBeDefined();
     });
 });
 
@@ -611,30 +649,36 @@ describe('Slack Settings', () => {
     });
 
     test('SLACK_SUIT - Should NOT update settings - Invalid Domain Id', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/slack/v1/settings/${TicketValidationType.IGNORED_ENVIRONMENT}/INVALID`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 environments: ['dev', 'dev1']
             }).expect(422);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUIT - Should NOT update settings - Slack Installation not found', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/slack/v1/settings/${TicketValidationType.IGNORED_ENVIRONMENT}/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 environments: ['dev', 'dev1']
             }).expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUIT - Should NOT update settings - Invalid Parameter', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/slack/v1/settings/INVALID/${domainId}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 environments: ['dev', 'dev1']
             }).expect(400);
+        
+        expect(response.body).toBeDefined();
     });
 
 });
@@ -855,7 +899,7 @@ describe('Slack Route - Create Ticket', () => {
         };
 
         //test - invalid domain id
-        await request(app)
+        let response = await request(app)
             .post('/slack/v1/ticket/validate')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
@@ -863,18 +907,20 @@ describe('Slack Route - Create Ticket', () => {
                 domain_id: 'INVALID',
                 ticket_content
             }).expect(422);
+        expect(response.body).toBeDefined();
 
         //test - domain not provided
-        await request(app)
+        response = await request(app)
             .post('/slack/v1/ticket/validate')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
                 ticket_content
             }).expect(422);
+        expect(response.body).toBeDefined();
 
         //test - domain not found
-        await request(app)
+        response = await request(app)
             .post('/slack/v1/ticket/validate')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
@@ -882,6 +928,7 @@ describe('Slack Route - Create Ticket', () => {
                 domain_id: new mongoose.Types.ObjectId(),
                 ticket_content
             }).expect(404);
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should NOT create a ticket - Invalid Domain Id', async () => {
@@ -893,7 +940,7 @@ describe('Slack Route - Create Ticket', () => {
         };
 
         //test - invalid domain id
-        await request(app)
+        let response = await request(app)
             .post('/slack/v1/ticket/create')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
@@ -901,18 +948,20 @@ describe('Slack Route - Create Ticket', () => {
                 domain_id: 'INVALID',
                 ticket_content
             }).expect(422);
+        expect(response.body).toBeDefined();
 
         //test - domain not provided
-        await request(app)
+        response = await request(app)
             .post('/slack/v1/ticket/create')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
                 team_id: slack.team_id,
                 ticket_content
             }).expect(422);
+        expect(response.body).toBeDefined();
 
         //test - domain not found
-        await request(app)
+        response = await request(app)
             .post('/slack/v1/ticket/create')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
@@ -920,6 +969,7 @@ describe('Slack Route - Create Ticket', () => {
                 domain_id: new mongoose.Types.ObjectId(),
                 ticket_content
             }).expect(404);
+        expect(response.body).toBeDefined();
     });
 });
 
@@ -994,7 +1044,7 @@ describe('Slack Route - Process Ticket', () => {
     });
 
     test('SLACK_SUITE - Should NOT process a ticket - Ticket not found', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/slack/v1/ticket/process')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
@@ -1003,13 +1053,15 @@ describe('Slack Route - Process Ticket', () => {
                 ticket_id: new mongoose.Types.ObjectId(),
                 approved: true
             }).expect(404);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should NOT process a ticket - Invalid Domain Id', async () => {
         const { ticket } = await createTicket();
 
         //test - invalid domain id
-        await request(app)
+        let response = await request(app)
             .post('/slack/v1/ticket/process')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
@@ -1018,9 +1070,10 @@ describe('Slack Route - Process Ticket', () => {
                 ticket_id: ticket._id,
                 approved: true
             }).expect(422);
+        expect(response.body).toBeDefined();
 
         //test - domain not provided
-        await request(app)
+        response = await request(app)
             .post('/slack/v1/ticket/process')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
@@ -1028,9 +1081,10 @@ describe('Slack Route - Process Ticket', () => {
                 ticket_id: ticket._id,
                 approved: true
             }).expect(422);
+        expect(response.body).toBeDefined();
 
         //test - domain not found
-        await request(app)
+        response = await request(app)
             .post('/slack/v1/ticket/process')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
@@ -1039,10 +1093,11 @@ describe('Slack Route - Process Ticket', () => {
                 ticket_id: ticket._id,
                 approved: true
             }).expect(404);
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should NOT process a ticket - Installation not found', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/slack/v1/ticket/process')
             .set('Authorization', `Bearer ${generateToken('30s')}`)
             .send({
@@ -1051,6 +1106,8 @@ describe('Slack Route - Process Ticket', () => {
                 ticket_id: new mongoose.Types.ObjectId(),
                 approved: true
             }).expect(404);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should deny a ticket', async () => {
@@ -1112,30 +1169,33 @@ describe('Slack Route - Process Ticket', () => {
 
     test('SLACK_SUITE - Should NOT reset installation tickets - Invalid Domain Id', async () => {
         //test - invalid domain id
-        await request(app)
+        let response = await request(app)
             .post('/slack/v1/ticket/clear')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 team_id: slack.team_id,
                 domain_id: 'INVALID'
             }).expect(422);
+        expect(response.body).toBeDefined();
 
         //test - domain not provided
-        await request(app)
+        response = await request(app)
             .post('/slack/v1/ticket/clear')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 team_id: slack.team_id
             }).expect(422);
+        expect(response.body).toBeDefined();
 
         //test - domain not found
-        await request(app)
+        response = await request(app)
             .post('/slack/v1/ticket/clear')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 team_id: slack.team_id,
                 domain_id: new mongoose.Types.ObjectId()
             }).expect(404);
+        expect(response.body).toBeDefined();
     });
 
 });

@@ -230,9 +230,9 @@ adminSchema.pre('deleteOne', { document: true, query: false }, async function ()
     for (const team of teams) {
         let indexMmeber = team.members.indexOf(this._id);
         team.members.splice(indexMmeber, 1);
-        await team.save();
     }
 
+    await Promise.all(teams.map(team => team.save()));
     notifyAcDeletion(this._id);
 });
 

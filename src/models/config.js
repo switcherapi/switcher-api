@@ -183,9 +183,7 @@ configSchema.virtual('configStrategy', {
 configSchema.pre('deleteOne', { document: true, query: false }, async function () {
     const strategies = await ConfigStrategy.find({ config: this._id }).exec();
     if (strategies) {
-        for (const strategy of strategies) {
-            await Promise.resolve(strategy.deleteOne());
-        }
+        await Promise.all(strategies.map(strategy => strategy.deleteOne()));
     }
 
     await History.deleteMany({ domainId: this.domain, elementId: this._id }).exec();

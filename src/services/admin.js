@@ -114,12 +114,13 @@ export async function leaveDomain(domainid, admin) {
     for (const admin_team of teams) {
         let indexMmeber = admin_team.members.indexOf(admin.id);
         admin_team.members.splice(indexMmeber, 1);
-        await admin_team.save();
 
         let indexTeam = admin.teams.indexOf(admin_team._id);
         admin.teams.splice(indexTeam, 1);
-        await saveAdmin(admin);
     }
+
+    await Promise.all(teams.map((admin_team) => admin_team.save()));
+    await saveAdmin(admin);
 
     return admin;
 }

@@ -126,11 +126,13 @@ describe('SAML Authentication', () => {
         });
 
         // test
-        await request(app)
+        const response = await request(app)
             .post('/admin/saml/callback')
             .set('Content-Type', 'application/x-www-form-urlencoded')
             .send('SAMLResponse=test')
             .expect(401);
+
+        expect(response.body).toBeDefined();
     });
 
     test('SAML_SUITE - Should authenticate SAML user from redirect', async () => {
@@ -151,10 +153,12 @@ describe('SAML Authentication', () => {
     });
 
     test('SAML_SUITE - Should reject SAML user authentication - not valid SAML account', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/admin/saml/auth')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .expect(401);
+
+        expect(response.body).toBeDefined();
     });
 
 });

@@ -80,8 +80,9 @@ teamSchema.pre('deleteOne', { document: true, query: false }, async function () 
     for (const member of membersToRemve) {
         const indexValue = member.teams.indexOf(this._id);
         member.teams.splice(indexValue, 1);
-        member.save();
     }
+    
+    await Promise.all(membersToRemve.map((member) => member.save()));
 });
 
 export const Team = mongoose.model('Team', teamSchema);

@@ -115,17 +115,16 @@ router.post('/admin/collaboration/permission', auth, [
         return res.send(permissionCache.get(cacheKey));
     }
 
-    let result = [];
-    for (const action_perm of req.body.action) {
+    const result = await Promise.all(req.body.action.map(async action_perm => {
         try {
             await verifyOwnership(req.admin, element, req.body.domain, action_perm, 
                 req.body.router, false, req.body.environment);
-            result.push({ action: action_perm, result: 'ok' });
+            return { action: action_perm, result: 'ok' };
         } catch (e) {
             Logger.debug('resolvePermission', e);
-            result.push({ action : action_perm, result: 'nok' });
+            return { action : action_perm, result: 'nok' };
         }
-    }
+    }));
 
     if (result.length) {
         permissionCache.set(cacheKey, result);

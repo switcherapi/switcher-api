@@ -165,19 +165,12 @@ function isElementActive(element, environment, activated) {
 async function resolveComponentsFirst(source, context, groups) {
     if (context._component) {
         const component = await Component.findOne({ domain: source._id, name: context._component }).exec();
-        const validGroups = [];
-
         context._component = component?._id;
-        for (const group of groups) {
-            let configsLength = await Config.find({
-                 domain: source._id, group: group._id, components: context._component 
-            }).countDocuments().exec();
+        const configsLengths = await Promise.all(groups.map(group => Config.find({
+            domain: source._id, group: group._id, components: context._component
+        }).countDocuments().exec()));
 
-            if (configsLength) {
-                validGroups.push(group);
-            }
-        }
-        return validGroups;
+        return groups.filter((_, index) => configsLengths[index]);
     }
     return groups;
 }

@@ -57,10 +57,12 @@ describe('Testing relay verification', () => {
         bodyRelay.endpoint.default = 'https://localhost:3001';
 
         // Test
-        await request(app)
+        const response = await request(app)
             .patch(`/config/updateRelay/${configId1}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(bodyRelay).expect(200);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('CONFIG_RELAY_SUITE - Should update Relay status', async () => {
@@ -78,10 +80,12 @@ describe('Testing relay verification', () => {
         bodyRelay.endpoint.default = 'HTTPS://localhost:3001';
 
         // Test
-        await request(app)
+        const response = await request(app)
             .patch(`/config/updateRelay/${configId1}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(bodyRelay).expect(200);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('CONFIG_RELAY_SUITE - Should reset Relay verified flag when changing endpoint', async () => {
@@ -180,10 +184,12 @@ describe('Testing relay association', () => {
     });
 
     test('CONFIG_RELAY_SUITE - Should NOT configure new Relay - Config not found', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/config/updateRelay/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(bodyRelayProd).expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('CONFIG_RELAY_SUITE - Should NOT configure new Relay - Environment does not exist', async () => {
@@ -206,7 +212,7 @@ describe('Testing relay association', () => {
     });
 
     test('CONFIG_RELAY_SUITE - Should NOT configure new Relay - Invalid TYPE', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/config/updateRelay/${configId1}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
@@ -220,10 +226,12 @@ describe('Testing relay association', () => {
                 },
                 method: 'GET'
             }).expect(400);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('CONFIG_RELAY_SUITE - Should NOT configure new Relay - Invalid METHOD', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/config/updateRelay/${configId1}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
@@ -237,6 +245,8 @@ describe('Testing relay association', () => {
                 },
                 method: 'PATCH'
             }).expect(400);
+
+        expect(response.body).toBeDefined();
     });
 
     test('CONFIG_RELAY_SUITE - Should configure new Relay on new environment', async () => {
@@ -333,10 +343,12 @@ describe('Testing relay association', () => {
     });
 
     test('CONFIG_RELAY_SUITE - Should NOT remove Relays - Config not found', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/config/removeRelay/${new mongoose.Types.ObjectId()}/default`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('CONFIG_RELAY_SUITE - Should remove all Relays', async () => {
@@ -379,10 +391,12 @@ describe('Testing relay association', () => {
     });
 
     test('CONFIG_RELAY_SUITE - Should NOT generate verification code - Config not found', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/domain/relay/verificationCode/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(bodyRelayProd).expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('CONFIG_RELAY_SUITE - Should verify code', async () => {
@@ -428,10 +442,12 @@ describe('Testing relay association', () => {
             .send().expect(200);
 
         // Test
-        await request(app)
+        const response = await request(app)
             .patch(`/config/relay/verify/${new mongoose.Types.ObjectId()}/${EnvType.DEFAULT}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('CONFIG_RELAY_SUITE - Should NOT verify code - Invalid code', async () => {

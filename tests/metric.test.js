@@ -129,84 +129,100 @@ describe('Fetch overall statistics', () => {
     });
 
     test('METRIC_SUITE - Should NOT return statistics when no Domain is provided', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/metric/statistics?statistics=all')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('METRIC_SUITE - Should NOT return statistics - Invalid queries', async () => {
-        await request(app)
+        let response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&environment=${'a'.repeat(31)}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-            .send().expect(422);
+            .send().expect(422);  
+        expect(response.body).toBeDefined();
 
-        await request(app)
+        response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&component=${'a'.repeat(51)}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        expect(response.body).toBeDefined();
 
-        await request(app)
+        response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&key=${'a'.repeat(31)}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        expect(response.body).toBeDefined();
 
-        await request(app)
+        response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&group=${'a'.repeat(31)}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        expect(response.body).toBeDefined();
 
-        await request(app)
+        response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&result=not_true`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        expect(response.body).toBeDefined();
 
-        await request(app)
+        response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&dateBefore=202000`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        expect(response.body).toBeDefined();
 
-        await request(app)
+        response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&dateAfter=2020000`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        expect(response.body).toBeDefined();
     });
 
     test('METRIC_SUITE - Should return statistics - Valid queries', async () => {
-        await request(app)
+        let response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&environment=${'a'.repeat(30)}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
+        expect(response.body).toBeDefined();
 
-        await request(app)
+        response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&component=${'a'.repeat(50)}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
+        expect(response.body).toBeDefined();
 
-        await request(app)
+        response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&key=${'a'.repeat(30)}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
+        expect(response.body).toBeDefined();
 
-        await request(app)
+        response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&group=${'a'.repeat(30)}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
+        expect(response.body).toBeDefined();
 
-        await request(app)
+        response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&result=true`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
-
-        await request(app)
+        expect(response.body).toBeDefined();
+        
+        response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&dateBefore=2020-10-10`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
+        expect(response.body).toBeDefined();
 
-        await request(app)
+        response = await request(app)
             .get(`/metric/statistics?domainid=${domainId}&statistics=all&dateAfter=2020-10-10`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
+        expect(response.body).toBeDefined();
     });
 });
 
@@ -224,17 +240,21 @@ describe('Fetch metrics', () => {
     });
 
     test('METRIC_SUITE - Should NOT fetch records from a unknown Domain - Not Domain Id', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/metric/data?domainid=UNKNOWN&page=1')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('METRIC_SUITE - Should NOT fetch records - Invalid attribute for page', async () => {
-        await request(app)
+        const response = await request(app)
             .get(`/metric/data?domainid=${domainId}&page=test`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(500);
+
+        expect(response.body).toBeDefined();
     });
 
     test('METRIC_SUITE - Should fetch records by KEY', async () => {
@@ -366,24 +386,30 @@ describe('Delete metrics', () => {
     beforeAll(setupDatabase);
 
     test('METRIC_SUITE - Should NOT delete metrics - Invalid ID', async () => {
-        await request(app)
+        const response = await request(app)
             .delete(`/metric?domainid=${domainId}&key=INVALID_ID`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('METRIC_SUITE - Should NOT delete metrics - Domain ID not provided', async () => {
-        await request(app)
+        const response = await request(app)
             .delete('/metric?key=INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('METRIC_SUITE - Should NOT delete metrics - Permission denied', async () => {
-        await request(app)
+        const response = await request(app)
             .delete(`/metric?domainid=${domainId}&key=KEY_1`)
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(403);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('METRIC_SUITE - Should delete metrics', async () => {

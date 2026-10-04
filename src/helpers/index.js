@@ -134,21 +134,10 @@ export async function verifyOwnership(admin, element, domainId, actions, routerT
     }
 
     const actionsArray = Array.isArray(actions) ? actions : [actions];
-    let hasPermission = [];
-    let allowedElement;
-
-    // Verify each team permission
-    for (const team of teams) {
-        if (cascade) {
-            allowedElement = await verifyPermissionsCascade(team, element, actionsArray, routerType, environment);
-        } else {
-            allowedElement = await verifyPermissions(team, element, actionsArray, routerType, environment);
-        }
-        
-        if (allowedElement) {
-            hasPermission.push(allowedElement);
-        }
-    }
+    let hasPermission = (await Promise.all(teams.map((team) => cascade
+        ? verifyPermissionsCascade(team, element, actionsArray, routerType, environment)
+        : verifyPermissions(team, element, actionsArray, routerType, environment)
+    ))).filter(Boolean);
     
     if (!hasPermission.length) {
         throw new PermissionError('Action forbidden');

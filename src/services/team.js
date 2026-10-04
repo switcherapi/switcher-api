@@ -90,7 +90,7 @@ export async function createTeam(args, admin, defaultActions) {
     if (defaultActions) {
         const actions = defaultActions.split(',');
         checkActionType(actions);
-        for (const action of actions) {
+        for await (const action of actions) {
             await addDefaultPermission(action, team);
         }
     }

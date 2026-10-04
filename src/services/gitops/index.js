@@ -18,9 +18,9 @@ export async function pushChanges(domainId, environment, changes) {
     Logger.debug(`Changes: ${JSON.stringify(changes)}`);
 
     let domain = await getDomainById(domainId);
-    for (const change of changes) {
-        await CHANGE_PROCESSES[change.action](domain, change, environment);
-    }
+    await Promise.all(changes.map(change =>
+        CHANGE_PROCESSES[change.action](domain, change, environment)
+    ));
 
     domain = await updateDomainVersion(domainId);
     return {

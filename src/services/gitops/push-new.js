@@ -32,7 +32,7 @@ async function processNewGroup(domain, change, environment) {
     }, admin);
 
     if (content.config?.length) {
-        for (const config of content.config) {
+        for await (const config of content.config) {
             await processNewConfig(domain, {
                 path: [group.name],
                 content: config
@@ -81,7 +81,7 @@ async function processNewConfig(domain, change, environment) {
     const config = await createConfig(newConfig, admin);
 
     if (content.strategies?.length) {
-        for (const strategy of content.strategies) {
+        for await(const strategy of content.strategies) {
             await processNewStrategy(domain, {
                 path: [group.name, config.key],
                 content: strategy
@@ -117,11 +117,9 @@ async function processNewComponent(domain, change) {
     const components = await getComponents({ domain: domain._id, name: { $in: content } });
     const componentIds = components.map(component => component._id);
 
-    for (const id of componentIds) {
-        if (!config.components.includes(id)) {
-            await addComponent(config._id, { component: id }, admin);
-        }
-    }
+    await Promise.all(componentIds
+        .filter(id => !config.components.includes(id))
+        .map(id => addComponent(config._id, { component: id }, admin)));
 }
 
 function getNewValue(newValue, defaultValue) {
