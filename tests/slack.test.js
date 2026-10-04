@@ -1158,13 +1158,15 @@ describe('Slack Route - Process Ticket', () => {
     });
 
     test('SLACK_SUITE - Should NOT reset installation tickets - Admin not owner', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/slack/v1/ticket/clear')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 team_id: slack.team_id,
                 domain_id: domainId
             }).expect(403);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('SLACK_SUITE - Should NOT reset installation tickets - Invalid Domain Id', async () => {
