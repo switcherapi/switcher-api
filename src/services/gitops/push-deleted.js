@@ -64,9 +64,7 @@ async function processComponentDeleted(domain, change) {
     const components = await getComponents({ domain: domain._id, name: { $in: content } });
     const componentIds = components.map(component => component._id);
 
-    for (const id of componentIds) {
-        if (config.components.includes(id)) {
-            await removeComponent(config._id, { component: id }, admin);
-        }
-    }
+    await Promise.all(componentIds
+        .filter(id => config.components.includes(id))
+        .map(id => removeComponent(config._id, { component: id }, admin)));
 }

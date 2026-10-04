@@ -78,9 +78,7 @@ groupConfigSchema.pre('deleteOne', { document: true, query: false }, async funct
     const configs = await Config.find({ group: this._id }).exec();
 
     if (configs) {
-        for (const config of configs) {
-            await Promise.resolve(config.deleteOne());
-        }
+        await Promise.all(configs.map(config => config.deleteOne()));
     }
 
     await History.deleteMany({ domainId: this.domain, elementId: this._id }).exec();

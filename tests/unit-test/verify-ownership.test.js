@@ -329,7 +329,7 @@ describe('Error tests', () => {
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Permission innactive', async () => {
         await changePermissionStatus(permission2Id, false);
 
-        expect(async () => {
+        await expect(async () => {
             await verifyOwnership(
                 adminAccount, 
                 groupConfig2Document, 
@@ -340,7 +340,7 @@ describe('Error tests', () => {
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Permission not found', async () => {
-        expect(async () => {
+        await expect(async () => {
             await verifyOwnership(
                 adminAccount, 
                 domainDocument, 
@@ -351,7 +351,7 @@ describe('Error tests', () => {
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Permission does not match', async () => {
-        expect(async () => {
+        await expect(async () => {
             await verifyOwnership(
                 adminAccount, 
                 configDocument, 
@@ -362,7 +362,7 @@ describe('Error tests', () => {
     });
 
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Member does not belong to a team', async () => {
-        expect(async () => {
+        await expect(async () => {
             await verifyOwnership(
                 adminAccount2, 
                 domainDocument, 
@@ -375,7 +375,7 @@ describe('Error tests', () => {
     test('UNIT_TEAM_PERMISSION_SUITE - Should NOT allow access - Team not active', async () => {
         await changeTeamStatus(team1Id, false);
 
-        expect(async () => {
+        await expect(async () => {
             await verifyOwnership(
                 adminAccount, 
                 groupConfig2Document, 
@@ -396,7 +396,7 @@ describe('Error tests', () => {
         let groups = await GroupConfig.find({ domain: domainId }).exec();
         expect(groups.length).toEqual(2);
 
-        expect(async () => {
+        await expect(async () => {
             await verifyOwnership(
                 adminAccount, 
                 groups, 
@@ -411,7 +411,7 @@ describe('Error tests', () => {
         //enabled Update - Switcher (update only in dev environment)
         await changePermissionStatus(permission11Id, true);
 
-        expect(async () => {
+        await expect(async () => {
             await verifyOwnership(
                 adminAccount, 
                 configDocument, 

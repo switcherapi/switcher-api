@@ -61,7 +61,7 @@ export async function createDomain(args, admin) {
         owner: admin._id
     });
 
-    environment.save();
+    await environment.save();
     return saveDomain(domain);
 }
 

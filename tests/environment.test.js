@@ -43,13 +43,15 @@ describe('Insertion tests', () => {
     });
 
     test('ENV_SUITE - Should NOT create a new Environment - Permission denied', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/environment/create')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 name: 'QA',
                 domain: domainId
             }).expect(403);
+
+        expect(response.body.error).toBeDefined();
     });
 
     test('ENV_SUITE - Should NOT create a new Environment - Environment already exists', async () => {
@@ -65,13 +67,15 @@ describe('Insertion tests', () => {
     });
 
     test('ENV_SUITE - Should NOT create a new Environment - Domain not found', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/environment/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'DEV',
                 domain: 'FAKE_DOMAIN'
             }).expect(404);
+
+        expect(response.body.error).toBeDefined();
     });
 });
 
@@ -96,10 +100,12 @@ describe('Reading tests', () => {
     });
 
     test('ENV_SUITE - Should NOT read Environment - Not found', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/environment/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 });
 
@@ -139,17 +145,21 @@ describe('Deletion tests', () => {
     });
 
     test('ENV_SUITE - Should NOT delete an Environment - Invalid Env Id', async () => {
-        await request(app)
+        const response = await request(app)
             .delete('/environment/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('ENV_SUITE - Should NOT delete an Environment - Env not found', async () => {
-        await request(app)
+        const response = await request(app)
             .delete('/environment/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(response.body.error).toBeDefined();
     });
 
     test('ENV_SUITE - Should NOT delete an Environment - Permission denied', async () => {
@@ -161,10 +171,12 @@ describe('Deletion tests', () => {
                 domain: domainId
             }).expect(201);
 
-        await request(app)
+        const response403 = await request(app)
             .delete('/environment/' + response.body._id)
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(403);
+
+        expect(response403.body.error).toBeDefined();
     });
 
     test('ENV_SUITE - Should recover an Environment', async () => {
@@ -252,16 +264,20 @@ describe('Deletion tests', () => {
     });
 
     test('ENV_SUITE - Should NOT recover an Environment - Invalid Env Id', async () => {
-        await request(app)
+        const responseInvalidId = await request(app)
             .patch('/environment/recover/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(responseInvalidId.body).toBeDefined();
     });
 
     test('ENV_SUITE - Should NOT recover an Environment - Env not found', async () => {
-        await request(app)
+        const responseNotFound = await request(app)
             .patch('/environment/recover/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(responseNotFound.body).toBeDefined();
     });
 });

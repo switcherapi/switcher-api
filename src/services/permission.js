@@ -71,11 +71,11 @@ export async function deletePermission(id, admin) {
     const team = await verifyRequestedTeamByPermission(permission._id, admin, ActionTypes.DELETE);
 
     const teams = await getTeams({ permissions: permission._id });
-    for (const pTeam of teams) {
+    await Promise.all(teams.map((pTeam) => {
         const indexValue = pTeam.permissions.indexOf(permission._id);
         pTeam.permissions.splice(indexValue, 1);
-        pTeam.save();
-    }
+        return pTeam.save();
+    }));
     
     permissionCache.permissionReset(team.domain, permission.action, permission.router);
     return permission.deleteOne();

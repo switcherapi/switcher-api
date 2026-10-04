@@ -66,7 +66,7 @@ describe('Insertion tests', () => {
     });
 
     test('COMPONENT_SUITE - Should NOT create a new Component - Domain not found', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/component/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
@@ -74,10 +74,12 @@ describe('Insertion tests', () => {
                 description: 'This is my Web App using this wonderful API',
                 domain: 'FAKE_DOMAIN'
             }).expect(400);
+
+        expect(response.body).toBeDefined();
     });
 
     test('COMPONENT_SUITE - Should NOT create a new Component - Name too short', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/component/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
@@ -85,6 +87,8 @@ describe('Insertion tests', () => {
                 description: 'This is my Web App using this wonderful API',
                 domain: domainId
             }).expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('COMPONENT_SUITE - Should generate a valid API Key for a Component', async () => {
@@ -103,16 +107,20 @@ describe('Insertion tests', () => {
 
     test('COMPONENT_SUITE - Should NOT generate an API Key for', async () => {
         // Invalid component ID
-        await request(app)
+        const responseInvalid = await request(app)
             .get('/component/generateApiKey/INVALID_COMPONENT_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
 
+        expect(responseInvalid.body).toBeDefined();
+
         // Not found component ID
-        await request(app)
+        const responseNotFound = await request(app)
             .get('/component/generateApiKey/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(responseNotFound.body).toBeDefined();
     });
 });
 
@@ -152,31 +160,39 @@ describe('Reading tests', () => {
     });
 
     test('COMPONENT_SUITE - Should NOT read Component - Invalid Id', async () => {
-        await request(app)
+        const responseInvalid = await request(app)
             .get('/component/NOT_FOUND')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(responseInvalid.body).toBeDefined();
     });
 
     test('COMPONENT_SUITE - Should NOT read Component - Not found', async () => {
-        await request(app)
+        const responseNotFound = await request(app)
             .get('/component/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(responseNotFound.body).toBeDefined();
     });
 
     test('COMPONENT_SUITE - Should NOT read Component - Invalid Domain Id', async () => {
-        await request(app)
+        const responseInvalidDomain = await request(app)
             .get('/component?domain=INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(responseInvalidDomain.body).toBeDefined();
     });
 
     test('COMPONENT_SUITE - Should NOT read Component - Domain Id not specified', async () => {
-        await request(app)
+        const responseDomainNotSpecified = await request(app)
             .get('/component?domain=')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(responseDomainNotSpecified.body).toBeDefined();
     });
 });
 
@@ -226,13 +242,14 @@ describe('Updating tests', () => {
                 description: 'Wow, this should be my updated description, only not'
             }).expect(422);
 
-        await request(app)
+        const responseNotFound = await request(app)
             .patch('/component/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Wow, this should be my updated description, only not'
             }).expect(404);
 
+        expect(responseNotFound.body).toBeDefined();
     });
 });
 
@@ -271,7 +288,7 @@ describe('Deletion tests', () => {
     });
 
     test('COMPONENT_SUITE - Should NOT delete a Component - Invalid Component Id/Not found', async () => {
-        await request(app)
+        const responseInvalid = await request(app)
             .post('/component/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
@@ -285,10 +302,14 @@ describe('Deletion tests', () => {
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
 
-        await request(app)
+        expect(responseInvalid.body).toBeDefined();
+
+        const responseNotFound = await request(app)
             .delete('/component/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(responseNotFound.body).toBeDefined();
     });
 
 });

@@ -77,11 +77,11 @@ componentSchema.pre('validate', async function () {
 
 componentSchema.pre('deleteOne', { document: true, query: false }, async function () {
     const configsToRemoveFrom = await Config.find({ components: { $in: [this._id] } }).exec();
-    for (const config of configsToRemoveFrom) {
+    await Promise.all(configsToRemoveFrom.map(async (config) => {
         const indexValue = config.components.indexOf(this._id);
         config.components.splice(indexValue, 1);
-        config.save();
-    }
+        await config.save();
+    }));
 });
 
 const Component = mongoose.model('Component', componentSchema);

@@ -630,12 +630,13 @@ describe('GitOps Account - Unsubscribe', () => {
         });
 
         // test
-        await request(app)
+        const response = await request(app)
             .post(`/gitops/v1/account/unsubscribe`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send(VALID_DELETE_REQUEST)
             .expect(200);
 
+        expect(response.body).toBeDefined();
         postStub.restore();
     });
 

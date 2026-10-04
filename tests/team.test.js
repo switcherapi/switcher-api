@@ -86,32 +86,38 @@ describe('Insertion tests', () => {
     });
 
     test('TEAM_SUITE - Should NOT create a new Team - Domain not found', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/team/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'My Team',
                 domain: new mongoose.Types.ObjectId()
             }).expect(404);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT create a new Team - Invalid domain Id', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/team/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'My Team',
                 domain: 'INVALID_ID'
             }).expect(422);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT create a new Team - Name is missing', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/team/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 domain: domainId
             }).expect(422);
+        
+        expect(response.body).toBeDefined();
     });
 });
 
@@ -142,10 +148,12 @@ describe('Reading tests', () => {
     });
 
     test('TEAM_SUITE - Should NOT read all Teams from a Domain - Invalid domain Id', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/team?domain=INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should read one single Team', async () => {
@@ -158,24 +166,30 @@ describe('Reading tests', () => {
     });
 
     test('TEAM_SUITE - Should NOT read Team - Not found', async () => {
-        await request(app)
+        const response = await request(app)
             .get(`/team/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT read Team - Invalid Id', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/team/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT read Team - Domain Id not provided', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/team')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        
+        expect(response.body).toBeDefined();
     });
 });
 
@@ -196,30 +210,36 @@ describe('Updating tests', () => {
     });
 
     test('TEAM_SUITE - Should NOT update a Team - Invalid field', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/team/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 domain: new mongoose.Types.ObjectId()
             }).expect(400);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT update a Team - Not found', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/team/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 active: true
             }).expect(404);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT update a Team - Invalid id', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/team/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 active: true
             }).expect(422);
+        
+        expect(response.body).toBeDefined();
     });
 });
 
@@ -262,17 +282,21 @@ describe('Deletion tests', () => {
     });
 
     test('TEAM_SUITE - Should NOT delete a Team - Not found', async () => {
-        await request(app)
+        const response = await request(app)
             .delete(`/team/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT delete a Team - Invalid Id', async () => {
-        await request(app)
+        const response = await request(app)
             .delete('/team/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        
+        expect(response.body).toBeDefined();
     });
 });
 
@@ -336,28 +360,32 @@ describe('Updating team members tests', () => {
     });
 
     test('TEAM_SUITE - Should NOT create invite request - Invalid Team ID', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/team/member/invite/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
             }).expect(422);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT get invitation request - Invalid Request ID', async () => {
-        await request(app)
+        const responseInvalidId = await request(app)
             .get('/team/member/invite/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
             }).expect(422);
+        expect(responseInvalidId.body).toBeDefined();
 
-        await request(app)
+        const responseNotFound = await request(app)
             .get(`/team/member/invite/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 email: adminMasterAccount.email
             }).expect(404);
+        expect(responseNotFound.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should get all invitation requests from a team', async () => {
@@ -378,22 +406,26 @@ describe('Updating team members tests', () => {
     });
 
     test('TEAM_SUITE - Should NOT get invitation requests - NO TEAM ID', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/team/member/invite/pending')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT remove team invitaion - TEAM INVITE REQUEST NOT FOUND', async () => {
-        await request(app)
+        const response = await request(app)
             .get(`/team/member/invite/pending/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(200);
+        expect(response.body).toBeDefined();
 
-        await request(app)
+        const responseRemove = await request(app)
             .delete(`/team/member/invite/remove/${team1Id}/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+        expect(responseRemove.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should remove team invitaion', async () => {
@@ -427,116 +459,138 @@ describe('Updating team members tests', () => {
     });
 
     test('TEAM_SUITE - Should NOT add a team member - Team not found', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/team/member/add/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: adminAccountId
             }).expect(404);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT add a team member - Member not found', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/team/member/add/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: new mongoose.Types.ObjectId()
             }).expect(404);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT add a team member - Member not given', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/team/member/add/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT add a team member - Member already joined', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/team/member/add/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: adminAccountId
             }).expect(400);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT add a team member - Invalid parameter', async () => {
         // Test - invalid parameter key
-        await request(app)
+        const responseInvalidKey = await request(app)
             .patch(`/team/member/add/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 admin: adminAccountId
             }).expect(422);
+        expect(responseInvalidKey.body).toBeDefined();
 
         // Test - invalid parameter value
-        await request(app)
+        const responseInvalidValue = await request(app)
             .patch(`/team/member/add/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: 'INVALID_ID'
             }).expect(422);
+        expect(responseInvalidValue.body).toBeDefined();
     });
     
     test('TEAM_SUITE - Should NOT remove a team member - Team not found', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/team/member/remove/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: adminAccountId
             }).expect(404);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT remove a team member - Member not found', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/team/member/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: new mongoose.Types.ObjectId()
             }).expect(404);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT remove a team member - Member do not belong to the team', async () => {
         // Remove member
-        await request(app)
+        let response = await request(app)
             .patch(`/team/member/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: adminMasterAccountId
             }).expect(200);
+        
+        expect(response.body).toBeDefined();
 
         // Trying to remove again
-        await request(app)
+        response = await request(app)
             .patch(`/team/member/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: adminMasterAccountId
             }).expect(404);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT remove a team member - Member not given', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/team/member/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT remove a team member - Invalid parameter', async () => {
         // Test - invalid parameter key
-        await request(app)
+        const responseInvalidKey = await request(app)
             .patch(`/team/member/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 admin: adminAccountId
             }).expect(422);
+        expect(responseInvalidKey.body).toBeDefined();
 
         // Test - invalid parameter value
-        await request(app)
+        const responseInvalidValue = await request(app)
             .patch(`/team/member/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: 'INVALID_ID'
             }).expect(422);
+        expect(responseInvalidValue.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should remove a team member', async () => {
@@ -650,57 +704,67 @@ describe('Updating team permissions tests', () => {
     beforeAll(setupDatabase);
 
     test('TEAM_SUITE - Should NOT remove a permission - Team not found', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/team/permission/remove/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 permission: permission1Id
             }).expect(404);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT remove a permission - Invalid Team Id', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/team/permission/remove/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 permission: permission1Id
             }).expect(422);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT remove a permission - Invalid parameter', async () => {
         // Test - invalid parameter key
-        await request(app)
+        const responseInvalidKey = await request(app)
             .patch(`/team/permission/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 member: permission1Id
             }).expect(422);
+        expect(responseInvalidKey.body).toBeDefined();
 
         // Test - invalid parameter value
-        await request(app)
+        const responseInvalidValue = await request(app)
             .patch(`/team/permission/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 permission: 'INVALID_ID'
             }).expect(422);
+        expect(responseInvalidValue.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should NOT remove a permission - Permission not found', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/team/permission/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 permission: new mongoose.Types.ObjectId()
             }).expect(404);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('TEAM_SUITE - Should remove a permission', async () => {
-        await request(app)
+        const response = await request(app)
             .patch(`/team/permission/remove/${team1Id}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 permission: permission1Id
             }).expect(200);
+        
+        expect(response.body).toBeDefined();
     });
 
 });

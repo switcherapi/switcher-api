@@ -15,24 +15,23 @@ export async function resolvePermission(args, admin) {
     
     let elements = await getElements(args.domain, args.parent, args.router);
 
-    let result = [];
-    for (const element of elements) {
-        result.push({
-            id: element._id,
-            name: element.name || element.key,
-            permissions: []
-        });
-
-        for (const action_perm of args.actions) {
+    const result = await Promise.all(elements.map(async (element) => {
+        const permissions = await Promise.all(args.actions.map(async (action_perm) => {
             try {
                 await verifyOwnership(admin, element, args.domain, action_perm, args.router, false, args.environment);
-                result.at(-1).permissions.push({ action: action_perm.toString(), result: 'ok' });
+                return { action: action_perm.toString(), result: 'ok' };
             } catch (e) {
                 Logger.debug('resolvePermission', e);
-                result.at(-1).permissions.push({ action: action_perm.toString(), result: 'nok' });
+                return { action: action_perm.toString(), result: 'nok' };
             }
-        }
-    }
+        }));
+
+        return {
+            id: element._id,
+            name: element.name || element.key,
+            permissions
+        };
+    }));
 
     if (result.length) {
         permissionCache.set(cacheKey, result);

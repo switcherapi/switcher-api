@@ -112,16 +112,12 @@ domainSchema.pre('deleteOne', { document: true, query: false }, async function (
     const groups = await GroupConfig.find({ domain: this._id }).exec();
 
     if (groups) {
-        for (const group of groups) {
-            await Promise.resolve(group.deleteOne());
-        }
+        await Promise.all(groups.map(group => group.deleteOne()));
     }
 
     const teams = await Team.find({ domain: this._id }).exec();
     if (teams) {
-        for (const team of teams) {
-            await Promise.resolve(team.deleteOne());
-        }
+        await Promise.all(teams.map(team => team.deleteOne()));
     }
 
     await Promise.all([

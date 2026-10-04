@@ -163,39 +163,51 @@ describe('Testing fetch Group info', () => {
     });
 
     test('GROUP_SUITE - Should NOT get Group Config information by Id', async () => {
-        await request(app)
+        const responseNotFound = await request(app)
             .get('/groupconfig/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
 
-        await request(app)
+        expect(responseNotFound.body).toBeDefined();
+
+        const responseInvalidId = await request(app)
             .get('/groupconfig/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(responseInvalidId.body).toBeDefined();
     });
 
     test('GROUP_SUITE - Should NOT found Group Config information by Id', async () => {
-        await request(app)
+        const responseInvalidDomain = await request(app)
             .get('/groupconfig?domain=INVALD_ID')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(422);
 
-        await request(app)
+        expect(responseInvalidDomain.body).toBeDefined();
+
+        const responseNotFoundDomain = await request(app)
             .get('/groupconfig?domain=' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send().expect(404);
+
+        expect(responseNotFoundDomain.body).toBeDefined();
     });
 
     test('GROUP_SUITE - Should NOT delete Group Config by invalid Group Id', async () => {
-        await request(app)
+        const responseInvalidGroupId = await request(app)
             .delete('/groupconfig/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
 
-        await request(app)
+        expect(responseInvalidGroupId.body).toBeDefined();
+
+        const responseNotFoundGroupId = await request(app)
             .delete('/groupconfig/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(responseNotFoundGroupId.body).toBeDefined();
     });
 
     test('GROUP_SUITE - Should delete Group Config', async () => {
@@ -273,29 +285,35 @@ describe('Testing update Group info', () => {
     });
 
     test('GROUP_SUITE - Should NOT update Group Config info', async () => {
-        await request(app)
-        .patch('/groupconfig/' + groupConfigId)
-        .set('Authorization', `Bearer ${adminMasterAccountToken}`)
-        .send({
-            name: 'Updated Group Name',
-            owner: 'I_SHOULD_NOT_UPDATE_THIS'
-        }).expect(400);
+        const responseInvalidUpdate = await request(app)
+            .patch('/groupconfig/' + groupConfigId)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({
+                name: 'Updated Group Name',
+                owner: 'I_SHOULD_NOT_UPDATE_THIS'
+            }).expect(400);
+
+        expect(responseInvalidUpdate.body.error).toBeDefined();
     });
 
     test('GROUP_SUITE - Should NOT update an unknown Group Config', async () => {
-        await request(app)
+        const responseInvalidGroupId = await request(app)
             .patch('/groupconfig/UNKNOWN_GROUP_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'Updated Group Name'
             }).expect(422);
 
-        await request(app)
+        expect(responseInvalidGroupId.body).toBeDefined();
+
+        const responseNotFoundGroupId = await request(app)
             .patch('/groupconfig/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'Updated Group Name'
             }).expect(404);
+
+        expect(responseNotFoundGroupId.body).toBeDefined();
     });
 
     test('GROUP_SUITE - Should update Group environment status - default', async () => {
@@ -316,27 +334,35 @@ describe('Testing update Group info', () => {
     });
 
     test('GROUP_SUITE - Should NOT list changes by invalid Group Id', async () => {
-        await request(app)
+        const responseInvalidHistoryId = await request(app)
             .get('/groupconfig/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
 
-        await request(app)
+        expect(responseInvalidHistoryId.body).toBeDefined();
+
+        const responseNotFoundHistoryId = await request(app)
             .get('/groupconfig/history/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(responseNotFoundHistoryId.body).toBeDefined();
     });
 
     test('GROUP_SUITE - Should NOT delete history by invalid Group Id', async () => {
-        await request(app)
+        const responseNotFoundHistory = await request(app)
             .delete('/groupconfig/history/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
 
-        await request(app)
+        expect(responseNotFoundHistory.body).toBeDefined();
+
+        const responseInvalidHistory = await request(app)
             .delete('/groupconfig/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(responseInvalidHistory.body).toBeDefined();
     });
 
     test('GROUP_SUITE - Should delete history from a Group element', async () => {
@@ -446,19 +472,23 @@ describe('Testing envrionment status change #1', () => {
     });
 
     test('GROUP_SUITE - Should NOT update Group environment status - Invalid Group Id', async () => {
-        await request(app)
+        const responseInvalidGroupId = await request(app)
             .patch('/groupconfig/updateStatus/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(422);
 
-        await request(app)
+        expect(responseInvalidGroupId.body).toBeDefined();
+
+        const responseNotFoundGroupId = await request(app)
             .patch('/groupconfig/updateStatus/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(404);
+
+        expect(responseNotFoundGroupId.body).toBeDefined();
     });
 });
 

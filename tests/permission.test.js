@@ -38,32 +38,38 @@ describe('Insertion tests', () => {
     });
 
     test('PERMISSION_SUITE - Should NOT create a new Permission - Invalid parameter (route instead of router)', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/permission/create/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 action: ActionTypes.READ,
                 route: RouterTypes.GROUP
             }).expect(400);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT create a new Permission - Missing required parameter', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/permission/create/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 action: ActionTypes.READ
             }).expect(400);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT create a new Permission - Team not found', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/permission/create/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 action: ActionTypes.READ,
                 router: RouterTypes.STRATEGY
             }).expect(404);
+
+        expect(response.body).toBeDefined();
     });
 });
 
@@ -91,7 +97,7 @@ describe('Insertion tests - by Environment', () => {
     });
 
     test('PERMISSION_SUITE - Should NOT create a new Permission - Environment is not an Array', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/permission/create/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
@@ -99,6 +105,8 @@ describe('Insertion tests - by Environment', () => {
                 router: RouterTypes.GROUP,
                 environments: 'development'
             }).expect(422);
+
+        expect(response.body).toBeDefined();
     });
 });
 
@@ -129,10 +137,12 @@ describe('Reading tests', () => {
     });
 
     test('PERMISSION_SUITE - Should NOT read all Permissions from a Domain - Invalid team Id', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/permission?team=INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should read one single Permission', async () => {
@@ -145,31 +155,39 @@ describe('Reading tests', () => {
     });
 
     test('PERMISSION_SUITE - Should NOT read Permission - Not found', async () => {
-        await request(app)
+        const response = await request(app)
             .get(`/permission/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT read Permission - Invalid Id', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/permission/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT read Permission - Team Id not provided', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/permission')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT read Permissions - Team not found', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/permission?team=' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should get all available routers', async () => {
@@ -227,30 +245,36 @@ describe('Updating tests', () => {
     });
 
     test('PERMISSION_SUITE - Should NOT update a Permission - Invalid field', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/' + team1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'New Value'
             }).expect(400);
+        
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT update a Permission - Not found', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 active: true
             }).expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT update a Permission - Invalid id', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 active: true
             }).expect(422);
+
+        expect(response.body).toBeDefined();
     });
 });
 
@@ -284,17 +308,21 @@ describe('Deletion tests', () => {
     });
 
     test('PERMISSION_SUITE - Should NOT delete a Permission - Not found', async () => {
-        await request(app)
+        const response = await request(app)
             .delete('/permission/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT delete a Permission - Invalid Id', async () => {
-        await request(app)
+        const response = await request(app)
             .delete('/permission/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 });
 
@@ -340,116 +368,142 @@ describe('Updating permission values tests', () => {
     });
 
     test('PERMISSION_SUITE - Should NOT add a value - Permission not found', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/value/add/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'NEW VALUE'
             }).expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT add a value - Invalid Permission Id', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/value/add/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'NEW VALUE'
             }).expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT add a value - Value not given', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/value/add/' + permission1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT add a value - Value already joined', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/value/add/' + permission1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'NEW VALUE'
             }).expect(400);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT add a value - Invalid parameter', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/value/add/' + permission1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 values: ['NEW']
             }).expect(400);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT update values from a permission - Invalid ID', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/updateValues/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 values: ['NEW VALUE 1', 'OLD VALUE']
             }).expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT update values from a permission - Wrong ID', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/updateValues/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 values: ['NEW VALUE 1', 'OLD VALUE']
             }).expect(422);
+
+        expect(response.body).toBeDefined();
     });
     
     test('PERMISSION_SUITE - Should NOT remove a value - Permission not found', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/value/remove/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'NEW VALUE'
             }).expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT remove a value - Invalid Permission Id', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/value/remove/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'NEW VALUE'
             }).expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT remove a value - Value not given', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/value/remove/' + permission1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT remove a value - Invalid parameter', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/value/remove/' + permission1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 values: '<- INVALID'
             }).expect(400);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should NOT remove a value - Value does not exist', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/value/remove/' + permission1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'NOT_EXISTING_VALUE'
             }).expect(404);
+
+        expect(response.body).toBeDefined();
     });
 
     test('PERMISSION_SUITE - Should remove a value', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/value/remove/' + permission1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 value: 'NEW VALUE'
             }).expect(200);
+
+        expect(response.body).toBeDefined();
 
         // DB validation
         const permission = await Permission.findById(permission1Id).lean().exec();
@@ -474,11 +528,13 @@ describe('Updating environments tests', () => {
     });
 
     test('PERMISSION_SUITE - Should NOT set an environment to the permission - Invalid value (not an array)', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/permission/' + permission1Id)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 environments: 'development'
             }).expect(422);
+
+        expect(response.body).toBeDefined();
     });
 });
