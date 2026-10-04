@@ -1,8 +1,10 @@
 import { response } from './common.js';
 import { Config } from '../models/config.js';
+import Domain from '../models/domain.js';
 import { formatInput, verifyOwnership, checkEnvironmentStatusRemoval } from '../helpers/index.js';
 import { ActionTypes, RouterTypes } from '../models/permission.js';
 import { getDomainById, updateDomainVersion } from './domain.js';
+import { getEnvironmentByName } from './environment.js';
 import { getGroupConfigById } from './group-config.js';
 import { checkSwitcher } from '../external/switcher-api-facade.js';
 import { BadRequestError, NotFoundError } from '../exceptions/index.js';
@@ -24,6 +26,39 @@ export async function getConfigById(id, populateAdmin = false) {
     }
     
     return response(config, 'Config not found');
+}
+
+export async function getConfigByKey(key, domainName, environmentName, populateAdmin = false) {
+    const formattedKey = formatInput(key, { toUpper: true, autoUnderscore: true });
+    const domain = await Domain.findOne({ name: domainName }).exec();
+
+    if (!domain) {
+        throw new Error('Domain not found');
+    }
+
+    if (environmentName) {
+        const environment = await getEnvironmentByName(domain._id, environmentName);
+
+        if (!environment) {
+            throw new Error('Environment not found');
+        }
+    }
+
+    let config = await Config.findOne({
+        key: formattedKey,
+        domain: domain._id
+    }).exec();
+
+    if (!config) {
+        throw new Error('Config not found');
+    }
+
+    if (populateAdmin) {
+        await config.populate({ path: 'admin', select: 'name' });
+        await config.populate({ path: 'configStrategy' });
+    }
+
+    return config;
 }
 
 export async function getConfig(where) {

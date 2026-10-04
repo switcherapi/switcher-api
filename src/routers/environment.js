@@ -1,6 +1,6 @@
 import express from 'express';
 import { check, query } from 'express-validator';
-import { auth } from '../middleware/auth.js';
+import { auth, authAny } from '../middleware/auth.js';
 import { responseException } from '../exceptions/index.js';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators.js';
 import * as Services from '../services/environment.js';
@@ -22,7 +22,7 @@ router.post('/environment/create', auth, verifyInputUpdateParameters([
 // GET /environment?domain=ID&limit=10&skip=20
 // GET /environment?domain=ID&sort=desc
 // GET /environment?domain=ID
-router.get('/environment', auth, [
+router.get('/environment', authAny, [
     query('domain', 'Please, specify the \'domain\' id').isMongoId()
 ], validate, async (req, res) => {
     try {

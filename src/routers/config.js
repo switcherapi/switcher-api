@@ -1,7 +1,7 @@
 import express from 'express';
 import { body, check, query } from 'express-validator';
 import { relayOptions } from '../models/config.js';
-import { auth } from '../middleware/auth.js';
+import { auth, authAny } from '../middleware/auth.js';
 import { ActionTypes, RouterTypes } from '../models/permission.js';
 import { responseException } from '../exceptions/index.js';
 import {
@@ -13,6 +13,7 @@ import { getHistory, deleteHistory } from '../services/history.js';
 import { getGroupConfigById } from '../services/group-config.js';
 import { SwitcherKeys } from '../external/switcher-api-facade.js';
 import { getFields } from './common/index.js';
+import { EnvType } from '../models/environment.js';
 
 const router = new express.Router();
 
@@ -60,6 +61,28 @@ router.get('/config', auth, [
         }
         
         res.send(configs);
+    } catch (e) {
+        responseException(res, e, 500);
+    }
+});
+
+router.get('/config/key/:key', authAny, [
+    check('key').isLength({ min: 3, max: 50 }),
+    query('domain').isString(),
+    query('environment').optional().isString()
+], validate, async (req, res) => {
+    try {
+        let config = await Services.getConfigByKey(
+            req.params.key, req.query.domain, req.query.environment, true);
+        config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.READ, RouterTypes.CONFIG, true);
+
+        const environment = req.query.environment || EnvType.DEFAULT;
+        const response = config.toJSON();
+        response.enabled = config.activated?.has(environment) ?
+            config.activated.get(environment) === true :
+            config.activated?.get(EnvType.DEFAULT) === true;
+
+        res.send(response);
     } catch (e) {
         responseException(res, e, 500);
     }

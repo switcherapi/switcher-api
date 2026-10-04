@@ -146,15 +146,18 @@ describe('Testing fetch configuration info', () => {
     });
 
     test('CONFIG_SUITE - Should NOT get Config information by invalid Group Id', async () => { 
-        await request(app)
+        const responseNotFound = await request(app)
             .get('/config?group=' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
 
-        await request(app)
+        const responseInvalidId = await request(app)
             .get('/config?group=INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(responseInvalidId.body.error).not.toBeNull();
+        expect(responseNotFound.body.error).not.toBeNull();
     });
 
     test('CONFIG_SUITE - Should get Config information by Id - resolveComponents as true', async () => {
@@ -182,15 +185,97 @@ describe('Testing fetch configuration info', () => {
     });
 
     test('CONFIG_SUITE - Should not find Config information by Id', async () => {
-        await request(app)
+        const responseInvalidId = await request(app)
             .get('/config/' + 'NOTEXIST')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
 
-        await request(app)
+        const responseNotFound = await request(app)
             .get('/config/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(responseInvalidId.body.error).not.toBeNull();
+        expect(responseNotFound.body.error).not.toBeNull();
+    });
+});
+
+describe('Testing fetch configuration by key', () => {
+    beforeAll(setupDatabase);
+
+    test('CONFIG_SUITE - Should get Config by key', async () => {
+        const response = await request(app)
+            .get(`/config/key/${config1Document.key}?domain=Domain`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        expect(String(response.body._id)).toEqual(String(config1Document._id));
+        expect(response.body.key).toEqual(config1Document.key);
+        expect(response.body.enabled).toEqual(true);
+    });
+
+    test('CONFIG_SUITE - Should get Config by key - case insensitive', async () => {
+        const response = await request(app)
+            .get(`/config/key/${config1Document.key.toLowerCase()}?domain=Domain`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        expect(response.body.key).toEqual(config1Document.key);
+    });
+
+    test('CONFIG_SUITE - Should get Config by key - environment reflected in enabled flag', async () => {
+        const response = await request(app)
+            .get(`/config/key/${config1Document.key}?domain=Domain&environment=dev`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(200);
+
+        // config1Document only has activation for the default environment
+        // therefore, the request should fall back to the default environment
+        expect(response.body.enabled).toEqual(true);
+    });
+
+    test('CONFIG_SUITE - Should NOT get Config by key - invalid key length', async () => {
+        const responseInvalidKey = await request(app)
+            .get('/config/key/AB?domain=Domain')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(422);
+
+        expect(responseInvalidKey.body.error).not.toBeNull();
+    });
+
+    test('CONFIG_SUITE - Should NOT get Config by key - domain not found', async () => {
+        const responseDomainNotFound = await request(app)
+            .get(`/config/key/${config1Document.key}?domain=UNKNOWN_DOMAIN`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(500);
+
+        expect(responseDomainNotFound.body.error).not.toBeNull();
+    });
+
+    test('CONFIG_SUITE - Should NOT get Config by key - environment not found', async () => {
+        const responseEnvironmentNotFound = await request(app)
+            .get(`/config/key/${config1Document.key}?domain=Domain&environment=UNKNOWN_ENV`)
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(500);
+
+        expect(responseEnvironmentNotFound.body.error).not.toBeNull();
+    });
+
+    test('CONFIG_SUITE - Should NOT get Config by key - key not found', async () => {
+        const responseKeyNotFound = await request(app)
+            .get('/config/key/UNKNOWN_CONFIG_KEY?domain=Domain')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(500);
+
+        expect(responseKeyNotFound.body.error).not.toBeNull();
+    });
+
+    test('CONFIG_SUITE - Should NOT get Config by key - unauthenticated', async () => {
+        const responseUnauthenticated = await request(app)
+            .get(`/config/key/${config1Document.key}?domain=Domain`)
+            .send().expect(401);
+
+        expect(responseUnauthenticated.body.error).not.toBeNull();
     });
 });
 
@@ -198,15 +283,18 @@ describe('Testing configuration deletion', () => {
     beforeAll(setupDatabase);
 
     test('CONFIG_SUITE - Should NOT delete Config - Wrong and bad Id', async () => {
-        await request(app)
+        const responseNotFound = await request(app)
             .delete('/config/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
 
-        await request(app)
+        const responseInvalidId = await request(app)
             .delete('/config/WRONG_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+            
+        expect(responseNotFound.body.error).not.toBeNull();
+        expect(responseInvalidId.body.error).not.toBeNull();
     });
 
     test('CONFIG_SUITE - Should delete Config', async () => {
@@ -284,7 +372,7 @@ describe('Testing update info', () => {
     });
 
     test('CONFIG_SUITE - Should NOT update Config info', async () => {
-        await request(app)
+        const response400 = await request(app)
             .patch('/config/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
@@ -292,19 +380,23 @@ describe('Testing update info', () => {
                 owner: 'I_SHOULD_NOT_UPDATE_THIS'
             }).expect(400);
 
-        await request(app)
+        const response404 = await request(app)
             .patch('/config/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
             }).expect(404);
 
-        await request(app)
+        const response422 = await request(app)
             .patch('/config/WRONG_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'New description'
             }).expect(422);
+
+        expect(response422.body.error).not.toBeNull();
+        expect(response404.body.error).not.toBeNull();
+        expect(response400.body.error).not.toBeNull();
     });
 
     test('CONFIG_SUITE - Should update Config environment status - default', async () => {
@@ -343,19 +435,22 @@ describe('Testing moving Config from GroupConfig to another', () => {
     });
 
     test('CONFIG_SUITE - Should NOT move Config to a different GroupConfig - GroupConfig not found', async () => {
-        await request(app)
+        const response404 = await request(app)
             .patch('/config/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 group: new mongoose.Types.ObjectId()
             }).expect(404);
 
-        await request(app)
+        const response422 = await request(app)
             .patch('/config/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 group: 'INVALID_VALUE_ID'
             }).expect(422);
+
+        expect(response404.body.error).not.toBeNull();
+        expect(response422.body.error).not.toBeNull();
     });
 
 });
@@ -404,19 +499,22 @@ describe('Testing Environment status change', () => {
     });
 
     test('CONFIG_SUITE - Should NOT update Config environment status - Config not fould', async () => {
-        await request(app)
+        const response422 = await request(app)
             .patch('/config/updateStatus/FAKE_CONFIG')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(422);
 
-        await request(app)
+        const response404 = await request(app)
             .patch('/config/updateStatus/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(404);
+
+        expect(response422.body.error).not.toBeNull();
+        expect(response404.body.error).not.toBeNull();
     });
 
     test('CONFIG_SUITE - Should NOT update Config environment status - Unknown environment name', async () => {
@@ -512,27 +610,33 @@ describe('Testing Environment status change', () => {
     });
 
     test('CONFIG_SUITE - Should NOT list changes by invalid Config Id', async () => {
-        await request(app)
+        const response404 = await request(app)
             .get('/config/history/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
 
-        await request(app)
+        const response422 = await request(app)
             .get('/config/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(response404.body.error).not.toBeNull();
+        expect(response422.body.error).not.toBeNull();
     });
 
     test('CONFIG_SUITE - Should NOT delete history by invalid Config Id', async () => {
-        await request(app)
+        const response404 = await request(app)
             .delete('/config/history/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
 
-        await request(app)
+        const response422 = await request(app)
             .delete('/config/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(response404.body.error).not.toBeNull();
+        expect(response422.body.error).not.toBeNull();
     });
 
     test('CONFIG_SUITE - Should delete history from a Config element', async () => {
@@ -688,12 +792,14 @@ describe('Testing component association', () => {
     });
 
     test('CONFIG_SUITE - Should NOT associate multiple components to a config - Wrong Config Id', async () => {
-        await request(app)
+        const response404 = await request(app)
             .patch('/config/updateComponents/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 components: [ new mongoose.Types.ObjectId() ]
             }).expect(404);
+
+        expect(response404.body.error).not.toBeNull();
     });
 
     test('CONFIG_SUITE - Should NOT associate component to a config - Component not found', async () => {
@@ -735,44 +841,52 @@ describe('Testing component association', () => {
     });
 
     test('CONFIG_SUITE - Should NOT associate component to a config - Config not found', async () => {
-        await request(app)
+        const response422 = await request(app)
             .patch('/config/addComponent/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: new mongoose.Types.ObjectId()
             }).expect(422);
 
-        await request(app)
+        const response404 = await request(app)
             .patch('/config/addComponent/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: new mongoose.Types.ObjectId()
             }).expect(404);
+
+        expect(response422.body.error).not.toBeNull();
+        expect(response404.body.error).not.toBeNull();
     });
 
     test('CONFIG_SUITE - Should NOT desassociate component from a config - Component not found', async () => {
-        await request(app)
+        const response404 = await request(app)
             .patch('/config/removeComponent/' + configId1)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: new mongoose.Types.ObjectId()
             }).expect(404);
+        
+        expect(response404.body.error).not.toBeNull();
     });
 
     test('CONFIG_SUITE - Should NOT desassociate component from a config - Config not found', async () => {
-        await request(app)
+        const response422 = await request(app)
             .patch('/config/removeComponent/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: new mongoose.Types.ObjectId()
             }).expect(422);
-
-        await request(app)
+            
+        const response404 = await request(app)
             .patch('/config/removeComponent/' + new mongoose.Types.ObjectId())
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 component: new mongoose.Types.ObjectId()
             }).expect(404);
+            
+        expect(response422.body.error).not.toBeNull();
+        expect(response404.body.error).not.toBeNull();
     });
 
     test('CONFIG_SUITE - Should desassociate component from a config', async () => {

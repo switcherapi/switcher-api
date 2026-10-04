@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 import request from 'supertest';
 import app from '../src/app';
 import Admin from '../src/models/admin';
@@ -54,12 +55,15 @@ describe('Testing Domain insertion', () => {
     });
 
     test('DOMAIN_SUITE - Should NOT create a new Domain - Missing required params', async () => {
-        await request(app)
+        const response = await request(app)
             .post('/domain/create')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description of my new Domain'
             }).expect(422);
+
+        // Response validation
+        expect(response.body.errors).toBeDefined();
     });
 
     test('DOMAIN_SUITE - Should NOT create a new Domain - Already exists', async () => {
@@ -151,16 +155,30 @@ describe('Testing fetch Domain info', () => {
         expect(response.body.admin.name).toBe(adminMasterAccount.name);
     });
 
+    test('DOMAIN_SUITE - Should NOT get Domain information - expired token (authAny)', async () => {
+        const expiredToken = jwt.sign({ _id: adminMasterAccountId }, process.env.JWT_SECRET || 'test_secret', { expiresIn: '0s' });
+
+        const response = await request(app)
+            .get('/domain')
+            .set('Authorization', `Bearer ${expiredToken}`)
+            .send().expect(401);
+
+        expect(response.body.error).toEqual('Token expired.');
+    });
+
     test('DOMAIN_SUITE - Should NOT return Domain information by Id', async () => {
-        await request(app)
+        const responseInvalidId = await request(app)
             .get('/domain/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
 
-        await request(app)
+        const responseNotFound = await request(app)
             .get(`/domain/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+        
+        expect(responseInvalidId.body.errors).toBeDefined();
+        expect(responseNotFound.body.error).toEqual('Domain not found');
     });
 
     test('DOMAIN_SUITE - Should delete Domain', async () => {
@@ -232,15 +250,18 @@ describe('Testing fetch Domain info', () => {
                 password: adminMasterAccount.password
             }).expect(200);
 
-        await request(app)
+        const responseNotFound = await request(app)
             .delete(`/domain/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send().expect(404);
 
-        await request(app)
+        const responseInvalidId = await request(app)
             .delete('/domain/INVALID_DOMAIN_ID')
             .set('Authorization', `Bearer ${responseLogin.body.jwt.token}`)
             .send().expect(422);
+
+        expect(responseInvalidId.body.errors).toBeDefined();
+        expect(responseNotFound.body.error).toEqual('Domain not found');
     });
 });
 
@@ -271,28 +292,33 @@ describe('Testing update Domain info', () => {
     });
 
     test('DOMAIN_SUITE - Should NOT update Domain info', async () => {
-        await request(app)
+        const responseInvalidId = await request(app)
             .patch('/domain/UNKNOWN_DOMAIN_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description updated'
             }).expect(422);
 
-        await request(app)
+        const responseNotFound = await request(app)
             .patch(`/domain/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 description: 'Description updated'
             }).expect(404);
+        
+        expect(responseInvalidId.body.errors).toBeDefined();
+        expect(responseNotFound.body.error).toEqual('Domain not found');
     });
 
     test('DOMAIN_SUITE - Should NOT update Domain name', async () => {
-        await request(app)
+        const response = await request(app)
             .patch('/domain/' + domainId)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 name: 'New Domain name'
             }).expect(400);
+        
+        expect(response.body.error).toBeDefined();
     });
 
     test('DOMAIN_SUITE - Should update Domain environment status - default', async () => {
@@ -313,19 +339,22 @@ describe('Testing update Domain info', () => {
     });
 
     test('DOMAIN_SUITE - Should NOT update environment status given an unknown Domain ID ', async () => {
-        await request(app)
+        const responseInvalidId = await request(app)
             .patch('/domain/updateStatus/UNKNOWN_DOMAIN_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(422);
 
-        await request(app)
+        const responseNotFound = await request(app)
             .patch(`/domain/updateStatus/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 default: false
             }).expect(404);
+
+        expect(responseInvalidId.body.errors).toBeDefined();
+        expect(responseNotFound.body.error).toEqual('Domain not found');
     });
 
     test('DOMAIN_SUITE - Should NOT update environment status given an unknown environment name', async () => {
@@ -340,29 +369,36 @@ describe('Testing update Domain info', () => {
     });
 
     test('DOMAIN_SUITE - Should NOT read changes on history collection - Invalid Domain Id', async () => {
-        await request(app)
+        const response = await request(app)
             .get('/domain/history/INVALID_ID')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+        
+        expect(response.body.errors).toBeDefined();
     });
 
     test('DOMAIN_SUITE - Should NOT read changes on history collection - Domain not found', async () => {
-        await request(app)
+        const response = await request(app)
             .get(`/domain/history/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
+
+        expect(response.body.error).toEqual('Domain not found');
     });
 
     test('DOMAIN_SUITE - Should NOT delete history by invalid Domain Id', async () => {
-        await request(app)
+        const responseNotFound = await request(app)
             .delete(`/domain/history/${new mongoose.Types.ObjectId()}`)
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(404);
 
-        await request(app)
+        const responseInvalidId = await request(app)
             .delete('/domain/history/INVALID_ID_VALUE')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send().expect(422);
+
+        expect(responseInvalidId.body.errors).toBeDefined();
+        expect(responseNotFound.body.error).toEqual('Domain not found');
     });
 
     test('DOMAIN_SUITE - Should delete history from a Domain element', async () => {
@@ -561,30 +597,36 @@ describe('Testing transfer Domain', () => {
     beforeAll(setupDatabase);
 
     test('DOMAIN_SUITE - Should NOT request Domain to transfer - Domain not found', async () => {
-        await request(app)
+        const responseNotFound = await request(app)
             .patch('/domain/transfer/request')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 domain: new mongoose.Types.ObjectId()
             }).expect(404);
+
+        expect(responseNotFound.body.error).toEqual('Domain not found');
     });
 
     test('DOMAIN_SUITE - Should NOT request Domain to transfer - Invalid Domain ID', async () => {
-        await request(app)
+        const responseInvalidId = await request(app)
             .patch('/domain/transfer/request')
             .set('Authorization', `Bearer ${adminMasterAccountToken}`)
             .send({
                 domain: 'NOT_VALID_ID'
             }).expect(422);
+        
+        expect(responseInvalidId.body.errors).toBeDefined();
     });
 
     test('DOMAIN_SUITE - Should NOT request Domain to transfer - Admin is not owner', async () => {
-        await request(app)
+        const responseNotOwner = await request(app)
             .patch('/domain/transfer/request')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 domain: domainId
             }).expect(404);
+        
+        expect(responseNotOwner.body.error).toEqual('Domain not found');
     });
 
     test('DOMAIN_SUITE - Should request/cancel Domain to transfer', async () => {
@@ -613,30 +655,36 @@ describe('Testing transfer Domain', () => {
     });
 
     test('DOMAIN_SUITE - Should NOT accept Domain to transfer - Domain not found', async () => {
-        await request(app)
+        const responseNotFound = await request(app)
             .patch('/domain/transfer/accept')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 domain: new mongoose.Types.ObjectId()
             }).expect(404);
+
+        expect(responseNotFound.body.error).toEqual('Domain not found');
     });
 
     test('DOMAIN_SUITE - Should NOT accept Domain to transfer - Invalid Domain ID', async () => {
-        await request(app)
+        const responseInvalidId = await request(app)
             .patch('/domain/transfer/accept')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 domain: 'NOT_VALID_ID'
             }).expect(422);
+
+        expect(responseInvalidId.body.errors).toBeDefined();
     });
 
     test('DOMAIN_SUITE - Should NOT accept Domain to transfer - Domain not flagged to be transfered', async () => {
-        await request(app)
+        const responseNotFlagged = await request(app)
             .patch('/domain/transfer/accept')
             .set('Authorization', `Bearer ${adminAccountToken}`)
             .send({
                 domain: domainId
             }).expect(404);
+
+        expect(responseNotFlagged.body.error).toEqual('Domain not found');
     });
 
     test('DOMAIN_SUITE - Should NOT accept Domain to transfer - Domain quota exceeded', async () => {

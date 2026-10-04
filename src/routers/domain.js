@@ -1,6 +1,6 @@
 import express from 'express';
 import { check } from 'express-validator';
-import { auth } from '../middleware/auth.js';
+import { auth, authAny } from '../middleware/auth.js';
 import { validate, verifyInputUpdateParameters } from '../middleware/validators.js';
 import { verifyOwnership, sortBy } from '../helpers/index.js';
 import { ActionTypes, RouterTypes } from '../models/permission.js';
@@ -26,7 +26,7 @@ router.post('/domain/create', auth, verifyInputUpdateParameters(['name', 'descri
 
 // GET /domain?limit=10&skip=20
 // GET /domain?sortBy=createdAt:desc
-router.get('/domain', auth, async (req, res) => {
+router.get('/domain', authAny, async (req, res) => {
     await req.admin.populate({
         path: 'domain',
         options: {
@@ -44,11 +44,11 @@ router.get('/domain', auth, async (req, res) => {
     res.send(req.admin.domain);
 });
 
-router.get('/domain/collaboration', auth, async (req, res) => {
+router.get('/domain/collaboration', authAny, async (req, res) => {
     await req.admin.populate({ path: 'team_list' });
 
     const domains = [];
-    for (const adm of req.admin.team_list) {
+    for await (const adm of req.admin.team_list) {
         domains.push(await Services.getDomainById(adm.domain.toString(), false, true));
     }
 
