@@ -98,6 +98,15 @@ Switcher API supports multiple auth providers such as email/password-based authe
 3. Enable SAML authentication in Switcher Management by setting the environment variable SAML_ENABLE=true
 
 * `service_provider` refers to Switcher API
+
+#### Dynamic OAuth clients (e.g. MCP server) consent screen
+
+OAuth clients created via `POST /oauth/register` (such as switcher-mcp-server) are redirected to a
+browser-based consent screen hosted by Switcher Management at `/oauth/consent`, rather than directly
+to this API. Set `SWITCHER_MANAGEMENT_URL` to your Switcher Management base URL so the
+`authorization_endpoint` advertised at `/.well-known/oauth-authorization-server` points there
+(if unset, it falls back to `SAML_REDIRECT_ENDPOINT_URL`, then to this API's own `/oauth/authorize`,
+which has no consent UI).
 * `web_app` refers to Switcher Management
 
 ### Running Switcher API from Docker Composer manifest file

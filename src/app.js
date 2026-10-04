@@ -20,6 +20,7 @@ import configStrategyRouter from './routers/config-strategy.js';
 import metricRouter from './routers/metric.js';
 import teamRouter from './routers/team.js';
 import permissionRouter from './routers/permission.js';
+import oauthRouter from './routers/oauth.js';
 import slackRouter from './routers/slack.js';
 import gitOpsRouter from './routers/gitops.js';
 import schema from './aggregator/schema.js';
@@ -67,6 +68,7 @@ app.use(configStrategyRouter);
 app.use(metricRouter);
 app.use(teamRouter);
 app.use(permissionRouter);
+app.use(oauthRouter);
 app.use(slackRouter);
 app.use(gitOpsRouter);
 

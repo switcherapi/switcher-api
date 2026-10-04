@@ -11,6 +11,7 @@ import pathPermission from './paths/path-permission.js';
 import pathMetric from './paths/path-metric.js';
 import pathSlack from './paths/path-slack.js';
 import pathGitOps from './paths/path-gitops.js';
+import pathOauth from './paths/path-oauth.js';
 
 import { commonSchema } from './schemas/common.js';
 import adminSchema from './schemas/admin.js';
@@ -25,6 +26,7 @@ import permissionSchema from './schemas/permission.js';
 import metricSchema from './schemas/metric.js';
 import slackSchema from './schemas/slack.js';
 import gitOpsSchema from './schemas/gitops.js';
+import oauthSchema from './schemas/oauth.js';
 import info from './swagger-info.js';
 
 export default {
@@ -71,7 +73,8 @@ export default {
             ...permissionSchema,
             ...metricSchema,
             ...slackSchema,
-            ...gitOpsSchema
+            ...gitOpsSchema,
+            ...oauthSchema
         }
     },
     paths: {
@@ -87,6 +90,7 @@ export default {
         ...pathPermission,
         ...pathMetric,
         ...pathSlack,
-        ...pathGitOps
+        ...pathGitOps,
+        ...pathOauth
     }
 };

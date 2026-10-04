@@ -15,6 +15,7 @@ import { Metric } from '../../src/models/metric';
 import { EnvType, Environment } from '../../src/models/environment';
 import { ConfigStrategy, StrategiesType, OperationsType } from '../../src/models/config-strategy';
 import { SlackTicket } from '../../src/models/slack_ticket';
+import { OAuthAuthorizationCode } from '../../src/models/oauth-authorization-code';
 import Slack from '../../src/models/slack';
 import { EncryptionSalts } from '../../src/models/common';
 
@@ -269,6 +270,7 @@ export const setupDatabase = async () => {
     await Team.deleteMany().exec();
     await TeamInvite.deleteMany().exec();
     await Permission.deleteMany().exec();
+    await OAuthAuthorizationCode.deleteMany().exec();
 
     adminMasterAccount.token = Admin.extractTokenPart(adminMasterAccountToken);
     await new Admin(adminMasterAccount).save();
