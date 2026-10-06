@@ -126,7 +126,7 @@ export async function createConfig(args, admin) {
 
     // creates config
     await config.save();
-    await updateDomainVersion(config.domain);
+    void updateDomainVersion(config.domain);
     
     // resets permission cache
     permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.group);
@@ -139,7 +139,7 @@ export async function deleteConfig(id, admin) {
     config = await verifyOwnership(admin, config, config.domain, ActionTypes.DELETE, RouterTypes.CONFIG);
 
     await config.deleteOne();
-    await updateDomainVersion(config.domain);
+    void updateDomainVersion(config.domain);
 
     // resets permission cache
     permissionCache.permissionReset(config.domain, ActionTypes.ALL, RouterTypes.CONFIG, config.group);
@@ -174,7 +174,7 @@ export async function updateConfig(id, args, admin) {
     updates.forEach((update) => config[update] = args[update]);
     
     await config.save();
-    await updateDomainVersion(config.domain);
+    void updateDomainVersion(config.domain);
 
     return config;
 }
@@ -228,7 +228,7 @@ export async function updateConfigRelay(id, args, admin) {
     }
     
     await config.save();
-    await updateDomainVersion(config.domain);
+    void updateDomainVersion(config.domain);
 
     return config;
 }
@@ -243,7 +243,7 @@ export async function updateConfigStatus(id, args, admin) {
     
     updates.forEach((update) => config.activated.set(update, args[update]));
     await config.save();
-    await updateDomainVersion(config.domain);
+    void updateDomainVersion(config.domain);
 
     return config;
 }
@@ -254,7 +254,7 @@ export async function removeConfigStatusEnv(id, env, admin) {
         RouterTypes.CONFIG, false, env);
     config.updatedBy = admin.email;
 
-    await updateDomainVersion(config.domain);
+    void updateDomainVersion(config.domain);
     return removeConfigStatus(config, env);
 }
 
@@ -291,7 +291,7 @@ export async function addComponent(id, args, admin) {
     config.updatedBy = admin.email;
     config.components.push(component._id);
     await config.save();
-    await updateDomainVersion(config.domain);
+    void updateDomainVersion(config.domain);
 
     return config;
 }
@@ -304,7 +304,7 @@ export async function removeComponent(id, args, admin) {
     const indexComponent = config.components.indexOf(args.component);
     config.components.splice(indexComponent, 1);
     await config.save();
-    await updateDomainVersion(config.domain);
+    void updateDomainVersion(config.domain);
 
     return config;
 }
@@ -320,7 +320,7 @@ export async function updateComponent(id, args, admin) {
     config.updatedBy = admin.email;
     config.components = args.components;
     await config.save();
-    await updateDomainVersion(config.domain);
+    void updateDomainVersion(config.domain);
 
     return config;
 }
@@ -342,7 +342,7 @@ export async function removeRelay(id, env, admin) {
         }
 
         await config.save();
-        await updateDomainVersion(config.domain);
+        void updateDomainVersion(config.domain);
     }
 
     return config;
