@@ -300,5 +300,5 @@ async function approveChange(domain, ticket) {
         await group.save();
     }
     
-    await updateDomainVersion(domain);
+    void updateDomainVersion(domain);
 }

@@ -70,7 +70,7 @@ export async function createStrategy(args, admin, status = true) {
         RouterTypes.STRATEGY, false, environment.name);
 
     await configStrategy.save();
-    await updateDomainVersion(configStrategy.domain);
+    void updateDomainVersion(configStrategy.domain);
 
     return configStrategy;
 }
@@ -81,7 +81,7 @@ export async function deleteStrategy(id, admin) {
         RouterTypes.STRATEGY, false, configStrategy.activated.keys().next().value);
     
     await configStrategy.deleteOne();
-    await updateDomainVersion(configStrategy.domain);
+    void updateDomainVersion(configStrategy.domain);
 
     // resets permission cache
     permissionCache.permissionReset(configStrategy.domain, ActionTypes.ALL, RouterTypes.STRATEGY, configStrategy.name);
@@ -98,7 +98,7 @@ export async function updateStrategy(id, args, admin) {
     const updates = Object.keys(args);
     updates.forEach((update) => configStrategy[update] = args[update]);
     await configStrategy.save();
-    await updateDomainVersion(configStrategy.domain);
+    void updateDomainVersion(configStrategy.domain);
 
     return configStrategy;
 }
@@ -120,7 +120,7 @@ export async function addVal(id, args, admin) {
 
     configStrategy.values.push(value);
     await configStrategy.save();
-    await updateDomainVersion(configStrategy.domain);
+    void updateDomainVersion(configStrategy.domain);
 
     return configStrategy;
 }
@@ -154,7 +154,7 @@ export async function updateVal(id, args, admin) {
     configStrategy.values.splice(indexOldValue, 1);
     configStrategy.values.push(newvalue);
     await configStrategy.save();
-    await updateDomainVersion(configStrategy.domain);
+    void updateDomainVersion(configStrategy.domain);
 
     return configStrategy;
 }
@@ -175,7 +175,7 @@ export async function removeVal(id, args, admin) {
 
     configStrategy.values.splice(indexValue, 1);
     await configStrategy.save();
-    await updateDomainVersion(configStrategy.domain);
+    void updateDomainVersion(configStrategy.domain);
 
     return configStrategy;
 }
@@ -199,7 +199,7 @@ export async function updateStatusEnv(id, args, admin) {
     
     configStrategy.activated.set(updates[0], args[updates[0]]);
     await configStrategy.save();
-    await updateDomainVersion(configStrategy.domain);
+    void updateDomainVersion(configStrategy.domain);
 
     return configStrategy;
 }

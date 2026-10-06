@@ -69,7 +69,7 @@ export async function createGroup(args, admin) {
     groupconfig = await verifyOwnership(admin, groupconfig, domain._id, ActionTypes.CREATE, RouterTypes.GROUP);
 
     // creates group config
-    await updateDomainVersion(domain._id);
+    void updateDomainVersion(domain._id);
     await groupconfig.save();
     
     // resets permission cache
@@ -83,7 +83,7 @@ export async function deleteGroup(id, admin) {
     groupconfig = await verifyOwnership(admin, groupconfig, groupconfig.domain, ActionTypes.DELETE, RouterTypes.GROUP);
 
     await groupconfig.deleteOne();
-    await updateDomainVersion(groupconfig.domain);
+    void updateDomainVersion(groupconfig.domain);
 
     // resets permission cache
     permissionCache.permissionReset(groupconfig.domain, ActionTypes.ALL, RouterTypes.GROUP);
@@ -114,7 +114,7 @@ export async function updateGroup(id, args, admin) {
     updates.forEach((update) => groupconfig[update] = args[update]);
     groupconfig.name = formatInput(groupconfig.name, { allowSpace: true });
     await groupconfig.save();
-    await updateDomainVersion(groupconfig.domain);
+    void updateDomainVersion(groupconfig.domain);
 
     return groupconfig;
 }
@@ -129,7 +129,7 @@ export async function updateGroupStatusEnv(id, args, admin) {
     const updates = await checkEnvironmentStatusChange(args, groupconfig.domain);
     updates.forEach((update) => groupconfig.activated.set(update, args[update]));
     await groupconfig.save();
-    await updateDomainVersion(groupconfig.domain);
+    void updateDomainVersion(groupconfig.domain);
 
     return groupconfig;
 }
@@ -140,7 +140,7 @@ export async function removeGroupStatusEnv(id, env, admin) {
     groupconfig = await verifyOwnership(admin, groupconfig, groupconfig.domain, [ActionTypes.UPDATE, ActionTypes.UPDATE_ENV_STATUS],
         RouterTypes.GROUP, false, env);
     groupconfig.updatedBy = admin.email;
-    await updateDomainVersion(groupconfig.domain);
+    void updateDomainVersion(groupconfig.domain);
     return removeGroupStatus(groupconfig, env);
 }
 
