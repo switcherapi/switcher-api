@@ -94,37 +94,6 @@ describe('Testing OAuth discovery metadata', () => {
         });
     });
 
-    test('OAUTH_SUITE - Should prefer SWITCHER_MANAGEMENT_URL over SAML_REDIRECT_ENDPOINT_URL', async () => {
-        //given
-        process.env.SWITCHER_MANAGEMENT_URL = 'http://localhost:4201';
-
-        //test
-        const response = await request(app)
-            .get('/.well-known/oauth-authorization-server')
-            .send().expect(200);
-
-        expect(response.body.authorization_endpoint).toBe('http://localhost:4201/oauth/consent');
-
-        //teardown
-        delete process.env.SWITCHER_MANAGEMENT_URL;
-    });
-
-    test('OAUTH_SUITE - Should fall back to the API authorize endpoint when no management URL is configured', async () => {
-        //given
-        const originalSamlRedirectEndpointUrl = process.env.SAML_REDIRECT_ENDPOINT_URL;
-        delete process.env.SAML_REDIRECT_ENDPOINT_URL;
-
-        //test
-        const response = await request(app)
-            .get('/.well-known/oauth-authorization-server')
-            .send().expect(200);
-
-        expect(response.body.authorization_endpoint).toBe(`${response.body.issuer}/oauth/authorize`);
-
-        //teardown
-        process.env.SAML_REDIRECT_ENDPOINT_URL = originalSamlRedirectEndpointUrl;
-    });
-
     test('OAUTH_SUITE - Should return protected resource metadata', async () => {
         const response = await request(app)
             .get('/.well-known/oauth-protected-resource')

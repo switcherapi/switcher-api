@@ -8,14 +8,11 @@ import * as Services from '../services/oauth.js';
 const router = new express.Router();
 
 function getBaseUrl(req) {
-    return (process.env.SWITCHER_API_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '');
+    return (process.env.OAUTH_ISSUER_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '');
 }
 
 function getManagementBaseUrl() {
-    // SAML_REDIRECT_ENDPOINT_URL already points at switcher-management for browser redirects
-    // (see admin-saml.js); reuse it as a fallback so existing deployments keep working.
-    const managementUrl = process.env.SWITCHER_MANAGEMENT_URL || process.env.SAML_REDIRECT_ENDPOINT_URL;
-    return managementUrl ? managementUrl.replace(/\/$/, '') : undefined;
+    return process.env.OAUTH_CONSENT_URL;
 }
 
 function buildMetadata(req) {
@@ -24,10 +21,6 @@ function buildMetadata(req) {
 
     return {
         issuer,
-        // The authorization endpoint must be a human-facing consent screen. switcher-api's own
-        // /oauth/authorize has no UI and requires an existing session, so this points at
-        // switcher-management's consent page, which collects user consent and then calls
-        // /oauth/authorize on this API with the result.
         authorization_endpoint: managementBaseUrl ? `${managementBaseUrl}/oauth/consent` : `${issuer}/oauth/authorize`,
         token_endpoint: `${issuer}/oauth/token`,
         registration_endpoint: `${issuer}/oauth/register`,
@@ -51,10 +44,6 @@ function getAuthorizeErrorRedirectUri(redirectUri, error, state) {
 }
 
 function wantsJsonRedirect(req) {
-    // switcher-management's consent screen calls this endpoint via an authenticated
-    // XHR/fetch (so it can attach the admin's session Authorization header, which a
-    // top-level browser navigation cannot do) and explicitly asks for JSON so it can
-    // perform the final top-level navigation to the client's redirect_uri itself.
     return req.headers.accept === 'application/json';
 }
 

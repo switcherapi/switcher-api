@@ -130,6 +130,7 @@ app.get('/check', defaultLimiter, (req, res) => {
             max_rpm: process.env.MAX_REQUEST_PER_MINUTE || DEFAULT_RATE_LIMIT,
             auth_providers: {
                 saml: isSamlAvailable(),
+                oauth: isOauthAvailable(),
                 github: isOauthAvailableFor('GIT_OAUTH_CLIENT_ID', 'GIT_OAUTH_SECRET'),
                 bitbucket: isOauthAvailableFor('BITBUCKET_OAUTH_CLIENT_ID', 'BITBUCKET_OAUTH_SECRET'),
             }
@@ -143,6 +144,11 @@ function isSamlAvailable() {
     return (process.env.SAML_ENTRY_POINT && 
         process.env.SAML_CALLBACK_ENDPOINT_URL && 
         process.env.SAML_CERT)?.length > 0;
+}
+
+function isOauthAvailable() {
+    return (process.env.OAUTH_CONSENT_URL && 
+        process.env.OAUTH_ISSUER_URL)?.length > 0;
 }
 
 function isOauthAvailableFor(clientId, secret) {
