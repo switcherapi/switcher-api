@@ -12,7 +12,7 @@ RUN npm ci
 
 COPY ./src ./src
 
-RUN npm prune --production
+RUN npm prune --omit=dev --legacy-peer-deps
 
 # ---------- Release ----------
 FROM base AS release
