@@ -63,7 +63,7 @@ export async function deleteMetrics(req) {
     }
 
     config = await verifyOwnership(req.admin, config, config.domain, ActionTypes.DELETE, RouterTypes.ADMIN);
-    await Metric.deleteMany({ domain: config.domain, config: config._id }).exec();
+    await Metric.deleteMany({ domain: config.domain, config: config._id.toString() }).exec();
 }
 
 async function aggreagateReasons(aggregate, result) {
@@ -178,7 +178,7 @@ function buildMetricsFilter(req) {
     let aggregate = Metric.aggregate();
     let args = {};
 
-    args.domain = req.query.domainid;
+    args.domain = req.query.domainid.toString();
     aggregate.match({ $expr: { $eq: [{ $toString: '$domain' }, args.domain] } });
 
     if (req.query.environment) {
