@@ -105,14 +105,15 @@ export async function updateAccount(args, admin) {
 }
 
 export async function leaveDomain(domainid, admin) {
-    const teams = await getTeams({ domain: domainid, members: admin.id });
+    const adminId = admin.id.toString();
+    const teams = await getTeams({ domain: domainid, members: adminId });
 
     if (!teams.length) {
         throw new NotFoundError('No team found for this given domain id');
     }
     
     for (const admin_team of teams) {
-        let indexMmeber = admin_team.members.indexOf(admin.id);
+        let indexMmeber = admin_team.members.indexOf(adminId);
         admin_team.members.splice(indexMmeber, 1);
 
         let indexTeam = admin.teams.indexOf(admin_team._id);

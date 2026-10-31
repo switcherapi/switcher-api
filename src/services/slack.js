@@ -61,7 +61,7 @@ async function deleteSlackTicketsBySlackId(slackId) {
 async function hasSlackTicket(slack, ticket_content) {
     const tickets = await SlackTicket.find({ 
         slack: slack._id.toString(),
-        domain: slack.domain,
+        domain: slack.domain.toString(),
         environment: ticket_content.environment,
         group: ticket_content.group,
         switcher: ticket_content.switcher,

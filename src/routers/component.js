@@ -38,7 +38,7 @@ router.get('/component', auth, [
     query('domain', 'Please, specify the \'domain\' id').isMongoId()
 ], validate, async (req, res) => {
     try {
-        let components = await Services.getComponents({ domain: req.query.domain },
+        let components = await Services.getComponents({ domain: req.query.domain.toString() },
             ['_id', 'name', 'description'],
             {
                 skip: Number.parseInt(req.query.skip || 0),
