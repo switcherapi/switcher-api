@@ -12,7 +12,7 @@ export async function getData(req, page) {
     if (req.query.key) { 
         const config = await getConfig({ domain: req.query.domainid, key: req.query.key });
         if (!config) return undefined;
-        args.config = config._id;
+        args.config = config._id.toString();
     }
 
     const skip = Number.parseInt((process.env.METRICS_MAX_PAGE * Number.parseInt(page)) - process.env.METRICS_MAX_PAGE);
@@ -57,7 +57,7 @@ export async function getStatistics(req) {
 }
 
 export async function deleteMetrics(req) {
-    let config = await getConfig({ domain: req.query.domainid, key: req.query.key });
+    let config = await getConfig({ domain: req.query.domainid.toString(), key: req.query.key.toString() });
     if (!config) {
         throw new NotFoundError('Switcher not found');
     }

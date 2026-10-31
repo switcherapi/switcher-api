@@ -30,7 +30,7 @@ export async function getConfigById(id, populateAdmin = false) {
 
 export async function getConfigByKey(key, domainName, environmentName, populateAdmin = false) {
     const formattedKey = formatInput(key, { toUpper: true, autoUnderscore: true });
-    const domain = await Domain.findOne({ name: domainName }).exec();
+    const domain = await Domain.findOne({ name: domainName.toString() }).exec();
 
     if (!domain) {
         throw new Error('Domain not found');
@@ -46,7 +46,7 @@ export async function getConfigByKey(key, domainName, environmentName, populateA
 
     let config = await Config.findOne({
         key: formattedKey,
-        domain: domain._id
+        domain: domain._id.toString()
     }).exec();
 
     if (!config) {
@@ -64,8 +64,8 @@ export async function getConfigByKey(key, domainName, environmentName, populateA
 export async function getConfig(where) {
     const query = Config.findOne();
 
-    query.where('key', where.key);
-    query.where('domain', where.domain);
+    query.where('key', where.key.toString());
+    query.where('domain', where.domain.toString());
 
     if (where.group) query.where('group', where.group);
     
@@ -75,11 +75,11 @@ export async function getConfig(where) {
 export async function getConfigs(where, lean = false) {
     const query = Config.find();
 
-    query.where('domain', where.domain);
+    query.where('domain', where.domain.toString());
     
-    if (where.id) query.where('_id', where.id);
-    if (where.key) query.where('key', where.key);
-    if (where.group) query.where('group', where.group);
+    if (where.id) query.where('_id', where.id.toString());
+    if (where.key) query.where('key', where.key.toString());
+    if (where.group) query.where('group', where.group.toString());
     if (lean) query.lean();
 
     return query.exec();
@@ -311,7 +311,8 @@ export async function removeComponent(id, args, admin) {
 
 export async function updateComponent(id, args, admin) {
     const config = await verifyAddComponentInput(id, admin);
-    const components = await getComponents({ _id: { $in: args.components } });
+    const componentIds = args.components.map(id => id.toString());
+    const components = await getComponents({ _id: { $in: componentIds } });
 
     if (components.length != args.components.length) {
         throw new NotFoundError('One or more component was not found');

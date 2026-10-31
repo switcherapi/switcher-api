@@ -128,8 +128,9 @@ export async function verifyOwnership(admin, element, domainId, actions, routerT
     }
     
     // Throw error if user has no teams
-    const teams = await getTeams({ _id: { $in: admin.teams }, domain: domain._id, active: true });
-    if (!teams.length || !admin.teams.length) {
+    const teamIds = admin.teams.map(id => id.toString()); 
+    const teams = await getTeams({ _id: { $in: teamIds }, domain: domain._id.toString(), active: true });
+    if (!teams.length || !teamIds.length) {
         throw new PermissionError('It was not possible to find any team that allows you to proceed with this operation');
     }
 

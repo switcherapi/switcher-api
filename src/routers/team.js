@@ -31,7 +31,7 @@ router.get('/team', auth, [
 ], validate, async (req, res) => {
     try {
         let teams = await Services.getTeamsSort(
-            { domain: req.query.domain }, null, 
+            { domain: req.query.domain.toString() }, null, 
             req.query.skip, req.query.limit, req.query.sort);
 
         teams = await verifyOwnership(req.admin, teams, req.query.domain, ActionTypes.READ, RouterTypes.ADMIN);

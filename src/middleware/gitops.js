@@ -22,7 +22,7 @@ const PATH_CONSTRAINTS_DELETED = {
     COMPONENT: 2
 };
 
-const CONTENT_TYPE_ARRAY = ['COMPONENT'];
+const CONTENT_TYPE = new Set(['COMPONENT']);
 
 export async function featureFlag(req, res, next) {
     try {
@@ -81,7 +81,7 @@ function validatePathForElement(changes) {
 
 function validateChangesContent(changes) {
     for (const change of changes) {
-        if (CONTENT_TYPE_ARRAY.includes(change.diff)) {
+        if (CONTENT_TYPE.has(change.diff)) {
             if (!Array.isArray(change.content)) {
                 throw new TypeError('Request has invalid content type [object]');
             }

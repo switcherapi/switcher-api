@@ -11,7 +11,7 @@ on:
 jobs:
   sonar-analysis:
     name: SonarCloud Analysis for PR
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Get PR details
@@ -41,7 +41,7 @@ jobs:
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.12.1
         with:
-          mongodb-version: 8.0
+          mongodb-version: 9.0.4
 
       - name: Install dependencies
         run: npm ci
@@ -77,7 +77,7 @@ jobs:
           SWITCHER_API_LOGGER: false
 
       - name: SonarCloud Scan
-        uses: sonarsource/sonarqube-scan-action@v8.3.0
+        uses: sonarsource/sonarqube-scan-action@v8.4.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: env.SONAR_TOKEN != ''

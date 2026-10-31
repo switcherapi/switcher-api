@@ -7,7 +7,7 @@ export async function getHistory(query, domainId, elementId, pagingArgs = {}) {
         throw new BadRequestError('Invalid paging args');
     }
 
-    return History.find({ domainId, elementId })
+    return History.find({ domainId: domainId.toString(), elementId: elementId.toString() })
             .select(query)
             .sort(sortBy(pagingArgs))
             .limit(Number.parseInt(pagingArgs.limit || 10))
@@ -16,5 +16,5 @@ export async function getHistory(query, domainId, elementId, pagingArgs = {}) {
 }
 
 export async function deleteHistory(domainId, elementId) {
-    await History.deleteMany({ domainId, elementId }).exec();
+    await History.deleteMany({ domainId: domainId.toString(), elementId: elementId.toString() }).exec();
 }
