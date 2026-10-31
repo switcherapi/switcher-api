@@ -100,7 +100,7 @@ function buildRegistrationResponse(client) {
 }
 
 async function getClient(client_id) {
-    const client = await OAuthClient.findOne({ client_id }).exec();
+    const client = await OAuthClient.findOne({ client_id: client_id.toString() }).exec();
 
     if (!client) {
         throw new Error('Invalid client_id');
@@ -223,8 +223,8 @@ export async function exchangeAuthorizationCode({
     }
 
     const authorizationCode = await OAuthAuthorizationCode.findOne({
-        code,
-        client_id
+        code: code.toString(),
+        client_id: client_id.toString()
     }).exec();
 
     if (!authorizationCode || authorizationCode.used) {
@@ -270,8 +270,8 @@ export async function refreshAccessToken({
     await getClient(client_id);
 
     const token = await OAuthToken.findOne({
-        client_id,
-        refresh_token,
+        client_id: client_id.toString(),
+        refresh_token: refresh_token.toString(),
         revoked: false
     }).exec();
 

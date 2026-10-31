@@ -55,24 +55,24 @@ async function deleteSlackInstallation(slack) {
 }
 
 async function deleteSlackTicketsBySlackId(slackId) {
-    return SlackTicket.deleteMany({ slack: slackId });
+    return SlackTicket.deleteMany({ slack: slackId.toString() });
 }
 
 async function hasSlackTicket(slack, ticket_content) {
     const tickets = await SlackTicket.find({ 
-        slack: slack._id,
+        slack: slack._id.toString(),
         domain: slack.domain,
         environment: ticket_content.environment,
         group: ticket_content.group,
         switcher: ticket_content.switcher,
-        status: ticket_content.status,
+        status: ticket_content.status.toString(),
     });
     
     return tickets;
 }
 
 export async function getDomainsByTeamId(team_id) {
-    const slacks = await Slack.find({ team_id });
+    const slacks = await Slack.find({ team_id: team_id.toString() });
     
     if (!slacks.length) {
         throw new NotFoundError('Slack installation not found');

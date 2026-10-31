@@ -68,7 +68,7 @@ export async function createDomain(args, admin) {
 export async function deleteDomainHistory(id, admin) {
     const domain = await getDomainById(id);
     await verifyOwnership(admin, domain, domain._id, ActionTypes.DELETE, RouterTypes.ADMIN);
-    await History.deleteMany({ elementId: domain._id }).exec();
+    await History.deleteMany({ elementId: domain._id.toString() }).exec();
     return domain;
 }
 
