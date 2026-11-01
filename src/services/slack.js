@@ -62,9 +62,9 @@ async function hasSlackTicket(slack, ticket_content) {
     const tickets = await SlackTicket.find({ 
         slack: slack._id.toString(),
         domain: slack.domain.toString(),
-        environment: ticket_content.environment,
-        group: ticket_content.group,
-        switcher: ticket_content.switcher,
+        environment: ticket_content.environment.toString(),
+        group: ticket_content.group.toString(),
+        switcher: ticket_content.switcher?.toString(),
         status: ticket_content.status.toString(),
     });
     
