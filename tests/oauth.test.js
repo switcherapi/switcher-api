@@ -209,6 +209,47 @@ describe('Testing OAuth Dynamic Client Registration', () => {
     });
 });
 
+describe('Testing OAuth redirect host allow-list', () => {
+    beforeAll(setupDatabase);
+
+    afterEach(() => {
+        delete process.env.OAUTH_ALLOWED_REDIRECT_HOSTS;
+    });
+
+    test('OAUTH_SUITE - Should NOT register a client - host not allowed', async () => {
+        process.env.OAUTH_ALLOWED_REDIRECT_HOSTS = 'claude.ai';
+
+        await request(app)
+            .post('/oauth/register')
+            .send({ redirect_uris: ['https://evil.example.com/callback'] })
+            .expect(400);
+    });
+
+    test('OAUTH_SUITE - Should register a client - allowed host and loopback', async () => {
+        process.env.OAUTH_ALLOWED_REDIRECT_HOSTS = ' Claude.ai ,vscode.dev';
+
+        await registerClient({ redirect_uris: ['https://claude.ai/callback', REDIRECT_URI] });
+    });
+
+    test('OAUTH_SUITE - Should NOT authorize - registered host no longer allowed', async () => {
+        const client = await registerClient({ redirect_uris: ['https://legacy.example.com/callback'] });
+        process.env.OAUTH_ALLOWED_REDIRECT_HOSTS = 'claude.ai';
+
+        await request(app)
+            .get('/oauth/authorize')
+            .query({
+                response_type: 'code',
+                client_id: client.client_id,
+                redirect_uri: 'https://legacy.example.com/callback',
+                code_challenge: 'challenge',
+                code_challenge_method: 'S256',
+                consent: 'true'
+            })
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send().expect(400);
+    });
+});
+
 describe('Testing OAuth Authorization Code flow', () => {
     let clientId;
 
