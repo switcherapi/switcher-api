@@ -160,6 +160,7 @@ export async function resolveFlatDomain(_source, context) {
 }
 
 export async function resolveComponents(source) {
-    const components = await getComponents({ _id: { $in: source.components } });
+    const componentIds = source.components.map(component => component._id.toString());
+    const components = await getComponents({ _id: { $in: componentIds } });
     return components.length ? components.map(component => component.name) : [];
 }
