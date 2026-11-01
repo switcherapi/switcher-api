@@ -37,6 +37,15 @@ function validateSupportedValues(values, supportedValues, field) {
     }
 }
 
+function isAllowedRedirectHost(hostname) {
+    const allowedHosts = (process.env.OAUTH_ALLOWED_REDIRECT_HOSTS || '')
+        .split(',')
+        .map((host) => host.trim().toLowerCase())
+        .filter(Boolean);
+
+    return !allowedHosts.length || allowedHosts.includes(hostname.toLowerCase());
+}
+
 function normalizeRedirectUri(redirectUri) {
     let url;
 
@@ -54,6 +63,10 @@ function normalizeRedirectUri(redirectUri) {
     const isHttps = url.protocol === 'https:';
 
     if (!isLoopback && !isHttps) {
+        throw new Error('Invalid redirect_uri');
+    }
+
+    if (!isLoopback && !isAllowedRedirectHost(url.hostname)) {
         throw new Error('Invalid redirect_uri');
     }
 

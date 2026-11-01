@@ -108,6 +108,11 @@ to this API. Set `OAUTH_CONSENT_URL` to your Switcher Management public URL so t
 `authorization_endpoint` advertised at `/.well-known/oauth-authorization-server` points there and
 `OAUTH_ISSUER_URL` to the public URL of your Switcher API.
 
+Optionally, set `OAUTH_ALLOWED_REDIRECT_HOSTS` to a comma-separated list of hostnames (e.g.
+`claude.ai,vscode.dev`) to restrict the https `redirect_uri` hosts accepted by `/oauth/register`,
+`/oauth/authorize` and `/oauth/token`. These are the hosts of the OAuth clients' callbacks.
+Loopback callbacks (`127.0.0.1`/`localhost`) are always allowed. When unset, any https host is accepted.
+
 ### Running Switcher API from Docker Composer manifest file
 
 This option leverages Switcher API and Switcher Management with minimum settings required.
