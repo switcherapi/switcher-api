@@ -18,10 +18,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Use Node.js 24.x
+      - name: Use Node.js 26.x
         uses: actions/setup-node@v7
         with:
-          node-version: 24.x
+          node-version: 26.x
 
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.12.1
@@ -62,7 +62,7 @@ jobs:
           SWITCHER_API_LOGGER: false
 
       - name: SonarCloud Scan
-        uses: sonarsource/sonarqube-scan-action@v8.4.0
+        uses: sonarsource/sonarqube-scan-action@v8.4.1
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: env.SONAR_TOKEN != ''

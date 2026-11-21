@@ -15,10 +15,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Use Node.js 24.x
+      - name: Use Node.js 26.x
         uses: actions/setup-node@v7
         with:
-          node-version: 24.x
+          node-version: 26.x
 
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.12.1
@@ -69,7 +69,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: trackerforce/switcher-api
       

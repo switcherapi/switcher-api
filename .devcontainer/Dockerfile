@@ -1,4 +1,4 @@
-FROM node:24-alpine
+FROM node:26-alpine
 
 ARG USERNAME=node
 ARG USER_UID=1000
