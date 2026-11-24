@@ -77,7 +77,7 @@ jobs:
           SWITCHER_API_LOGGER: false
 
       - name: SonarCloud Scan
-        uses: sonarsource/sonarqube-scan-action@v8.4.1
+        uses: sonarsource/sonarqube-scan-action@v8.5.1
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         if: env.SONAR_TOKEN != ''

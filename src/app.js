@@ -24,7 +24,7 @@ import oauthRouter from './routers/oauth.js';
 import slackRouter from './routers/slack.js';
 import gitOpsRouter from './routers/gitops.js';
 import schema from './aggregator/schema.js';
-import { auth, resourcesAuth, slackAuth, gitopsAuth } from './middleware/auth.js';
+import { authAny, restrictOAuthGraphQL, resourcesAuth, slackAuth, gitopsAuth } from './middleware/auth.js';
 import { DEFAULT_RATE_LIMIT, defaultLimiter } from './middleware/limiter.js';
 import { createServer } from './app-server.js';
 
@@ -88,7 +88,7 @@ const handler = (req, res, next) =>
     createHandler({ schema, context: req })(req, res, next);
 
 // Admin: Aggregator API
-app.use('/adm-graphql', auth, defaultLimiter, handler);
+app.use('/adm-graphql', authAny, restrictOAuthGraphQL(['configuration']), defaultLimiter, handler);
 // Slack: Aggregator API
 app.use('/slack-graphql', slackAuth, handler);
 // GitOps: Aggregator API

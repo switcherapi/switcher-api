@@ -813,6 +813,54 @@ describe('Testing protected resource access using an OAuth access token', () => 
         expect(response.body.enabled).toEqual(true);
     });
 
+    test('OAUTH_SUITE - Should query configuration on /adm-graphql using an OAuth access token', async () => {
+        const response = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${accessToken}`)
+            .send({ query: `{ configuration(domain: "${domainId}", key: "${config1Document.key}", environment: "default") { config { key } } }` })
+            .expect(200);
+
+        expect(response.body.errors).toBeUndefined();
+        expect(response.body.data.configuration.config[0].key).toEqual(config1Document.key);
+    });
+
+    test('OAUTH_SUITE - Should NOT run other GraphQL operations using an OAuth access token', async () => {
+        const queries = [
+            `{ domain(_id: "${domainId}") { name } }`,
+            '{ __schema { types { name } } }',
+            `{ configuration(domain: "${domainId}") { domain { name } } domain(_id: "${domainId}") { name } }`,
+            `query { ...F } fragment F on Query { domain(_id: "${domainId}") { name } }`,
+            'mutation { foo }',
+            'not a query'
+        ];
+
+        for (const query of queries) {
+            await request(app)
+                .post('/adm-graphql')
+                .set('Authorization', `Bearer ${accessToken}`)
+                .send({ query })
+                .expect(403);
+        }
+    });
+
+    test('OAUTH_SUITE - Should keep any query available for session JWT on /adm-graphql', async () => {
+        const response = await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', `Bearer ${adminMasterAccountToken}`)
+            .send({ query: `{ domain(_id: "${domainId}") { name } }` })
+            .expect(200);
+
+        expect(response.body.data.domain.name).toEqual('Domain');
+    });
+
+    test('OAUTH_SUITE - Should NOT access /adm-graphql with an invalid token', async () => {
+        await request(app)
+            .post('/adm-graphql')
+            .set('Authorization', 'Bearer invalid-access-token')
+            .send({ query: '{ configuration(domain: "x") { domain { name } } }' })
+            .expect(401);
+    });
+
     test('OAUTH_SUITE - Should NOT access protected resources with an invalid access token', async () => {
         const response = await request(app)
             .get('/domain')
