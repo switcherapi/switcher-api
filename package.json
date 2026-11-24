@@ -52,7 +52,7 @@
     "jsonwebtoken": "^9.0.3",
     "moment": "^2.31.0",
     "mongodb": "^7.9.1",
-    "mongoose": "^9.12.3",
+    "mongoose": "^9.13.0",
     "passport": "^0.7.0",
     "@node-saml/passport-saml": "^5.1.1",
     "pino": "^10.4.0",

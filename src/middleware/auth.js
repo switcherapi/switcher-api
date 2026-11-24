@@ -1,5 +1,6 @@
 import basicAuth from 'express-basic-auth';
 import jwt from 'jsonwebtoken';
+import { parse, Kind } from 'graphql';
 import { getAdmin, getAdminById } from '../services/admin.js';
 import { validateAccessToken } from '../services/oauth.js';
 import Admin from '../models/admin.js';
@@ -74,7 +75,8 @@ export async function auth(req, res, next) {
  * Use `authAny` only for routes that must be reachable by both
  * switcher-management (JWT) **and** MCP/OAuth clients - as of this
  * writing: `GET /domain`, `GET /domain/collaboration`, `GET /environment`,
- * and `GET /config/key/:key`. Don't default new routes to `authAny`;
+ * `GET /config/key/:key`, and `/adm-graphql` (OAuth tokens limited to the
+ * `configuration` query via `restrictOAuthGraphQL`). Don't default new routes to `authAny`;
  * keep using plain `auth` unless the route is a deliberate MCP tool
  * target (see `docs/copilot/switcher-mcp/MCP_DEVELOPMENT.md`).
  */
@@ -91,6 +93,7 @@ export async function authAny(req, res, next) {
 
                 req.token = token;
                 req.admin = admin;
+                req.isOAuth = strategy === validateAccessToken;
                 return next();
             } catch (err) {
                 if (err.name === 'TokenExpiredError') {
@@ -103,6 +106,41 @@ export async function authAny(req, res, next) {
     } catch (err) {
         responseExceptionSilent(res, err, 401, 'Please authenticate.');
     }
+}
+
+/**
+ * Restricts MCP/OAuth tokens (see `authAny`) to a set of top-level GraphQL
+ * query fields. Session JWTs are not restricted.
+ *
+ * OAuth requests are denied (403) unless the document is a single-operation
+ * `query` whose top-level selections are all plain fields listed in
+ * `allowedFields` (no mutations, introspection, or top-level fragments).
+ */
+export function restrictOAuthGraphQL(allowedFields) {
+    return (req, res, next) => {
+        if (!req.isOAuth) {
+            return next();
+        }
+
+        try {
+            const source = req.body?.query ?? req.query?.query;
+            const document = parse(String(source));
+            const operations = document.definitions.filter(d => d.kind === Kind.OPERATION_DEFINITION);
+
+            const allowed = operations.length === 1 &&
+                operations[0].operation === 'query' &&
+                operations[0].selectionSet.selections.every(s =>
+                    s.kind === Kind.FIELD && allowedFields.includes(s.name.value));
+
+            if (allowed) {
+                return next();
+            }
+        } catch {
+            // unparsable documents are denied below
+        }
+
+        return res.status(403).send({ error: 'Operation not allowed for this token.' });
+    };
 }
 
 export async function authRefreshToken(req, res, next) {
