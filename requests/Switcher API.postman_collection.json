@@ -6084,7 +6084,7 @@
                   "mode": "graphql",
                   "graphql": {
                     "query": "query Permission(\r\n    $domain: String!, $actions: [String]!, $router: String!, \r\n    $parent: String, $environment: String) {\r\n    permission(\r\n        domain: $domain, \r\n        parent: $parent, \r\n        actions: $actions,\r\n        router: $router,\r\n        environment: $environment\r\n    ) {\r\n        id\r\n        name\r\n        permissions {\r\n            action\r\n            result\r\n        }\r\n    }\r\n}",
-                    "variables": "{\r\n    \"domain\": \"{{domainid}}\",\r\n    \"parent\": \"{{groupid}}\",\r\n    \"actions\": [\"READ\", \"UPDATE\", \"DELETE\"],\r\n    \"router\": \"SWITCHER\",\r\n    \"environment\": \"\"\r\n}"
+                    "variables": "{\r\n    \"domain\": \"{{domainid}}\",\r\n    \"parent\": \"{{groupid}}\",\r\n    \"actions\": [\"UPDATE\", \"UPDATE_ENV_STATUS\", \"DELETE\"],\r\n    \"router\": \"SWITCHER\",\r\n    \"environment\": \"{{env_name}}\"\r\n}"
                   }
                 },
                 "url": {
@@ -6100,7 +6100,7 @@
               "response": []
             },
             {
-              "name": "Permission - By Router Grroup",
+              "name": "Permission - By Router Group",
               "request": {
                 "method": "POST",
                 "header": [],
