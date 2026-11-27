@@ -1,4 +1,4 @@
-import { pathParameter, queryParameter } from '../schemas/common.js';
+import { queryParameter } from '../schemas/common.js';
 import { commonSchemaContent } from './common.js';
 
 export default {
@@ -74,24 +74,6 @@ export default {
                 200: {
                     description: 'Protected resource metadata',
                     content: commonSchemaContent('OAuthProtectedResourceMetadata')
-                }
-            }
-        }
-    },
-    '/config/key/{key}': {
-        get: {
-            tags: ['Config'],
-            description: 'Get Config by key and domain name',
-            security: [{ bearerAuth: [] }],
-            parameters: [
-                pathParameter('key', 'Config key', true),
-                queryParameter('domain', 'Domain name', true),
-                queryParameter('environment', 'Environment name', false)
-            ],
-            responses: {
-                200: {
-                    description: 'Config',
-                    content: commonSchemaContent('ConfigByKeyResponse')
                 }
             }
         }

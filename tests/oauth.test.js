@@ -803,16 +803,6 @@ describe('Testing protected resource access using an OAuth access token', () => 
         expect(response.body.length).toBeGreaterThan(0);
     });
 
-    test('OAUTH_SUITE - Should get a Config by key using an OAuth access token', async () => {
-        const response = await request(app)
-            .get(`/config/key/${config1Document.key}?domain=Domain`)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .send().expect(200);
-
-        expect(response.body.key).toEqual(config1Document.key);
-        expect(response.body.enabled).toEqual(true);
-    });
-
     test('OAUTH_SUITE - Should query configuration on /adm-graphql using an OAuth access token', async () => {
         const response = await request(app)
             .post('/adm-graphql')

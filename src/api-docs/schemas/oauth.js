@@ -1,4 +1,3 @@
-import { config } from './config.js';
 
 const oauthMetadata = {
     type: 'object',
@@ -183,27 +182,6 @@ export default {
                 }
             },
             ...oauthMetadata.properties
-        }
-    },
-    ConfigByKeyResponse: {
-        ...config({
-            type: 'array',
-            description: 'The component IDs that can use the Swichter',
-            items: {
-                type: 'string'
-            }
-        }),
-        properties: {
-            ...config({
-                type: 'array',
-                description: 'The component IDs that can use the Swichter',
-                items: {
-                    type: 'string'
-                }
-            }).properties,
-            enabled: {
-                type: 'boolean'
-            }
         }
     }
 };
