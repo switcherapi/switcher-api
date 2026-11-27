@@ -6052,6 +6052,30 @@
               "response": []
             },
             {
+              "name": "Configuration - MCP",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "graphql",
+                  "graphql": {
+                    "query": "query Configuration(\r\n    $domain: String!, \r\n    $group: String,\r\n    $key: String,\r\n    $environment: String) {\r\n    configuration(domain: $domain, group: $group, key: $key, environment: $environment) {\r\n        domain {\r\n            id: _id\r\n            version\r\n            name\r\n            activated\r\n        }\r\n        group {\r\n            _id\r\n            name\r\n            activated\r\n        }\r\n        config {\r\n            _id\r\n            key\r\n            activated\r\n            components\r\n            relay {\r\n                type\r\n                method\r\n                endpoint\r\n                description\r\n                activated\r\n            }\r\n        }\r\n        strategies {\r\n            description\r\n            strategy\r\n            operation\r\n            values\r\n            activated\r\n        }\r\n    }\r\n}",
+                    "variables": "{\r\n    \"domain\": \"{{doaminid}}\",\r\n    \"key\": \"{{switcher_key}}\",\r\n    // \"group\": \"{{group}}\",\r\n    \"environment\": \"{{environment}}\"\r\n}"
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}/adm-graphql",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "path": [
+                    "adm-graphql"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
               "name": "Permission - By Router Switcher",
               "request": {
                 "method": "POST",
