@@ -71,14 +71,6 @@ export async function auth(req, res, next) {
  * falling through to the other strategy. If neither strategy succeeds
  * (and it wasn't an expiry), the request fails with a generic 401
  * `Please authenticate.`.
- *
- * Use `authAny` only for routes that must be reachable by both
- * switcher-management (JWT) **and** MCP/OAuth clients - as of this
- * writing: `GET /domain`, `GET /domain/collaboration`, `GET /environment`,
- * `GET /config/key/:key`, and `/adm-graphql` (OAuth tokens limited to the
- * `configuration` query via `restrictOAuthGraphQL`). Don't default new routes to `authAny`;
- * keep using plain `auth` unless the route is a deliberate MCP tool
- * target (see `docs/copilot/switcher-mcp/MCP_DEVELOPMENT.md`).
  */
 export async function authAny(req, res, next) {
     const token = getBearerToken(req);
